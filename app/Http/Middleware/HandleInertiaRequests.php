@@ -45,6 +45,18 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'tenant' => app()->has('tenant') ? [
+                'id' => app('tenant')->id,
+                'name' => app('tenant')->name,
+                'slug' => app('tenant')->slug,
+                'settings' => app('tenant')->settings,
+            ] : null,
+            'tenants' => $request->user()?->tenants()->get()->map(fn($t) => [
+                'id' => $t->id,
+                'name' => $t->name,
+                'slug' => $t->slug,
+                'role' => $t->pivot->role,
+            ]),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

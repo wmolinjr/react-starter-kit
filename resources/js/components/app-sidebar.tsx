@@ -1,6 +1,7 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { TenantSwitcher } from '@/components/tenant-switcher';
 import {
     Sidebar,
     SidebarContent,
@@ -10,10 +11,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import tenants from '@/routes/tenants';
+import pages from '@/routes/pages';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Building2, FileText, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +24,16 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Pages',
+        href: pages.index(),
+        icon: FileText,
+    },
+    {
+        title: 'Workspaces',
+        href: tenants.index(),
+        icon: Building2,
     },
 ];
 
@@ -53,6 +66,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
+                <TenantSwitcher />
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
