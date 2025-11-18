@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia as HasMediaInterface;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Page extends Model
+class Page extends Model implements HasMediaInterface
 {
-    use BelongsToTenant, HasFactory;
+    use BelongsToTenant, HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'tenant_id',

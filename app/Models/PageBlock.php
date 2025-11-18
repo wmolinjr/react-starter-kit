@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia as HasMediaInterface;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class PageBlock extends Model
+class PageBlock extends Model implements HasMediaInterface
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'page_id',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageBlockController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\TenantController;
@@ -49,6 +50,17 @@ Route::domain('{subdomain}.' . config('app.domain'))
         Route::post('pages/{page}/blocks/{block}/move-down', [PageBlockController::class, 'moveDown'])->name('tenant.pages.blocks.move-down');
         Route::post('pages/{page}/blocks/{block}/duplicate', [PageBlockController::class, 'duplicate'])->name('tenant.pages.blocks.duplicate');
         Route::post('pages/{page}/blocks/reorder', [PageBlockController::class, 'reorder'])->name('tenant.pages.blocks.reorder');
+
+        // Media Library Routes (tenant-scoped)
+        Route::get('media', [MediaController::class, 'index'])->name('tenant.media.index');
+        Route::post('media', [MediaController::class, 'store'])->name('tenant.media.store');
+        Route::get('media/collections', [MediaController::class, 'collections'])->name('tenant.media.collections');
+        Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('tenant.media.bulk-delete');
+        Route::get('media/{media}', [MediaController::class, 'show'])->name('tenant.media.show');
+        Route::patch('media/{media}', [MediaController::class, 'update'])->name('tenant.media.update');
+        Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('tenant.media.destroy');
+        Route::get('media/{media}/download', [MediaController::class, 'download'])->name('tenant.media.download');
+        Route::get('media/{media}/url/{conversion?}', [MediaController::class, 'url'])->name('tenant.media.url');
     });
 
 /*
@@ -106,6 +118,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('pages/{page}/blocks/{block}/move-down', [PageBlockController::class, 'moveDown'])->name('pages.blocks.move-down');
     Route::post('pages/{page}/blocks/{block}/duplicate', [PageBlockController::class, 'duplicate'])->name('pages.blocks.duplicate');
     Route::post('pages/{page}/blocks/reorder', [PageBlockController::class, 'reorder'])->name('pages.blocks.reorder');
+
+    // Media Library Routes
+    Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    Route::post('media', [MediaController::class, 'store'])->name('media.store');
+    Route::get('media/collections', [MediaController::class, 'collections'])->name('media.collections');
+    Route::post('media/bulk-delete', [MediaController::class, 'bulkDelete'])->name('media.bulk-delete');
+    Route::get('media/{media}', [MediaController::class, 'show'])->name('media.show');
+    Route::patch('media/{media}', [MediaController::class, 'update'])->name('media.update');
+    Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+    Route::get('media/{media}/download', [MediaController::class, 'download'])->name('media.download');
+    Route::get('media/{media}/url/{conversion?}', [MediaController::class, 'url'])->name('media.url');
 });
 
 require __DIR__.'/settings.php';
