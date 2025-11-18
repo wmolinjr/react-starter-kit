@@ -68,7 +68,7 @@ class MediaController extends Controller
      * Upload a new media file.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -115,15 +115,17 @@ class MediaController extends Controller
                 ]);
             }
 
-            return response()->json([
-                'message' => 'Media uploaded successfully',
-                'data' => $media->fresh(),
-            ], 201);
+            // Return data via flash session for Inertia v2
+            return back()->with([
+                'flash' => [
+                    'data' => $media->fresh(),
+                    'message' => 'Media uploaded successfully',
+                ],
+            ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to upload media',
-                'error' => $e->getMessage(),
-            ], 500);
+            return back()->withErrors([
+                'upload' => 'Failed to upload media: '.$e->getMessage(),
+            ]);
         }
     }
 

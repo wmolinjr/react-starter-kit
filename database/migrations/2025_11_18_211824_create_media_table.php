@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->nullable()->constrained()->cascadeOnDelete();
             $table->index('tenant_id');
 
-            $table->morphs('model');
+            $table->nullableMorphs('model');
             $table->uuid()->nullable()->unique();
             $table->string('collection_name');
             $table->string('name');
