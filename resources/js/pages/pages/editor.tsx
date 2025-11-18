@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { BlockEditor } from '@/components/page-builder/block-editor';
 import AppLayout from '@/layouts/app-layout';
 import pagesRoutes from '@/routes/pages';
 import type { BreadcrumbItem, Page } from '@/types';
@@ -349,66 +350,7 @@ export default function PagesEditor({ page }: Props) {
 
                 {/* Content Blocks Tab */}
                 {activeTab === 'content' && (
-                    <div className="space-y-6">
-                        <div className="rounded-lg border border-dashed p-12 text-center">
-                            <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center">
-                                <FileText className="h-10 w-10 text-muted-foreground" />
-                                <h3 className="mt-4 text-lg font-semibold">
-                                    Block Editor Coming Soon
-                                </h3>
-                                <p className="mb-4 mt-2 text-sm text-muted-foreground">
-                                    The visual block editor is currently under development.
-                                    For now, you can view your {page.blocks.length} blocks in
-                                    the preview.
-                                </p>
-                                <Button variant="outline" asChild>
-                                    <a href={pagesRoutes.show({ page: page.id }).url}>
-                                        <Eye className="mr-2 h-4 w-4" />
-                                        Preview Page
-                                    </a>
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* List existing blocks */}
-                        {page.blocks.length > 0 && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Current Blocks</CardTitle>
-                                    <CardDescription>
-                                        Blocks on this page (editing coming soon)
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-2">
-                                        {page.blocks.map((block, index) => (
-                                            <div
-                                                key={block.id}
-                                                className="flex items-center justify-between rounded-lg border p-4"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-sm font-medium">
-                                                        {index + 1}
-                                                    </span>
-                                                    <div>
-                                                        <p className="font-medium capitalize">
-                                                            {block.block_type}
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Block #{block.id}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <Badge variant="secondary">
-                                                    Order: {block.order}
-                                                </Badge>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
+                    <BlockEditor pageId={page.id} blocks={page.blocks} />
                 )}
             </div>
         </AppLayout>

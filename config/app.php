@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Domain
+    |--------------------------------------------------------------------------
+    |
+    | This is the base domain for your application, used for subdomain-based
+    | multi-tenancy. For example, 'localhost' or 'myapp.com'.
+    | Tenants will be accessed via subdomains like 'cliente.localhost'
+    |
+    */
+
+    'domain' => env('APP_DOMAIN', 'localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

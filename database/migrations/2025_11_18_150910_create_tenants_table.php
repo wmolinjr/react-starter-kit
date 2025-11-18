@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('domain')->nullable()->unique();
+            $table->string('subdomain')->nullable()->unique()->comment('Subdomain for tenant (e.g., "cliente" for cliente.localhost)');
+            $table->string('domain')->nullable()->unique()->comment('Custom domain (e.g., "www.cliente.com")');
             $table->json('settings')->nullable();
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
             $table->timestamps();

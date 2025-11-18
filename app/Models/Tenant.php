@@ -15,6 +15,7 @@ class Tenant extends Model
     protected $fillable = [
         'name',
         'slug',
+        'subdomain',
         'domain',
         'settings',
         'status',
@@ -35,6 +36,11 @@ class Tenant extends Model
             if (empty($tenant->slug)) {
                 $tenant->slug = Str::slug($tenant->name);
             }
+
+            // Auto-generate subdomain from slug if not provided
+            if (empty($tenant->subdomain)) {
+                $tenant->subdomain = $tenant->slug;
+            }
         });
     }
 
@@ -46,6 +52,14 @@ class Tenant extends Model
         return $this->belongsToMany(User::class)
             ->withPivot('role')
             ->withTimestamps();
+    }
+
+    /**
+     * Get all pages that belong to this tenant.
+     */
+    public function pages(): HasMany
+    {
+        return $this->hasMany(Page::class);
     }
 
     /**
