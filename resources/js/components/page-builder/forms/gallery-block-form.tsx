@@ -9,11 +9,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import type { PageBlock } from '@/types';
-import { Plus, Trash2 } from 'lucide-react';
+import type { Media } from '@/types/media';
+import { MediaPicker } from '@/components/media/media-picker';
+import { LazyImage } from '@/components/media/lazy-image';
+import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface GalleryImage {
-    url: string;
+    media: Media;
     alt?: string;
     caption?: string;
 }
@@ -26,7 +29,7 @@ interface GalleryBlockFormProps {
 
 export function GalleryBlockForm({ block, onSave, onCancel }: GalleryBlockFormProps) {
     const [images, setImages] = useState<GalleryImage[]>(
-        block.content.images || [{ url: '', alt: '', caption: '' }]
+        block.content.images || []
     );
     const [columns, setColumns] = useState<string>(
         String(block.config?.columns || 3)
@@ -35,26 +38,39 @@ export function GalleryBlockForm({ block, onSave, onCancel }: GalleryBlockFormPr
         block.config?.gap || 'medium'
     );
 
-    const addImage = () => {
-        setImages([...images, { url: '', alt: '', caption: '' }]);
+    const handleMediaSelection = (media: Media | Media[] | null) => {
+        if (!media) return;
+
+        const mediaArray = Array.isArray(media) ? media : [media];
+        const newImages: GalleryImage[] = mediaArray.map((m) => ({
+            media: m,
+            alt: m.name,
+            caption: '',
+        }));
+
+        setImages([...images, ...newImages]);
     };
 
     const removeImage = (index: number) => {
         setImages(images.filter((_, i) => i !== index));
     };
 
-    const updateImage = (index: number, field: keyof GalleryImage, value: string) => {
+    const updateImageAlt = (index: number, alt: string) => {
         const newImages = [...images];
-        newImages[index] = { ...newImages[index], [field]: value };
+        newImages[index] = { ...newImages[index], alt };
+        setImages(newImages);
+    };
+
+    const updateImageCaption = (index: number, caption: string) => {
+        const newImages = [...images];
+        newImages[index] = { ...newImages[index], caption };
         setImages(newImages);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Filter out empty images
-        const validImages = images.filter(img => img.url.trim() !== '');
 
-        if (validImages.length === 0) {
+        if (images.length === 0) {
             alert('Please add at least one image');
             return;
         }
@@ -62,7 +78,12 @@ export function GalleryBlockForm({ block, onSave, onCancel }: GalleryBlockFormPr
         onSave({
             ...block,
             content: {
-                images: validImages,
+                images: images.map((img) => ({
+                    media_id: img.media.id,
+                    media: img.media,
+                    alt: img.alt || img.media.name,
+                    caption: img.caption,
+                })),
             },
             config: {
                 columns: parseInt(columns),
@@ -79,23 +100,27 @@ export function GalleryBlockForm({ block, onSave, onCancel }: GalleryBlockFormPr
                         Gallery Images
                         <span className="text-destructive">*</span>
                     </Label>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={addImage}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Image
-                    </Button>
+                    <MediaPicker
+                        collection="gallery-images"
+                        accept="image/*"
+                        multiple={true}
+                        value={null}
+                        onChange={handleMediaSelection}
+                        triggerLabel="Add Images"
+                        triggerVariant="outline"
+                    />
                 </div>
 
-                <div className="space-y-4">
-                    {images.map((image, index) => (
-                        <div key={index} className="rounded-lg border p-4 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">Image {index + 1}</span>
-                                {images.length > 1 && (
+                {images.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-8 border-2 border-dashed rounded-lg">
+                        No images selected. Click "Add Images" to get started.
+                    </p>
+                ) : (
+                    <div className="space-y-4">
+                        {images.map((image, index) => (
+                            <div key={index} className="rounded-lg border p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium">Image {index + 1}</span>
                                     <Button
                                         type="button"
                                         variant="ghost"
@@ -104,56 +129,51 @@ export function GalleryBlockForm({ block, onSave, onCancel }: GalleryBlockFormPr
                                     >
                                         <Trash2 className="h-4 w-4 text-destructive" />
                                     </Button>
-                                )}
-                            </div>
+                                </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor={`url-${index}`}>Image URL</Label>
-                                <Input
-                                    id={`url-${index}`}
-                                    type="url"
-                                    value={image.url}
-                                    onChange={(e) => updateImage(index, 'url', e.target.value)}
-                                    placeholder="https://example.com/image.jpg"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-2">
-                                    <Label htmlFor={`alt-${index}`}>Alt Text</Label>
-                                    <Input
-                                        id={`alt-${index}`}
-                                        type="text"
-                                        value={image.alt || ''}
-                                        onChange={(e) => updateImage(index, 'alt', e.target.value)}
-                                        placeholder="Image description"
+                                {/* Image Preview */}
+                                <div className="rounded border overflow-hidden">
+                                    <LazyImage
+                                        media={image.media}
+                                        conversion="medium"
+                                        alt={image.alt || image.media.name}
+                                        className="h-32 w-full"
+                                        objectFit="cover"
                                     />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor={`caption-${index}`}>Caption</Label>
-                                    <Input
-                                        id={`caption-${index}`}
-                                        type="text"
-                                        value={image.caption || ''}
-                                        onChange={(e) => updateImage(index, 'caption', e.target.value)}
-                                        placeholder="Optional caption"
-                                    />
+                                {/* Image Details */}
+                                <p className="text-xs text-muted-foreground">
+                                    {image.media.name} ({(image.media.size / 1024 / 1024).toFixed(2)} MB)
+                                </p>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-2">
+                                        <Label htmlFor={`alt-${index}`}>Alt Text</Label>
+                                        <Input
+                                            id={`alt-${index}`}
+                                            type="text"
+                                            value={image.alt || ''}
+                                            onChange={(e) => updateImageAlt(index, e.target.value)}
+                                            placeholder="Image description"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor={`caption-${index}`}>Caption</Label>
+                                        <Input
+                                            id={`caption-${index}`}
+                                            type="text"
+                                            value={image.caption || ''}
+                                            onChange={(e) => updateImageCaption(index, e.target.value)}
+                                            placeholder="Optional caption"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-
-                            {image.url && (
-                                <div className="rounded border p-2">
-                                    <img
-                                        src={image.url}
-                                        alt={image.alt || ''}
-                                        className="h-24 w-full rounded object-cover"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

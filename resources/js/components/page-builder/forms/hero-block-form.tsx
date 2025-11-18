@@ -10,7 +10,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import type { PageBlock } from '@/types';
+import type { Media } from '@/types/media';
+import { MediaPicker } from '@/components/media/media-picker';
+import { LazyImage } from '@/components/media/lazy-image';
 import { useState } from 'react';
+import { X } from 'lucide-react';
 
 interface HeroBlockFormProps {
     block: PageBlock;
@@ -23,7 +27,9 @@ export function HeroBlockForm({ block, onSave, onCancel }: HeroBlockFormProps) {
     const [subtitle, setSubtitle] = useState(block.content.subtitle || '');
     const [ctaText, setCtaText] = useState(block.content.cta_text || '');
     const [ctaUrl, setCtaUrl] = useState(block.content.cta_url || '');
-    const [imageUrl, setImageUrl] = useState(block.content.image_url || '');
+    const [backgroundMedia, setBackgroundMedia] = useState<Media | null>(
+        block.content.background_media || null
+    );
     const [alignment, setAlignment] = useState<string>(
         block.config?.alignment || 'center'
     );
@@ -43,7 +49,8 @@ export function HeroBlockForm({ block, onSave, onCancel }: HeroBlockFormProps) {
                 subtitle,
                 cta_text: ctaText,
                 cta_url: ctaUrl,
-                image_url: imageUrl,
+                background_media_id: backgroundMedia?.id,
+                background_media: backgroundMedia, // Store media object for preview
             },
             config: {
                 alignment,
@@ -105,15 +112,51 @@ export function HeroBlockForm({ block, onSave, onCancel }: HeroBlockFormProps) {
                 </div>
             </div>
 
+            {/* Background Image */}
             <div className="space-y-2">
-                <Label htmlFor="image_url">Background/Hero Image URL</Label>
-                <Input
-                    id="image_url"
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://example.com/hero.jpg"
-                />
+                <Label>Background/Hero Image (Optional)</Label>
+                {backgroundMedia ? (
+                    <div className="space-y-2">
+                        <div className="relative rounded-lg border p-4">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setBackgroundMedia(null)}
+                                className="absolute top-2 right-2 z-10"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                            <LazyImage
+                                media={backgroundMedia}
+                                conversion="large"
+                                alt="Hero background"
+                                className="max-h-48 rounded"
+                                objectFit="cover"
+                            />
+                            <p className="mt-2 text-xs text-muted-foreground">
+                                {backgroundMedia.name} ({(backgroundMedia.size / 1024 / 1024).toFixed(2)} MB)
+                            </p>
+                        </div>
+                        <MediaPicker
+                            collection="hero-images"
+                            accept="image/*"
+                            value={backgroundMedia}
+                            onChange={(m) => setBackgroundMedia(m as Media | null)}
+                            triggerLabel="Change Background"
+                            triggerVariant="outline"
+                        />
+                    </div>
+                ) : (
+                    <MediaPicker
+                        collection="hero-images"
+                        accept="image/*"
+                        value={backgroundMedia}
+                        onChange={(m) => setBackgroundMedia(m as Media | null)}
+                        triggerLabel="Select Background Image"
+                        triggerVariant="outline"
+                    />
+                )}
             </div>
 
             <div className="grid grid-cols-3 gap-4">

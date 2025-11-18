@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia as HasMediaInterface;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media as MediaModel;
 
 class PageBlock extends Model implements HasMediaInterface
 {
@@ -76,5 +77,30 @@ class PageBlock extends Model implements HasMediaInterface
             'config' => $this->config,
             'order' => $maxOrder + 1,
         ]);
+    }
+
+    // Media conversions
+    public function registerMediaConversions(?MediaModel $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(200)
+            ->height(200)
+            ->sharpen(10)
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('medium')
+            ->width(800)
+            ->height(600)
+            ->sharpen(10)
+            ->format('webp')
+            ->performOnCollections('page-images', 'hero-images', 'gallery-images');
+
+        $this->addMediaConversion('large')
+            ->width(1920)
+            ->height(1080)
+            ->sharpen(10)
+            ->format('webp')
+            ->performOnCollections('page-images', 'hero-images', 'gallery-images');
     }
 }

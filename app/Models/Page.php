@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia as HasMediaInterface;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media as MediaModel;
 
 class Page extends Model implements HasMediaInterface
 {
@@ -136,5 +137,30 @@ class Page extends Model implements HasMediaInterface
             ],
             'created_by' => auth()->id(),
         ]);
+    }
+
+    // Media conversions
+    public function registerMediaConversions(?MediaModel $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(200)
+            ->height(200)
+            ->sharpen(10)
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('medium')
+            ->width(800)
+            ->height(600)
+            ->sharpen(10)
+            ->format('webp')
+            ->performOnCollections('page-images', 'hero-images', 'gallery-images');
+
+        $this->addMediaConversion('large')
+            ->width(1920)
+            ->height(1080)
+            ->sharpen(10)
+            ->format('webp')
+            ->performOnCollections('page-images', 'hero-images', 'gallery-images');
     }
 }
