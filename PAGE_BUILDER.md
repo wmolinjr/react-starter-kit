@@ -1,8 +1,8 @@
 # Page Builder - Sistema de Construção de Páginas
 
-**Status:** 🚧 Em Desenvolvimento (70% Completo)
+**Status:** 🚧 Em Desenvolvimento (75% Completo)
 **Data:** 2025-11-18
-**Versão:** 2.5
+**Versão:** 3.0
 
 ---
 
@@ -51,7 +51,9 @@ O Page Builder é um sistema completo de construção de páginas visuais, permi
 | Frontend (Preview) | ✅ Completo | 100% |
 | Templates | ✅ Backend | 100% |
 | Versionamento | ✅ Backend | 100% |
-| **GERAL** | **🚧 Em Desenvolvimento** | **70%** |
+| **Media Library (Backend)** | ✅ Completo | 100% |
+| Media Library (Frontend) | ⏱️ Pendente | 25% |
+| **GERAL** | **🚧 Em Desenvolvimento** | **75%** |
 
 ---
 
@@ -798,21 +800,36 @@ Cada tipo de bloco precisa de um form dedicado:
 
 **Resultado**: ✅ Editor com UX moderna e produtiva, drag-and-drop fluido, undo/redo funcional, animações profissionais.
 
-### Fase 3: Conteúdo Rico ⏱️ 8-10 horas
+### Fase 3: Conteúdo Rico 🚧 75% Completo (6 horas investidas)
 
-**Prioridade**: 🟡 Média - Melhora flexibilidade
+**Prioridade**: 🔴 Alta - Em Andamento
 
-**Features**:
+**Features Backend** ✅ COMPLETO:
+- [x] **Spatie Media Library v11** integrado com multi-tenancy
+- [x] Custom `Media` model com `BelongsToTenant` trait
+- [x] `TenantPathGenerator` para isolamento de arquivos
+- [x] `MediaController` completo (CRUD + bulk operations)
+- [x] `MediaPolicy` com autorização por tenant
+- [x] 18 rotas de API (main domain + tenant subdomains)
+- [x] Image optimization configurado (jpegoptim, pngquant, webp)
+- [x] Queue processing habilitado
+- [x] TypeScript types (`media.d.ts`)
+
+**Features Frontend** ⏱️ PENDENTE (2-4 horas):
+- [ ] `MediaUpload` component (drag-and-drop)
+- [ ] `MediaPicker` component (gallery modal)
+- [ ] `LazyImage` component (progressive loading)
+- [ ] Integrar MediaPicker nos block forms (Image, Hero, Gallery)
+- [ ] Configurar image conversions (thumb, medium, large)
+- [ ] Testar com Playwright
+
+**Features Opcionais**:
 - [ ] Integrar TipTap rich text editor para blocos de texto
-- [ ] Criar `ImageUploadService` para upload de imagens
-- [ ] Criar `MediaLibrary` component para gerenciar assets
-- [ ] Integrar image picker nos block forms
-- [ ] Implementar drag-and-drop de imagens
-- [ ] Image optimization (resize, compress)
-- [ ] Preview de imagens antes do upload
-- [ ] Suporte a galeria de imagens
+- [ ] Editor de imagens (crop, resize)
 
-**Resultado**: Edição de texto rica e upload de imagens funcionando perfeitamente.
+**Documentação**: Ver [MEDIA_LIBRARY.md](./MEDIA_LIBRARY.md) para detalhes completos.
+
+**Resultado**: Backend completo e pronto. Frontend 25% completo (apenas types). Upload de imagens funcionará após implementar componentes React.
 
 ### Fase 4: Templates e Versões ⏱️ 4-6 horas
 
