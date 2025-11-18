@@ -45,12 +45,33 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'tenant' => app()->has('tenant') ? [
-                'id' => app('tenant')->id,
-                'name' => app('tenant')->name,
-                'slug' => app('tenant')->slug,
-                'settings' => app('tenant')->settings,
-            ] : null,
+            'tenant' => function () use ($request) {
+                // First try to get tenant from container (set by IdentifyTenantByDomain middleware)
+                if (app()->has('tenant')) {
+                    $tenant = app('tenant');
+                    return [
+                        'id' => $tenant->id,
+                        'name' => $tenant->name,
+                        'slug' => $tenant->slug,
+                        'settings' => $tenant->settings,
+                    ];
+                }
+
+                // Fallback to user's current tenant
+                if ($request->user()?->current_tenant_id) {
+                    $tenant = $request->user()->currentTenant;
+                    if ($tenant) {
+                        return [
+                            'id' => $tenant->id,
+                            'name' => $tenant->name,
+                            'slug' => $tenant->slug,
+                            'settings' => $tenant->settings,
+                        ];
+                    }
+                }
+
+                return null;
+            },
             'tenants' => $request->user()?->tenants()->get()->map(fn($t) => [
                 'id' => $t->id,
                 'name' => $t->name,
