@@ -492,13 +492,13 @@ Fortify::authenticateUsing(function (Request $request) {
 
 ## Checklist
 
-- [ ] `routes/web.php` configurado para central app
-- [ ] `routes/tenant.php` configurado para tenant app
-- [ ] Middleware `InitializeTenancyByDomain` aplicado
-- [ ] Middleware `EnsureSubscriptionIsActive` criado
-- [ ] Middleware `VerifyTenantAccess` criado
-- [ ] RegisterController criado para sign up
-- [ ] Fortify configurado para aceitar apenas users do tenant
+- [x] `routes/web.php` configurado para central app ✅
+- [x] `routes/tenant.php` configurado para tenant app ✅
+- [x] Middleware `InitializeTenancyByDomain` aplicado ✅
+- [ ] Middleware `EnsureSubscriptionIsActive` criado (Etapa 07 - Billing)
+- [x] Middleware `VerifyTenantAccess` criado ✅
+- [ ] RegisterController criado para sign up (Etapa 05/06)
+- [ ] Fortify configurado para aceitar apenas users do tenant (Etapa 05/06)
 - [ ] Teste: acessar central app (`myapp.test`) funciona
 - [ ] Teste: acessar tenant app (`tenant.myapp.test`) funciona
 - [ ] Teste: criar novo tenant via register funciona
