@@ -610,15 +610,15 @@ Resposta esperada:
 
 Antes de prosseguir para o próximo passo, certifique-se:
 
-- [ ] Todos os pacotes instalados (`archtechx/tenancy`, `cashier`, `medialibrary`, `sanctum`)
-- [ ] `config/tenancy.php` configurado corretamente
-- [ ] `TenancyServiceProvider` registrado em `bootstrap/providers.php`
-- [ ] `routes/tenant.php` criado
-- [ ] `.env` configurado com variáveis necessárias
-- [ ] Domínios locais configurados (Herd/Valet/Sail ou `/etc/hosts`)
-- [ ] Teste de acesso ao central app (`myapp.test`) funciona
-- [ ] Teste de acesso ao tenant app (`tenant.myapp.test`) funciona
-- [ ] Middleware de tenancy funciona (tenant context inicializado)
+- [x] Todos os pacotes instalados (`stancl/tenancy`, `cashier`, `medialibrary`, `sanctum`) ✅
+- [x] `config/tenancy.php` configurado corretamente ✅
+- [x] `TenancyServiceProvider` registrado em `bootstrap/providers.php` ✅
+- [x] `routes/tenant.php` criado ✅
+- [x] `.env` configurado com variáveis necessárias ✅
+- [ ] Domínios locais configurados (Herd/Valet/Sail ou `/etc/hosts`) - ⏳ Etapa 04
+- [ ] Teste de acesso ao central app (`myapp.test`) funciona - ⏳ Etapa 04
+- [ ] Teste de acesso ao tenant app (`tenant.myapp.test`) funciona - ⏳ Etapa 04
+- [ ] Middleware de tenancy funciona (tenant context inicializado) - ⏳ Etapa 04
 
 ---
 

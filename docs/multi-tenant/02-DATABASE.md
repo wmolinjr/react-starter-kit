@@ -703,17 +703,17 @@ php artisan migrate:fresh --seed
 
 Antes de prosseguir, certifique-se:
 
-- [ ] Migration `create_tenants_table` criada e executada
-- [ ] Migration `create_domains_table` criada e executada
-- [ ] Migration `create_tenant_user_table` criada e executada
-- [ ] Migration `add_is_super_admin_to_users_table` criada e executada
-- [ ] Cashier migrations executadas
-- [ ] Migration `add_tenant_id_to_subscriptions_table` criada e executada
-- [ ] MediaLibrary migrations executadas
-- [ ] Todas as tabelas tenant-scoped têm `tenant_id` **E** indexes
-- [ ] Seeder de tenants de teste criado
-- [ ] Comando `php artisan migrate:fresh --seed` executado com sucesso
-- [ ] Tabelas criadas corretamente (verificar com `php artisan migrate:status`)
+- [x] Migration `create_tenants_table` criada e executada ✅
+- [x] Migration `create_domains_table` criada e executada ✅
+- [x] Migration `create_tenant_user_table` criada e executada ✅
+- [x] Migration `add_is_super_admin_to_users_table` criada e executada ✅
+- [x] Cashier migrations executadas ✅
+- [x] Migration `add_tenant_id_to_subscriptions_table` criada e executada ✅
+- [x] MediaLibrary migrations executadas ✅
+- [x] Todas as tabelas tenant-scoped têm `tenant_id` **E** indexes ✅
+- [x] Seeder de tenants de teste criado ✅
+- [x] Comando `php artisan migrate:fresh --seed` executado com sucesso ✅
+- [x] Tabelas criadas corretamente (verificar com `php artisan migrate:status`) ✅
 
 **Verificar tabelas:**
 ```bash

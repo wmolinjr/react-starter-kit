@@ -773,15 +773,15 @@ $myProjects = Project::ownedBy(auth()->user())->get();
 
 Antes de prosseguir, certifique-se:
 
-- [ ] Model `Tenant` criado com relacionamentos
-- [ ] Model `Domain` criado
-- [ ] Model `User` atualizado com relacionamentos tenants
-- [ ] Trait `BelongsToTenant` criado
-- [ ] Scope `TenantScope` criado
-- [ ] Model `Project` (ou outro tenant-scoped) criado como exemplo
-- [ ] Helpers de tenant criados e registrados
-- [ ] Macros de Query Builder registrados no AppServiceProvider
-- [ ] `composer dump-autoload` executado
+- [x] Model `Tenant` criado com relacionamentos ✅
+- [x] Model `Domain` criado ✅
+- [x] Model `User` atualizado com relacionamentos tenants ✅
+- [x] Trait `BelongsToTenant` criado ✅
+- [x] Scope `TenantScope` criado ✅
+- [x] Model `Project` (ou outro tenant-scoped) criado como exemplo ✅
+- [x] Helpers de tenant criados e registrados ✅
+- [x] Macros de Query Builder registrados no AppServiceProvider ✅
+- [x] `composer dump-autoload` executado ✅
 
 **Testar no Tinker:**
 
