@@ -106,7 +106,11 @@ class TeamTest extends TenantTestCase
     /** @test */
     public function cannot_remove_owner_from_team()
     {
-        $response = $this->delete("/team/{$this->user->id}");
+        // Create a second owner
+        $secondOwner = $this->createTenantUser('owner');
+
+        // Try to remove the second owner (not self-removal, but still forbidden)
+        $response = $this->delete("/team/{$secondOwner->id}");
 
         $response->assertForbidden();
     }

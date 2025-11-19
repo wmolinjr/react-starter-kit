@@ -13,6 +13,7 @@ class ProjectTest extends TenantTestCase
         $response = $this->post('/projects', [
             'name' => 'Test Project',
             'description' => 'Test description',
+            'status' => 'active',
         ]);
 
         $response->assertRedirect();

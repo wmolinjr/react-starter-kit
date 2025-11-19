@@ -19,7 +19,7 @@ class ProjectController extends Controller
 
         $projects = Project::with(['user', 'media'])
             ->latest()
-            ->paginate(15);
+            ->get();
 
         return Inertia::render('tenant/projects/index', [
             'projects' => $projects,

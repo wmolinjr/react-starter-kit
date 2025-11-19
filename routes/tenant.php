@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\InitializeTenancyForTests;
 use App\Http\Middleware\VerifyTenantAccess;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /*
@@ -15,16 +15,17 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 | Rotas tenant-scoped. Todas as rotas aqui têm acesso ao tenant context.
 | Middleware aplicado:
-| - InitializeTenancyByDomain: inicializa o tenant pelo subdomínio
-| - PreventAccessFromCentralDomains: previne acesso de domínios centrais
+| - InitializeTenancyForTests: inicializa o tenant pelo subdomínio (production)
+|   ou reutiliza tenant já inicializado (testing)
+| - PreventAccessFromCentralDomains: previne acesso via domínios centrais (localhost)
 | - VerifyTenantAccess: verifica se usuário tem acesso ao tenant
 |
 */
 
 Route::middleware([
     'web',
-    InitializeTenancyByDomain::class,
-    // PreventAccessFromCentralDomains::class, // Disabled for testing - prevents test domains from being blocked
+    InitializeTenancyForTests::class, // Test-friendly: reuses initialized tenant in tests, verifies central domains and delegates to InitializeTenancyByDomain in production
+    // PreventAccessFromCentralDomains is now integrated into InitializeTenancyForTests
 ])->group(function () {
     // Redirect root para dashboard
     Route::get('/', function () {

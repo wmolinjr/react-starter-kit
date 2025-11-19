@@ -37,10 +37,11 @@ abstract class TenantTestCase extends TestCase
             'joined_at' => now(),
         ]);
 
-        // Initialize tenant context
+        // Initialize tenant context manually (following Stancl Tenancy docs)
+        // This ensures tenant is available before middleware runs
         tenancy()->initialize($this->tenant);
 
-        // Set default SERVER variables for tenant domain
+        // Set SERVER variables for consistency (even though middleware won't re-initialize)
         $this->withServerVariables([
             'HTTP_HOST' => $domain->domain,
             'SERVER_NAME' => $domain->domain,
@@ -52,7 +53,7 @@ abstract class TenantTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        // End tenant context
+        // End tenant context (following Stancl Tenancy docs)
         tenancy()->end();
 
         parent::tearDown();

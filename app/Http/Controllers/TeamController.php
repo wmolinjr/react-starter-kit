@@ -181,6 +181,18 @@ class TeamController extends Controller
             return back()->with('error', 'Você não pode alterar sua própria role.');
         }
 
+        // Apenas owners podem alterar role de outros owners
+        $isTargetOwner = $tenant->users()
+            ->wherePivot('user_id', $user->id)
+            ->wherePivot('role', 'owner')
+            ->exists();
+
+        $currentUserRole = $currentUser->roleOn($tenant);
+
+        if ($isTargetOwner && $currentUserRole !== 'owner') {
+            abort(403, 'Apenas owners podem alterar a role de outros owners.');
+        }
+
         // Prevenir remoção do último owner
         if ($validated['role'] !== 'owner') {
             $ownerCount = $tenant->users()
@@ -220,18 +232,14 @@ class TeamController extends Controller
             return back()->with('error', 'Você não pode remover a si mesmo do time.');
         }
 
-        // Prevenir remoção do último owner
-        $ownerCount = $tenant->users()
-            ->wherePivot('role', 'owner')
-            ->count();
-
+        // Prevenir remoção de qualquer owner (deve rebaixar primeiro)
         $isTargetOwner = $tenant->users()
             ->wherePivot('user_id', $user->id)
             ->wherePivot('role', 'owner')
             ->exists();
 
-        if ($ownerCount === 1 && $isTargetOwner) {
-            return back()->with('error', 'Não é possível remover o único owner. Promova outro membro primeiro.');
+        if ($isTargetOwner) {
+            abort(403, 'Não é possível remover um owner diretamente. Altere a role primeiro.');
         }
 
         // Remover do tenant

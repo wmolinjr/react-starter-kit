@@ -31,6 +31,29 @@ Route::get('/pricing', function () {
 // Register tenant + user (será implementado em RegisterController)
 // POST /register será adicionado quando criar o controller
 
+// Central dashboard (lista de tenants do usuário)
+Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    $tenants = $user?->tenants()
+        ->withPivot('role', 'joined_at')
+        ->get()
+        ->map(function ($tenant) {
+            return [
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+                'slug' => $tenant->slug,
+                'role' => $tenant->pivot->role,
+                'joined_at' => $tenant->pivot->joined_at,
+                'url' => "http://{$tenant->slug}.".config('tenancy.central_domains')[0],
+            ];
+        }) ?? collect();
+
+    return Inertia::render('dashboard', [
+        'tenants' => $tenants,
+    ]);
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 // Accept invitation (rota pública, pode não estar autenticado)
 Route::get('/accept-invitation', function () {
     $token = request()->query('token');
