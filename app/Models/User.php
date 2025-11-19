@@ -92,6 +92,20 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get user's role on a specific tenant
+     */
+    public function roleOn(Tenant|int $tenant): ?string
+    {
+        $tenantId = $tenant instanceof Tenant ? $tenant->id : $tenant;
+
+        return $this->tenants()
+            ->where('tenant_id', $tenantId)
+            ->first()
+            ?->pivot
+            ->role;
+    }
+
+    /**
      * Verificar se user tem role específico no tenant atual
      */
     public function hasRole(string $role): bool
