@@ -24,13 +24,13 @@ export function TenantSwitcher() {
     const isMobile = useIsMobile();
 
     const handleSwitch = (slug: string) => {
-        router.post(
-            tenants.switch({ tenant: slug }).url,
-            {},
-            {
-                preserveScroll: true,
-            }
-        );
+        // Navigate to tenant subdomain
+        // EnsureTenantAccess middleware will automatically update current_tenant_id
+        const protocol = window.location.protocol;
+        const domain = window.location.hostname.split('.').slice(-1)[0]; // Get base domain (localhost or production domain)
+        const tenantUrl = `${protocol}//${slug}.${domain}`;
+
+        window.location.href = tenantUrl;
     };
 
     if (!tenantsList || tenantsList.length === 0) {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Tenant extends Model
@@ -19,6 +20,10 @@ class Tenant extends Model
         'domain',
         'settings',
         'status',
+        'description',
+        'logo',
+        'favicon',
+        'primary_color',
     ];
 
     protected $casts = [
@@ -63,11 +68,57 @@ class Tenant extends Model
     }
 
     /**
+     * Get all custom domains for this tenant.
+     */
+    public function domains(): HasMany
+    {
+        return $this->hasMany(Domain::class);
+    }
+
+    /**
+     * Get all invitations for this tenant.
+     */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(TenantInvitation::class);
+    }
+
+    /**
+     * Get the primary domain for this tenant.
+     */
+    public function primaryDomain(): HasOne
+    {
+        return $this->hasOne(Domain::class)->where('is_primary', true);
+    }
+
+    /**
      * Get the owner of this tenant.
      */
     public function owner()
     {
         return $this->users()->wherePivot('role', 'owner')->first();
+    }
+
+    /**
+     * Add a custom domain to this tenant.
+     */
+    public function addDomain(string $domain, bool $isPrimary = false): Domain
+    {
+        $domainModel = $this->domains()->create([
+            'domain' => $domain,
+            'is_primary' => $isPrimary,
+            'verification_status' => 'pending',
+        ]);
+
+        // Generate verification token
+        $domainModel->generateVerificationToken();
+
+        // If this should be primary, ensure it is
+        if ($isPrimary) {
+            $domainModel->setPrimary();
+        }
+
+        return $domainModel->fresh();
     }
 
     /**
@@ -84,5 +135,42 @@ class Tenant extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    /**
+     * Get the logo URL.
+     */
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (!$this->logo) {
+            return null;
+        }
+
+        return asset('storage/' . $this->logo);
+    }
+
+    /**
+     * Get the favicon URL.
+     */
+    public function getFaviconUrlAttribute(): ?string
+    {
+        if (!$this->favicon) {
+            return null;
+        }
+
+        return asset('storage/' . $this->favicon);
+    }
+
+    /**
+     * Update branding for this tenant.
+     */
+    public function updateBranding(array $data): void
+    {
+        $this->update([
+            'description' => $data['description'] ?? $this->description,
+            'logo' => $data['logo'] ?? $this->logo,
+            'favicon' => $data['favicon'] ?? $this->favicon,
+            'primary_color' => $data['primary_color'] ?? $this->primary_color,
+        ]);
     }
 }

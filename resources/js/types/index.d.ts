@@ -42,6 +42,20 @@ export interface TenantListItem {
     role: TenantRole;
 }
 
+export type DomainVerificationStatus = 'pending' | 'verified' | 'failed';
+
+export interface Domain {
+    id: number;
+    tenant_id: number;
+    domain: string;
+    is_primary: boolean;
+    verification_status: DomainVerificationStatus;
+    verification_token: string | null;
+    verified_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Tenant {
     id: number;
     name: string;
@@ -50,6 +64,13 @@ export interface Tenant {
     settings?: Record<string, unknown> | null;
     status: TenantStatus;
     created_at: string;
+    domains?: Domain[];
+    description?: string | null;
+    logo?: string | null;
+    favicon?: string | null;
+    primary_color?: string | null;
+    logo_url?: string | null;
+    favicon_url?: string | null;
 }
 
 export interface TenantWithUsers extends Tenant {
@@ -62,6 +83,26 @@ export interface TenantUser {
     email: string;
     role: TenantRole;
     joined_at: string;
+}
+
+export type InvitationStatus = 'pending' | 'accepted' | 'expired';
+
+export interface TenantInvitation {
+    id: number;
+    tenant_id: number;
+    email: string;
+    role: TenantRole;
+    token: string;
+    invited_by: number;
+    inviter?: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    accepted_at: string | null;
+    expires_at: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface TenantIndexItem {

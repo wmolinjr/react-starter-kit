@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Domain;
 use App\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
@@ -12,24 +13,30 @@ class IdentifyTenantByDomain
     /**
      * Handle an incoming request.
      *
-     * Identifies tenant by subdomain or custom domain.
-     * Priority: custom domain > subdomain
+     * Identifies tenant by custom domain (via domains table) or subdomain.
+     * Priority: verified custom domain > subdomain > legacy domain field
      *
      * Examples:
      * - cliente.localhost -> finds tenant with subdomain='cliente'
-     * - www.cliente.com -> finds tenant with domain='www.cliente.com'
+     * - www.cliente.com -> finds tenant via domains table (verified)
      */
     public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
+        $tenant = null;
 
-        // Try to find tenant by custom domain first
-        $tenant = Tenant::where('domain', $host)
-            ->where('status', 'active')
+        // Priority 1: Try to find tenant by verified custom domain in domains table
+        $domain = Domain::where('domain', $host)
+            ->verified()
+            ->with('tenant')
             ->first();
 
-        // If not found by domain, try subdomain
-        if (!$tenant) {
+        if ($domain && $domain->tenant?->isActive()) {
+            $tenant = $domain->tenant;
+        }
+
+        // Priority 2: If not found by custom domain, try subdomain
+        if (! $tenant) {
             $subdomain = $this->extractSubdomain($host);
 
             if ($subdomain) {
@@ -39,9 +46,16 @@ class IdentifyTenantByDomain
             }
         }
 
+        // Priority 3: Fallback to legacy domain field in tenants table
+        if (! $tenant) {
+            $tenant = Tenant::where('domain', $host)
+                ->where('status', 'active')
+                ->first();
+        }
+
         // If still not found, abort
-        if (!$tenant) {
-            abort(404, 'Tenant not found for domain: ' . $host);
+        if (! $tenant) {
+            abort(404, 'Tenant not found for domain: '.$host);
         }
 
         // Store tenant in container and request
@@ -74,12 +88,12 @@ class IdentifyTenantByDomain
         }
 
         // Check if host ends with base domain
-        if (!str_ends_with($hostWithoutPort, '.' . $baseDomain)) {
+        if (! str_ends_with($hostWithoutPort, '.'.$baseDomain)) {
             return null;
         }
 
         // Extract subdomain
-        $subdomain = str_replace('.' . $baseDomain, '', $hostWithoutPort);
+        $subdomain = str_replace('.'.$baseDomain, '', $hostWithoutPort);
 
         // Ignore www subdomain
         if ($subdomain === 'www') {

@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\DomainController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageBlockController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\TenantInvitationController;
+use App\Http\Controllers\TenantMemberController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -79,6 +82,11 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// Public invitation acceptance route
+Route::get('invitations/accept/{token}', [TenantInvitationController::class, 'accept'])
+    ->name('invitations.accept')
+    ->middleware('auth');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
@@ -89,18 +97,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'tenants' => 'slug',
     ]);
 
-    // Switch current tenant
-    Route::post('tenants/{tenant}/switch', function (string $slug) {
-        $tenant = \App\Models\Tenant::where('slug', $slug)->firstOrFail();
+    // Domain Management Routes (tenant-scoped)
+    Route::prefix('tenants/{slug}')->name('tenants.')->group(function () {
+        Route::get('domains', [DomainController::class, 'index'])->name('domains.index');
+        Route::post('domains', [DomainController::class, 'store'])->name('domains.store');
+        Route::patch('domains/{domain}', [DomainController::class, 'update'])->name('domains.update');
+        Route::post('domains/{domain}/verify', [DomainController::class, 'verify'])->name('domains.verify');
+        Route::delete('domains/{domain}', [DomainController::class, 'destroy'])->name('domains.destroy');
 
-        if (!auth()->user()->hasAccessToTenant($tenant)) {
-            abort(403, 'You do not have access to this workspace');
-        }
+        // Branding Management
+        Route::put('branding', [TenantController::class, 'updateBranding'])->name('branding.update');
 
-        auth()->user()->switchTenant($tenant);
+        // Invitation Management
+        Route::get('invitations', [TenantInvitationController::class, 'index'])->name('invitations.index');
+        Route::post('invitations', [TenantInvitationController::class, 'store'])->name('invitations.store');
+        Route::post('invitations/{invitation}/resend', [TenantInvitationController::class, 'resend'])->name('invitations.resend');
+        Route::delete('invitations/{invitation}', [TenantInvitationController::class, 'destroy'])->name('invitations.destroy');
 
-        return back()->with('success', 'Switched to ' . $tenant->name);
-    })->name('tenants.switch');
+        // Member Management
+        Route::get('members', [TenantMemberController::class, 'index'])->name('members.index');
+        Route::patch('members/{user}', [TenantMemberController::class, 'update'])->name('members.update');
+        Route::delete('members/{user}', [TenantMemberController::class, 'destroy'])->name('members.destroy');
+        Route::post('members/{user}/transfer-ownership', [TenantMemberController::class, 'transferOwnership'])->name('members.transfer-ownership');
+    });
 
     // Page Management Routes
     Route::resource('pages', PageController::class);

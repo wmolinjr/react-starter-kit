@@ -49,11 +49,16 @@ class HandleInertiaRequests extends Middleware
                 // First try to get tenant from container (set by IdentifyTenantByDomain middleware)
                 if (app()->has('tenant')) {
                     $tenant = app('tenant');
+                    $tenant->load(['domains' => function ($query) {
+                        $query->orderBy('is_primary', 'desc')->orderBy('created_at', 'desc');
+                    }]);
+
                     return [
                         'id' => $tenant->id,
                         'name' => $tenant->name,
                         'slug' => $tenant->slug,
                         'settings' => $tenant->settings,
+                        'domains' => $tenant->domains,
                     ];
                 }
 
@@ -61,18 +66,23 @@ class HandleInertiaRequests extends Middleware
                 if ($request->user()?->current_tenant_id) {
                     $tenant = $request->user()->currentTenant;
                     if ($tenant) {
+                        $tenant->load(['domains' => function ($query) {
+                            $query->orderBy('is_primary', 'desc')->orderBy('created_at', 'desc');
+                        }]);
+
                         return [
                             'id' => $tenant->id,
                             'name' => $tenant->name,
                             'slug' => $tenant->slug,
                             'settings' => $tenant->settings,
+                            'domains' => $tenant->domains,
                         ];
                     }
                 }
 
                 return null;
             },
-            'tenants' => $request->user()?->tenants()->get()->map(fn($t) => [
+            'tenants' => $request->user()?->tenants()->get()->map(fn ($t) => [
                 'id' => $t->id,
                 'name' => $t->name,
                 'slug' => $t->slug,

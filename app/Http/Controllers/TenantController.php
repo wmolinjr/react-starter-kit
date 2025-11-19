@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tenant;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -152,5 +153,55 @@ class TenantController extends Controller
 
         return redirect()->route('tenants.index')
             ->with('success', 'Workspace deleted successfully!');
+    }
+
+    /**
+     * Update branding for the specified tenant.
+     */
+    public function updateBranding(Request $request, string $slug)
+    {
+        $tenant = Tenant::where('slug', $slug)->firstOrFail();
+
+        $this->authorize('update', $tenant);
+
+        $validated = $request->validate([
+            'description' => 'nullable|string|max:500',
+            'logo' => 'nullable|image|max:2048|mimes:png,jpg,jpeg,svg',
+            'favicon' => 'nullable|image|max:512|mimes:ico,png',
+            'primary_color' => ['nullable', 'regex:/^#[0-9A-F]{6}$/i'],
+        ]);
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($tenant->logo) {
+                Storage::disk('public')->delete($tenant->logo);
+            }
+
+            // Store new logo
+            $path = $request->file('logo')->store('tenants/' . $tenant->slug, 'public');
+            $validated['logo'] = $path;
+        }
+
+        // Handle favicon upload
+        if ($request->hasFile('favicon')) {
+            // Delete old favicon if exists
+            if ($tenant->favicon) {
+                Storage::disk('public')->delete($tenant->favicon);
+            }
+
+            // Store new favicon
+            $path = $request->file('favicon')->store('tenants/' . $tenant->slug, 'public');
+            $validated['favicon'] = $path;
+        }
+
+        $tenant->update($validated);
+
+        return back()->with([
+            'flash' => [
+                'data' => $tenant->fresh()->append(['logo_url', 'favicon_url']),
+                'message' => 'Branding updated successfully',
+            ],
+        ]);
     }
 }
