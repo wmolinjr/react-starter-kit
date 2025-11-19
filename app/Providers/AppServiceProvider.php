@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Listeners\UpdateTenantLimits;
 use App\Models\User;
 use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Cashier\Events\WebhookReceived;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,5 +41,11 @@ class AppServiceProvider extends ServiceProvider
         Builder::macro('ownedBy', function (User $user) {
             return $this->where('user_id', $user->id);
         });
+
+        // Event Listeners
+        Event::listen(
+            WebhookReceived::class,
+            UpdateTenantLimits::class,
+        );
     }
 }

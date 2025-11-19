@@ -60,6 +60,29 @@ return [
             'report' => false,
         ],
 
+        // Tenant-isolated local storage
+        'tenant_uploads' => [
+            'driver' => 'local',
+            'root' => storage_path('app/tenants/'.(tenancy()->initialized ? tenant('id') : 'central')),
+            'url' => env('APP_URL').'/storage/tenants/'.(tenancy()->initialized ? tenant('id') : 'central'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Tenant-isolated S3 storage
+        'tenant_s3' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'root' => 'tenants/'.(tenancy()->initialized ? tenant('id') : 'central'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

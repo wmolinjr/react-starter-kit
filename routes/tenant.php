@@ -40,21 +40,20 @@ Route::middleware([
             ]);
         })->name('tenant.dashboard');
 
-        // Projects (CRUD example)
+        // Projects (CRUD + File Upload)
         Route::prefix('projects')->name('projects.')->group(function () {
-            Route::get('/', function () {
-                $projects = \App\Models\Project::with('user')->paginate(15);
+            Route::get('/', [\App\Http\Controllers\ProjectController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\ProjectController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\ProjectController::class, 'store'])->name('store');
+            Route::get('/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])->name('show');
+            Route::get('/{project}/edit', [\App\Http\Controllers\ProjectController::class, 'edit'])->name('edit');
+            Route::patch('/{project}', [\App\Http\Controllers\ProjectController::class, 'update'])->name('update');
+            Route::delete('/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('destroy');
 
-                return Inertia::render('tenant/projects/index', [
-                    'projects' => $projects,
-                ]);
-            })->name('index');
-
-            Route::get('/create', function () {
-                return Inertia::render('tenant/projects/create');
-            })->name('create');
-
-            // store, show, edit, update, destroy serão implementados em ProjectController
+            // Media Management
+            Route::post('/{project}/media', [\App\Http\Controllers\ProjectController::class, 'uploadFile'])->name('media.upload');
+            Route::get('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'downloadFile'])->name('media.download');
+            Route::delete('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'deleteFile'])->name('media.delete');
         });
 
         // Team Management
@@ -67,16 +66,11 @@ Route::middleware([
 
         // Billing (Laravel Cashier)
         Route::prefix('billing')->name('billing.')->group(function () {
-            Route::get('/', function () {
-                $tenant = tenant();
-
-                return Inertia::render('tenant/billing/index', [
-                    'tenant' => $tenant,
-                    'subscription' => $tenant->subscription('default'),
-                ]);
-            })->name('index');
-
-            // subscribe, portal, cancel serão implementados em BillingController
+            Route::get('/', [\App\Http\Controllers\BillingController::class, 'index'])->name('index');
+            Route::post('/checkout', [\App\Http\Controllers\BillingController::class, 'checkout'])->name('checkout');
+            Route::get('/success', [\App\Http\Controllers\BillingController::class, 'success'])->name('success');
+            Route::get('/portal', [\App\Http\Controllers\BillingController::class, 'portal'])->name('portal');
+            Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\BillingController::class, 'invoice'])->name('invoice');
         });
 
         // Settings do tenant (já existe em routes/settings.php, mas podemos adicionar aqui também)

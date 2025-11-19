@@ -7,9 +7,9 @@ Este arquivo rastreia todo o progresso da implementação do sistema Multi-Tenan
 ## Status Geral
 
 **Iniciado em:** 2025-11-19
-**Última Atualização:** 2025-11-19 18:15
-**Etapa Atual:** 05 - Authorization
-**Progresso Total:** 5/15 etapas (33.3%)
+**Última Atualização:** 2025-11-19 20:15
+**Etapa Atual:** 08 - File Storage (Tenant-Isolated)
+**Progresso Total:** 8/15 etapas (53.3%)
 
 ---
 
@@ -23,11 +23,11 @@ Este arquivo rastreia todo o progresso da implementação do sistema Multi-Tenan
 ### Core Features
 - [x] **Etapa 04** - Routing (04-ROUTING.md) ✅
 - [x] **Etapa 05** - Authorization (05-AUTHORIZATION.md) ✅
-- [ ] **Etapa 06** - Team Management (06-TEAM-MANAGEMENT.md)
-- [ ] **Etapa 07** - Billing (07-BILLING.md)
+- [x] **Etapa 06** - Team Management (06-TEAM-MANAGEMENT.md) ✅
+- [x] **Etapa 07** - Billing (07-BILLING.md) ✅
 
 ### Advanced Features
-- [ ] **Etapa 08** - File Storage (08-FILE-STORAGE.md)
+- [x] **Etapa 08** - File Storage (08-FILE-STORAGE.md) ✅
 - [ ] **Etapa 09** - Impersonation (09-IMPERSONATION.md)
 - [ ] **Etapa 10** - API Tokens (10-API-TOKENS.md)
 - [ ] **Etapa 11** - Tenant Settings (11-TENANT-SETTINGS.md)
@@ -1169,13 +1169,457 @@ Etapa XX - Nome da Etapa
 
 ### Próximos Passos
 
-- Etapa 07: Billing (Stripe Checkout, Portal, Subscription Management)
 - Etapa 08: File Storage (S3, Media Library)
 - Etapa 09: API (Sanctum, Rate Limiting, Versioning)
 
 ---
 
-**Última Atualização:** 2025-11-19 19:00
+## Etapa 07 - Billing & Stripe Integration
+
+**Data:** 2025-11-19
+**Duração:** ~40 minutos
+
+### Implementações Realizadas
+
+**Backend:**
+1. ✅ Helper billing_plans() criado
+   - `app/Helpers/billing_helpers.php` (64 linhas)
+   - 3 planos: Starter ($9), Professional ($29), Enterprise ($99)
+   - Estrutura: name, price_id, price, interval, features, limits
+   - Features listadas para apresentação no frontend
+   - Limits: max_users, max_projects, storage_mb
+
+2. ✅ Config Stripe atualizada
+   - `config/services.php` (modificado)
+   - Stripe key, secret, webhook secret
+   - Price IDs por plano (STRIPE_PRICE_STARTER, etc.)
+   - Placeholders para facilitar configuração
+
+3. ✅ BillingController criado com 5 métodos
+   - `app/Http/Controllers/BillingController.php` (119 linhas)
+   - Métodos:
+     - index() - Lista planos, subscription, invoices
+     - checkout() - Cria Stripe Checkout Session
+     - success() - Callback após checkout (atualiza limits)
+     - portal() - Redireciona para Stripe Customer Portal
+     - invoice() - Download de invoice PDF
+   - Gate::authorize('manage-billing') em todos os métodos
+   - Trial de 14 dias configurado no checkout
+
+4. ✅ UpdateTenantLimits Listener criado
+   - `app/Listeners/UpdateTenantLimits.php` (31 linhas)
+   - Escuta evento WebhookReceived (Cashier)
+   - Atualiza max_users e settings do tenant
+   - Triggered em customer.subscription.updated
+   - Busca tenant por stripe_id, plano por price_id
+
+5. ✅ Event Listener registrado
+   - `app/Providers/AppServiceProvider.php` (modificado)
+   - Event::listen(WebhookReceived::class, UpdateTenantLimits::class)
+   - Imports adicionados: Event, WebhookReceived, UpdateTenantLimits
+
+6. ✅ Helper billing_plans() registrado
+   - `composer.json` (modificado)
+   - Adicionado em autoload.files: "app/Helpers/billing_helpers.php"
+   - Disponível globalmente em toda a aplicação
+
+**Rotas:**
+7. ✅ Rotas de billing configuradas
+   - `routes/tenant.php` (modificado)
+   - 5 rotas tenant-scoped:
+     - GET /billing → BillingController@index
+     - POST /billing/checkout → BillingController@checkout
+     - GET /billing/success → BillingController@success
+     - GET /billing/portal → BillingController@portal
+     - GET /billing/invoice/{invoiceId} → BillingController@invoice
+   - Todas protegidas com middleware: auth, verified, VerifyTenantAccess
+
+**Frontend:**
+8. ✅ Página de billing criada
+   - `resources/js/pages/tenant/billing/index.tsx` (264 linhas)
+   - Seções:
+     - Current Subscription: Status badge, trial/cancel info, botão Manage
+     - Available Plans: Grid 3 colunas (cards com features)
+     - Billing History: Table com invoices e download
+   - Lógica:
+     - Identifica plano atual comparando price_id
+     - Botão "Current Plan" desabilitado para plano ativo
+     - Botão "Subscribe" se sem subscription
+     - Botão "Change Plan" se subscription ativa
+   - Componentes shadcn/ui: Card, Badge, Table, Button
+   - Ícones lucide: Check, Download, ExternalLink
+
+### Fluxo de Subscription Implementado
+
+**1. Escolha de Plano:**
+- Usuário acessa `/billing`
+- Vê 3 planos com features e preços
+- Clica "Subscribe" ou "Change Plan"
+
+**2. Checkout:**
+- POST /billing/checkout com plano escolhido
+- BillingController valida plano (starter/professional/enterprise)
+- Cria Stripe Checkout Session via Cashier:
+  - Tenant como billable entity
+  - Price ID do plano selecionado
+  - Trial de 14 dias
+  - Success URL: /billing/success
+  - Cancel URL: /billing
+- Inertia::location() redireciona para Stripe
+
+**3. Stripe Checkout:**
+- Usuário preenche dados de pagamento
+- Stripe processa pagamento
+- Redireciona para /billing/success
+
+**4. Success Callback:**
+- BillingController@success executa
+- Busca subscription default do tenant
+- Identifica plano pelo price_id
+- Atualiza tenant:
+  - max_users = plan limits
+  - settings.limits = plan limits
+- Redireciona para /billing com mensagem
+
+**5. Webhooks (Automático):**
+- Stripe dispara customer.subscription.updated
+- UpdateTenantLimits listener captura
+- Busca tenant por stripe_id
+- Identifica plano por price_id
+- Atualiza max_users e settings.limits
+- Garante sincronia automática
+
+**6. Customer Portal:**
+- Usuário clica "Manage Subscription"
+- BillingController@portal redireciona
+- Stripe Customer Portal permite:
+  - Atualizar cartão
+  - Ver invoices
+  - Cancelar subscription
+  - Retorna para /billing
+
+### Planos Configurados
+
+**Starter - $9/month:**
+- 10 team members
+- 50 projects
+- 1GB storage
+- Email support
+- Limits: max_users=10, max_projects=50, storage_mb=1000
+
+**Professional - $29/month:**
+- 50 team members
+- Unlimited projects
+- 10GB storage
+- Priority support
+- Custom domains
+- Limits: max_users=50, max_projects=null, storage_mb=10000
+
+**Enterprise - $99/month:**
+- Unlimited team members
+- Unlimited projects
+- 100GB storage
+- 24/7 support
+- Custom domains
+- SSO
+- SLA
+- Limits: max_users=null, max_projects=null, storage_mb=100000
+
+### Arquivos Criados/Modificados
+
+**Criados (4 arquivos):**
+- Backend:
+  - `app/Helpers/billing_helpers.php` (64 linhas)
+  - `app/Http/Controllers/BillingController.php` (119 linhas)
+  - `app/Listeners/UpdateTenantLimits.php` (31 linhas)
+- Frontend:
+  - `resources/js/pages/tenant/billing/index.tsx` (264 linhas)
+
+**Modificados (4 arquivos):**
+- `config/services.php` (+12 linhas) - Stripe configuration
+- `composer.json` (+1 linha) - billing_helpers autoload
+- `app/Providers/AppServiceProvider.php` (+7 linhas) - Event listener
+- `routes/tenant.php` (+7 linhas) - Billing routes
+
+### Validações Implementadas
+
+**Backend (BillingController):**
+- Gate authorization: manage-billing (owner apenas)
+- Plan validation: in:starter,professional,enterprise
+- Subscription status checks (onTrial, canceled, etc.)
+- Invoice ownership (tenant-scoped)
+
+**Frontend:**
+- Current plan identificado e desabilitado
+- Subscribe apenas se sem subscription
+- Change Plan apenas se subscription ativa
+- Botões contextuais baseados em estado
+
+### Recursos Utilizados
+
+**Backend:**
+- Laravel Cashier v16 (Stripe integration)
+- Billable trait no Tenant model
+- Checkout Sessions (14-day trial)
+- Customer Portal (Stripe-hosted)
+- Webhook Handling (WebhookReceived event)
+- Event Listeners (UpdateTenantLimits)
+
+**Frontend:**
+- Inertia.js (router.post, router.get)
+- shadcn/ui components:
+  - Card, CardHeader, CardTitle, CardDescription
+  - CardContent, CardFooter
+  - Badge, Table, Button
+- Lucide icons (Check, Download, ExternalLink)
+- TypeScript tipos customizados (Plan, Subscription, Invoice)
+
+### Integração Stripe
+
+**Cashier Configuration:**
+- Model: Tenant (usa trait Billable)
+- Stripe Customer: criado automaticamente
+- Customer Name: tenant->name
+- Customer Email: primeiro owner->email
+- Price IDs: definidos em config/services.php
+- Webhooks: /stripe/webhook (Cashier default)
+
+**Webhook Events Handled:**
+- customer.subscription.updated → UpdateTenantLimits
+- Outros eventos Cashier (invoice.*, payment.*, etc.)
+
+**Security:**
+- Webhook signature verification (Cashier automático)
+- STRIPE_WEBHOOK_SECRET configurado
+- Tenant isolation (stripe_id único por tenant)
+
+### Próximos Passos
+
+**Configuração Obrigatória (Usuário):**
+1. Criar conta Stripe (Test Mode)
+2. Obter API Keys: STRIPE_KEY, STRIPE_SECRET
+3. Criar 3 Products com Prices:
+   - Starter: $9/month
+   - Professional: $29/month
+   - Enterprise: $99/month
+4. Copiar Price IDs para .env:
+   - STRIPE_PRICE_STARTER=price_xxx
+   - STRIPE_PRICE_PROFESSIONAL=price_xxx
+   - STRIPE_PRICE_ENTERPRISE=price_xxx
+5. Configurar webhook endpoint: /stripe/webhook
+6. Copiar Webhook Secret: STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+**Testing Local:**
+- Usar Stripe CLI: `stripe listen --forward-to localhost/stripe/webhook`
+- Test cards: 4242 4242 4242 4242 (success)
+- Testar trial period (14 dias)
+- Testar webhook events (subscription.updated)
+
+**Próximas Etapas:**
+- Etapa 09: Impersonation (Super Admin impersonate tenants)
+- Etapa 10: API Tokens (Sanctum, rate limiting)
+
+---
+
+## Etapa 08 - File Storage (Tenant-Isolated with Spatie MediaLibrary)
+
+**Data:** 2025-11-19
+**Duração:** ~25 minutos
+
+### Implementações Realizadas
+
+**Backend - Storage Configuration:**
+1. ✅ Disks tenant-isolated configurados
+   - `config/filesystems.php` (modificado)
+   - Disk `tenant_uploads` (local): `storage/app/tenants/{tenant_id}/`
+   - Disk `tenant_s3` (S3): `tenants/{tenant_id}/` prefix
+   - Ambos com `visibility: private` para segurança
+   - Fallback para 'central' quando tenancy não inicializado
+
+2. ✅ Project model já preparado (Etapa 03)
+   - Interface `HasMedia` implementada
+   - Trait `InteractsWithMedia` presente
+   - `registerMediaCollections()` configurado:
+     - Collection 'attachments': arquivos genéricos
+     - Collection 'images': imagens com thumb 300x300
+
+**Backend - ProjectController:**
+3. ✅ Controller CRUD completo criado
+   - `app/Http/Controllers/ProjectController.php` (204 linhas)
+   - 7 métodos padrão: index, create, store, show, edit, update, destroy
+   - 3 métodos media: uploadFile, downloadFile, deleteFile
+   - Validações: 10MB max file size, collection obrigatória
+   - Security: Verifica ownership do tenant em downloads/deletes
+   - Authorization: Gate checks em todos os métodos
+
+**Rotas:**
+4. ✅ Rotas completas configuradas
+   - `routes/tenant.php` (modificado)
+   - 7 rotas CRUD padrão (GET, POST, PATCH, DELETE)
+   - 3 rotas media:
+     - POST /projects/{project}/media - Upload
+     - GET /projects/{project}/media/{media} - Download
+     - DELETE /projects/{project}/media/{media} - Delete
+
+**Frontend:**
+5. ✅ Página projects/show com upload
+   - `resources/js/pages/tenant/projects/show.tsx` (288 linhas)
+   - Seções:
+     - Header com back button, title, status badge
+     - Description card
+     - Attachments section com upload
+     - Images section com upload e grid preview
+   - Features:
+     - Upload automático ao selecionar arquivo
+     - Estados de loading (uploadingAttachment, uploadingImage)
+     - Confirmação antes de deletar
+     - Download direto via links
+     - Preview de thumbnails para imagens
+     - Grid responsivo 2-4 colunas
+     - Hover actions (download + delete)
+
+### Fluxo de Upload Implementado
+
+**1. Seleção de Arquivo:**
+- Usuário clica "Upload File" ou "Upload Image"
+- Input hidden com ref é acionado
+- onChange dispara submit automático do form
+
+**2. Upload:**
+- FormData criado com file + collection
+- router.post() envia para `/projects/{id}/media`
+- ProjectController@uploadFile valida:
+  - Tamanho máximo 10MB
+  - Collection válida (attachments/images)
+- MediaLibrary processa:
+  - Salva em disk tenant_uploads
+  - Se image: gera conversion 'thumb' 300x300
+- Redirect com success message
+
+**3. Visualização:**
+- Attachments: Table com nome, tamanho, tipo, ações
+- Images: Grid com thumbnails, hover overlay com ações
+- Download: Link direto para ProjectController@downloadFile
+- Delete: Botão com confirmação
+
+**4. Segurança:**
+- Verificação tenant_id em downloads/deletes
+- Verificação model ownership (media pertence ao project?)
+- Private visibility (arquivos não públicos)
+- Gate authorization checks
+
+### Tenant Isolation
+
+**Path Structure:**
+```
+Local (development):
+storage/app/tenants/
+├── 1/                    # Tenant ID 1 (Acme)
+│   ├── 1/                # Project ID 1
+│   │   ├── file.pdf
+│   │   └── conversions/
+│   │       └── thumb.jpg
+│   └── 2/                # Project ID 2
+└── 2/                    # Tenant ID 2 (Startup)
+    └── 1/
+        └── image.png
+
+S3 (production):
+my-bucket/
+└── tenants/
+    ├── 1/                # Tenant ID 1
+    │   └── ...
+    └── 2/                # Tenant ID 2
+        └── ...
+```
+
+**Isolation Guarantees:**
+1. Disk root dinâmico baseado em `tenant('id')`
+2. Verificação de `tenant_id` em downloads
+3. MediaLibrary salva automaticamente em subdirs por model
+4. Private visibility impede acesso direto por URL
+
+### Arquivos Criados/Modificados
+
+**Criados (2 arquivos):**
+- Backend:
+  - `app/Http/Controllers/ProjectController.php` (204 linhas)
+- Frontend:
+  - `resources/js/pages/tenant/projects/show.tsx` (288 linhas)
+
+**Modificados (2 arquivos):**
+- `config/filesystems.php` (+24 linhas) - 2 disks tenant-isolated
+- `routes/tenant.php` (+11 linhas) - 10 rotas projects (7 CRUD + 3 media)
+
+### Validações Implementadas
+
+**Backend (ProjectController):**
+- File upload: required|file|max:10240 (10MB)
+- Collection: required|in:attachments,images
+- Model ownership: media->model_id === project->id
+- Tenant ownership: project->tenant_id === current_tenant_id()
+- Authorization: Gate checks (view, update, delete)
+
+**Frontend:**
+- Accept apenas images para image input
+- Confirmação antes de delete
+- Loading states durante upload
+- Formulário auto-submit ao selecionar
+
+### Recursos Utilizados
+
+**Backend:**
+- Spatie MediaLibrary v11 (já instalado na Etapa 01)
+- MediaConversions (thumb 300x300 para images)
+- Laravel Storage (disk tenant_uploads)
+- Gate authorization (ProjectPolicy)
+- Response::download() para servir arquivos
+
+**Frontend:**
+- Inertia.js router (post, delete com FormData)
+- shadcn/ui components:
+  - Card, Table, Button, Badge, Input
+- Lucide icons (Upload, Download, Trash2, Image, Paperclip)
+- useRef para file inputs
+- useState para loading states
+- Grid responsivo (grid-cols-2 md:grid-cols-4)
+
+### Storage Limits
+
+**Current Setup:**
+- Max file size: 10MB per file
+- Collections: 2 (attachments, images)
+- Conversions: 1 (thumb 300x300 only for images)
+- No limit on number of files per project
+
+**Future Enhancements:**
+- Storage quotas per tenant plan (via settings.limits.storage_mb)
+- Multiple image sizes (small, medium, large)
+- Supported file types whitelist
+- Virus scanning integration
+- CDN integration for public assets
+
+### Testing
+
+**Manual Testing Required:**
+1. Criar project
+2. Upload attachment (PDF, DOCX)
+3. Upload image (PNG, JPG)
+4. Verificar thumb gerado
+5. Download arquivos
+6. Delete arquivos
+7. Verificar paths no storage (tenant isolation)
+8. Tentar acessar arquivo de outro tenant (deve 404)
+
+### Próximos Passos
+
+**Etapa 09**: Impersonation (Super Admin pode impersonar tenants)
+**Etapa 10**: API Tokens (Sanctum, rate limiting, versioning)
+**Etapa 11**: Tenant Settings (Preferences, branding, notifications)
+
+---
+
+**Última Atualização:** 2025-11-19 20:15
 **Atualizado por:** Multi-Tenant SaaS Builder Agent
 **Etapas Completadas:**
 - ✅ 01 - Setup Inicial
@@ -1184,3 +1628,5 @@ Etapa XX - Nome da Etapa
 - ✅ 04 - Routing e Middleware
 - ✅ 05 - Authorization (Roles, Permissions, Gates, Policies)
 - ✅ 06 - Team Management (Invitation System, Email, Frontend)
+- ✅ 07 - Billing & Stripe Integration (Cashier, Checkout, Portal, Webhooks)
+- ✅ 08 - File Storage (Tenant-Isolated, Spatie MediaLibrary, Upload/Download)
