@@ -7,9 +7,9 @@ Este arquivo rastreia todo o progresso da implementação do sistema Multi-Tenan
 ## Status Geral
 
 **Iniciado em:** 2025-11-19
-**Última Atualização:** 2025-11-19 15:15
-**Etapa Atual:** 01 - Setup Inicial
-**Progresso Total:** 1/15 etapas (6.7%)
+**Última Atualização:** 2025-11-19 16:05
+**Etapa Atual:** 02 - Database Schema
+**Progresso Total:** 2/15 etapas (13.3%)
 
 ---
 
@@ -17,7 +17,7 @@ Este arquivo rastreia todo o progresso da implementação do sistema Multi-Tenan
 
 ### Fundação
 - [x] **Etapa 01** - Setup Inicial (01-SETUP.md) ✅
-- [ ] **Etapa 02** - Database Schema (02-DATABASE.md)
+- [x] **Etapa 02** - Database Schema (02-DATABASE.md) ✅
 - [ ] **Etapa 03** - Models (03-MODELS.md)
 
 ### Core Features
@@ -185,6 +185,224 @@ quando houver rotas e pages implementadas para testar.
 
 ---
 
+## [Etapa 02] - Database Schema - 2025-11-19 16:05
+
+### 📋 Objetivo
+Criar e configurar todas as migrations necessárias para o sistema multi-tenant:
+- Modificar migrations do stancl/tenancy (tenants, domains)
+- Criar pivot table tenant_user (N:N relationship)
+- Configurar migrations Cashier para billing tenant-aware
+- Integrar MediaLibrary migrations
+- Criar migrations de exemplo (projects table)
+- Popular banco com dados de teste (seeder)
+
+### ✅ Tarefas Completadas
+- [x] Analisar documentação 02-DATABASE.md completa (739 linhas)
+- [x] Coletar preferências do usuário via AskUserQuestion (domains + projects table)
+- [x] Modificar `create_tenants_table.php` (UUID → auto-increment + structured columns)
+- [x] Modificar `create_domains_table.php` (tenant_id foreignId + is_primary)
+- [x] Criar `create_tenant_user_table.php` (pivot N:N com composite PK e roles)
+- [x] Criar `add_is_super_admin_to_users_table.php` (super admin flag)
+- [x] Publicar 5 migrations Cashier (subscriptions, items, meters)
+- [x] Criar `add_tenant_id_to_subscriptions_table.php` (tenant-aware billing)
+- [x] Publicar migration MediaLibrary (media table)
+- [x] Criar `create_projects_table.php` (exemplo de tenant-scoped table)
+- [x] Criar TenantSeeder (2 tenants + 3 users)
+- [x] Modificar DatabaseSeeder (registrar TenantSeeder)
+- [x] Executar `sail artisan migrate:fresh --seed` com sucesso
+
+### 📁 Arquivos Criados
+- `database/migrations/2025_11_19_152423_create_tenant_user_table.php` - Pivot N:N users-tenants com roles
+- `database/migrations/2025_11_19_152652_add_is_super_admin_to_users_table.php` - Flag super admin
+- `database/migrations/2019_05_03_000001_create_customer_columns.php` - Cashier: customer columns
+- `database/migrations/2019_05_03_000002_create_subscriptions_table.php` - Cashier: subscriptions
+- `database/migrations/2019_05_03_000003_create_subscription_items_table.php` - Cashier: items
+- `database/migrations/2024_08_02_000001_add_meter_columns_to_customers_table.php` - Cashier: meters
+- `database/migrations/2024_08_02_000002_create_meter_events_table.php` - Cashier: meter events
+- `database/migrations/2025_11_19_153155_add_tenant_id_to_subscriptions_table.php` - Tenant-aware billing
+- `database/migrations/2025_11_19_153425_create_media_table.php` - MediaLibrary integration
+- `database/migrations/2025_11_19_153645_create_projects_table.php` - Exemplo tenant-scoped
+- `database/seeders/TenantSeeder.php` - Seeder de tenants de teste
+
+### 📝 Arquivos Modificados
+- `database/migrations/2019_09_15_000010_create_tenants_table.php` - Mudanças:
+  - `$table->string('id')->primary()` → `$table->id()` (auto-increment)
+  - Removido campo genérico `data` JSON
+  - Adicionados campos estruturados: `name`, `slug` (unique), `settings` (JSON nullable)
+  - Schema completo seguindo padrão Laravel
+
+- `database/migrations/2019_09_15_000020_create_domains_table.php` - Mudanças:
+  - `$table->string('tenant_id')` → `$table->foreignId('tenant_id')->constrained()->cascadeOnDelete()`
+  - Adicionado `$table->boolean('is_primary')->default(false)`
+  - Adicionados indexes: `index('tenant_id')`, `index(['tenant_id', 'is_primary'])`
+  - Foreign key constraint para integridade referencial
+
+- `database/seeders/DatabaseSeeder.php` - Mudanças:
+  - Registrado `TenantSeeder::class` no método `run()`
+  - Removidas factories de exemplo (User::factory)
+
+### 🧪 Testes Executados
+
+**Inicialização do Ambiente:**
+```bash
+./vendor/bin/sail up -d
+```
+✅ Resultado: 3 containers iniciados (pgsql, redis, laravel.test)
+
+**Execução de Migrations:**
+```bash
+./vendor/bin/sail artisan migrate:fresh --seed
+```
+✅ Resultado: 18 migrations executadas com sucesso
+- Dropped all tables
+- Migration table created
+- 18 migrations ran
+- TenantSeeder executed successfully
+
+**Dados Criados pelo Seeder:**
+- ✅ 1 super admin: admin@myapp.com / password
+- ✅ 2 tenants:
+  - Acme Corporation (slug: acme, domain: tenant1.localhost)
+  - Startup Inc (slug: startup, domain: tenant2.localhost)
+- ✅ 2 tenant owners:
+  - john@acme.com / password (owner do Acme)
+  - jane@startup.com / password (owner do Startup)
+- ✅ 2 tenant_user pivot entries (role: owner)
+
+**Verificação de Status:**
+```bash
+./vendor/bin/sail artisan migrate:status
+```
+✅ Resultado: Todas 18 migrations marcadas como "Ran"
+
+**Nota sobre MCP Tools:**
+- Telescope MCP: Ainda não aplicável (sem rotas/requests para monitorar)
+- Playwright MCP: Ainda não aplicável (sem páginas frontend implementadas)
+- Context7 MCP: ✅ Usado durante análise para consultar best practices Laravel/Inertia
+
+### ⚠️ Decisões Tomadas
+
+1. **Domains para Desenvolvimento (Escolha do Usuário):**
+   - Opção escolhida: `tenant1.localhost` e `tenant2.localhost`
+   - Alternativa rejeitada: `acme.localhost` e `startup.localhost`
+   - Justificativa: Convenção simples e numérica, fácil de expandir (tenant3, tenant4, etc.)
+
+2. **Projects Table - Criar Agora (Escolha do Usuário):**
+   - Opção escolhida: Sim, criar agora como exemplo
+   - Alternativa rejeitada: Criar depois na Etapa 3
+   - Justificativa: Serve como template completo de tenant-scoped table com todos os indexes críticos
+
+3. **Composite Primary Key em tenant_user:**
+   - Decisão: `$table->primary(['tenant_id', 'user_id'])`
+   - Justificativa: Garante unicidade do relacionamento, melhor performance em queries
+   - Evita necessidade de coluna `id` auto-increment extra
+
+4. **Enum Constraint para Roles:**
+   - Decisão: `enum('role', ['owner', 'admin', 'member', 'guest'])`
+   - Justificativa: Validação em nível de database, previne dados inválidos
+   - Roles padronizados conforme documentação
+
+5. **Indexes Críticos em Todas Tabelas Tenant-Scoped:**
+   - Decisão: Sempre adicionar `$table->index('tenant_id')` + indexes compostos
+   - Justificativa: Performance crítica para queries filtradas por tenant
+   - Exemplo: `index(['tenant_id', 'created_at'])` em projects
+
+6. **Tenant_id em Subscriptions (Cashier):**
+   - Decisão: Criar migration adicional para adicionar `tenant_id` à tabela `subscriptions`
+   - Justificativa: Cashier não é tenant-aware por padrão, precisamos adaptar
+   - Cascade delete configurado para integridade referencial
+
+7. **Seeder com DB Facade (não Models):**
+   - Decisão: Usar `DB::table()->insert()` ao invés de models Tenant/Domain
+   - Justificativa: Models ainda não criados nesta etapa
+   - User model usado pois já existe (Laravel default)
+
+### 🐛 Problemas Encontrados e Soluções
+
+**Problema 1: PostgreSQL Connection Refused**
+- **Descrição:** Ao executar `php artisan migrate:fresh --seed`, erro:
+  ```
+  SQLSTATE[08006] [7] could not translate host name "pgsql" to address:
+  Temporary failure in name resolution
+  ```
+- **Causa:** Containers Docker (Laravel Sail) não estavam rodando
+- **Solução:**
+  1. Executar `./vendor/bin/sail up -d` para iniciar containers
+  2. Aguardar 10 segundos para PostgreSQL inicializar completamente
+  3. Executar migrations via Sail: `./vendor/bin/sail artisan migrate:fresh --seed`
+  4. ✅ Sucesso: 18 migrations executadas
+- **Lição Aprendida:** Sempre verificar status dos containers antes de rodar migrations
+
+### 📊 Métricas
+- **Migrations criadas:** 11 novas migrations
+- **Migrations modificadas:** 2 migrations (tenants, domains)
+- **Migrations publicadas:** 6 migrations (5 Cashier + 1 MediaLibrary)
+- **Total de migrations executadas:** 18 migrations
+- **Seeders criados:** 1 (TenantSeeder)
+- **Seeders modificados:** 1 (DatabaseSeeder)
+- **Tabelas criadas no banco:** 18 tabelas
+- **Registros criados:**
+  - Users: 3 (1 super admin + 2 owners)
+  - Tenants: 2 (Acme + Startup)
+  - Domains: 2 (tenant1.localhost + tenant2.localhost)
+  - Tenant_user: 2 (pivot entries)
+- **Linhas de código:** ~420 linhas (migrations + seeders)
+- **Tempo de implementação:** ~35 minutos
+
+### 💡 Observações
+
+1. **Padrão de Migrations Tenant-Scoped:**
+   - SEMPRE adicionar `foreignId('tenant_id')->constrained()->cascadeOnDelete()`
+   - SEMPRE adicionar `index('tenant_id')` para performance
+   - Considerar indexes compostos: `index(['tenant_id', 'created_at'])`
+   - Exemplo completo implementado em `create_projects_table.php`
+
+2. **Tenant-Aware Billing:**
+   - Cashier não é multi-tenant por padrão
+   - Solução: Adicionar `tenant_id` à tabela `subscriptions`
+   - Trait `Billable` será adicionado ao Model Tenant na Etapa 3
+   - Webhooks Stripe precisarão considerar tenant_id (Etapa 7)
+
+3. **Super Admin vs Tenant Owners:**
+   - Super Admin: `is_super_admin = true` no users table
+   - Tem acesso global, pode impersonar qualquer tenant
+   - Não pertence a nenhum tenant específico (sem entry em tenant_user)
+   - Tenant Owner: `role = 'owner'` em tenant_user pivot
+   - Pode ter múltiplos owners por tenant (não há constraint unique)
+
+4. **Settings JSON em Tenants:**
+   - Estrutura flexível para configurações customizadas por tenant
+   - Exemplos no seeder: `branding` (cores), `limits` (quotas)
+   - PostgreSQL suporta queries JSON nativas (melhor que MySQL)
+   - Serão expostos via API na Etapa 11 (Tenant Settings)
+
+5. **Invitation System (Preparado):**
+   - Campos criados em tenant_user: `invited_at`, `invitation_token`, `joined_at`
+   - Permite convidar usuários antes de criarem conta
+   - Token único para segurança
+   - Implementação do fluxo de convites na Etapa 6 (Team Management)
+
+6. **MediaLibrary Integration:**
+   - Migration publicada, mas ainda não configurada para tenancy
+   - Isolation por tenant será implementado na Etapa 8 (File Storage)
+   - Usar `addMediaConversion()` para otimizar uploads
+
+### ➡️ Próxima Etapa
+**Etapa 03** - Models (03-MODELS.md)
+- Criar Model `App\Models\Tenant` extends `Stancl\Tenancy\Database\Models\Tenant`
+- Adicionar trait `Billable` ao Tenant model (Cashier integration)
+- Criar trait `BelongsToTenant` para models tenant-scoped
+- Configurar relationships:
+  - Tenant hasMany User (via tenant_user pivot)
+  - User belongsToMany Tenant (via tenant_user pivot)
+  - Tenant hasMany Domain
+  - Tenant hasMany Subscription
+- Adicionar scopes automáticos para tenant isolation
+- Configurar observers para auto-associar tenant_id
+- Escrever testes de models (factories + unit tests)
+
+---
+
 <!-- Template para próximas etapas abaixo -->
 
 ### Template de Entrada (Copiar para cada etapa)
@@ -324,28 +542,45 @@ Etapa XX - Nome da Etapa
 ## Estatísticas Finais
 
 **Total de Arquivos:**
-- Criados: 11 (Etapa 01)
-- Modificados: 5 (Etapa 01)
-- Total: 16 arquivos
+- Criados: 22 arquivos (11 Etapa 01 + 11 Etapa 02)
+- Modificados: 8 arquivos (5 Etapa 01 + 3 Etapa 02)
+- Total: 30 arquivos
 
 **Total de Código:**
-- PHP: ~150 linhas (configs + migrations)
+- PHP: ~570 linhas (configs + migrations + seeders)
+  - Etapa 01: ~150 linhas (configs + migrations base)
+  - Etapa 02: ~420 linhas (migrations + seeders)
 - TypeScript/JavaScript: 0 linhas (ainda não iniciado)
-- Migrations: 3 migrations centrais criadas (não executadas)
+- Migrations: 18 migrations executadas com sucesso
 
 **Pacotes:**
 - Instalados: 4 principais (stancl/tenancy, laravel/cashier, spatie/laravel-medialibrary, laravel/sanctum)
 - Dependências: +15 packages
+- Total: 19 packages
+
+**Database:**
+- Tabelas criadas: 18 tabelas
+- Registros de teste:
+  - Users: 3 (1 super admin + 2 owners)
+  - Tenants: 2 (Acme Corporation + Startup Inc)
+  - Domains: 2 (tenant1.localhost + tenant2.localhost)
+  - Tenant_user: 2 (pivot entries)
 
 **Testes:**
+- Migrations executadas: ✅ 18/18 com sucesso
+- Seeder executado: ✅ TenantSeeder com sucesso
 - Feature tests: 0 (serão criados na Etapa 13)
 - Unit tests: 0 (serão criados na Etapa 13)
 - Coverage: 0%
 
-**Tempo Total:** ~25 minutos (Etapa 01)
+**Tempo Total:** ~60 minutos
+- Etapa 01: ~25 minutos (Setup)
+- Etapa 02: ~35 minutos (Database Schema)
 
 ---
 
-**Última Atualização:** 2025-11-19 15:15
+**Última Atualização:** 2025-11-19 16:05
 **Atualizado por:** Multi-Tenant SaaS Builder Agent
-**Etapa Completada:** 01 - Setup Inicial ✅
+**Etapas Completadas:**
+- ✅ 01 - Setup Inicial
+- ✅ 02 - Database Schema

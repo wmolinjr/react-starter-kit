@@ -16,12 +16,13 @@ class CreateTenantsTable extends Migration
     public function up(): void
     {
         Schema::create('tenants', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->id(); // Auto-increment instead of UUID
 
-            // your custom columns may go here
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->json('settings')->nullable();
 
             $table->timestamps();
-            $table->json('data')->nullable();
         });
     }
 
