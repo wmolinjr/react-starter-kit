@@ -59,20 +59,10 @@ Route::middleware([
 
         // Team Management
         Route::prefix('team')->name('team.')->group(function () {
-            Route::get('/', function () {
-                $tenant = tenant();
-                $members = $tenant->users()
-                    ->withPivot('role', 'permissions', 'joined_at')
-                    ->orderBy('tenant_user.joined_at', 'desc')
-                    ->get();
-
-                return Inertia::render('tenant/team/index', [
-                    'members' => $members,
-                    'tenant' => $tenant,
-                ]);
-            })->name('index');
-
-            // invite, remove, update-role serão implementados em TeamController
+            Route::get('/', [\App\Http\Controllers\TeamController::class, 'index'])->name('index');
+            Route::post('/invite', [\App\Http\Controllers\TeamController::class, 'invite'])->name('invite');
+            Route::patch('/{user}/role', [\App\Http\Controllers\TeamController::class, 'updateRole'])->name('update-role');
+            Route::delete('/{user}', [\App\Http\Controllers\TeamController::class, 'remove'])->name('remove');
         });
 
         // Billing (Laravel Cashier)

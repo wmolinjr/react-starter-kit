@@ -30,3 +30,16 @@ Route::get('/pricing', function () {
 
 // Register tenant + user (será implementado em RegisterController)
 // POST /register será adicionado quando criar o controller
+
+// Accept invitation (rota pública, pode não estar autenticado)
+Route::get('/accept-invitation', function () {
+    $token = request()->query('token');
+
+    return Inertia::render('accept-invitation', [
+        'token' => $token,
+    ]);
+})->name('accept-invitation');
+
+Route::post('/accept-invitation', [\App\Http\Controllers\TeamController::class, 'acceptInvitation'])
+    ->middleware('auth')
+    ->name('accept-invitation.store');

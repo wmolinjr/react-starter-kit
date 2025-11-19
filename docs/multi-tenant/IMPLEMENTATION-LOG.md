@@ -995,7 +995,187 @@ Etapa XX - Nome da Etapa
 
 ---
 
-**Última Atualização:** 2025-11-19 18:15
+---
+
+## Etapa 06 - Team Management
+
+**Data:** 2025-11-19
+**Duração:** ~45 minutos
+
+### Implementações Realizadas
+
+**Backend:**
+1. ✅ TeamController criado com 5 métodos
+   - `app/Http/Controllers/TeamController.php` (242 linhas)
+   - Métodos: index, invite, acceptInvitation, updateRole, remove
+   - Validações: limite de usuários, prevenir auto-remoção, último owner
+   - Transações DB para operações críticas
+
+2. ✅ TeamInvitation Mailable criado
+   - `app/Mail/TeamInvitation.php` (67 linhas)
+   - Implements ShouldQueue para envio assíncrono
+   - Parâmetros: tenant, invitedBy, role, token
+   - Subject dinâmico com nome do tenant
+
+3. ✅ Template de email criado
+   - `resources/views/emails/team-invitation.blade.php` (98 linhas)
+   - Design responsivo com CSS inline
+   - Badges coloridos por role (admin/member/guest)
+   - Link de aceitação com token
+
+4. ✅ Método hasReachedUserLimit() adicionado ao Tenant
+   - `app/Models/Tenant.php` (linha 135-148)
+   - Verifica limite max_users
+   - Conta apenas usuários com joined_at preenchido
+   - Retorna false se sem limite
+
+**Rotas:**
+5. ✅ Rotas de team configuradas
+   - `routes/tenant.php` - 4 rotas tenant-scoped:
+     - GET /team → TeamController@index
+     - POST /team/invite → TeamController@invite
+     - PATCH /team/{user}/role → TeamController@updateRole
+     - DELETE /team/{user} → TeamController@remove
+   - `routes/web.php` - 2 rotas centrais:
+     - GET /accept-invitation → Inertia page
+     - POST /accept-invitation → TeamController@acceptInvitation (auth)
+
+**Frontend:**
+6. ✅ Página de gerenciamento de time
+   - `resources/js/pages/tenant/team/index.tsx` (218 linhas)
+   - Table com membros: nome, email, role, status (pending/ativo)
+   - Badges por role e status
+   - Dropdown menu com ações: Update Role, Remove
+   - Indicador de uso: X/Y membros ativos
+   - Integração com Can component (canManageTeam)
+
+7. ✅ Componente de convite de membro
+   - `resources/js/components/invite-member-dialog.tsx` (130 linhas)
+   - Dialog com formulário Inertia
+   - Campos: email (required), role (select: admin/member/guest)
+   - Descrições contextuais por role
+   - Alert quando limite atingido
+   - Validação client-side e server-side
+
+8. ✅ Página de aceitação de convite
+   - `resources/js/pages/accept-invitation.tsx` (120 linhas)
+   - Verificação de token
+   - Estados: não autenticado, autenticado, token inválido
+   - Links para login/register com redirect
+   - Submit POST via useForm (Inertia)
+
+### Fluxo de Convite Implementado
+
+**1. Convite (Owner/Admin):**
+- Acessa `/team`
+- Clica "Convidar Membro"
+- Preenche email e role
+- Sistema verifica limite de usuários
+- Verifica se email já é membro
+- Cria user (se não existe) com senha temporária
+- Gera token de 64 caracteres
+- Adiciona ao tenant_user com joined_at=NULL
+- Envia email com link de aceitação
+
+**2. Aceitação (Convidado):**
+- Recebe email com link: /accept-invitation?token=XXX
+- Acessa link (rota central)
+- Se não autenticado: mostra botões Login/Register
+- Se autenticado: mostra botão "Aceitar Convite"
+- Ao clicar: POST /accept-invitation com token
+- Sistema atualiza joined_at e limpa invitation_token
+- Redireciona para dashboard do tenant
+
+**3. Gerenciamento Pós-Convite:**
+- Owner/Admin pode ver status "Pending" na tabela
+- Pode alterar role de membros ativos
+- Pode remover membros (exceto si mesmo e último owner)
+- Sistema previne remoção acidental do último owner
+
+### Arquivos Criados/Modificados
+
+**Criados (8 arquivos):**
+- Backend:
+  - `app/Http/Controllers/TeamController.php` (242 linhas)
+  - `app/Mail/TeamInvitation.php` (67 linhas)
+  - `resources/views/emails/team-invitation.blade.php` (98 linhas)
+- Frontend:
+  - `resources/js/pages/tenant/team/index.tsx` (218 linhas)
+  - `resources/js/components/invite-member-dialog.tsx` (130 linhas)
+  - `resources/js/pages/accept-invitation.tsx` (120 linhas)
+
+**Modificados (3 arquivos):**
+- `app/Models/Tenant.php` (+14 linhas) - método hasReachedUserLimit()
+- `routes/tenant.php` (+4 linhas) - rotas team management
+- `routes/web.php` (+12 linhas) - rotas accept-invitation
+
+### Validações Implementadas
+
+**Backend (TeamController):**
+- Limite de usuários por plano (max_users)
+- Email já é membro do tenant
+- Token válido e não expirado (joined_at NULL)
+- Prevenir auto-atualização de role
+- Prevenir auto-remoção do time
+- Prevenir remoção do último owner
+- Prevenir alteração de role do último owner
+
+**Frontend:**
+- Email formato válido (HTML5 + server-side)
+- Role obrigatória (admin/member/guest)
+- Botão desabilitado se limite atingido
+- Alert visual quando limite atingido
+- Mensagens de erro contextuais
+
+### Recursos Utilizados
+
+**Backend:**
+- Laravel Mail (Mailable + ShouldQueue)
+- Blade templates para emails
+- DB transactions para operações críticas
+- firstOrCreate para upsert de users
+- Str::random(64) para tokens seguros
+- Gate::authorize para check de permissões
+
+**Frontend:**
+- Inertia.js Form (useForm hook)
+- shadcn/ui components:
+  - Dialog, Button, Input, Label, Select
+  - Table, Badge, DropdownMenu, Alert
+- Lucide icons (Mail, Users, UserPlus, etc.)
+- Can component para conditional rendering
+- usePermissions hook para auth checks
+
+### Segurança
+
+**Token de Convite:**
+- 64 caracteres aleatórios (Str::random)
+- Stored em tenant_user.invitation_token
+- Usado apenas uma vez
+- Limpado após aceitação
+- Verificado com joined_at NULL
+
+**Autenticação:**
+- acceptInvitation requer auth middleware
+- index/invite/updateRole/remove requerem Gate manage-team
+- Rotas tenant-scoped com VerifyTenantAccess
+
+**Validações de Integridade:**
+- Último owner não pode ser removido
+- Último owner não pode ter role alterada
+- Usuário não pode se remover
+- Usuário não pode alterar própria role
+- Limite de usuários respeitado
+
+### Próximos Passos
+
+- Etapa 07: Billing (Stripe Checkout, Portal, Subscription Management)
+- Etapa 08: File Storage (S3, Media Library)
+- Etapa 09: API (Sanctum, Rate Limiting, Versioning)
+
+---
+
+**Última Atualização:** 2025-11-19 19:00
 **Atualizado por:** Multi-Tenant SaaS Builder Agent
 **Etapas Completadas:**
 - ✅ 01 - Setup Inicial
@@ -1003,3 +1183,4 @@ Etapa XX - Nome da Etapa
 - ✅ 03 - Models e Relacionamentos
 - ✅ 04 - Routing e Middleware
 - ✅ 05 - Authorization (Roles, Permissions, Gates, Policies)
+- ✅ 06 - Team Management (Invitation System, Email, Frontend)

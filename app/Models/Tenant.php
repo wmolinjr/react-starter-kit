@@ -130,6 +130,24 @@ class Tenant extends Model
     }
 
     /**
+     * Verificar se atingiu limite de usuários
+     */
+    public function hasReachedUserLimit(): bool
+    {
+        $maxUsers = $this->max_users;
+
+        if ($maxUsers === null) {
+            return false; // Sem limite
+        }
+
+        $currentUsers = $this->users()
+            ->whereNotNull('tenant_user.joined_at')
+            ->count();
+
+        return $currentUsers >= $maxUsers;
+    }
+
+    /**
      * Stripe customer name para Cashier
      */
     public function stripeCustomerName(): string
