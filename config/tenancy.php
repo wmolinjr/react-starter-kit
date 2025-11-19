@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Models\Tenant;
 use Stancl\Tenancy\Database\Models\Domain;
-use Stancl\Tenancy\Database\Models\Tenant;
 
 return [
-    'tenant_model' => Tenant::class, // Will be replaced with App\Models\Tenant in next step
+    'tenant_model' => Tenant::class, // Using custom App\Models\Tenant
     'id_generator' => null, // Use auto-increment instead of UUID
 
     'domain_model' => Domain::class,
@@ -27,7 +27,8 @@ return [
      * To configure their behavior, see the config keys below.
      */
     'bootstrappers' => [
-        Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
+        // DatabaseTenancyBootstrapper is DISABLED for single database strategy with tenant_id isolation
+        // Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,

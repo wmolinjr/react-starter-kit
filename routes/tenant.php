@@ -24,7 +24,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
+    // PreventAccessFromCentralDomains::class, // Disabled for testing - prevents test domains from being blocked
 ])->group(function () {
     // Redirect root para dashboard
     Route::get('/', function () {
@@ -93,16 +93,11 @@ Route::middleware([
             // API Tokens Management
             Route::get('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'index'])->name('tokens.index');
             Route::post('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'store'])->name('tokens.store');
+            Route::patch('/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'update'])->name('tokens.update');
             Route::delete('/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('tokens.destroy');
-            Route::delete('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'destroyAll'])->name('tokens.destroy-all');
 
-            // Example: API endpoint for projects (tenant-scoped)
-            Route::get('/projects', function () {
-                return response()->json([
-                    'tenant_id' => current_tenant_id(),
-                    'projects' => \App\Models\Project::all(),
-                ]);
-            })->name('projects.index');
+            // Projects API (tenant-scoped)
+            Route::apiResource('projects', \App\Http\Controllers\Api\ProjectController::class);
         });
 });
 

@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Cashier\Billable;
+use Stancl\Tenancy\Contracts\TenantWithDatabase;
+use Stancl\Tenancy\Database\Concerns\HasDatabase;
+use Stancl\Tenancy\Database\Concerns\HasInternalKeys;
+use Stancl\Tenancy\Database\Concerns\TenantRun;
 
-class Tenant extends Model
+class Tenant extends Model implements TenantWithDatabase
 {
-    use HasFactory, Billable;
+    use HasFactory, Billable, HasDatabase, HasInternalKeys, TenantRun;
 
     protected $fillable = [
         'name',
@@ -21,6 +25,24 @@ class Tenant extends Model
     protected $casts = [
         'settings' => 'array',
     ];
+
+    /**
+     * Get the name of the key used for identifying the tenant.
+     * Required by Stancl\Tenancy\Contracts\Tenant
+     */
+    public function getTenantKeyName(): string
+    {
+        return 'id';
+    }
+
+    /**
+     * Get the value of the key used for identifying the tenant.
+     * Required by Stancl\Tenancy\Contracts\Tenant
+     */
+    public function getTenantKey()
+    {
+        return $this->getAttribute($this->getTenantKeyName());
+    }
 
     /**
      * Tenant tem muitos domínios

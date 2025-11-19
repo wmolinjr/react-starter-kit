@@ -25,7 +25,7 @@ abstract class TenantTestCase extends TestCase
             'slug' => 'test-tenant-'.uniqid(),
         ]);
 
-        $this->tenant->domains()->create([
+        $domain = $this->tenant->domains()->create([
             'domain' => $this->tenant->slug.'.myapp.test',
             'is_primary' => true,
         ]);
@@ -39,6 +39,12 @@ abstract class TenantTestCase extends TestCase
 
         // Initialize tenant context
         tenancy()->initialize($this->tenant);
+
+        // Set default SERVER variables for tenant domain
+        $this->withServerVariables([
+            'HTTP_HOST' => $domain->domain,
+            'SERVER_NAME' => $domain->domain,
+        ]);
 
         // Authenticate user
         $this->actingAs($this->user);
