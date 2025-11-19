@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { AppLayout } from '@/layouts/app-layout';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -60,6 +60,7 @@ interface BillingPageProps {
   plans: Plans;
   subscription: Subscription | null;
   invoices: Invoice[];
+  [key: string]: unknown;
 }
 
 export default function BillingIndex() {
@@ -187,7 +188,7 @@ export default function BillingIndex() {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
-                      {plan.features.map((feature, index) => (
+                      {plan.features.map((feature: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <Check className="mr-2 h-4 w-4 text-primary" />
                           <span className="text-sm">{feature}</span>

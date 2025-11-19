@@ -32,7 +32,7 @@ Route::middleware([
     });
 
     // Rotas autenticadas do tenant
-    Route::middleware(['auth', 'verified', VerifyTenantAccess::class])->group(function () {
+    Route::middleware(['auth', 'verified', VerifyTenantAccess::class, 'prevent.impersonation'])->group(function () {
         // Dashboard
         Route::get('/dashboard', function () {
             return Inertia::render('tenant/dashboard', [

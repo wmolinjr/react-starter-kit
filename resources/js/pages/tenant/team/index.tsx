@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield } from 'lucide-react';
 
-import { AppLayout } from '@/layouts/app-layout';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { InviteMemberDialog } from '@/components/invite-member-dialog';
 import { Can } from '@/components/can';
-import { usePermissions } from '@/hooks/use-permissions';
 
 interface Member {
   id: number;
@@ -49,7 +48,6 @@ interface Props {
 
 export default function TeamIndex({ members, tenant }: Props) {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const permissions = usePermissions();
 
   const getRoleBadge = (role: string) => {
     const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {

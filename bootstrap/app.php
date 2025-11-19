@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\PreventActionsWhileImpersonating;
 use App\Http\Middleware\VerifyTenantAccess;
 use App\Models\Project;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
+            // Admin routes
+            Route::middleware('web')
+                ->group(base_path('routes/admin.php'));
+
             // Tenant routes
             Route::middleware('web')
                 ->group(base_path('routes/tenant.php'));
@@ -46,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant.access' => VerifyTenantAccess::class,
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'prevent.impersonation' => PreventActionsWhileImpersonating::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
