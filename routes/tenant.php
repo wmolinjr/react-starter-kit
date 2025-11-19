@@ -76,4 +76,52 @@ Route::middleware([
         // Settings do tenant (já existe em routes/settings.php, mas podemos adicionar aqui também)
         require __DIR__.'/settings.php';
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Routes (Tenant-Scoped with Sanctum)
+    |--------------------------------------------------------------------------
+    |
+    | Rotas API com autenticação Sanctum e tenant context.
+    | Todas as rotas aqui são isoladas por tenant.
+    |
+    */
+    Route::middleware(['auth:sanctum'])
+        ->prefix('api')
+        ->name('api.')
+        ->group(function () {
+            // API Tokens Management
+            Route::get('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'index'])->name('tokens.index');
+            Route::post('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'store'])->name('tokens.store');
+            Route::delete('/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('tokens.destroy');
+            Route::delete('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'destroyAll'])->name('tokens.destroy-all');
+
+            // Example: API endpoint for projects (tenant-scoped)
+            Route::get('/projects', function () {
+                return response()->json([
+                    'tenant_id' => current_tenant_id(),
+                    'projects' => \App\Models\Project::all(),
+                ]);
+            })->name('projects.index');
+        });
 });
+
+        // Tenant Settings (Branding, Domains, Features, Notifications)
+        Route::prefix('tenant-settings')->name('tenant.settings.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\TenantSettingsController::class, 'index'])->name('index');
+
+            // Branding
+            Route::get('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'branding'])->name('branding');
+            Route::post('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'updateBranding'])->name('branding.update');
+
+            // Domains
+            Route::get('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'domains'])->name('domains');
+            Route::post('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'addDomain'])->name('domains.add');
+            Route::delete('/domains/{domainId}', [\App\Http\Controllers\TenantSettingsController::class, 'removeDomain'])->name('domains.remove');
+
+            // Features
+            Route::post('/features', [\App\Http\Controllers\TenantSettingsController::class, 'updateFeatures'])->name('features.update');
+
+            // Notifications
+            Route::post('/notifications', [\App\Http\Controllers\TenantSettingsController::class, 'updateNotifications'])->name('notifications.update');
+        });

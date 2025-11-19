@@ -39,13 +39,25 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
-                'permissions' => $request->user() ? [
+                'user' => $user ? array_merge(
+                    $user->toArray(),
+                    ['is_super_admin' => $user->is_super_admin ?? false]
+                ) : null,
+                'tenants' => $user ? $user->tenants->map(fn ($tenant) => [
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'slug' => $tenant->slug,
+                    'role' => $user->roleOn($tenant),
+                    'is_current' => tenancy()->initialized && tenant('id') === $tenant->id,
+                ]) : [],
+                'permissions' => $user ? [
                     // Gates
                     'canManageTeam' => Gate::allows('manage-team'),
                     'canManageBilling' => Gate::allows('manage-billing'),
@@ -53,10 +65,10 @@ class HandleInertiaRequests extends Middleware
                     'canCreateResources' => Gate::allows('create-resources'),
 
                     // Role atual
-                    'role' => $request->user()->currentTenantRole(),
-                    'isOwner' => $request->user()->isOwner(),
-                    'isAdmin' => $request->user()->hasRole('admin'),
-                    'isAdminOrOwner' => $request->user()->isAdminOrOwner(),
+                    'role' => $user->currentTenantRole(),
+                    'isOwner' => $user->isOwner(),
+                    'isAdmin' => $user->hasRole('admin'),
+                    'isAdminOrOwner' => $user->isAdminOrOwner(),
                 ] : null,
             ],
             'tenant' => tenancy()->initialized ? [
@@ -65,13 +77,44 @@ class HandleInertiaRequests extends Middleware
                 'slug' => current_tenant()->slug,
                 'domain' => $request->getHost(),
                 'settings' => current_tenant()->settings,
+                'subscription' => $this->getTenantSubscription(current_tenant()),
             ] : null,
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+                'info' => $request->session()->get('info'),
+            ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'impersonation' => [
                 'isImpersonating' => $request->session()->has('impersonating_tenant'),
                 'impersonatingTenant' => $request->session()->get('impersonating_tenant'),
                 'impersonatingUser' => $request->session()->get('impersonating_user'),
             ],
+        ];
+    }
+
+    /**
+     * Get tenant subscription information.
+     */
+    protected function getTenantSubscription($tenant): ?array
+    {
+        if (! $tenant) {
+            return null;
+        }
+
+        $subscription = $tenant->subscription('default');
+
+        if (! $subscription) {
+            return null;
+        }
+
+        return [
+            'name' => $subscription->stripe_price,
+            'active' => $subscription->active(),
+            'on_trial' => $subscription->onTrial(),
+            'ends_at' => $subscription->ends_at?->toISOString(),
+            'trial_ends_at' => $subscription->trial_ends_at?->toISOString(),
         ];
     }
 }
