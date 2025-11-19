@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -44,7 +45,27 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => $request->user() ? [
+                    // Gates
+                    'canManageTeam' => Gate::allows('manage-team'),
+                    'canManageBilling' => Gate::allows('manage-billing'),
+                    'canManageSettings' => Gate::allows('manage-settings'),
+                    'canCreateResources' => Gate::allows('create-resources'),
+
+                    // Role atual
+                    'role' => $request->user()->currentTenantRole(),
+                    'isOwner' => $request->user()->isOwner(),
+                    'isAdmin' => $request->user()->hasRole('admin'),
+                    'isAdminOrOwner' => $request->user()->isAdminOrOwner(),
+                ] : null,
             ],
+            'tenant' => tenancy()->initialized ? [
+                'id' => tenant('id'),
+                'name' => tenant('name'),
+                'slug' => current_tenant()->slug,
+                'domain' => $request->getHost(),
+                'settings' => current_tenant()->settings,
+            ] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

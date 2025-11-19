@@ -7,9 +7,9 @@ Este arquivo rastreia todo o progresso da implementação do sistema Multi-Tenan
 ## Status Geral
 
 **Iniciado em:** 2025-11-19
-**Última Atualização:** 2025-11-19 17:45
-**Etapa Atual:** 04 - Routing
-**Progresso Total:** 4/15 etapas (26.7%)
+**Última Atualização:** 2025-11-19 18:15
+**Etapa Atual:** 05 - Authorization
+**Progresso Total:** 5/15 etapas (33.3%)
 
 ---
 
@@ -22,7 +22,7 @@ Este arquivo rastreia todo o progresso da implementação do sistema Multi-Tenan
 
 ### Core Features
 - [x] **Etapa 04** - Routing (04-ROUTING.md) ✅
-- [ ] **Etapa 05** - Authorization (05-AUTHORIZATION.md)
+- [x] **Etapa 05** - Authorization (05-AUTHORIZATION.md) ✅
 - [ ] **Etapa 06** - Team Management (06-TEAM-MANAGEMENT.md)
 - [ ] **Etapa 07** - Billing (07-BILLING.md)
 
@@ -784,12 +784,19 @@ php artisan route:list
    - A implementar: redirect para tenant específico após login
 
 ### ➡️ Próxima Etapa
-**Etapa 05** - Authorization (05-AUTHORIZATION.md)
-- Implementar sistema de roles (owner, admin, member, guest)
-- Criar Policies para Tenant, Project, e outros models
-- Configurar Gates para permission checks
-- Criar middleware para role-based access control
-- Implementar can_manage_team(), can_manage_billing() helpers
+**Etapa 06** - Team Management (06-TEAM-MANAGEMENT.md)
+
+---
+
+## [Etapa 05] - Authorization - 2025-11-19 18:15
+
+**Backend:** AuthServiceProvider com 5 Gates (manage-team, manage-billing, manage-settings, create-resources, view-resources) + SuperAdmin/Owner bypass, ProjectPolicy com 7 métodos (viewAny, view, create, update, delete, restore, forceDelete), EnsureUserHasRole middleware com role parameter, HandleInertiaRequests compartilhando permissões e tenant info.
+
+**Frontend:** Hook use-permissions.ts (8 permissões: canManageTeam, canManageBilling, canManageSettings, canCreateResources, role, isOwner, isAdmin, isAdminOrOwner), Componente Can.tsx para renderização condicional.
+
+**Arquivos:** 4 criados (AuthServiceProvider, ProjectPolicy, EnsureUserHasRole, use-permissions.ts, can.tsx), 2 modificados (HandleInertiaRequests, bootstrap/app.php), ~250 linhas PHP + ~50 linhas TypeScript. AuthServiceProvider já registrado em bootstrap/providers.php. User model já tinha métodos de role.
+
+**Testing:** Gates funcionando via HandleInertiaRequests. Permissões disponíveis no frontend via usePage().props.auth.permissions. Middleware 'role:owner' disponível para rotas.
 
 ---
 
@@ -988,10 +995,11 @@ Etapa XX - Nome da Etapa
 
 ---
 
-**Última Atualização:** 2025-11-19 17:45
+**Última Atualização:** 2025-11-19 18:15
 **Atualizado por:** Multi-Tenant SaaS Builder Agent
 **Etapas Completadas:**
 - ✅ 01 - Setup Inicial
 - ✅ 02 - Database Schema
 - ✅ 03 - Models e Relacionamentos
 - ✅ 04 - Routing e Middleware
+- ✅ 05 - Authorization (Roles, Permissions, Gates, Policies)

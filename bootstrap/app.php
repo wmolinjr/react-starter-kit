@@ -45,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Alias para middleware customizado
         $middleware->alias([
             'tenant.access' => VerifyTenantAccess::class,
+            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
