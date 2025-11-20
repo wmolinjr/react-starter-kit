@@ -13,12 +13,23 @@ class Project extends Model implements HasMedia
 {
     use HasFactory, BelongsToTenant, InteractsWithMedia;
 
+    /**
+     * Mass assignment protection
+     * NOTE: tenant_id is NOT fillable - it's set automatically by BelongsToTenant trait
+     */
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'name',
         'description',
         'status',
+    ];
+
+    /**
+     * Attributes that should never be mass assignable
+     */
+    protected $guarded = [
+        'id',
+        'tenant_id', // Prevent tenant_id manipulation
     ];
 
     protected $casts = [

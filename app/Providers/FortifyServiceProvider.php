@@ -74,18 +74,49 @@ class FortifyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Configure rate limiting.
+     * Configure rate limiting for authentication endpoints.
+     *
+     * Implements strict rate limiting to prevent brute force attacks,
+     * credential stuffing, and enumeration attacks.
      */
     private function configureRateLimiting(): void
     {
+        // Two-factor authentication: 5 attempts per minute
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
 
+        // Login: 5 attempts per minute per email+IP combination
+        // Prevents brute force attacks
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
+        });
+
+        // Registration: 3 attempts per hour per IP
+        // Prevents mass account creation and spam
+        RateLimiter::for('register', function (Request $request) {
+            return [
+                Limit::perMinute(3)->by($request->ip())->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'message' => 'Too many registration attempts. Please try again later.',
+                    ], 429, $headers);
+                }),
+                Limit::perHour(10)->by($request->ip()),
+            ];
+        });
+
+        // Password reset request: 3 attempts per hour per IP
+        // Prevents email enumeration and spam
+        RateLimiter::for('password.reset', function (Request $request) {
+            return Limit::perHour(3)->by($request->ip());
+        });
+
+        // Email verification: 6 attempts per minute
+        // Allows legitimate users to retry but prevents abuse
+        RateLimiter::for('verification', function (Request $request) {
+            return Limit::perMinute(6)->by($request->user()?->id ?: $request->ip());
         });
     }
 }

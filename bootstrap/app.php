@@ -1,14 +1,18 @@
 <?php
 
+use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PreventActionsWhileImpersonating;
 use App\Http\Middleware\VerifyTenantAccess;
 use App\Models\Project;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,6 +21,42 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
+            // Configure global rate limiting for API and general routes
+            // Implements tenant-aware rate limiting to prevent abuse
+
+            // API rate limiting: tenant-aware
+            RateLimiter::for('api', function (Request $request) {
+                $tenantId = tenancy()->initialized ? tenant('id') : 'global';
+                return Limit::perMinute(60)->by($tenantId.':'.$request->user()?->id ?: $request->ip());
+            });
+
+            // General web rate limiting
+            RateLimiter::for('global', function (Request $request) {
+                return Limit::perMinute(100)->by($request->user()?->id ?: $request->ip());
+            });
+
+            // Tenant-specific actions rate limiting
+            RateLimiter::for('tenant-actions', function (Request $request) {
+                if (! tenancy()->initialized) {
+                    return Limit::none();
+                }
+                $tenantId = tenant('id');
+                $userId = $request->user()?->id;
+                return [
+                    Limit::perMinute(30)->by($tenantId.':'.$userId),
+                    Limit::perMinute(100)->by($tenantId),
+                ];
+            });
+
+            // File upload rate limiting
+            RateLimiter::for('uploads', function (Request $request) {
+                $tenantId = tenancy()->initialized ? tenant('id') : 'global';
+                return [
+                    Limit::perMinute(10)->by($tenantId.':'.$request->user()?->id ?: $request->ip()),
+                    Limit::perHour(50)->by($tenantId.':'.$request->user()?->id ?: $request->ip()),
+                ];
+            });
+
             // Admin routes
             Route::middleware('web')
                 ->group(base_path('routes/admin.php'));
@@ -42,6 +82,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
+            AddSecurityHeaders::class, // Add security headers first
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,

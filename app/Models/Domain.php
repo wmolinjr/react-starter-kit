@@ -10,10 +10,21 @@ class Domain extends Model
 {
     use HasFactory;
 
+    /**
+     * Mass assignment protection
+     * NOTE: tenant_id should be set explicitly, not via mass assignment
+     */
     protected $fillable = [
-        'tenant_id',
         'domain',
         'is_primary',
+    ];
+
+    /**
+     * Attributes that should never be mass assignable
+     */
+    protected $guarded = [
+        'id',
+        'tenant_id', // Prevent tenant_id manipulation
     ];
 
     protected $casts = [

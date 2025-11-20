@@ -23,7 +23,20 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'is_super_admin',
+    ];
+
+    /**
+     * Attributes that should never be mass assignable
+     * SECURITY: Prevents privilege escalation attacks
+     *
+     * @var list<string>
+     */
+    protected $guarded = [
+        'id',
+        'is_super_admin', // CRITICAL: Prevent users from making themselves super admins
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
     ];
 
     /**
