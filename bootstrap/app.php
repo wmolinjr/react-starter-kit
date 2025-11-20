@@ -4,7 +4,6 @@ use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PreventActionsWhileImpersonating;
-use App\Http\Middleware\VerifyMediaTenantAccess;
 use App\Http\Middleware\VerifyTenantAccess;
 use App\Models\Project;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -90,7 +89,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // Alias para middleware customizado
         $middleware->alias([
             'tenant.access' => VerifyTenantAccess::class,
-            'media.tenant' => VerifyMediaTenantAccess::class,
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'prevent.impersonation' => PreventActionsWhileImpersonating::class,
         ]);

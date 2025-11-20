@@ -67,9 +67,11 @@ Route::middleware([
             });
 
             // Media Management (stricter rate limiting for uploads)
+            // Note: Media isolation is handled by BelongsToTenant global scope
+            // Route model binding automatically filters by tenant_id
             Route::middleware('throttle:uploads')->post('/{project}/media', [\App\Http\Controllers\ProjectController::class, 'uploadFile'])->name('media.upload');
-            Route::middleware('media.tenant')->get('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'downloadFile'])->name('media.download');
-            Route::middleware(['throttle:tenant-actions', 'media.tenant'])->delete('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'deleteFile'])->name('media.delete');
+            Route::get('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'downloadFile'])->name('media.download');
+            Route::middleware('throttle:tenant-actions')->delete('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'deleteFile'])->name('media.delete');
         });
 
         // Team Management
