@@ -46,8 +46,11 @@ abstract class TenantTestCase extends TestCase
         tenancy()->initialize($this->tenant);
         setPermissionsTeamId($this->tenant->id);
 
+        // Sync permissions and roles for tests
+        $this->syncPermissionsForTests();
+
         // Create and assign owner role (requires tenant context)
-        $ownerRole = Role::findOrCreate('owner', 'web');
+        $ownerRole = Role::findByName('owner', 'web');
         $this->user->assignRole($ownerRole);
         $this->user->load('roles');
 
@@ -103,5 +106,16 @@ abstract class TenantTestCase extends TestCase
         ]);
 
         return $otherTenant;
+    }
+
+    /**
+     * Sync permissions and roles for current tenant in tests.
+     * Uses the same structure as SyncPermissions command.
+     */
+    protected function syncPermissionsForTests(): void
+    {
+        // Run the permissions:sync command to create all permissions and roles
+        // This ensures tests have the same permission structure as production
+        \Artisan::call('permissions:sync');
     }
 }

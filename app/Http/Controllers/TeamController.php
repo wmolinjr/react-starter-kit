@@ -59,7 +59,7 @@ class TeamController extends Controller
 
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
-            'role' => ['required', Rule::in(['admin', 'member', 'guest'])],
+            'role' => ['required', Rule::in(['admin', 'member'])],
         ]);
 
         $tenant = tenant();
@@ -203,7 +203,7 @@ class TeamController extends Controller
         Gate::authorize('manage-team');
 
         $validated = $request->validate([
-            'role' => ['required', Rule::in(['owner', 'admin', 'member', 'guest'])],
+            'role' => ['required', Rule::in(['owner', 'admin', 'member'])],
         ]);
 
         $tenant = tenant();

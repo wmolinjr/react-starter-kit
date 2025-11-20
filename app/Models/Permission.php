@@ -28,6 +28,8 @@ class Permission extends SpatiePermission
         'tenant_id',
         'name',
         'guard_name',
+        'description',
+        'category',
     ];
 
     /**

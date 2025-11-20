@@ -62,9 +62,9 @@ class TeamTest extends TenantTestCase
 
         $this->actingAs($admin);
 
-        // Admin can change member role
+        // Admin can change member role to admin
         $response = $this->patch("/team/{$member->id}/role", [
-            'role' => 'viewer',
+            'role' => 'admin',
         ]);
 
         $response->assertRedirect();

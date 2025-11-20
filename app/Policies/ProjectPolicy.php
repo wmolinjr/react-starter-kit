@@ -12,7 +12,7 @@ class ProjectPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['owner', 'admin', 'member', 'guest']);
+        return $user->can('tenant.projects:view');
     }
 
     /**
@@ -21,7 +21,8 @@ class ProjectPolicy
     public function view(User $user, Project $project): bool
     {
         // Verificar se project pertence ao tenant atual
-        return $project->tenant_id === current_tenant_id();
+        return $project->tenant_id === current_tenant_id()
+            && $user->can('tenant.projects:view');
     }
 
     /**
@@ -29,7 +30,7 @@ class ProjectPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['owner', 'admin', 'member']);
+        return $user->can('tenant.projects:create');
     }
 
     /**
@@ -37,13 +38,13 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        // Owners e admins podem editar qualquer project
-        if ($user->hasAnyRole(['owner', 'admin'])) {
+        // Pode editar se tem permission "edit" (qualquer project)
+        if ($user->can('tenant.projects:edit')) {
             return true;
         }
 
-        // Members podem editar apenas seus próprios projects
-        return $user->hasRole('member') && $project->user_id === $user->id;
+        // Ou se tem permission "edit-own" E é o criador do project
+        return $user->can('tenant.projects:edit-own') && $project->user_id === $user->id;
     }
 
     /**
@@ -51,8 +52,8 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        // Apenas owner, admin ou criador do project
-        return $user->hasAnyRole(['owner', 'admin'])
+        // Apenas quem tem permission de delete OU é o criador do project
+        return $user->can('tenant.projects:delete')
             || $project->user_id === $user->id;
     }
 
@@ -61,8 +62,8 @@ class ProjectPolicy
      */
     public function restore(User $user, Project $project): bool
     {
-        // Apenas owners e admins podem restaurar
-        return $user->hasAnyRole(['owner', 'admin']);
+        // Restore requer permission de archive
+        return $user->can('tenant.projects:archive');
     }
 
     /**
@@ -70,7 +71,31 @@ class ProjectPolicy
      */
     public function forceDelete(User $user, Project $project): bool
     {
-        // Apenas owners podem deletar permanentemente
-        return $user->isOwner();
+        // Force delete requer permission de delete (apenas owners têm)
+        return $user->can('tenant.projects:delete');
+    }
+
+    /**
+     * Determine whether the user can upload files to the project.
+     */
+    public function uploadFiles(User $user, Project $project): bool
+    {
+        return $user->can('tenant.projects:upload');
+    }
+
+    /**
+     * Determine whether the user can download files from the project.
+     */
+    public function downloadFiles(User $user, Project $project): bool
+    {
+        return $user->can('tenant.projects:download');
+    }
+
+    /**
+     * Determine whether the user can archive/unarchive the project.
+     */
+    public function archive(User $user, Project $project): bool
+    {
+        return $user->can('tenant.projects:archive');
     }
 }
