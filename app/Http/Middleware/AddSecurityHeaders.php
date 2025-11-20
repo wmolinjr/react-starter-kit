@@ -125,6 +125,11 @@ class AddSecurityHeaders
             // Media: Allow self
             "media-src 'self'",
 
+            // Workers: Allow self + blob URLs for Vite HMR
+            $isLocal
+                ? "worker-src 'self' blob: http://localhost:* http://127.0.0.1:*"
+                : "worker-src 'self' blob:",
+
             // Objects: Block all (Flash, etc.)
             "object-src 'none'",
 
