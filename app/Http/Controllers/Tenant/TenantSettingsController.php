@@ -4,13 +4,29 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class TenantSettingsController extends Controller
+class TenantSettingsController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            // View permissions
+            new Middleware('permission:tenant.settings:view', only: ['index', 'branding', 'domains']),
+
+            // Edit permissions
+            new Middleware('permission:tenant.settings:edit', only: ['updateBranding', 'addDomain', 'removeDomain', 'updateFeatures', 'updateNotifications']),
+        ];
+    }
+
     /**
      * Display tenant settings page.
      */

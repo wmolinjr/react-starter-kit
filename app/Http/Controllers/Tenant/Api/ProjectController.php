@@ -3,12 +3,32 @@
 namespace App\Http\Controllers\Tenant\Api;
 use App\Http\Controllers\Controller;
 
-use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ProjectController extends Controller
+class ProjectController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            // Require authentication via Sanctum
+            'auth:sanctum',
+
+            // View permissions
+            new Middleware('permission:tenant.projects:view', only: ['index']),
+
+            // Create permission
+            new Middleware('permission:tenant.projects:create', only: ['store']),
+
+            // Update and delete use authorize() in methods
+        ];
+    }
+
     /**
      * Display a listing of the projects.
      */

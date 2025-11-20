@@ -53,6 +53,11 @@ class SyncPermissions extends Command
         ['name' => 'tenant.billing:view', 'description' => 'View billing', 'category' => 'billing'],
         ['name' => 'tenant.billing:manage', 'description' => 'Manage subscriptions', 'category' => 'billing'],
         ['name' => 'tenant.billing:invoices', 'description' => 'Download invoices', 'category' => 'billing'],
+
+        // API Tokens (3 permissions)
+        ['name' => 'tenant.api-tokens:view', 'description' => 'View API tokens', 'category' => 'api-tokens'],
+        ['name' => 'tenant.api-tokens:create', 'description' => 'Create API tokens', 'category' => 'api-tokens'],
+        ['name' => 'tenant.api-tokens:delete', 'description' => 'Delete API tokens', 'category' => 'api-tokens'],
     ];
 
     /**
@@ -63,7 +68,8 @@ class SyncPermissions extends Command
             'display_name' => 'Proprietário',
             'description' => 'Acesso total incluindo billing',
             'permissions' => [
-                // All permissions (19 total)
+                // All permissions (22 total)
+                // Projects
                 'tenant.projects:view',
                 'tenant.projects:create',
                 'tenant.projects:edit',
@@ -72,17 +78,24 @@ class SyncPermissions extends Command
                 'tenant.projects:upload',
                 'tenant.projects:download',
                 'tenant.projects:archive',
+                // Team
                 'tenant.team:view',
                 'tenant.team:invite',
                 'tenant.team:remove',
                 'tenant.team:manage-roles',
                 'tenant.team:activity',
+                // Settings
                 'tenant.settings:view',
                 'tenant.settings:edit',
                 'tenant.settings:danger',
+                // Billing
                 'tenant.billing:view',
                 'tenant.billing:manage',
                 'tenant.billing:invoices',
+                // API Tokens (owner only)
+                'tenant.api-tokens:view',
+                'tenant.api-tokens:create',
+                'tenant.api-tokens:delete',
             ],
         ],
         'admin' => [

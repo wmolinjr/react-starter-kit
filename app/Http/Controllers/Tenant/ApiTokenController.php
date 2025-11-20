@@ -4,11 +4,30 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-class ApiTokenController extends Controller
+class ApiTokenController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            // View permission
+            new Middleware('permission:tenant.api-tokens:view', only: ['index']),
+
+            // Create permission
+            new Middleware('permission:tenant.api-tokens:create', only: ['store', 'update']),
+
+            // Delete permission
+            new Middleware('permission:tenant.api-tokens:delete', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display API tokens management page.
      */
