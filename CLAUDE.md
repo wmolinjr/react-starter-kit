@@ -576,6 +576,259 @@ Ver arquivo `.env.production.example` com configuração completa e comentada.
 - [ ] Middleware `prevent.impersonation` em ações sensíveis
 - [ ] Rota `/impersonate/{token}` apenas em tenant domains
 
+**Redis Session Scoping:**
+- [ ] `SESSION_DRIVER=redis` configurado
+- [ ] `tenancy.cache.scope_sessions=true` habilitado
+- [ ] `RedisTenancyBootstrapper` habilitado
+- [ ] Redis connections separadas (default, cache, queue)
+- [ ] Queue connection NÃO em `prefixed_connections`
+
+### Redis Session Scoping (Stancl Tenancy)
+
+Este projeto usa **Redis para sessions** com **isolamento automático por tenant** seguindo as melhores práticas do Stancl Tenancy v4.
+
+#### Arquitetura Multi-Database Redis
+
+**Estratégia**: Múltiplas databases Redis para separação de concerns.
+
+```env
+REDIS_DB=0          # Default: Sessions + Direct Redis calls (tenant-prefixed)
+REDIS_CACHE_DB=1    # Cache: Application cache (tenant-tagged)
+REDIS_QUEUE_DB=2    # Queue: Background jobs (NO tenant prefix)
+```
+
+**Configuração** (`config/database.php:145-194`):
+
+```php
+'redis' => [
+    'client' => env('REDIS_CLIENT', 'phpredis'),
+
+    'default' => [
+        'database' => env('REDIS_DB', '0'),  // Sessions + Redis facade
+        // ...
+    ],
+
+    'cache' => [
+        'database' => env('REDIS_CACHE_DB', '1'),  // Cache store
+        // ...
+    ],
+
+    'queue' => [
+        'database' => env('REDIS_QUEUE_DB', '2'),  // Queue connection
+        // ⚠️ CRITICAL: Separate DB to avoid tenant prefixes breaking jobs
+    ],
+],
+```
+
+#### Session Scoping via CacheTenancyBootstrapper
+
+**Configuração** (`config/tenancy.php:103-106`):
+
+```php
+'cache' => [
+    'tag_base' => 'tenant',
+    'scope_sessions' => true,  // ✅ Automatic session scoping for cache-based drivers
+],
+```
+
+**Como Funciona**:
+
+1. **`CacheTenancyBootstrapper`** detecta que `SESSION_DRIVER=redis` é cache-based
+2. Com `scope_sessions => true`, aplica **tenant tagging** automático nas sessions
+3. Sessions são isoladas por tenant usando cache tags: `tenant:{tenant_id}`
+4. Garante que `tenant1` nunca acesse sessions de `tenant2`, mesmo compartilhando o mesmo Redis database
+
+**Referência**: [Session Scoping - Tenancy for Laravel v4](https://v4.tenancyforlaravel.com/session-scoping)
+
+#### Redis Prefix Scoping via RedisTenancyBootstrapper
+
+**Configuração** (`config/tenancy.php:174-180`):
+
+```php
+'redis' => [
+    'prefix_base' => 'tenant',
+    'prefixed_connections' => [
+        'default',  // Tenant-prefixed: tenant_{id}:key
+        // 'queue' is intentionally NOT here
+    ],
+],
+```
+
+**Como Funciona**:
+
+- **Connection `default`** (DB 0): Chaves prefixadas com `tenant_{tenant_id}:`
+  - Sessions: `tenant_1:laravel_session:abc123`
+  - Direct Redis calls: `Redis::set('key', 'val')` → `tenant_1:key`
+
+- **Connection `cache`** (DB 1): Usa tagging (via `CacheTenancyBootstrapper`)
+  - Cache keys: Tagged com `tenant:{tenant_id}`
+
+- **Connection `queue`** (DB 2): **SEM prefixo** (critical!)
+  - Queue jobs: `queues:default:job123` (global, sem tenant prefix)
+  - ⚠️ **IMPORTANTE**: Jobs NÃO devem ser tenant-prefixed para evitar conflitos
+
+**Referência**: [Queue Bootstrapper - Tenancy for Laravel v4](https://v4.tenancyforlaravel.com/bootstrappers/queue)
+
+#### ⚠️ CRITICAL: Queue Connection Isolation
+
+**Problema**: Se a queue connection estiver em `prefixed_connections`, jobs ficam inacessíveis.
+
+**Exemplo de Problema**:
+```php
+// ❌ ERRADO: 'queue' em prefixed_connections
+'prefixed_connections' => ['default', 'queue'],
+
+// Job dispatch: tenant_1:queues:default:job123
+// Worker procura: queues:default:job123
+// Resultado: Job nunca processado!
+```
+
+**Solução** (`config/queue.php:69`):
+```php
+'redis' => [
+    'driver' => 'redis',
+    'connection' => env('REDIS_QUEUE_CONNECTION', 'queue'),  // Uses separate 'queue' connection
+    // ...
+],
+```
+
+```php
+// ✅ CORRETO: 'queue' NÃO em prefixed_connections
+'prefixed_connections' => ['default'],  // Only 'default' is prefixed
+
+// Queue connection usa DB 2 (separada) sem prefixo tenant
+// Jobs ficam acessíveis globalmente para workers
+```
+
+#### Fluxo Completo de Session Isolation
+
+**Tenant Initialization**:
+```php
+// 1. Middleware InitializeTenancyByDomain identifica tenant
+// 2. Tenancy::initialize($tenant) dispara bootstrappers:
+
+// CacheTenancyBootstrapper:
+$this->app['cache']->forgetDriver();  // Reset cache driver
+// Session scope: tenant:{tenant_id} tag applied
+
+// RedisTenancyBootstrapper:
+Redis::connection('default')->client()->select(0);  // DB 0
+// Prefix: tenant_{tenant_id}: applied to keys
+```
+
+**Session Read/Write** (Tenant 1):
+```php
+// User in tenant1.yourdomain.com
+session()->put('user_id', 123);
+
+// Redis key (DB 0): tenant_1:laravel_session:abc123
+// Cache tag: tenant:1
+// Result: Isolated to Tenant 1 only
+```
+
+**Session Read/Write** (Tenant 2):
+```php
+// User in tenant2.yourdomain.com
+session()->put('user_id', 456);
+
+// Redis key (DB 0): tenant_2:laravel_session:xyz789
+// Cache tag: tenant:2
+// Result: Completely isolated from Tenant 1
+```
+
+#### Verificação de Configuração
+
+**Checklist Técnico**:
+
+1. **`.env` Configuration**:
+   ```env
+   SESSION_DRIVER=redis
+   REDIS_DB=0
+   REDIS_CACHE_DB=1
+   REDIS_QUEUE_DB=2
+   REDIS_QUEUE_CONNECTION=queue
+   ```
+
+2. **`config/tenancy.php` Bootstrappers**:
+   ```php
+   'bootstrappers' => [
+       Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
+       Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
+       // ...
+   ],
+   ```
+
+3. **`config/tenancy.php` Cache Config**:
+   ```php
+   'cache' => [
+       'tag_base' => 'tenant',
+       'scope_sessions' => true,  // ✅ MUST be true
+   ],
+   ```
+
+4. **`config/tenancy.php` Redis Config**:
+   ```php
+   'redis' => [
+       'prefix_base' => 'tenant',
+       'prefixed_connections' => [
+           'default',  // ✅ Sessions + direct Redis
+           // 'queue' NOT here!
+       ],
+   ],
+   ```
+
+5. **`config/queue.php`**:
+   ```php
+   'connections' => [
+       'redis' => [
+           'connection' => 'queue',  // ✅ Separate connection
+       ],
+   ],
+   ```
+
+6. **`config/database.php` Redis Connections**:
+   ```php
+   'default' => ['database' => env('REDIS_DB', '0')],
+   'cache' => ['database' => env('REDIS_CACHE_DB', '1')],
+   'queue' => ['database' => env('REDIS_QUEUE_DB', '2')],  // ✅ Separate DB
+   ```
+
+**Teste de Isolamento**:
+```bash
+# Terminal 1: Monitor Redis (DB 0 - sessions)
+redis-cli -n 0 MONITOR | grep laravel_session
+
+# Terminal 2: Acessar tenant1.localhost
+# Expected: tenant_1:laravel_session:...
+
+# Terminal 3: Acessar tenant2.localhost
+# Expected: tenant_2:laravel_session:...
+
+# Verify: Different prefixes = isolated sessions ✅
+```
+
+#### Benefícios da Arquitetura
+
+1. **Performance**:
+   - Redis mais rápido que database sessions
+   - Databases separadas evitam key conflicts
+   - Cache tags eficientes (O(1) lookups)
+
+2. **Security**:
+   - Isolamento automático por tenant (via prefix + tags)
+   - Impossível cross-tenant session access
+   - Queue jobs não "vazam" entre tenants
+
+3. **Scalability**:
+   - Redis cluster-ready
+   - Databases independentes podem ser movidas para Redis instances separados
+   - Horizontal scaling sem mudanças de código
+
+4. **Maintainability**:
+   - Configuração declarativa (via config files)
+   - Zero código customizado para session scoping
+   - Stancl Tenancy gerencia automaticamente
+
 ## MCP Tools (Model Context Protocol)
 
 Este projeto tem acesso a ferramentas MCP para debugging, testes e documentação. **Use estas ferramentas proativamente durante o desenvolvimento.**

@@ -93,9 +93,16 @@ return [
      * scope the cache both when writing to it and when reading from it.
      *
      * You can clear cache selectively by specifying the tag.
+     *
+     * IMPORTANT: scope_sessions = true enables automatic session scoping for cache-based
+     * session drivers (Redis, Memcached, DynamoDB, APC). This works together with
+     * RedisTenancyBootstrapper to ensure complete session isolation between tenants.
+     *
+     * @see https://v4.tenancyforlaravel.com/session-scoping
      */
     'cache' => [
         'tag_base' => 'tenant', // This tag_base, followed by the tenant_id, will form a tag that will be applied on each cache call.
+        'scope_sessions' => true, // Enable automatic session scoping for cache-based session drivers
     ],
 
     /**
@@ -153,11 +160,22 @@ return [
      * Note: You don't need to use this if you're using Redis only for cache.
      * Redis tenancy is only relevant if you're making direct Redis calls,
      * either using the Redis facade or by injecting it as a dependency.
+     *
+     * IMPORTANT: When using Redis queue driver, ensure the queue connection
+     * is NOT listed in prefixed_connections. Use a separate Redis connection
+     * for queues (e.g., 'queue') to prevent tenant prefixes from breaking jobs.
+     *
+     * Session Scoping: Sessions are scoped via CacheTenancyBootstrapper with
+     * 'cache.scope_sessions => true', which works together with this bootstrapper.
+     *
+     * @see https://v4.tenancyforlaravel.com/bootstrappers/queue
+     * @see https://v4.tenancyforlaravel.com/session-scoping
      */
     'redis' => [
         'prefix_base' => 'tenant', // Each key in Redis will be prepended by this prefix_base, followed by the tenant id.
         'prefixed_connections' => [ // Redis connections whose keys are prefixed, to separate one tenant's keys from another.
-            'default', // Isolate direct Redis calls (Redis::get/set) by tenant
+            'default', // Isolate direct Redis calls (Redis::get/set) and sessions by tenant
+            // 'queue' is intentionally NOT here - jobs should not be tenant-prefixed
         ],
     ],
 
