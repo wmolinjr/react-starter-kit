@@ -120,7 +120,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
             }
 
             // In production, only super admins can access
-            return $user->is_super_admin ?? false;
+            // Verifica a role global (sem tenant_id)
+            setPermissionsTeamId(null);
+            return $user->hasRole('Super Admin');
         });
     }
 }

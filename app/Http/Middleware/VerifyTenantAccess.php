@@ -12,7 +12,7 @@ class VerifyTenantAccess
      * Handle an incoming request.
      *
      * Verifica se o usuário autenticado tem acesso ao tenant atual.
-     * Super admins têm acesso a todos os tenants.
+     * Super admins (role "Super Admin") têm acesso a todos os tenants.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
@@ -25,8 +25,17 @@ class VerifyTenantAccess
 
         $user = $request->user();
 
-        // Super admins têm acesso a todos os tenants
-        if ($user->is_super_admin) {
+        // Super admins (global role) têm acesso a todos os tenants
+        // Verifica a role sem tenant_id (global)
+        setPermissionsTeamId(null);
+        $isSuperAdmin = $user->hasRole('Super Admin');
+
+        if ($isSuperAdmin) {
+            // Se é super admin e tenant está inicializado, seta o team ID para o tenant atual
+            // para que as verificações de permissão funcionem corretamente
+            if (tenancy()->initialized) {
+                setPermissionsTeamId(tenant('id'));
+            }
             return $next($request);
         }
 

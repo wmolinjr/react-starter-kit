@@ -155,6 +155,9 @@ class SyncPermissions extends Command
             $this->newLine();
         }
 
+        // Sync Global Super Admin Role (without tenant_id)
+        $this->syncSuperAdminRole();
+
         // Sync Permissions
         $this->syncPermissions();
 
@@ -180,6 +183,43 @@ class SyncPermissions extends Command
         $this->displaySummary();
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Sync Super Admin role globally (without tenant_id)
+     * This role bypasses all permission checks via Gate::before()
+     */
+    protected function syncSuperAdminRole(): void
+    {
+        $this->info('👑 Syncing Global Super Admin Role...');
+
+        // Temporarily set tenant_id to null to create global role
+        $currentTeamId = getPermissionsTeamId();
+        setPermissionsTeamId(null);
+
+        $role = Role::updateOrCreate(
+            ['name' => 'Super Admin', 'guard_name' => 'web'],
+            [
+                'display_name' => 'Super Administrador',
+                'description' => 'Acesso total à plataforma (global)',
+            ]
+        );
+
+        if ($role->wasRecentlyCreated) {
+            $this->line("  ✓ Created global role: {$role->name}");
+        } else {
+            $this->line("  ↻ Updated global role: {$role->name}");
+        }
+
+        // Note: Super Admin doesn't need explicit permissions
+        // Gate::before() in AppServiceProvider grants all permissions automatically
+        $this->line("    → Bypasses all permission checks via Gate::before()");
+
+        // Restore previous team_id
+        setPermissionsTeamId($currentTeamId);
+
+        $this->info('  ✅ Super Admin role synced.');
+        $this->newLine();
     }
 
     /**

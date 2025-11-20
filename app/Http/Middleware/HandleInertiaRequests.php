@@ -45,10 +45,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $user ? array_merge(
-                    $user->toArray(),
-                    ['is_super_admin' => $user->is_super_admin ?? false]
-                ) : null,
+                'user' => $user?->toArray(),
                 'tenants' => $user ? $user->tenants->map(fn ($tenant) => [
                     'id' => $tenant->id,
                     'name' => $tenant->name,
@@ -61,12 +58,21 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => $user ? $user->getAllPermissions()->pluck('name')->toArray() : [],
 
                 // Role info: para UI apenas (badges, display, etc) - NÃO usar para autorização
-                'role' => $user ? [
-                    'name' => $user->currentTenantRole(),
-                    'isOwner' => $user->isOwner(),
-                    'isAdmin' => $user->hasRole('admin'),
-                    'isAdminOrOwner' => $user->isAdminOrOwner(),
-                ] : null,
+                'role' => $user ? (function () use ($user) {
+                    // Check Super Admin globally (without tenant_id)
+                    $currentTeamId = getPermissionsTeamId();
+                    setPermissionsTeamId(null);
+                    $isSuperAdmin = $user->hasRole('Super Admin');
+                    setPermissionsTeamId($currentTeamId);
+
+                    return [
+                        'name' => $user->currentTenantRole(),
+                        'isOwner' => $user->isOwner(),
+                        'isAdmin' => $user->hasRole('admin'),
+                        'isAdminOrOwner' => $user->isAdminOrOwner(),
+                        'isSuperAdmin' => $isSuperAdmin,
+                    ];
+                })() : null,
             ],
             'tenant' => tenancy()->initialized ? [
                 'id' => tenant('id'),

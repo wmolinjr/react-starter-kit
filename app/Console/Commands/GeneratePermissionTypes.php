@@ -151,6 +151,9 @@ export interface Role {
 
   /** Is user admin or owner? (for UI badges/display) */
   isAdminOrOwner: boolean;
+
+  /** Is user a Super Admin? (global platform admin - for UI badges/display) */
+  isSuperAdmin: boolean;
 }
 
 /**

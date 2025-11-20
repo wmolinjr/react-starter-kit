@@ -15,7 +15,9 @@ class AdminController extends Controller
     public function dashboard()
     {
         // Apenas super admin pode acessar
-        if (!auth()->user()->is_super_admin) {
+        // Verifica a role global (sem tenant_id)
+        setPermissionsTeamId(null);
+        if (!auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Only super administrators can access this area.');
         }
 

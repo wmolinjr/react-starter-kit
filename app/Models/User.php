@@ -36,7 +36,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $guarded = [
         'id',
-        'is_super_admin', // CRITICAL: Prevent users from making themselves super admins
         'two_factor_secret',
         'two_factor_recovery_codes',
         'two_factor_confirmed_at',
@@ -64,7 +63,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_super_admin' => 'boolean',
             'two_factor_confirmed_at' => 'datetime',
         ];
     }

@@ -32,11 +32,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Super admin bypass - full access to everything
-        Gate::before(function (User $user, string $ability) {
-            if ($user->is_super_admin) {
-                return true;
-            }
-        });
+        // Note: Super Admin Gate::before() is now in AppServiceProvider
+        // to follow Spatie Laravel Permission best practices
     }
 }

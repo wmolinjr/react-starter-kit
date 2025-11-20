@@ -20,9 +20,13 @@ class TenantSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'admin@setor3.app',
             'password' => bcrypt('password'),
-            'is_super_admin' => true,
             'email_verified_at' => now(),
         ]);
+
+        // Assign Super Admin role (globally, without tenant_id)
+        setPermissionsTeamId(null);
+        $superAdmin->assignRole('Super Admin');
+        setPermissionsTeamId(null); // Keep null for next operations
 
         // Tenant 1
         $tenant1Id = DB::table('tenants')->insertGetId([

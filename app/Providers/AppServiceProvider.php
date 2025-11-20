@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Events\WebhookReceived;
 
@@ -25,6 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Super Admin: bypass all permission checks
+        // This works with auth()->user()->can() and @can() Blade directive
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('Super Admin') ? true : null;
+        });
+
         // Macro para queries tenant-scoped
         Builder::macro('forTenant', function ($tenantId = null) {
             $tenantId = $tenantId ?? current_tenant_id();

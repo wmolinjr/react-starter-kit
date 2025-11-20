@@ -78,15 +78,17 @@ class SecurityAuditTest extends TestCase
     {
         $user = new User();
 
-        // is_super_admin should be guarded
-        $this->assertContains('is_super_admin', $user->getGuarded());
+        // Critical fields should be guarded
+        $this->assertContains('two_factor_secret', $user->getGuarded());
+        $this->assertContains('two_factor_recovery_codes', $user->getGuarded());
 
-        // is_super_admin should NOT be fillable
+        // Two-factor secret should NOT be fillable
+        $this->assertNotContains('two_factor_secret', $user->getFillable());
+        $this->assertNotContains('two_factor_recovery_codes', $user->getFillable());
+
+        // Super Admin is now managed via Spatie Permission roles, not via column
+        // Users cannot elevate privileges via mass assignment
         $this->assertNotContains('is_super_admin', $user->getFillable());
-
-        // Try to mass assign is_super_admin (should be ignored)
-        $user->fill(['is_super_admin' => true]);
-        $this->assertNull($user->is_super_admin);
     }
 
     /**

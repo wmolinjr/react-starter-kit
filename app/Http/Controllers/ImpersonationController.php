@@ -17,7 +17,9 @@ class ImpersonationController extends Controller
     public function start(Tenant $tenant, User $user = null)
     {
         // Apenas super admin pode impersonar
-        if (!auth()->user()->is_super_admin) {
+        // Verifica a role global (sem tenant_id)
+        setPermissionsTeamId(null);
+        if (!auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Only super administrators can impersonate tenants.');
         }
 
