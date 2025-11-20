@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
+use Spatie\Permission\Guard;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 
 class Permission extends SpatiePermission
@@ -36,7 +37,7 @@ class Permission extends SpatiePermission
      */
     public static function findByName(string $name, $guardName = null): self
     {
-        $guardName = $guardName ?? static::getDefaultGuardName();
+        $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
         $query = static::query()->where('name', $name)->where('guard_name', $guardName);
 
@@ -59,7 +60,7 @@ class Permission extends SpatiePermission
      */
     public static function findOrCreate(string $name, $guardName = null): self
     {
-        $guardName = $guardName ?? static::getDefaultGuardName();
+        $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
         $query = static::query()->where('name', $name)->where('guard_name', $guardName);
 

@@ -74,6 +74,7 @@ class Tenant extends Model implements TenantWithDatabase
     {
         // Initialize tenant context
         tenancy()->initialize($this);
+        setPermissionsTeamId($this->id);
 
         // Get all active users (joined_at not null)
         $users = $this->users()

@@ -172,6 +172,7 @@ class TeamController extends Controller
 
             // Inicializar tenant context para atribuir role via Spatie Permission
             tenancy()->initialize($tenant);
+            setPermissionsTeamId($tenant->id);
 
             // Atribuir role ao usuário
             $user->assignRole($invitation->role);

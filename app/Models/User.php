@@ -132,6 +132,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         tenancy()->initialize($tenantModel);
+        setPermissionsTeamId($tenantModel->id);
 
         // Obter primeira role do usuário (normalmente só terá uma)
         $roleName = $this->roles()->first()?->name;
@@ -139,6 +140,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // Restaurar contexto original
         if ($currentTenantId) {
             tenancy()->initialize(Tenant::find($currentTenantId));
+            setPermissionsTeamId($currentTenantId);
         } else {
             tenancy()->end();
         }
@@ -213,6 +215,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         tenancy()->initialize($tenant);
+        setPermissionsTeamId($tenant->id);
 
         return true;
     }
