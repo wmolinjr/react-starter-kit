@@ -58,13 +58,42 @@ class HandleInertiaRequests extends Middleware
                     'is_current' => tenancy()->initialized && tenant('id') === $tenant->id,
                 ]) : [],
                 'permissions' => $user ? [
-                    // Gates
+                    // Legacy gates (manter para compatibilidade)
                     'canManageTeam' => Gate::allows('manage-team'),
                     'canManageBilling' => Gate::allows('manage-billing'),
                     'canManageSettings' => Gate::allows('manage-settings'),
                     'canCreateResources' => Gate::allows('create-resources'),
 
-                    // Role atual
+                    // Permissions granulares (recomendado)
+                    'projects' => [
+                        'view' => $user->can('tenant.projects:view'),
+                        'create' => $user->can('tenant.projects:create'),
+                        'edit' => $user->can('tenant.projects:edit'),
+                        'editOwn' => $user->can('tenant.projects:edit-own'),
+                        'delete' => $user->can('tenant.projects:delete'),
+                        'upload' => $user->can('tenant.projects:upload'),
+                        'download' => $user->can('tenant.projects:download'),
+                        'archive' => $user->can('tenant.projects:archive'),
+                    ],
+                    'team' => [
+                        'view' => $user->can('tenant.team:view'),
+                        'invite' => $user->can('tenant.team:invite'),
+                        'remove' => $user->can('tenant.team:remove'),
+                        'manageRoles' => $user->can('tenant.team:manage-roles'),
+                        'activity' => $user->can('tenant.team:activity'),
+                    ],
+                    'settings' => [
+                        'view' => $user->can('tenant.settings:view'),
+                        'edit' => $user->can('tenant.settings:edit'),
+                        'danger' => $user->can('tenant.settings:danger'),
+                    ],
+                    'billing' => [
+                        'view' => $user->can('tenant.billing:view'),
+                        'manage' => $user->can('tenant.billing:manage'),
+                        'invoices' => $user->can('tenant.billing:invoices'),
+                    ],
+
+                    // Role info (para UI - badges, display, etc)
                     'role' => $user->currentTenantRole(),
                     'isOwner' => $user->isOwner(),
                     'isAdmin' => $user->hasRole('admin'),

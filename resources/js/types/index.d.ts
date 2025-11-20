@@ -23,10 +23,42 @@ export interface TenantInfo {
 }
 
 export interface Permissions {
+    // Legacy gates (deprecated - use granular permissions)
     canManageTeam: boolean;
     canManageBilling: boolean;
     canManageSettings: boolean;
     canCreateResources: boolean;
+
+    // Granular permissions (recommended)
+    projects: {
+        view: boolean;
+        create: boolean;
+        edit: boolean;
+        editOwn: boolean;
+        delete: boolean;
+        upload: boolean;
+        download: boolean;
+        archive: boolean;
+    };
+    team: {
+        view: boolean;
+        invite: boolean;
+        remove: boolean;
+        manageRoles: boolean;
+        activity: boolean;
+    };
+    settings: {
+        view: boolean;
+        edit: boolean;
+        danger: boolean;
+    };
+    billing: {
+        view: boolean;
+        manage: boolean;
+        invoices: boolean;
+    };
+
+    // Role info (for UI display only - do NOT use for authorization)
     role: string | null;
     isOwner: boolean;
     isAdmin: boolean;

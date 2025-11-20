@@ -189,28 +189,200 @@ class ProjectPolicy
 }
 ```
 
-### Em Blade/Inertia
+### Em React/Inertia (Frontend)
 
-```php
-// Em controllers (props para Inertia)
-return Inertia::render('ProjectIndex', [
-    'can' => [
-        'create' => $user->can('tenant.projects:create'),
-        'edit' => $user->can('tenant.projects:edit'),
-        'delete' => $user->can('tenant.projects:delete'),
-    ],
-]);
-```
+**IMPORTANTE**: Permissions são **automaticamente** passadas para o frontend via `HandleInertiaRequests` middleware.
+
+#### Acesso via usePage()
 
 ```tsx
-// Em React (Inertia)
 import { usePage } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { Button } from '@/components/ui/button';
 
-const { can } = usePage().props;
+function ProjectsPage() {
+    const { auth } = usePage<PageProps>().props;
+    const { permissions } = auth;
 
-{can.create && (
-    <Button onClick={handleCreate}>Create Project</Button>
-)}
+    return (
+        <div>
+            {/* ✅ RECOMENDADO: Permissions granulares */}
+            {permissions?.projects.create && (
+                <Button onClick={handleCreate}>
+                    Create Project
+                </Button>
+            )}
+
+            {permissions?.projects.edit && (
+                <Button onClick={handleEdit}>
+                    Edit
+                </Button>
+            )}
+
+            {permissions?.projects.delete && (
+                <Button variant="destructive" onClick={handleDelete}>
+                    Delete
+                </Button>
+            )}
+
+            {permissions?.projects.upload && (
+                <input type="file" onChange={handleUpload} />
+            )}
+        </div>
+    );
+}
+```
+
+#### Permissions Disponíveis no Frontend
+
+Todas as permissions são automaticamente passadas em:
+```tsx
+auth.permissions.projects.{view, create, edit, editOwn, delete, upload, download, archive}
+auth.permissions.team.{view, invite, remove, manageRoles, activity}
+auth.permissions.settings.{view, edit, danger}
+auth.permissions.billing.{view, manage, invoices}
+```
+
+#### Exemplo Completo de Componente
+
+```tsx
+// resources/js/pages/projects/index.tsx
+import { usePage, Link } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { Button } from '@/components/ui/button';
+import { PlusIcon, TrashIcon } from 'lucide-react';
+
+export default function ProjectsIndex({ projects }: { projects: Project[] }) {
+    const { auth } = usePage<PageProps>().props;
+    const { permissions } = auth;
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <h1>Projects</h1>
+
+                {/* Show create button only if user can create */}
+                {permissions?.projects.create && (
+                    <Link href="/projects/create">
+                        <Button>
+                            <PlusIcon className="mr-2" />
+                            Create Project
+                        </Button>
+                    </Link>
+                )}
+            </div>
+
+            <div className="grid gap-4">
+                {projects.map((project) => {
+                    // Can edit if has global edit OR (has edit-own AND is owner)
+                    const canEdit = permissions?.projects.edit ||
+                        (permissions?.projects.editOwn && project.user_id === auth.user?.id);
+
+                    return (
+                        <div key={project.id} className="border p-4 rounded">
+                            <h3>{project.name}</h3>
+
+                            <div className="flex gap-2 mt-4">
+                                {/* Edit button */}
+                                {canEdit && (
+                                    <Link href={`/projects/${project.id}/edit`}>
+                                        <Button variant="outline">Edit</Button>
+                                    </Link>
+                                )}
+
+                                {/* Delete button - only if user can delete */}
+                                {permissions?.projects.delete && (
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => handleDelete(project.id)}
+                                    >
+                                        <TrashIcon className="mr-2" />
+                                        Delete
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+```
+
+#### Helper Hooks (Opcional)
+
+Criar hook customizado para simplificar uso:
+
+```tsx
+// resources/js/hooks/use-permissions.ts
+import { usePage } from '@inertiajs/react';
+import { PageProps } from '@/types';
+
+export function usePermissions() {
+    const { auth } = usePage<PageProps>().props;
+    return auth.permissions;
+}
+
+export function useHasPermission(path: string): boolean {
+    const permissions = usePermissions();
+    const [category, action] = path.split('.');
+
+    if (!permissions || !category || !action) return false;
+
+    return permissions[category]?.[action] ?? false;
+}
+
+// Uso:
+function MyComponent() {
+    const canCreate = useHasPermission('projects.create');
+    const canDelete = useHasPermission('projects.delete');
+
+    return (
+        <div>
+            {canCreate && <Button>Create</Button>}
+            {canDelete && <Button>Delete</Button>}
+        </div>
+    );
+}
+```
+
+#### ⚠️ IMPORTANTE: Role Checks no Frontend
+
+**Roles são apenas para display (badges, labels) - NÃO para autorização!**
+
+```tsx
+// ✅ OK: Usar role para display
+<div className="badge">
+    {permissions?.isOwner && <span>Owner</span>}
+    {permissions?.isAdmin && <span>Admin</span>}
+    {permissions?.role === 'member' && <span>Member</span>}
+</div>
+
+// ❌ ERRADO: Não usar role para autorização
+{permissions?.isOwner && <Button>Delete Project</Button>}
+
+// ✅ CORRETO: Usar permission
+{permissions?.projects.delete && <Button>Delete Project</Button>}
+```
+
+#### Exemplo Completo
+
+Ver arquivo completo com mais exemplos:
+```
+resources/js/examples/PermissionsUsageExample.tsx
+```
+
+#### Legacy Gates (Deprecated)
+
+```tsx
+// ❌ Old way - menos granular (deprecated)
+{permissions?.canManageTeam && <Button>Manage Team</Button>}
+
+// ✅ New way - mais granular (recomendado)
+{permissions?.team.invite && <Button>Invite Member</Button>}
+{permissions?.team.remove && <Button>Remove Member</Button>}
+{permissions?.team.manageRoles && <Button>Change Roles</Button>}
 ```
 
 ### Em Middleware
