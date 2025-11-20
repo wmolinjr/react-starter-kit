@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Tenant;
-use App\Http\Controllers\Controller;
 
-use App\Http\Middleware\VerifyTenantAccess;
+use App\Http\Controllers\Controller;
 use App\Mail\TeamInvitation;
 use App\Models\TenantInvitation;
 use App\Models\User;
@@ -196,9 +195,6 @@ class TeamController extends Controller implements HasMiddleware
             // Atribuir role ao usuário
             $user->assignRole($invitation->role);
 
-            // Invalidar cache de acesso ao tenant
-            VerifyTenantAccess::invalidateUserAccess($user->id, $tenantId);
-
             // Marcar convite como aceito
             $invitation->update(['accepted_at' => now()]);
 
@@ -251,14 +247,11 @@ class TeamController extends Controller implements HasMiddleware
         }
 
         // Atualizar role via Spatie Permission
-        DB::transaction(function () use ($user, $validated, $tenant) {
+        DB::transaction(function () use ($user, $validated) {
             // Remove todas as roles anteriores
             $user->syncRoles([]);
             // Atribui nova role
             $user->assignRole($validated['role']);
-
-            // Invalidar cache de acesso ao tenant
-            VerifyTenantAccess::invalidateUserAccess($user->id, $tenant->id);
         });
 
         return back()->with('success', 'Role atualizada com sucesso!');
@@ -287,9 +280,6 @@ class TeamController extends Controller implements HasMiddleware
 
         // Remover do tenant
         $tenant->users()->detach($user->id);
-
-        // Invalidar cache de acesso ao tenant
-        VerifyTenantAccess::invalidateUserAccess($user->id, $tenant->id);
 
         return back()->with('success', 'Membro removido com sucesso!');
     }
