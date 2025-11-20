@@ -33,6 +33,9 @@ return [
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
+
+        // Spatie Permission: Isola cache de roles/permissions por tenant
+        App\Bootstrappers\SpatiePermissionsBootstrapper::class,
     ],
 
     /**
