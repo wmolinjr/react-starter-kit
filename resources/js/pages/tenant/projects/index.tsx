@@ -37,7 +37,7 @@ export default function ProjectsIndex({ projects }: Props) {
                         </p>
                     </div>
 
-                    <Can permission="canCreateResources">
+                    <Can permission="tenant.projects:create">
                         <Link href="/projects/create">
                             <Button>
                                 <Plus className="mr-2 h-4 w-4" />
@@ -67,7 +67,7 @@ export default function ProjectsIndex({ projects }: Props) {
                             <p className="text-muted-foreground text-center mb-4">
                                 Comece criando seu primeiro projeto
                             </p>
-                            <Can permission="canCreateResources">
+                            <Can permission="tenant.projects:create">
                                 <Link href="/projects/create">
                                     <Button>
                                         <Plus className="mr-2 h-4 w-4" />

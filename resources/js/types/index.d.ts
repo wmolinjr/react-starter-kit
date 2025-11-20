@@ -1,5 +1,9 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
+import type { Auth as AuthType } from './permissions';
+
+// Re-export types from permissions.d.ts
+export type { Permission, Role, Auth, PermissionCategory, PermissionAction } from './permissions';
 
 export interface User {
     id: number;
@@ -22,47 +26,12 @@ export interface TenantInfo {
     is_current: boolean;
 }
 
-export interface Permissions {
-    // Granular permissions
-    projects: {
-        view: boolean;
-        create: boolean;
-        edit: boolean;
-        editOwn: boolean;
-        delete: boolean;
-        upload: boolean;
-        download: boolean;
-        archive: boolean;
-    };
-    team: {
-        view: boolean;
-        invite: boolean;
-        remove: boolean;
-        manageRoles: boolean;
-        activity: boolean;
-    };
-    settings: {
-        view: boolean;
-        edit: boolean;
-        danger: boolean;
-    };
-    billing: {
-        view: boolean;
-        manage: boolean;
-        invoices: boolean;
-    };
-
-    // Role info (for UI display only - do NOT use for authorization)
-    role: string | null;
-    isOwner: boolean;
-    isAdmin: boolean;
-    isAdminOrOwner: boolean;
-}
-
-export interface Auth {
-    user: User | null;
+/**
+ * Extended Auth with tenants list
+ * Combines auto-generated Auth type with tenant info
+ */
+export interface ExtendedAuth extends AuthType {
     tenants: TenantInfo[];
-    permissions: Permissions | null;
 }
 
 export interface TenantSubscription {
@@ -115,7 +84,7 @@ export interface NavItem {
 export interface PageProps {
     name: string;
     quote: { message: string; author: string };
-    auth: Auth;
+    auth: ExtendedAuth;
     tenant: Tenant | null;
     flash: FlashMessages;
     sidebarOpen: boolean;

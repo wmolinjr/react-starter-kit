@@ -61,17 +61,17 @@ export function useTenant() {
         /**
          * Check if current user is the owner of the current tenant
          */
-        isOwner: auth.permissions?.isOwner ?? false,
+        isOwner: auth.role?.isOwner ?? false,
 
         /**
          * Check if current user is admin or owner of the current tenant
          */
-        isAdminOrOwner: auth.permissions?.isAdminOrOwner ?? false,
+        isAdminOrOwner: auth.role?.isAdminOrOwner ?? false,
 
         /**
          * Current user's role on the current tenant
          */
-        role: auth.permissions?.role,
+        role: auth.role?.name,
 
         /**
          * Subscription info

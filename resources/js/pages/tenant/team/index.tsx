@@ -104,7 +104,7 @@ export default function TeamIndex({ members, tenant }: Props) {
             </p>
           </div>
 
-          <Can permission="canManageTeam">
+          <Can permission="tenant.team:invite">
             <Button onClick={() => setInviteDialogOpen(true)}>
               <UserPlus className="mr-2 h-4 w-4" />
               Convidar Membro
@@ -159,7 +159,7 @@ export default function TeamIndex({ members, tenant }: Props) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Can permission="canManageTeam">
+                      <Can any={["tenant.team:manage-roles", "tenant.team:remove"]}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">

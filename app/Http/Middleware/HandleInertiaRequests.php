@@ -56,38 +56,13 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->roleOn($tenant),
                     'is_current' => tenancy()->initialized && tenant('id') === $tenant->id,
                 ]) : [],
-                'permissions' => $user ? [
-                    // Granular permissions
-                    'projects' => [
-                        'view' => $user->can('tenant.projects:view'),
-                        'create' => $user->can('tenant.projects:create'),
-                        'edit' => $user->can('tenant.projects:edit'),
-                        'editOwn' => $user->can('tenant.projects:edit-own'),
-                        'delete' => $user->can('tenant.projects:delete'),
-                        'upload' => $user->can('tenant.projects:upload'),
-                        'download' => $user->can('tenant.projects:download'),
-                        'archive' => $user->can('tenant.projects:archive'),
-                    ],
-                    'team' => [
-                        'view' => $user->can('tenant.team:view'),
-                        'invite' => $user->can('tenant.team:invite'),
-                        'remove' => $user->can('tenant.team:remove'),
-                        'manageRoles' => $user->can('tenant.team:manage-roles'),
-                        'activity' => $user->can('tenant.team:activity'),
-                    ],
-                    'settings' => [
-                        'view' => $user->can('tenant.settings:view'),
-                        'edit' => $user->can('tenant.settings:edit'),
-                        'danger' => $user->can('tenant.settings:danger'),
-                    ],
-                    'billing' => [
-                        'view' => $user->can('tenant.billing:view'),
-                        'manage' => $user->can('tenant.billing:manage'),
-                        'invoices' => $user->can('tenant.billing:invoices'),
-                    ],
+                // Permissions: apenas as que o usuário TEM (não todas com booleans)
+                // Mais performático (1 query vs 19+) e escalável (100+ permissions no futuro)
+                'permissions' => $user ? $user->getAllPermissions()->pluck('name')->toArray() : [],
 
-                    // Role info (para UI - badges, display, etc)
-                    'role' => $user->currentTenantRole(),
+                // Role info: para UI apenas (badges, display, etc) - NÃO usar para autorização
+                'role' => $user ? [
+                    'name' => $user->currentTenantRole(),
                     'isOwner' => $user->isOwner(),
                     'isAdmin' => $user->hasRole('admin'),
                     'isAdminOrOwner' => $user->isAdminOrOwner(),

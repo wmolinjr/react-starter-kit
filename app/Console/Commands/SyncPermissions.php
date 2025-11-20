@@ -167,6 +167,12 @@ class SyncPermissions extends Command
         $this->info('✅ Cache cleared.');
         $this->newLine();
 
+        // Generate TypeScript types
+        $this->info('📝 Generating TypeScript types...');
+        Artisan::call('permissions:generate-types');
+        $this->info('✅ TypeScript types generated.');
+        $this->newLine();
+
         $this->info('🎉 Roles & Permissions synced successfully!');
         $this->newLine();
 
