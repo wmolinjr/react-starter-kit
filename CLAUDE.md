@@ -111,6 +111,52 @@ Inertia bridges Laravel and React, enabling server-side routing with React compo
 - `auth.user`: Current authenticated user
 - `sidebarOpen`: Sidebar state from cookie
 
+### Vite & Asset Bundling
+
+**IMPORTANT**: Follow Inertia.js best practices for Vite configuration.
+
+**✅ CORRECT Configuration** (`resources/views/app.blade.php:43`):
+```blade
+@viteReactRefresh
+@vite(['resources/css/app.css', 'resources/js/app.tsx'])
+@inertiaHead
+```
+
+**❌ NEVER do this:**
+```blade
+{{-- DON'T: This breaks Vite manifest and Inertia's module resolution --}}
+@vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+```
+
+**Why?**
+- Vite only builds entry points defined in `vite.config.ts` (`app.tsx` and `ssr.tsx`)
+- Individual page components are NOT in the Vite manifest
+- Inertia handles dynamic page loading via `import.meta.glob('./pages/**/*.tsx')` in `app.tsx:16`
+- Attempting to preload individual pages causes `ViteException: Unable to locate file in Vite manifest`
+
+**How Inertia Loads Pages** (`resources/js/app.tsx:13-17`):
+```typescript
+resolve: (name) =>
+    resolvePageComponent(
+        `./pages/${name}.tsx`,
+        import.meta.glob('./pages/**/*.tsx'),
+    ),
+```
+
+**Vite Configuration** (`vite.config.ts:9-11`):
+```typescript
+laravel({
+    input: ['resources/css/app.css', 'resources/js/app.tsx'],
+    ssr: 'resources/js/ssr.tsx',
+    refresh: true,
+}),
+```
+
+**Multi-Tenant Considerations:**
+- Same Vite setup works for both Central and Tenant domains
+- Pages are resolved at runtime based on route
+- No need for domain-specific manifests or builds
+
 ### Frontend Structure
 
 - **Pages**: `resources/js/pages/` - Inertia page components

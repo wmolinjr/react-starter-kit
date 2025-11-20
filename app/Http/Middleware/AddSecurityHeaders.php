@@ -99,28 +99,28 @@ class AddSecurityHeaders
             // Default fallback for all resources
             "default-src 'self'",
 
-            // Scripts: Allow self + Vite in development
+            // Scripts: Allow self + Vite in development + Google Analytics
             $isLocal
-                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:*"
-                : "script-src 'self'",
+                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:* https://www.googletagmanager.com https://www.google-analytics.com"
+                : "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com",
 
-            // Styles: Allow self + Vite in development + Bunny Fonts (GDPR-compliant font service)
+            // Styles: Allow self + Vite in development + Bunny Fonts + Google Fonts
             $isLocal
-                ? "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.bunny.net"
-                : "style-src 'self' 'unsafe-inline' https://fonts.bunny.net", // unsafe-inline needed for dynamic styles
+                ? "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.bunny.net https://fonts.googleapis.com"
+                : "style-src 'self' 'unsafe-inline' https://fonts.bunny.net https://fonts.googleapis.com", // unsafe-inline needed for dynamic styles
 
-            // Images: Allow self, data URLs, and HTTPS images
-            "img-src 'self' data: https:",
+            // Images: Allow self, data URLs, HTTPS images, and Google Analytics
+            "img-src 'self' data: https: https://www.google-analytics.com https://www.googletagmanager.com",
 
-            // Fonts: Allow self + Vite in development + Bunny Fonts (GDPR-compliant font service)
+            // Fonts: Allow self + Vite in development + Bunny Fonts + Google Fonts
             $isLocal
-                ? "font-src 'self' data: http://localhost:* http://127.0.0.1:* https://fonts.bunny.net"
-                : "font-src 'self' data: https://fonts.bunny.net",
+                ? "font-src 'self' data: http://localhost:* http://127.0.0.1:* https://fonts.bunny.net https://fonts.gstatic.com"
+                : "font-src 'self' data: https://fonts.bunny.net https://fonts.gstatic.com",
 
-            // Connect (AJAX, WebSocket): Allow self + Vite HMR + tenant subdomains in development + Bunny Fonts
+            // Connect (AJAX, WebSocket): Allow self + Vite HMR + tenant subdomains + fonts + analytics
             $isLocal
-                ? "connect-src 'self' ws://localhost:* ws://127.0.0.1:* ws://*.localhost http://localhost:* http://127.0.0.1:* http://*.localhost https://fonts.bunny.net"
-                : "connect-src 'self' https://fonts.bunny.net",
+                ? "connect-src 'self' ws://localhost:* ws://127.0.0.1:* ws://*.localhost http://localhost:* http://127.0.0.1:* http://*.localhost https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net"
+                : "connect-src 'self' https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net",
 
             // Media: Allow self
             "media-src 'self'",
