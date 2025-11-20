@@ -82,8 +82,19 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        // CRITICAL: Initialize tenancy BEFORE StartSession middleware
+        // Ensures Redis session prefixing works correctly for tenant-scoped sessions
+        // Uses priority() to guarantee execution order
+        // @see https://v4.tenancyforlaravel.com/version-4 (Early Identification Middleware)
+        $middleware->priority([
+            \App\Http\Middleware\InitializeTenancyByDomainExceptTests::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+        ]);
+
+        $middleware->prepend(\App\Http\Middleware\InitializeTenancyByDomainExceptTests::class);
+
         $middleware->web(append: [
-            AddSecurityHeaders::class, // Add security headers first
+            AddSecurityHeaders::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,

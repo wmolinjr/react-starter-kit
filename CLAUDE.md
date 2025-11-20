@@ -220,6 +220,43 @@ SESSION_DRIVER=redis         # Performance + escalabilidade
 
 **See**: [docs/SESSION-SECURITY.md](docs/SESSION-SECURITY.md) for complete security guide.
 
+### User Impersonation & Session Configuration
+
+**⚠️ CRÍTICO**: Impersonation requer configuração correta de `SESSION_DOMAIN` e middleware de tenancy.
+
+#### 1. SESSION_DOMAIN DEVE ESTAR VAZIO
+
+**Problema**: `SESSION_DOMAIN=.localhost` compartilha cookies entre todos os subdomains
+- Cookies criados em `localhost` são acessíveis em `tenant1.localhost`
+- Session fixation e leakage entre tenants
+- Impersonation não funciona (sessões não isoladas)
+
+**Solução** (`.env:39`):
+```env
+SESSION_DOMAIN=    # VAZIO = isolamento por domínio exato
+```
+
+**Benefícios**:
+- ✅ Cookies isolados por domínio exato (`localhost` ≠ `tenant1.localhost`)
+- ✅ Segurança multi-tenant (sem session leakage)
+- ✅ Impersonation funciona corretamente
+- ✅ Válido para DEV e PROD
+
+#### 2. Early Middleware Initialization
+
+**Middleware** (`bootstrap/app.php:89-94`):
+```php
+$middleware->priority([
+    \App\Http\Middleware\InitializeTenancyByDomainExceptTests::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+]);
+$middleware->prepend(\App\Http\Middleware\InitializeTenancyByDomainExceptTests::class);
+```
+
+**Propósito**: Garante que tenancy seja inicializado ANTES do StartSession para Redis session prefixing correto.
+
+**Reference**: [Tenancy v4 docs - Early Identification Middleware](https://v4.tenancyforlaravel.com/version-4)
+
 ### MediaLibrary Integration
 
 **Spatie MediaLibrary** com isolamento multi-tenant completo:
