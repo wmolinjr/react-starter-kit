@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -15,7 +14,6 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        Gate::authorize('viewAny', Project::class);
 
         $projects = Project::with(['user', 'media'])
             ->latest()
@@ -31,7 +29,6 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        Gate::authorize('create', Project::class);
 
         return Inertia::render('tenant/projects/create');
     }
@@ -41,7 +38,6 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('create', Project::class);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -63,7 +59,6 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        Gate::authorize('view', $project);
 
         $project->load(['user', 'media']);
 
@@ -101,7 +96,6 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        Gate::authorize('update', $project);
 
         return Inertia::render('tenant/projects/edit', [
             'project' => $project,
@@ -113,7 +107,6 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        Gate::authorize('update', $project);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -132,7 +125,6 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        Gate::authorize('delete', $project);
 
         $project->delete();
 
@@ -145,7 +137,6 @@ class ProjectController extends Controller
      */
     public function uploadFile(Request $request, Project $project)
     {
-        Gate::authorize('update', $project);
 
         $request->validate([
             'file' => ['required', 'file', 'max:10240'], // 10MB max
@@ -163,7 +154,6 @@ class ProjectController extends Controller
      */
     public function downloadFile(Project $project, Media $media)
     {
-        Gate::authorize('view', $project);
 
         // Verificar se media pertence ao project
         if ($media->model_id !== $project->id || $media->model_type !== Project::class) {
@@ -183,7 +173,6 @@ class ProjectController extends Controller
      */
     public function deleteFile(Project $project, Media $media)
     {
-        Gate::authorize('update', $project);
 
         // Verificar se media pertence ao project
         if ($media->model_id !== $project->id || $media->model_type !== Project::class) {

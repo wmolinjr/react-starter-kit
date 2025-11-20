@@ -133,35 +133,72 @@ php artisan permissions:sync --fresh
 
 ## Como Usar Permissions
 
-### Em Controllers
+### ✅ Abordagem Recomendada: Middleware nas Rotas
+
+A melhor prática é usar middleware `can:` nas rotas. Isso mantém os controllers limpos e centraliza a autorização.
 
 ```php
-use Illuminate\Support\Facades\Gate;
+// routes/tenant.php
 
-class ProjectController extends Controller
+// ✅ RECOMENDADO: Middleware nas rotas
+Route::prefix('team')->name('team.')->group(function () {
+    Route::get('/', [TeamController::class, 'index'])
+        ->middleware('can:tenant.team:view')
+        ->name('index');
+
+    Route::post('/invite', [TeamController::class, 'invite'])
+        ->middleware('can:tenant.team:invite')
+        ->name('invite');
+
+    Route::patch('/{user}/role', [TeamController::class, 'updateRole'])
+        ->middleware('can:tenant.team:manage-roles')
+        ->name('update-role');
+});
+
+// Para Policies (com route model binding)
+Route::prefix('projects')->name('projects.')->group(function () {
+    Route::get('/{project}', [ProjectController::class, 'show'])
+        ->middleware('can:view,project')  // usa ProjectPolicy::view()
+        ->name('show');
+
+    Route::patch('/{project}', [ProjectController::class, 'update'])
+        ->middleware('can:update,project')  // usa ProjectPolicy::update()
+        ->name('update');
+});
+```
+
+### Em Controllers
+
+Com middleware nas rotas, os controllers ficam limpos (sem `Gate::authorize()`):
+
+```php
+class TeamController extends Controller
 {
     public function index()
     {
-        // Opção 1: Via Gate
-        Gate::authorize('tenant.projects:view');
+        // Autorização já feita pelo middleware
+        $tenant = tenant();
+        $members = $tenant->users()->get();
 
-        // Opção 2: Via Policy (recomendado)
-        Gate::authorize('viewAny', Project::class);
-
-        // ...
+        return Inertia::render('tenant/team/index', [
+            'members' => $members,
+        ]);
     }
 
-    public function store(Request $request)
+    public function invite(Request $request)
     {
-        // Check manual
-        if (!$request->user()->can('tenant.projects:create')) {
-            abort(403, 'Você não tem permissão para criar projetos.');
-        }
+        // Autorização já feita pelo middleware
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'role' => 'required|in:admin,member',
+        ]);
 
         // ...
     }
 }
 ```
+
+**Nota**: Só use `Gate::authorize()` ou `$user->can()` no controller se a lógica de autorização for dinâmica e não puder ser feita no middleware.
 
 ### Em Policies
 

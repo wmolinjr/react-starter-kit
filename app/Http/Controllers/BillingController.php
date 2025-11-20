@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class BillingController extends Controller
@@ -13,7 +12,6 @@ class BillingController extends Controller
      */
     public function index()
     {
-        Gate::authorize('manage-billing');
 
         $tenant = current_tenant();
         $subscription = $tenant->subscription('default');
@@ -43,7 +41,6 @@ class BillingController extends Controller
      */
     public function checkout(Request $request)
     {
-        Gate::authorize('manage-billing');
 
         $request->validate([
             'plan' => 'required|in:starter,professional,enterprise',
@@ -69,7 +66,6 @@ class BillingController extends Controller
      */
     public function success()
     {
-        Gate::authorize('manage-billing');
 
         $tenant = current_tenant();
 
@@ -95,7 +91,6 @@ class BillingController extends Controller
      */
     public function portal()
     {
-        Gate::authorize('manage-billing');
 
         $tenant = current_tenant();
 
@@ -107,7 +102,6 @@ class BillingController extends Controller
      */
     public function invoice(string $invoiceId)
     {
-        Gate::authorize('manage-billing');
 
         $tenant = current_tenant();
 

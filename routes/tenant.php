@@ -54,46 +54,86 @@ Route::middleware([
         // Projects (CRUD + File Upload)
         Route::prefix('projects')->name('projects.')->group(function () {
             // Read operations (no rate limiting)
-            Route::get('/', [\App\Http\Controllers\ProjectController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\ProjectController::class, 'create'])->name('create');
-            Route::get('/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])->name('show');
-            Route::get('/{project}/edit', [\App\Http\Controllers\ProjectController::class, 'edit'])->name('edit');
+            Route::get('/', [\App\Http\Controllers\ProjectController::class, 'index'])
+                ->middleware('can:tenant.projects:view')
+                ->name('index');
+            Route::get('/create', [\App\Http\Controllers\ProjectController::class, 'create'])
+                ->middleware('can:tenant.projects:create')
+                ->name('create');
+            Route::get('/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])
+                ->middleware('can:view,project')
+                ->name('show');
+            Route::get('/{project}/edit', [\App\Http\Controllers\ProjectController::class, 'edit'])
+                ->middleware('can:update,project')
+                ->name('edit');
 
             // Write operations (rate limited)
             Route::middleware('throttle:tenant-actions')->group(function () {
-                Route::post('/', [\App\Http\Controllers\ProjectController::class, 'store'])->name('store');
-                Route::patch('/{project}', [\App\Http\Controllers\ProjectController::class, 'update'])->name('update');
-                Route::delete('/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('destroy');
+                Route::post('/', [\App\Http\Controllers\ProjectController::class, 'store'])
+                    ->middleware('can:tenant.projects:create')
+                    ->name('store');
+                Route::patch('/{project}', [\App\Http\Controllers\ProjectController::class, 'update'])
+                    ->middleware('can:update,project')
+                    ->name('update');
+                Route::delete('/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])
+                    ->middleware('can:delete,project')
+                    ->name('destroy');
             });
 
             // Media Management (stricter rate limiting for uploads)
             // Note: Media isolation is handled by BelongsToTenant global scope
             // Route model binding automatically filters by tenant_id
-            Route::middleware('throttle:uploads')->post('/{project}/media', [\App\Http\Controllers\ProjectController::class, 'uploadFile'])->name('media.upload');
-            Route::get('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'downloadFile'])->name('media.download');
-            Route::middleware('throttle:tenant-actions')->delete('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'deleteFile'])->name('media.delete');
+            Route::middleware('throttle:uploads')
+                ->post('/{project}/media', [\App\Http\Controllers\ProjectController::class, 'uploadFile'])
+                ->middleware('can:tenant.projects:upload')
+                ->name('media.upload');
+            Route::get('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'downloadFile'])
+                ->middleware('can:tenant.projects:download')
+                ->name('media.download');
+            Route::middleware('throttle:tenant-actions')
+                ->delete('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'deleteFile'])
+                ->middleware('can:tenant.projects:delete')
+                ->name('media.delete');
         });
 
         // Team Management
         Route::prefix('team')->name('team.')->group(function () {
             // Read operations
-            Route::get('/', [\App\Http\Controllers\TeamController::class, 'index'])->name('index');
+            Route::get('/', [\App\Http\Controllers\TeamController::class, 'index'])
+                ->middleware('can:tenant.team:view')
+                ->name('index');
 
             // Write operations (rate limited)
             Route::middleware('throttle:tenant-actions')->group(function () {
-                Route::post('/invite', [\App\Http\Controllers\TeamController::class, 'invite'])->name('invite');
-                Route::patch('/{user}/role', [\App\Http\Controllers\TeamController::class, 'updateRole'])->name('update-role');
-                Route::delete('/{user}', [\App\Http\Controllers\TeamController::class, 'remove'])->name('remove');
+                Route::post('/invite', [\App\Http\Controllers\TeamController::class, 'invite'])
+                    ->middleware('can:tenant.team:invite')
+                    ->name('invite');
+                Route::patch('/{user}/role', [\App\Http\Controllers\TeamController::class, 'updateRole'])
+                    ->middleware('can:tenant.team:manage-roles')
+                    ->name('update-role');
+                Route::delete('/{user}', [\App\Http\Controllers\TeamController::class, 'remove'])
+                    ->middleware('can:tenant.team:remove')
+                    ->name('remove');
             });
         });
 
         // Billing (Laravel Cashier)
         Route::prefix('billing')->name('billing.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\BillingController::class, 'index'])->name('index');
-            Route::post('/checkout', [\App\Http\Controllers\BillingController::class, 'checkout'])->name('checkout');
-            Route::get('/success', [\App\Http\Controllers\BillingController::class, 'success'])->name('success');
-            Route::get('/portal', [\App\Http\Controllers\BillingController::class, 'portal'])->name('portal');
-            Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\BillingController::class, 'invoice'])->name('invoice');
+            Route::get('/', [\App\Http\Controllers\BillingController::class, 'index'])
+                ->middleware('can:tenant.billing:view')
+                ->name('index');
+            Route::post('/checkout', [\App\Http\Controllers\BillingController::class, 'checkout'])
+                ->middleware('can:tenant.billing:manage')
+                ->name('checkout');
+            Route::get('/success', [\App\Http\Controllers\BillingController::class, 'success'])
+                ->middleware('can:tenant.billing:view')
+                ->name('success');
+            Route::get('/portal', [\App\Http\Controllers\BillingController::class, 'portal'])
+                ->middleware('can:tenant.billing:manage')
+                ->name('portal');
+            Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\BillingController::class, 'invoice'])
+                ->middleware('can:tenant.billing:invoices')
+                ->name('invoice');
         });
 
         // Settings do tenant (já existe em routes/settings.php, mas podemos adicionar aqui também)
@@ -124,19 +164,43 @@ Route::middleware([
         });
 });
 
-        // Tenant Settings (Branding, Domains, Features, Notifications)
-        Route::prefix('tenant-settings')->name('tenant.settings.')->group(function () {
-            // Read operations
-            Route::get('/', [\App\Http\Controllers\TenantSettingsController::class, 'index'])->name('index');
-            Route::get('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'branding'])->name('branding');
-            Route::get('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'domains'])->name('domains');
+// Tenant Settings (Branding, Domains, Features, Notifications)
+Route::middleware([
+    'web',
+    InitializeTenancyByDomainExceptTests::class,
+    PreventAccessFromCentralDomainsExceptTests::class,
+    'auth',
+    'verified',
+    VerifyTenantAccess::class,
+    'prevent.impersonation',
+])->prefix('tenant-settings')->name('tenant.settings.')->group(function () {
+    // Read operations
+    Route::get('/', [\App\Http\Controllers\TenantSettingsController::class, 'index'])
+        ->middleware('can:tenant.settings:view')
+        ->name('index');
+    Route::get('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'branding'])
+        ->middleware('can:tenant.settings:view')
+        ->name('branding');
+    Route::get('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'domains'])
+        ->middleware('can:tenant.settings:view')
+        ->name('domains');
 
-            // Write operations (rate limited)
-            Route::middleware('throttle:tenant-actions')->group(function () {
-                Route::post('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'updateBranding'])->name('branding.update');
-                Route::post('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'addDomain'])->name('domains.add');
-                Route::delete('/domains/{domainId}', [\App\Http\Controllers\TenantSettingsController::class, 'removeDomain'])->name('domains.remove');
-                Route::post('/features', [\App\Http\Controllers\TenantSettingsController::class, 'updateFeatures'])->name('features.update');
-                Route::post('/notifications', [\App\Http\Controllers\TenantSettingsController::class, 'updateNotifications'])->name('notifications.update');
-            });
-        });
+    // Write operations (rate limited)
+    Route::middleware('throttle:tenant-actions')->group(function () {
+        Route::post('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'updateBranding'])
+            ->middleware('can:tenant.settings:edit')
+            ->name('branding.update');
+        Route::post('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'addDomain'])
+            ->middleware('can:tenant.settings:edit')
+            ->name('domains.add');
+        Route::delete('/domains/{domainId}', [\App\Http\Controllers\TenantSettingsController::class, 'removeDomain'])
+            ->middleware('can:tenant.settings:danger')
+            ->name('domains.remove');
+        Route::post('/features', [\App\Http\Controllers\TenantSettingsController::class, 'updateFeatures'])
+            ->middleware('can:tenant.settings:edit')
+            ->name('features.update');
+        Route::post('/notifications', [\App\Http\Controllers\TenantSettingsController::class, 'updateNotifications'])
+            ->middleware('can:tenant.settings:edit')
+            ->name('notifications.update');
+    });
+});

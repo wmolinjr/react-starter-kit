@@ -7,7 +7,6 @@ use App\Models\TenantInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -20,8 +19,6 @@ class TeamController extends Controller
      */
     public function index()
     {
-        Gate::authorize('tenant.team:view');
-
         $tenant = tenant();
 
         $members = $tenant->users()
@@ -55,8 +52,6 @@ class TeamController extends Controller
      */
     public function invite(Request $request)
     {
-        Gate::authorize('tenant.team:invite');
-
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
             'role' => ['required', Rule::in(['admin', 'member'])],
@@ -200,8 +195,6 @@ class TeamController extends Controller
      */
     public function updateRole(Request $request, User $user)
     {
-        Gate::authorize('tenant.team:manage-roles');
-
         $validated = $request->validate([
             'role' => ['required', Rule::in(['owner', 'admin', 'member'])],
         ]);
@@ -249,8 +242,6 @@ class TeamController extends Controller
      */
     public function remove(Request $request, User $user)
     {
-        Gate::authorize('tenant.team:remove');
-
         $tenant = tenant();
         $currentUser = $request->user();
 
