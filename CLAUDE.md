@@ -258,6 +258,90 @@ React Compiler (Babel plugin) is enabled in `vite.config.ts` for automatic optim
 - Testing environment vars in `phpunit.xml` (cache=array, queue=sync, etc.)
 - **Telescope desabilitado durante testes** para evitar ruído nos dados de teste
 
+## Session Security & Multi-Tenancy
+
+### Configuração Segura de Sessões
+
+Este projeto usa **multi-tenancy com isolamento de sessões** para segurança máxima entre tenants.
+
+#### ⚠️ CONFIGURAÇÃO CRÍTICA: SESSION_DOMAIN
+
+**Para PRODUÇÃO** (obrigatório):
+```env
+SESSION_DOMAIN=              # VAZIO = Isolamento por domínio exato
+SESSION_SAME_SITE=lax        # Proteção CSRF + permite impersonation
+SESSION_SECURE_COOKIE=true   # HTTPS obrigatório
+```
+
+**Para DESENVOLVIMENTO** (opcional):
+```env
+SESSION_DOMAIN=.localhost    # Facilita testes locais
+SESSION_SAME_SITE=lax
+```
+
+#### Implicações de Segurança
+
+| Configuração | Comportamento | Segurança | Produção |
+|--------------|---------------|-----------|----------|
+| `SESSION_DOMAIN=null` | Cookies isolados por domínio exato | ✅ **Seguro** - Tenants isolados | ✅ **Recomendado** |
+| `SESSION_DOMAIN=.yourdomain.com` | Cookies compartilhados entre subdomains | ❌ **Inseguro** - Session leakage | ❌ **Nunca usar** |
+| `SESSION_SAME_SITE=strict` | Máxima proteção CSRF | ✅ Seguro (pode quebrar flows) | ⚠️ Requer testes |
+| `SESSION_SAME_SITE=lax` | Proteção CSRF + permite GET redirects | ✅ **Recomendado** | ✅ **Ideal** |
+| `SESSION_SAME_SITE=none` | Permite cross-site requests | ❌ **Muito inseguro** | ❌ **Nunca usar** |
+
+#### ❌ Vulnerabilidades de SESSION_DOMAIN=.yourdomain.com
+
+1. **Session Fixation**: Atacante em `tenant1.yourdomain.com` pode fixar sessão em `tenant2.yourdomain.com`
+2. **Cross-Tenant Cookie Leakage**: Sessões vazam entre tenants diferentes
+3. **Session Hijacking via XSS**: XSS em qualquer subdomain compromete todos os outros
+4. **CSRF Cross-Domain**: Ataques CSRF facilitados entre subdomains
+
+#### ✅ Sistema de Impersonation Seguro
+
+O impersonation **NÃO DEPENDE** de cookies compartilhados. Funciona perfeitamente com `SESSION_DOMAIN=null`:
+
+**Fluxo Seguro:**
+1. Admin em `admin.yourdomain.com` cria token de impersonation
+2. Redireciona para `tenant1.yourdomain.com/impersonate/{token}`
+3. Token validado no tenant domain
+4. **NOVA sessão criada** exclusivamente em `tenant1.yourdomain.com`
+5. Cookies **NÃO compartilhados** entre admin e tenant
+
+**Implementação** (`app/Http/Controllers/TenantImpersonationController.php:41`):
+```php
+// Cria nova sessão isolada no domínio do tenant
+auth()->login($impersonationToken->user, true);
+session()->regenerate(); // Sessão independente
+```
+
+**Segurança do Token:**
+- ✅ Single-use (consumido após primeiro uso)
+- ✅ Time-limited (expira em 5 minutos)
+- ✅ Tenant-scoped (validado contra tenant atual)
+- ✅ Audit trail (registra quem impersonou quem)
+
+#### Checklist de Segurança para Produção
+
+Ver arquivo `.env.production.example` com configuração completa e comentada.
+
+**Sessões:**
+- [ ] `SESSION_DOMAIN` vazio (isolamento por domínio)
+- [ ] `SESSION_SAME_SITE=lax` ou `strict`
+- [ ] `SESSION_SECURE_COOKIE=true` (HTTPS)
+- [ ] `SESSION_DRIVER=redis` (performance + escalabilidade)
+
+**Multi-Tenancy:**
+- [ ] Route model binding verifica `tenant_id` (`bootstrap/app.php:68`)
+- [ ] Middleware `VerifyTenantAccess` em todas as rotas tenant
+- [ ] Models usam `BelongsToTenant` trait
+- [ ] Storage isolado por tenant (`tenants/{tenant_id}/...`)
+
+**Impersonation:**
+- [ ] Tokens single-use e time-limited
+- [ ] Audit trail habilitado
+- [ ] Middleware `prevent.impersonation` em ações sensíveis
+- [ ] Rota `/impersonate/{token}` apenas em tenant domains
+
 ## MCP Tools (Model Context Protocol)
 
 Este projeto tem acesso a ferramentas MCP para debugging, testes e documentação. **Use estas ferramentas proativamente durante o desenvolvimento.**

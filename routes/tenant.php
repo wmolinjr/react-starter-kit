@@ -6,6 +6,7 @@ use App\Http\Middleware\InitializeTenancyForTests;
 use App\Http\Middleware\VerifyTenantAccess;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Stancl\Tenancy\Features\UserImpersonation;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /*
@@ -27,6 +28,13 @@ Route::middleware([
     InitializeTenancyForTests::class, // Test-friendly: reuses initialized tenant in tests, verifies central domains and delegates to InitializeTenancyByDomain in production
     // PreventAccessFromCentralDomains is now integrated into InitializeTenancyForTests
 ])->group(function () {
+    // Impersonation token consumption (Stancl/Tenancy official implementation)
+    // Uses the official UserImpersonation::makeResponse() from the package
+    // This route is NOT authenticated because the token provides the authentication
+    Route::get('/impersonate/{token}', function ($token) {
+        return UserImpersonation::makeResponse($token);
+    })->name('impersonate.consume');
+
     // Redirect root para dashboard
     Route::get('/', function () {
         return redirect()->route('tenant.dashboard');

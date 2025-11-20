@@ -17,12 +17,6 @@ use Laravel\Fortify\Features;
 |
 */
 
-// Impersonation token consumption (UNIVERSAL ROUTE - works on both central and tenant domains)
-// Must be registered BEFORE domain-scoped routes to be accessible on all domains
-Route::middleware('web')
-    ->get('/impersonate/{token}', [\App\Http\Controllers\TenantImpersonationController::class, 'consume'])
-    ->name('impersonate.consume');
-
 // Central domain routes - only accessible on localhost (or configured central domains)
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->middleware('web')->group(function () {

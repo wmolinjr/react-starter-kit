@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ImpersonationToken;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ImpersonationController extends Controller
 {
     /**
      * Iniciar impersonation de tenant/usuário via token
+     *
+     * Usa a API oficial do Stancl/Tenancy: tenancy()->impersonate()
      */
     public function start(Tenant $tenant, User $user = null)
     {
@@ -21,20 +21,22 @@ class ImpersonationController extends Controller
             abort(403, 'Only super administrators can impersonate tenants.');
         }
 
-        // Se usuário específico foi fornecido, validar que pertence ao tenant
-        if ($user) {
-            if (!$user->tenants()->where('tenant_id', $tenant->id)->exists()) {
-                abort(403, 'User does not belong to this tenant.');
-            }
+        // Se usuário específico NÃO foi fornecido, selecionar primeiro usuário do tenant
+        if (!$user) {
+            $user = $tenant->users()->firstOrFail();
         }
 
-        // Criar token de impersonation com expiração de 5 minutos
-        $token = ImpersonationToken::create([
-            'token' => Str::random(64),
-            'tenant_id' => $tenant->id,
-            'user_id' => $user?->id,
-            'expires_at' => now()->addMinutes(5),
-        ]);
+        // Validar que o usuário pertence ao tenant
+        if (!$user->tenants()->where('tenant_id', $tenant->id)->exists()) {
+            abort(403, 'User does not belong to this tenant.');
+        }
+
+        // Usa a API oficial do pacote Stancl/Tenancy para criar o token
+        // Redireciona para o dashboard do tenant após impersonation
+        $redirectUrl = '/dashboard';
+
+        // UserImpersonation requer $userId como string
+        $token = tenancy()->impersonate($tenant, (string) $user->id, $redirectUrl);
 
         // Redirecionar para URL de consumo do token no domínio do tenant
         return Inertia::location($tenant->url() . '/impersonate/' . $token->token);
