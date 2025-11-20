@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { FolderOpen, Plus, Search } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import TenantLayout from '@/layouts/tenant-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ interface Props {
 
 export default function ProjectsIndex({ projects }: Props) {
     return (
-        <AppLayout>
+        <TenantLayout>
             <Head title="Projetos" />
 
             <div className="space-y-6">
@@ -106,6 +106,6 @@ export default function ProjectsIndex({ projects }: Props) {
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </TenantLayout>
     );
 }

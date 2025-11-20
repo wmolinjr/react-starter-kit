@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { BarChart3, Users, CreditCard, FolderOpen, TrendingUp } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import TenantLayout from '@/layouts/tenant-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTenant } from '@/hooks/use-tenant';
 import type { Tenant } from '@/types';
@@ -13,7 +13,7 @@ export default function TenantDashboard({ tenant }: Props) {
     const { subscription, hasActiveSubscription, isOnTrial } = useTenant();
 
     return (
-        <AppLayout>
+        <TenantLayout>
             <Head title="Dashboard" />
 
             <div className="space-y-6">
@@ -144,6 +144,6 @@ export default function TenantDashboard({ tenant }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </AppLayout>
+        </TenantLayout>
     );
 }

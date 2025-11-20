@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import TenantLayout from '@/layouts/tenant-layout';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -94,7 +94,7 @@ export default function ProjectShow({ project }: ProjectShowProps) {
   };
 
   return (
-    <AppLayout>
+    <TenantLayout>
       <Head title={project.name} />
 
       <div className="space-y-6">
@@ -273,6 +273,6 @@ export default function ProjectShow({ project }: ProjectShowProps) {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
+    </TenantLayout>
   );
 }

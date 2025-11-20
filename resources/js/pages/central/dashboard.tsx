@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
+import CentralLayout from '@/layouts/central-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -48,7 +48,7 @@ const roleColors: Record<string, string> = {
 
 export default function Dashboard({ tenants = [] }: DashboardProps) {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <CentralLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-6">
                 {/* Header */}
@@ -157,6 +157,6 @@ export default function Dashboard({ tenants = [] }: DashboardProps) {
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </CentralLayout>
     );
 }

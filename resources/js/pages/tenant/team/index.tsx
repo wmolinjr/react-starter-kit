@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield } from 'lucide-react';
 
-import AppLayout from '@/layouts/app-layout';
+import TenantLayout from '@/layouts/tenant-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -88,7 +88,7 @@ export default function TeamIndex({ members, tenant }: Props) {
   };
 
   return (
-    <AppLayout>
+    <TenantLayout>
       <Head title="Gerenciar Time" />
 
       <div className="space-y-6">
@@ -211,6 +211,6 @@ export default function TeamIndex({ members, tenant }: Props) {
         onOpenChange={setInviteDialogOpen}
         maxUsersReached={tenant.max_users !== null && tenant.current_users >= tenant.max_users}
       />
-    </AppLayout>
+    </TenantLayout>
   );
 }

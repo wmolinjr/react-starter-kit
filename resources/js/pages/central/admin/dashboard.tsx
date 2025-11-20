@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import CentralLayout from '@/layouts/central-layout';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -69,7 +69,7 @@ export default function AdminDashboard({
   };
 
   return (
-    <AppLayout>
+    <CentralLayout>
       <Head title="Admin Dashboard" />
 
       <div className="space-y-6">
@@ -226,6 +226,6 @@ export default function AdminDashboard({
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
+    </CentralLayout>
   );
 }

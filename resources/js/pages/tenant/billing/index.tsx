@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import TenantLayout from '@/layouts/tenant-layout';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -105,7 +105,7 @@ export default function BillingIndex() {
   const currentPlanKey = getCurrentPlan();
 
   return (
-    <AppLayout>
+    <TenantLayout>
       <Head title="Billing" />
 
       <div className="space-y-8">
@@ -267,6 +267,6 @@ export default function BillingIndex() {
           </Card>
         )}
       </div>
-    </AppLayout>
+    </TenantLayout>
   );
 }
