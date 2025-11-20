@@ -260,7 +260,7 @@ Criar e configurar todas as migrations necessárias para o sistema multi-tenant:
 - TenantSeeder executed successfully
 
 **Dados Criados pelo Seeder:**
-- ✅ 1 super admin: admin@myapp.com / password
+- ✅ 1 super admin: admin@setor3.app / password
 - ✅ 2 tenants:
   - Acme Corporation (slug: acme, domain: tenant1.localhost)
   - Startup Inc (slug: startup, domain: tenant2.localhost)
@@ -902,8 +902,8 @@ Etapa XX - Nome da Etapa
 - Enterprise: $Z/mês - [limites] - A definir na Etapa 7
 
 **Domínios:**
-- Central: localhost (dev) / app.myapp.com (prod - a definir)
-- Tenant suffix: .localhost (dev) / .myapp.com (prod - a definir)
+- Central: localhost (dev) / app.setor3.app (prod - a definir)
+- Tenant suffix: .localhost (dev) / .setor3.app (prod - a definir)
 
 ### Credenciais e Configurações
 
@@ -2399,7 +2399,7 @@ npm run lint
 **Usar Token**:
 ```bash
 curl -H "Authorization: Bearer 1|aBcD...token...eFgH" \
-     https://tenant.myapp.com/api/projects
+     https://tenant.setor3.app/api/projects
 ```
 
 ### Próxima Etapa
@@ -3494,7 +3494,7 @@ DELETE /api/projects/{project}  api.projects.destroy
 
 #### 1. Criação de Token
 ```bash
-curl -X POST https://acme.myapp.com/api/tokens \
+curl -X POST https://acme.setor3.app/api/tokens \
   -H "Authorization: Bearer {existing-token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -3505,22 +3505,22 @@ curl -X POST https://acme.myapp.com/api/tokens \
 
 #### 2. Listagem de Tokens
 ```bash
-curl -X GET https://acme.myapp.com/api/tokens \
+curl -X GET https://acme.setor3.app/api/tokens \
   -H "Authorization: Bearer {token}"
 ```
 
 #### 3. Uso do Token API
 ```bash
 # Listar projetos do tenant
-curl -X GET https://acme.myapp.com/api/projects \
+curl -X GET https://acme.setor3.app/api/projects \
   -H "Authorization: Bearer {token}"
 
 # Buscar projetos
-curl -X GET "https://acme.myapp.com/api/projects?search=laravel&per_page=10" \
+curl -X GET "https://acme.setor3.app/api/projects?search=laravel&per_page=10" \
   -H "Authorization: Bearer {token}"
 
 # Criar projeto
-curl -X POST https://acme.myapp.com/api/projects \
+curl -X POST https://acme.setor3.app/api/projects \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{

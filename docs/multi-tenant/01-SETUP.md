@@ -148,7 +148,7 @@ return [
      */
     'central_domains' => [
         'myapp.test',        // Local
-        'app.myapp.com',     // Produção
+        'app.setor3.app',     // Produção
     ],
 
     /**
@@ -256,10 +256,10 @@ class TenancyServiceProvider extends ServiceProvider
             function (Events\TenantCreated $event) {
                 $tenant = $event->tenant;
 
-                // Criar domínio slug.myapp.test (local) ou slug.myapp.com (prod)
+                // Criar domínio slug.myapp.test (local) ou slug.setor3.app (prod)
                 $domain = config('app.env') === 'local'
                     ? "{$tenant->slug}.myapp.test"
-                    : "{$tenant->slug}.myapp.com";
+                    : "{$tenant->slug}.setor3.app";
 
                 $tenant->domains()->create([
                     'domain' => $domain,

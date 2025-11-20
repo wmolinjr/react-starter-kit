@@ -180,7 +180,7 @@ tenant_id | user_id | role       | invited_at | joined_at
 
 **Funcionamento:**
 ```
-tenant.myapp.com  →  Tenant identificado por subdomain "tenant"
+tenant.setor3.app  →  Tenant identificado por subdomain "tenant"
 custom.com        →  Tenant identificado via tabela domains
 ```
 
@@ -188,9 +188,9 @@ custom.com        →  Tenant identificado via tabela domains
 ```php
 id | tenant_id | domain           | is_primary
 ---|-----------|------------------|------------
-1  | 1         | acme.myapp.com   | true
+1  | 1         | acme.setor3.app   | true
 2  | 1         | acme.com         | false
-3  | 2         | startup.myapp.com| true
+3  | 2         | startup.setor3.app| true
 ```
 
 ---
@@ -216,7 +216,7 @@ User                    Central App              Database
   │                          ├─────────────────────► │
   │                          │                       │
   │                          ├─ Create Domain        │
-  │                          │   (slug.myapp.com)    │
+  │                          │   (slug.setor3.app)    │
   │                          ├─────────────────────► │
   │                          │                       │
   │                          ├─ Attach User          │
@@ -224,7 +224,7 @@ User                    Central App              Database
   │                          ├─────────────────────► │
   │                          │                       │
   │◄─ Redirect to            │                       │
-  │   slug.myapp.com/dashboard                      │
+  │   slug.setor3.app/dashboard                      │
 ```
 
 ### 2. Login em Tenant Existente
@@ -232,7 +232,7 @@ User                    Central App              Database
 ```
 User                    Tenant App              Tenancy Middleware
   │                          │                       │
-  ├─ GET acme.myapp.com      │                       │
+  ├─ GET acme.setor3.app      │                       │
   │──────────────────────────►                       │
   │                          ├─ InitializeTenancyByDomain
   │                          │   Extract "acme"      │
@@ -263,7 +263,7 @@ function TenantSwitcher() {
 
   return (
     <select onChange={(e) => {
-      window.location.href = `https://${e.target.value}.myapp.com/dashboard`;
+      window.location.href = `https://${e.target.value}.setor3.app/dashboard`;
     }}>
       {auth.user.tenants.map(tenant => (
         <option key={tenant.id} value={tenant.slug}>
@@ -282,7 +282,7 @@ function TenantSwitcher() {
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                       CENTRAL APP                             │
-│                    (app.myapp.com)                           │
+│                    (app.setor3.app)                           │
 │                                                               │
 │  - Landing page                                              │
 │  - Sign up (create tenant + user)                           │
@@ -298,17 +298,17 @@ function TenantSwitcher() {
 │  1. Create User (users table)                                │
 │  2. Create Tenant (tenants table)                            │
 │  3. Create Domain (domains table)                            │
-│     - slug.myapp.com                                         │
+│     - slug.setor3.app                                         │
 │  4. Attach User to Tenant (tenant_user pivot)               │
 │     - role: owner                                            │
 │                                                               │
-│  Redirect to: slug.myapp.com/dashboard                      │
+│  Redirect to: slug.setor3.app/dashboard                      │
 └──────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                      TENANT APP                               │
-│                   (slug.myapp.com)                           │
+│                   (slug.setor3.app)                           │
 │                                                               │
 │  [InitializeTenancyByDomain Middleware]                     │
 │   ↓                                                          │
@@ -395,7 +395,7 @@ users (global)
 - Download URLs assinadas
 
 ### ✅ 7. Custom Domains
-- Subdomain padrão: `{slug}.myapp.com`
+- Subdomain padrão: `{slug}.setor3.app`
 - Custom domains ilimitados (Pro+)
 - Domínio principal por tenant
 - SSL automático (requer Cloudflare/Let's Encrypt)

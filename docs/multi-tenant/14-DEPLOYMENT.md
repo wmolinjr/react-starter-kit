@@ -7,11 +7,11 @@
 ```env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://app.myapp.com
+APP_URL=https://app.setor3.app
 
 # Domínios
-CENTRAL_DOMAIN=app.myapp.com
-TENANT_DOMAIN_SUFFIX=.myapp.com
+CENTRAL_DOMAIN=app.setor3.app
+TENANT_DOMAIN_SUFFIX=.setor3.app
 
 # Database
 DB_CONNECTION=pgsql
@@ -41,7 +41,7 @@ AWS_BUCKET=your-bucket
 # Mail
 MAIL_MAILER=smtp
 MAIL_HOST=your-smtp-host
-MAIL_FROM_ADDRESS=noreply@myapp.com
+MAIL_FROM_ADDRESS=noreply@setor3.app
 ```
 
 ### 2. Wildcard SSL Certificate
@@ -50,8 +50,8 @@ MAIL_FROM_ADDRESS=noreply@myapp.com
 
 ```bash
 sudo certbot certonly --dns-cloudflare \
-  -d myapp.com \
-  -d *.myapp.com
+  -d setor3.app \
+  -d *.setor3.app
 ```
 
 **Opção 2: Cloudflare (Recomendado)**
@@ -70,21 +70,21 @@ sudo certbot certonly --dns-cloudflare \
 # Redirect HTTP to HTTPS
 server {
     listen 80;
-    server_name myapp.com *.myapp.com;
+    server_name setor3.app *.setor3.app;
     return 301 https://$host$request_uri;
 }
 
 # HTTPS Server
 server {
     listen 443 ssl http2;
-    server_name myapp.com *.myapp.com;
+    server_name setor3.app *.setor3.app;
 
     root /var/www/myapp/public;
     index index.php;
 
     # SSL Certificates (Wildcard)
-    ssl_certificate /etc/ssl/certs/myapp.com.crt;
-    ssl_certificate_key /etc/ssl/private/myapp.com.key;
+    ssl_certificate /etc/ssl/certs/setor3.app.crt;
+    ssl_certificate_key /etc/ssl/private/setor3.app.key;
 
     # SSL Configuration
     ssl_protocols TLSv1.2 TLSv1.3;

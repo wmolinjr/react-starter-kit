@@ -149,7 +149,7 @@ $request->validate([
 
 'allowed_origins' => [
     config('app.url'),
-    'https://*.myapp.com',
+    'https://*.setor3.app',
 ],
 
 'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -215,10 +215,10 @@ APP_DEBUG=false
 APP_ENV=production
 
 # 2. SSL
-curl -I https://myapp.com | grep -i strict
+curl -I https://setor3.app | grep -i strict
 
 # 3. Headers
-curl -I https://myapp.com | grep -i x-frame
+curl -I https://setor3.app | grep -i x-frame
 
 # 4. Database
 # Verificar que não há database pública

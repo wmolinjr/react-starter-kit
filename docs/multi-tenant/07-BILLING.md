@@ -280,7 +280,7 @@ Route::post(
 
 **Stripe Dashboard → Developers → Webhooks**
 
-**URL:** `https://myapp.com/stripe/webhook`
+**URL:** `https://setor3.app/stripe/webhook`
 
 **Events:**
 - `customer.subscription.created`

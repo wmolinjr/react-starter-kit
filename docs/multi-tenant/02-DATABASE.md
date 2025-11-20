@@ -143,9 +143,9 @@ CREATE INDEX domains_is_primary_index ON domains(tenant_id, is_primary);
 ```
 id | tenant_id | domain            | is_primary
 ---|-----------|-------------------|------------
-1  | 1         | acme.myapp.com    | true
+1  | 1         | acme.setor3.app    | true
 2  | 1         | acme.com          | false
-3  | 2         | startup.myapp.com | true
+3  | 2         | startup.setor3.app | true
 ```
 
 ### 4. `tenant_user` (Pivot N:N)
@@ -610,7 +610,7 @@ class TenantSeeder extends Seeder
         // Criar super admin
         $superAdmin = User::create([
             'name' => 'Super Admin',
-            'email' => 'admin@myapp.com',
+            'email' => 'admin@setor3.app',
             'password' => bcrypt('password'),
             'is_super_admin' => true,
             'email_verified_at' => now(),
@@ -674,7 +674,7 @@ class TenantSeeder extends Seeder
         $this->command->info('✅ Tenants created successfully!');
         $this->command->info('  - acme.myapp.test (john@acme.com)');
         $this->command->info('  - startup.myapp.test (jane@startup.com)');
-        $this->command->info('  - Super admin: admin@myapp.com');
+        $this->command->info('  - Super admin: admin@setor3.app');
     }
 }
 ```

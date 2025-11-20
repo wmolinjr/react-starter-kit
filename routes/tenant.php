@@ -11,7 +11,7 @@ use Stancl\Tenancy\Features\UserImpersonation;
 
 /*
 |--------------------------------------------------------------------------
-| Tenant Routes (*.myapp.com)
+| Tenant Routes (*.setor3.app)
 |--------------------------------------------------------------------------
 |
 | Rotas tenant-scoped. Todas as rotas aqui têm acesso ao tenant context.

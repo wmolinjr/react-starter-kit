@@ -16,7 +16,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ CENTRAL APP (app.myapp.com)                                 │
+│ CENTRAL APP (app.setor3.app)                                 │
 │ routes/web.php                                               │
 │                                                               │
 │ - Landing page                                               │
@@ -26,7 +26,7 @@
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│ TENANT APP (*.myapp.com ou custom domains)                  │
+│ TENANT APP (*.setor3.app ou custom domains)                  │
 │ routes/tenant.php                                            │
 │                                                               │
 │ [InitializeTenancyByDomain middleware]                      │
@@ -411,7 +411,7 @@ class RegisterController extends Controller
             // 3. Criar domínio
             $domain = config('app.env') === 'local'
                 ? "{$slug}.myapp.test"
-                : "{$slug}.myapp.com";
+                : "{$slug}.setor3.app";
 
             $tenant->domains()->create([
                 'domain' => $domain,

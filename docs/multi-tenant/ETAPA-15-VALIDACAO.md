@@ -112,7 +112,7 @@ Duration: 0.35s
 ```
 
 **Padrões de Subdomínios Tenant:**
-- Produção: `https://*.myapp.com`
+- Produção: `https://*.setor3.app`
 - Desenvolvimento: `http(s)://*.myapp.test`, `*.localhost`
 
 ---
@@ -381,8 +381,8 @@ php artisan test --filter=test_security_headers_are_present
    ```env
    APP_ENV=production
    APP_DEBUG=false
-   APP_DOMAIN=myapp.com
-   CORS_ALLOWED_ORIGINS=https://app.myapp.com,https://admin.myapp.com
+   APP_DOMAIN=setor3.app
+   CORS_ALLOWED_ORIGINS=https://app.setor3.app,https://admin.setor3.app
    ```
 
 2. **SSL/TLS:**

@@ -168,7 +168,7 @@ Cada tenant pode ter múltiplos domínios:
 
 ```
 Tenant "Acme Corp":
-  - acme.myapp.com (subdomain padrão, is_primary=true)
+  - acme.setor3.app (subdomain padrão, is_primary=true)
   - acme.com (custom domain, is_primary=false)
   - acmeinc.com (custom domain 2)
 ```

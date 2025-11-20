@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class TenantSeeder extends Seeder
@@ -18,7 +18,7 @@ class TenantSeeder extends Seeder
         // Criar super admin
         $superAdmin = User::create([
             'name' => 'Super Admin',
-            'email' => 'admin@myapp.com',
+            'email' => 'admin@setor3.app',
             'password' => bcrypt('password'),
             'is_super_admin' => true,
             'email_verified_at' => now(),
@@ -64,10 +64,14 @@ class TenantSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Assign owner role via Spatie Permission (requires tenant context)
+        // Assign owner role
         $tenant1 = Tenant::find($tenant1Id);
         tenancy()->initialize($tenant1);
-        Role::findOrCreate('owner', 'web'); // Create role if doesn't exist
+        setPermissionsTeamId($tenant1->id); // Set team ID for Spatie Permission
+
+        // Sync permissions and roles for this tenant
+        Artisan::call('permissions:sync');
+
         $tenant1Owner->assignRole('owner');
         tenancy()->end();
 
@@ -111,16 +115,20 @@ class TenantSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Assign owner role via Spatie Permission (requires tenant context)
+        // Assign owner role
         $tenant2 = Tenant::find($tenant2Id);
         tenancy()->initialize($tenant2);
-        Role::findOrCreate('owner', 'web'); // Create role if doesn't exist
+        setPermissionsTeamId($tenant2->id); // Set team ID for Spatie Permission
+
+        // Sync permissions and roles for this tenant
+        Artisan::call('permissions:sync');
+
         $tenant2Owner->assignRole('owner');
         tenancy()->end();
 
         $this->command->info('✅ Tenants created successfully!');
         $this->command->info('  - tenant1.localhost (john@acme.com / password)');
         $this->command->info('  - tenant2.localhost (jane@startup.com / password)');
-        $this->command->info('  - Super admin: admin@myapp.com / password');
+        $this->command->info('  - Super admin: admin@setor3.app / password');
     }
 }

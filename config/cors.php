@@ -51,13 +51,13 @@ return [
      * Supports wildcard subdomains for multi-tenant architecture
      *
      * Example patterns:
-     * - https://*.myapp.com (all subdomains in production)
+     * - https://*.setor3.app (all subdomains in production)
      * - https://*.myapp.test (all subdomains in local dev)
      * - https://*.myapp.localhost (Docker/Sail development)
      */
     'allowed_origins_patterns' => [
         env('APP_ENV') === 'production'
-            ? '/^https:\/\/[\w-]+\.'.preg_quote(env('APP_DOMAIN', 'myapp.com'), '/').'$/'
+            ? '/^https:\/\/[\w-]+\.'.preg_quote(env('APP_DOMAIN', 'setor3.app'), '/').'$/'
             : '/^https?:\/\/[\w-]+\.(myapp\.test|myapp\.localhost|localhost)(:\d+)?$/',
     ],
 
