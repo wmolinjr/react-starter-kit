@@ -3,11 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TenantTestCase;
 
 class TeamTest extends TenantTestCase
 {
-    /** @test */
+    #[Test]
     public function owner_can_invite_members_to_team()
     {
         $response = $this->post('/team/invite', [
@@ -19,7 +20,7 @@ class TeamTest extends TenantTestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    #[Test]
     public function member_cannot_invite_others()
     {
         $member = $this->createTenantUser('member');
@@ -33,10 +34,13 @@ class TeamTest extends TenantTestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function owner_can_change_user_roles()
     {
         $member = $this->createTenantUser('member');
+
+        // Pre-create admin role for this tenant
+        \App\Models\Role::findOrCreate('admin', 'web');
 
         $response = $this->patch("/team/{$member->id}/role", [
             'role' => 'admin',
@@ -44,15 +48,13 @@ class TeamTest extends TenantTestCase
 
         $response->assertRedirect();
 
-        // Verify role changed in pivot table
-        $this->assertDatabaseHas('tenant_user', [
-            'tenant_id' => $this->tenant->id,
-            'user_id' => $member->id,
-            'role' => 'admin',
-        ]);
+        // Verify role changed using Spatie Permission
+        $member->refresh();
+        $this->assertTrue($member->hasRole('admin'));
+        $this->assertFalse($member->hasRole('member'));
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_change_member_roles_but_not_owner()
     {
         $admin = $this->createTenantUser('admin');
@@ -75,7 +77,7 @@ class TeamTest extends TenantTestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function owner_can_remove_team_members()
     {
         $member = $this->createTenantUser('member');
@@ -90,7 +92,7 @@ class TeamTest extends TenantTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function member_cannot_remove_team_members()
     {
         $member = $this->createTenantUser('member');
@@ -103,7 +105,7 @@ class TeamTest extends TenantTestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function cannot_remove_owner_from_team()
     {
         // Create a second owner
@@ -115,7 +117,7 @@ class TeamTest extends TenantTestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_only_see_team_members_of_current_tenant()
     {
         // Add members to current tenant
@@ -126,9 +128,18 @@ class TeamTest extends TenantTestCase
         $otherTenant = $this->createOtherTenant();
         $otherUser = User::factory()->create();
         $otherTenant->users()->attach($otherUser->id, [
-            'role' => 'member',
             'joined_at' => now(),
         ]);
+
+        // Assign role to other tenant's user using Spatie Permission
+        tenancy()->end(); // End current tenant
+        tenancy()->initialize($otherTenant); // Switch to other tenant
+        setPermissionsTeamId($otherTenant->id); // Set Spatie team ID
+        $memberRole = \App\Models\Role::findOrCreate('member', 'web');
+        $otherUser->assignRole($memberRole);
+        tenancy()->end(); // End other tenant
+        tenancy()->initialize($this->tenant); // Switch back to test tenant
+        setPermissionsTeamId($this->tenant->id);
 
         $response = $this->get('/team');
 

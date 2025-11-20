@@ -20,50 +20,54 @@ return new class extends Migration
         throw_if(empty($tableNames), Exception::class, 'Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.');
         throw_if($teams && empty($columnNames['team_foreign_key'] ?? null), Exception::class, 'Error: team_foreign_key on config/permission.php not loaded. Run [php artisan config:clear] and try again.');
 
-        Schema::create($tableNames['permissions'], static function (Blueprint $table) {
+        Schema::create($tableNames['permissions'], static function (Blueprint $table) use ($teams, $columnNames) {
             // $table->engine('InnoDB');
             $table->bigIncrements('id'); // permission id
 
-            // Tenant isolation - permissions are tenant-scoped
-            $table->unsignedBigInteger('tenant_id')->nullable()->index();
+            // Tenant isolation via Spatie teams feature (using tenant_id as team_foreign_key)
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable()->index();
+                $table->foreign($columnNames['team_foreign_key'])
+                    ->references('id')
+                    ->on('tenants')
+                    ->onDelete('cascade');
+            }
 
             $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
             $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
             $table->timestamps();
 
             // Unique constraint includes tenant_id for isolation
-            $table->unique(['tenant_id', 'name', 'guard_name']);
-
-            // Foreign key to tenants table
-            $table->foreign('tenant_id')
-                ->references('id')
-                ->on('tenants')
-                ->onDelete('cascade');
+            if ($teams) {
+                $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
+            } else {
+                $table->unique(['name', 'guard_name']);
+            }
         });
 
         Schema::create($tableNames['roles'], static function (Blueprint $table) use ($teams, $columnNames) {
             // $table->engine('InnoDB');
             $table->bigIncrements('id'); // role id
 
-            // Tenant isolation - roles are tenant-scoped
-            $table->unsignedBigInteger('tenant_id')->nullable()->index();
-
-            if ($teams || config('permission.testing')) { // permission.testing is a fix for sqlite testing
-                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
-                $table->index($columnNames['team_foreign_key'], 'roles_team_foreign_key_index');
+            // Tenant isolation via Spatie teams feature (using tenant_id as team_foreign_key)
+            if ($teams) {
+                $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable()->index();
+                $table->foreign($columnNames['team_foreign_key'])
+                    ->references('id')
+                    ->on('tenants')
+                    ->onDelete('cascade');
             }
+
             $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
             $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
             $table->timestamps();
 
             // Unique constraint includes tenant_id for isolation
-            $table->unique(['tenant_id', 'name', 'guard_name']);
-
-            // Foreign key to tenants table
-            $table->foreign('tenant_id')
-                ->references('id')
-                ->on('tenants')
-                ->onDelete('cascade');
+            if ($teams) {
+                $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
+            } else {
+                $table->unique(['name', 'guard_name']);
+            }
         });
 
         Schema::create($tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {

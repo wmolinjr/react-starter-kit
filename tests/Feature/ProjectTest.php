@@ -3,11 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Project;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TenantTestCase;
 
 class ProjectTest extends TenantTestCase
 {
-    /** @test */
+    #[Test]
     public function user_can_create_project_in_their_tenant()
     {
         $response = $this->post('/projects', [
@@ -25,7 +26,7 @@ class ProjectTest extends TenantTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_cannot_see_projects_from_other_tenants()
     {
         // Create another tenant with project
@@ -45,7 +46,7 @@ class ProjectTest extends TenantTestCase
         $response->assertNotFound();
     }
 
-    /** @test */
+    #[Test]
     public function member_can_only_edit_own_projects()
     {
         // Create member (not owner)
@@ -67,7 +68,7 @@ class ProjectTest extends TenantTestCase
         $response->assertForbidden();
     }
 
-    /** @test */
+    #[Test]
     public function owner_can_delete_any_project_in_tenant()
     {
         // Create project owned by member
@@ -87,7 +88,7 @@ class ProjectTest extends TenantTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function projects_are_automatically_scoped_to_current_tenant()
     {
         // Create projects in current tenant

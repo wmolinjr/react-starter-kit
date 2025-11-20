@@ -120,9 +120,19 @@ class TenantIsolationTest extends TenantTestCase
         $otherTenant = $this->createOtherTenant();
         $otherUser = User::factory()->create();
         $otherTenant->users()->attach($otherUser->id, [
-            'role' => 'member',
             'joined_at' => now(),
         ]);
+
+        // Assign role using Spatie Permission
+        tenancy()->initialize($otherTenant);
+        setPermissionsTeamId($otherTenant->id);
+        $memberRole = \App\Models\Role::findOrCreate('member', 'web');
+        $otherUser->assignRole($memberRole);
+        tenancy()->end();
+
+        // Reinitialize test tenant before HTTP request
+        tenancy()->initialize($this->tenant);
+        setPermissionsTeamId($this->tenant->id);
 
         // Get team listing
         $response = $this->get('/team');

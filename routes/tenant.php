@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\InitializeTenancyForTests;
+use App\Http\Middleware\InitializeTenancyByDomainExceptTests;
+use App\Http\Middleware\PreventAccessFromCentralDomainsExceptTests;
 use App\Http\Middleware\VerifyTenantAccess;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Stancl\Tenancy\Features\UserImpersonation;
-use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,17 +16,19 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 | Rotas tenant-scoped. Todas as rotas aqui têm acesso ao tenant context.
 | Middleware aplicado:
-| - InitializeTenancyForTests: inicializa o tenant pelo subdomínio (production)
-|   ou reutiliza tenant já inicializado (testing)
-| - PreventAccessFromCentralDomains: previne acesso via domínios centrais (localhost)
+| - InitializeTenancyByDomainExceptTests: identifica tenant pelo domínio (pula se já inicializado)
+| - PreventAccessFromCentralDomainsExceptTests: previne acesso via domínios centrais (pula em tests)
 | - VerifyTenantAccess: verifica se usuário tem acesso ao tenant
+|
+| Em testes: o tenant é inicializado manualmente no TenantTestCase::setUp()
+| Em produção: usa InitializeTenancyByDomain normalmente
 |
 */
 
 Route::middleware([
     'web',
-    InitializeTenancyForTests::class, // Test-friendly: reuses initialized tenant in tests, verifies central domains and delegates to InitializeTenancyByDomain in production
-    // PreventAccessFromCentralDomains is now integrated into InitializeTenancyForTests
+    InitializeTenancyByDomainExceptTests::class,
+    PreventAccessFromCentralDomainsExceptTests::class,
 ])->group(function () {
     // Impersonation token consumption (Stancl/Tenancy official implementation)
     // Uses the official UserImpersonation::makeResponse() from the package

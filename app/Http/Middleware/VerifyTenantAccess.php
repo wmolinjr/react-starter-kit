@@ -37,6 +37,10 @@ class VerifyTenantAccess
 
         $tenantId = tenant('id');
 
+        // Set Spatie Permission team ID to current tenant
+        // This ensures role/permission lookups are scoped to the current tenant
+        setPermissionsTeamId($tenantId);
+
         // Verifica se o usuário pertence ao tenant atual
         $belongsToTenant = $user->tenants()
             ->where('tenant_id', $tenantId)

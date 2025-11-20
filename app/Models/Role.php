@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
+use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Guard;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
@@ -36,7 +38,7 @@ class Role extends SpatieRole
      */
     public static function findByName(string $name, $guardName = null): self
     {
-        $guardName = $guardName ?? static::getDefaultGuardName();
+        $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
         $query = static::query()->where('name', $name)->where('guard_name', $guardName);
 
@@ -54,26 +56,4 @@ class Role extends SpatieRole
         return $role;
     }
 
-    /**
-     * Find or create role, scoped to current tenant.
-     */
-    public static function findOrCreate(string $name, $guardName = null): self
-    {
-        $guardName = $guardName ?? static::getDefaultGuardName();
-
-        $query = static::query()->where('name', $name)->where('guard_name', $guardName);
-
-        // Se tenant context está ativo, filtrar por tenant_id
-        if (tenancy()->initialized) {
-            $query->where('tenant_id', tenant('id'));
-        }
-
-        $role = $query->first();
-
-        if (! $role) {
-            return static::create(['name' => $name, 'guard_name' => $guardName]);
-        }
-
-        return $role;
-    }
 }

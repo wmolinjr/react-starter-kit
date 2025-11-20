@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\TeamInvitation;
+use App\Models\TenantInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -92,16 +93,23 @@ class TeamController extends Controller
             // Gerar token de convite
             $invitationToken = Str::random(64);
 
-            // Adicionar ao tenant com status pendente
+            // Adicionar ao tenant com status pendente (sem role)
             $tenant->users()->attach($user->id, [
                 'invited_at' => now(),
                 'joined_at' => null,
                 'invitation_token' => $invitationToken,
             ]);
 
-            // TODO: Store pending role in session or separate table
-            // For now, role will be assigned when invitation is accepted
-            // Could use: session(["invitation_{$invitationToken}" => $validated['role']])
+            // Criar registro de convite com role
+            TenantInvitation::create([
+                'tenant_id' => $tenant->id,
+                'user_id' => $user->id,
+                'invited_by_user_id' => $request->user()->id,
+                'role' => $validated['role'],
+                'invitation_token' => $invitationToken,
+                'invited_at' => now(),
+                'expires_at' => now()->addDays(7), // Convite expira em 7 dias
+            ]);
 
             // Enviar email de convite
             Mail::to($user->email)->send(new TeamInvitation(
@@ -136,32 +144,54 @@ class TeamController extends Controller
             return redirect()->route('login')->with('error', 'Você precisa estar autenticado para aceitar convites.');
         }
 
-        // Buscar tenant pelo token de convite
-        $tenantUser = DB::table('tenant_user')
-            ->where('user_id', $user->id)
-            ->where('invitation_token', $validated['token'])
-            ->whereNull('joined_at')
-            ->first();
+        // Buscar convite pendente
+        $invitation = TenantInvitation::findByToken($validated['token']);
 
-        if (! $tenantUser) {
-            return redirect()->route('home')->with('error', 'Convite inválido ou já aceito.');
+        if (! $invitation) {
+            return redirect()->route('home')->with('error', 'Convite inválido, expirado ou já aceito.');
         }
 
-        // Atualizar joined_at e limpar token
-        DB::table('tenant_user')
-            ->where('user_id', $user->id)
-            ->where('tenant_id', $tenantUser->tenant_id)
-            ->update([
-                'joined_at' => now(),
-                'invitation_token' => null,
-            ]);
+        // Verificar se o convite é para o usuário autenticado
+        if ($invitation->user_id !== $user->id) {
+            return redirect()->route('home')->with('error', 'Este convite não é para você.');
+        }
 
-        // Buscar tenant para redirecionar
-        $tenant = \App\Models\Tenant::find($tenantUser->tenant_id);
+        DB::beginTransaction();
 
-        return redirect()
-            ->to("http://{$tenant->slug}.".config('tenancy.central_domains')[0]."/dashboard")
-            ->with('success', 'Convite aceito! Bem-vindo ao time.');
+        try {
+            $tenant = $invitation->tenant;
+
+            // Atualizar joined_at e limpar token na pivot table
+            DB::table('tenant_user')
+                ->where('user_id', $user->id)
+                ->where('tenant_id', $tenant->id)
+                ->update([
+                    'joined_at' => now(),
+                    'invitation_token' => null,
+                ]);
+
+            // Inicializar tenant context para atribuir role via Spatie Permission
+            tenancy()->initialize($tenant);
+
+            // Atribuir role ao usuário
+            $user->assignRole($invitation->role);
+
+            // Finalizar tenant context
+            tenancy()->end();
+
+            // Marcar convite como aceito
+            $invitation->update(['accepted_at' => now()]);
+
+            DB::commit();
+
+            return redirect()
+                ->to("http://{$tenant->slug}.".config('tenancy.central_domains')[0]."/dashboard")
+                ->with('success', 'Convite aceito! Bem-vindo ao time.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->route('home')->with('error', 'Erro ao aceitar convite: '.$e->getMessage());
+        }
     }
 
     /**

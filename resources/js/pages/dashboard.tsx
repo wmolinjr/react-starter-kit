@@ -1,8 +1,23 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import {
+    Building2,
+    Users,
+    ArrowRight,
+    CalendarDays,
+    Plus,
+} from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -11,25 +26,136 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
+interface Tenant {
+    id: number;
+    name: string;
+    slug: string;
+    role: string | null;
+    joined_at: string;
+    url: string;
+}
+
+interface DashboardProps {
+    tenants: Tenant[];
+}
+
+const roleColors: Record<string, string> = {
+    owner: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+    admin: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    member: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    guest: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+};
+
+export default function Dashboard({ tenants = [] }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">
+                            Meus Tenants
+                        </h1>
+                        <p className="text-muted-foreground">
+                            Gerencie seus tenants e acesse rapidamente
+                        </p>
                     </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Criar Tenant
+                    </Button>
                 </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
+
+                {/* Tenants Grid */}
+                {tenants.length === 0 ? (
+                    <Card className="col-span-full">
+                        <CardContent className="flex flex-col items-center justify-center py-16">
+                            <Building2 className="mb-4 h-12 w-12 text-muted-foreground" />
+                            <h3 className="mb-2 text-lg font-semibold">
+                                Nenhum tenant encontrado
+                            </h3>
+                            <p className="mb-4 text-center text-sm text-muted-foreground">
+                                Você ainda não pertence a nenhum tenant. Crie
+                                um novo ou aguarde um convite.
+                            </p>
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Criar Primeiro Tenant
+                            </Button>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {tenants.map((tenant) => (
+                            <Card
+                                key={tenant.id}
+                                className="group relative overflow-hidden transition-all hover:shadow-lg"
+                            >
+                                <CardHeader>
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                                <Building2 className="h-5 w-5 text-primary" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-lg">
+                                                    {tenant.name}
+                                                </CardTitle>
+                                                <CardDescription className="text-xs">
+                                                    {tenant.slug}
+                                                </CardDescription>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {/* Role Badge */}
+                                    <div className="flex items-center gap-2">
+                                        <Users className="h-4 w-4 text-muted-foreground" />
+                                        <Badge
+                                            variant="secondary"
+                                            className={
+                                                roleColors[
+                                                    tenant.role || 'guest'
+                                                ]
+                                            }
+                                        >
+                                            {tenant.role || 'Sem role'}
+                                        </Badge>
+                                    </div>
+
+                                    {/* Joined Date */}
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <CalendarDays className="h-4 w-4" />
+                                        <span>
+                                            Membro desde{' '}
+                                            {new Date(
+                                                tenant.joined_at,
+                                            ).toLocaleDateString('pt-BR', {
+                                                day: '2-digit',
+                                                month: 'short',
+                                                year: 'numeric',
+                                            })}
+                                        </span>
+                                    </div>
+
+                                    {/* Access Button */}
+                                    <a
+                                        href={tenant.url}
+                                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                                    >
+                                        Acessar Tenant
+                                        <ArrowRight className="h-4 w-4" />
+                                    </a>
+                                </CardContent>
+
+                                {/* Hover Gradient */}
+                                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                            </Card>
+                        ))}
+                    </div>
+                )}
             </div>
         </AppLayout>
     );

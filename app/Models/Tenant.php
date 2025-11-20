@@ -65,42 +65,69 @@ class Tenant extends Model implements TenantWithDatabase
     }
 
     /**
-     * Owners do tenant
+     * Get users with a specific role in this tenant
      *
-     * NOTA: Usa Spatie Permission - requer tenant context ativo
-     * @deprecated Use Spatie Permission directly with tenant context
+     * @param string $roleName Role name (owner, admin, member, guest)
+     * @return \Illuminate\Support\Collection<User>
      */
-    public function owners(): BelongsToMany
+    public function getUsersByRole(string $roleName): \Illuminate\Support\Collection
     {
-        // TODO: Refactor to use Spatie Permission
-        // Temporariamente retorna todos os users - filtrar por role no código que chama
-        return $this->users()->whereNotNull('tenant_user.joined_at');
+        // Initialize tenant context
+        tenancy()->initialize($this);
+
+        // Get all active users (joined_at not null)
+        $users = $this->users()
+            ->whereNotNull('tenant_user.joined_at')
+            ->get()
+            ->filter(function ($user) use ($roleName) {
+                // Filter by role using Spatie Permission
+                return $user->hasRole($roleName);
+            });
+
+        // End tenant context if it wasn't active before
+        tenancy()->end();
+
+        return $users;
     }
 
     /**
-     * Admins do tenant
+     * Owners do tenant (users with 'owner' role)
      *
-     * NOTA: Usa Spatie Permission - requer tenant context ativo
-     * @deprecated Use Spatie Permission directly with tenant context
+     * @return \Illuminate\Support\Collection<User>
      */
-    public function admins(): BelongsToMany
+    public function owners(): \Illuminate\Support\Collection
     {
-        // TODO: Refactor to use Spatie Permission
-        // Temporariamente retorna todos os users - filtrar por role no código que chama
-        return $this->users()->whereNotNull('tenant_user.joined_at');
+        return $this->getUsersByRole('owner');
     }
 
     /**
-     * Members do tenant
+     * Admins do tenant (users with 'admin' role)
      *
-     * NOTA: Usa Spatie Permission - requer tenant context ativo
-     * @deprecated Use Spatie Permission directly with tenant context
+     * @return \Illuminate\Support\Collection<User>
      */
-    public function members(): BelongsToMany
+    public function admins(): \Illuminate\Support\Collection
     {
-        // TODO: Refactor to use Spatie Permission
-        // Retorna todos os membros ativos (joined_at não nulo)
-        return $this->users()->whereNotNull('tenant_user.joined_at');
+        return $this->getUsersByRole('admin');
+    }
+
+    /**
+     * Members do tenant (users with 'member' role)
+     *
+     * @return \Illuminate\Support\Collection<User>
+     */
+    public function members(): \Illuminate\Support\Collection
+    {
+        return $this->getUsersByRole('member');
+    }
+
+    /**
+     * All active members (joined_at not null) regardless of role
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<User>
+     */
+    public function activeMembers(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->users()->whereNotNull('tenant_user.joined_at')->get();
     }
 
     /**
