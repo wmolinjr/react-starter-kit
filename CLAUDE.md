@@ -302,6 +302,61 @@ Run SSR: `php artisan inertia:start-ssr` (after building)
 
 React Compiler (Babel plugin) is enabled in `vite.config.ts` for automatic optimizations.
 
+## Permissions & Roles
+
+Este projeto usa **Spatie Laravel Permission** integrado com **multi-tenancy** para controle de acesso granular.
+
+### Documentação Completa
+
+Ver **[docs/PERMISSIONS.md](docs/PERMISSIONS.md)** para documentação completa incluindo:
+- Lista de todas as 19 permissions organizadas por categoria
+- 3 roles MVP (owner, admin, member)
+- Como usar permissions no código
+- Como adicionar novas permissions
+- Troubleshooting
+
+### Quick Reference
+
+**Sincronizar Permissions**:
+```bash
+# Atualizar/criar permissions (idempotente)
+sail artisan permissions:sync
+
+# Limpar e recriar tudo
+sail artisan permissions:sync --fresh
+```
+
+**Nomenclatura**: `tenant.resource:action`
+- Exemplo: `tenant.projects:view`, `tenant.team:invite`, `tenant.billing:manage`
+
+**Categorias**:
+- `projects` (8 permissions)
+- `team` (5 permissions)
+- `settings` (3 permissions)
+- `billing` (3 permissions)
+
+**Uso no Código**:
+```php
+// Em Controllers
+Gate::authorize('tenant.projects:create');
+
+// Em Policies
+public function update(User $user, Project $project): bool {
+    return $user->can('tenant.projects:edit')
+        || ($user->can('tenant.projects:edit-own') && $project->user_id === $user->id);
+}
+
+// Check direto
+if ($user->can('tenant.team:invite')) {
+    // ...
+}
+```
+
+**Roles MVP**:
+- `owner`: 19 permissions (todas) - Acesso total
+- `admin`: 13 permissions - Gerencia projetos e equipe (sem billing)
+- `member`: 6 permissions - Cria e edita próprios projetos
+
 ## Testing
 
 - PHPUnit 11 configured with `phpunit.xml`
