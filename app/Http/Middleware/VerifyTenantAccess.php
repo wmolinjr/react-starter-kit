@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyTenantAccess
@@ -14,9 +15,10 @@ class VerifyTenantAccess
      * Verifica se o usuário autenticado tem acesso ao tenant atual.
      * Super admins (role "Super Admin") têm acesso a todos os tenants.
      *
-     * PERFORMANCE: Usa Spatie Permission cache (já configurado) em vez de query ao banco.
-     * Se o usuário tem qualquer role no tenant (owner, admin, member),
-     * significa que ele pertence ao tenant.
+     * PERFORMANCE OPTIMIZATION:
+     * 1. Request cache: Evita verificações duplicadas no mesmo request
+     * 2. Redis cache: Cacheia verificação de acesso por 60 segundos
+     * 3. Spatie Permission cache: Cache nativo de roles/permissions
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
@@ -28,25 +30,26 @@ class VerifyTenantAccess
         }
 
         $user = $request->user();
+        $userId = $user->id;
 
-        // Super admins (global role) têm acesso a todos os tenants
-        // Verifica a role sem tenant_id (global)
+        // OPTIMIZATION 1: Request cache (evita verificações duplicadas no mesmo request)
+        $requestCacheKey = "tenant_access_verified_{$userId}";
+        if ($request->attributes->has($requestCacheKey)) {
+            return $next($request);
+        }
+
+        // OPTIMIZATION 2: Check Super Admin first (cached by Spatie)
         setPermissionsTeamId(null);
-
-        // Unset cached relations before switching team context
-        // This ensures fresh role check from cache for global scope
         $user->unsetRelation('roles')->unsetRelation('permissions');
-
         $isSuperAdmin = $user->hasRole('Super Admin');
 
         if ($isSuperAdmin) {
             // Se é super admin e tenant está inicializado, seta o team ID para o tenant atual
-            // para que as verificações de permissão funcionem corretamente
             if (tenancy()->initialized) {
                 setPermissionsTeamId(tenant('id'));
-                // Unset again for tenant context
                 $user->unsetRelation('roles')->unsetRelation('permissions');
             }
+            $request->attributes->set($requestCacheKey, true);
             return $next($request);
         }
 
@@ -57,24 +60,73 @@ class VerifyTenantAccess
 
         $tenantId = tenant('id');
 
-        // Set Spatie Permission team ID to current tenant
-        // This ensures role/permission lookups are scoped to the current tenant
-        setPermissionsTeamId($tenantId);
+        // OPTIMIZATION 3: Redis cache (60 seconds) - evita verificação de roles repetidas
+        // Se cache não suporta tags (ex: array em testes), faz verificação direta
+        $cacheKey = "tenant_access:user_{$userId}:tenant_{$tenantId}";
 
-        // PERFORMANCE: Unset cached model relations so tenant-scoped roles will reload
-        // This uses Spatie Permission's existing cache (already configured in TenancyServiceProvider)
-        // No additional cache management needed!
-        $user->unsetRelation('roles')->unsetRelation('permissions');
+        $hasAccess = Cache::supportsTags()
+            ? Cache::tags(['tenant_access', "tenant_{$tenantId}"])->remember(
+                $cacheKey,
+                now()->addSeconds(60),
+                function () use ($user, $tenantId) {
+                    // Set Spatie Permission team ID to current tenant
+                    setPermissionsTeamId($tenantId);
 
-        // Check if user has ANY role in this tenant (not specific roles)
-        // getRoleNames() uses Spatie Permission cache - NO database query!
-        // Works with ANY role (owner, admin, member, or future custom roles)
-        $hasAnyRole = $user->getRoleNames()->isNotEmpty();
+                    // Unset cached relations so tenant-scoped roles will reload
+                    $user->unsetRelation('roles')->unsetRelation('permissions');
 
-        if (! $hasAnyRole) {
+                    // Check if user has ANY role in this tenant
+                    // getRoleNames() uses Spatie Permission cache - NO database query!
+                    return $user->getRoleNames()->isNotEmpty();
+                }
+            )
+            : (function () use ($user, $tenantId) {
+                // Fallback para testes: verificação direta sem cache
+                setPermissionsTeamId($tenantId);
+                $user->unsetRelation('roles')->unsetRelation('permissions');
+                return $user->getRoleNames()->isNotEmpty();
+            })();
+
+        if (! $hasAccess) {
             abort(403, 'Você não tem acesso a este tenant.');
         }
 
+        // Ensure team ID is set for subsequent permission checks in the request
+        setPermissionsTeamId($tenantId);
+        $user->unsetRelation('roles')->unsetRelation('permissions');
+
+        // Mark as verified in request cache
+        $request->attributes->set($requestCacheKey, true);
+
         return $next($request);
+    }
+
+    /**
+     * Invalida o cache de acesso de um usuário a um tenant específico.
+     * Deve ser chamado quando roles de um usuário mudam.
+     */
+    public static function invalidateUserAccess(int $userId, int $tenantId): void
+    {
+        // Array cache (usado em testes) não suporta tags
+        if (! Cache::supportsTags()) {
+            return;
+        }
+
+        $cacheKey = "tenant_access:user_{$userId}:tenant_{$tenantId}";
+        Cache::tags(['tenant_access', "tenant_{$tenantId}"])->forget($cacheKey);
+    }
+
+    /**
+     * Invalida o cache de acesso de todos os usuários de um tenant.
+     * Deve ser chamado quando roles do tenant mudam (ex: novo membro).
+     */
+    public static function invalidateTenantAccess(int $tenantId): void
+    {
+        // Array cache (usado em testes) não suporta tags
+        if (! Cache::supportsTags()) {
+            return;
+        }
+
+        Cache::tags("tenant_{$tenantId}")->flush();
     }
 }

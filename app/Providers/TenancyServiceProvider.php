@@ -78,9 +78,22 @@ class TenancyServiceProvider extends ServiceProvider
             ],
 
             Events\BootstrappingTenancy::class => [],
-            Events\TenancyBootstrapped::class => [],
+            Events\TenancyBootstrapped::class => [
+                // Configure Spatie Permission cache key per tenant
+                // This ensures permission cache is isolated between tenants
+                function (Events\TenancyBootstrapped $event) {
+                    $permissionRegistrar = app(\Spatie\Permission\PermissionRegistrar::class);
+                    $permissionRegistrar->cacheKey = 'spatie.permission.cache.tenant.' . $event->tenancy->tenant->getTenantKey();
+                },
+            ],
             Events\RevertingToCentralContext::class => [],
-            Events\RevertedToCentralContext::class => [],
+            Events\RevertedToCentralContext::class => [
+                // Reset Spatie Permission cache key when leaving tenant context
+                function (Events\RevertedToCentralContext $event) {
+                    $permissionRegistrar = app(\Spatie\Permission\PermissionRegistrar::class);
+                    $permissionRegistrar->cacheKey = 'spatie.permission.cache';
+                },
+            ],
 
             // Resource syncing
             Events\SyncedResourceSaved::class => [
