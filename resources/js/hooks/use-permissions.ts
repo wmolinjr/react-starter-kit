@@ -18,7 +18,7 @@ import type { Permission } from '@/types/permissions';
  * @example
  * // Check multiple permissions (OR logic)
  * const { hasAny } = usePermissions();
- * if (hasAny('tenant.projects:edit', 'tenant.projects:edit-own')) {
+ * if (hasAny('tenant.projects:edit', 'tenant.projects:editOwn')) {
  *   return <EditButton />;
  * }
  *

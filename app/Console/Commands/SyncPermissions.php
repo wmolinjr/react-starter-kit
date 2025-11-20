@@ -31,7 +31,7 @@ class SyncPermissions extends Command
         ['name' => 'tenant.projects:view', 'description' => 'View all projects', 'category' => 'projects'],
         ['name' => 'tenant.projects:create', 'description' => 'Create new projects', 'category' => 'projects'],
         ['name' => 'tenant.projects:edit', 'description' => 'Edit any project', 'category' => 'projects'],
-        ['name' => 'tenant.projects:edit-own', 'description' => 'Edit own projects only', 'category' => 'projects'],
+        ['name' => 'tenant.projects:editOwn', 'description' => 'Edit own projects only', 'category' => 'projects'],
         ['name' => 'tenant.projects:delete', 'description' => 'Delete projects', 'category' => 'projects'],
         ['name' => 'tenant.projects:upload', 'description' => 'Upload files', 'category' => 'projects'],
         ['name' => 'tenant.projects:download', 'description' => 'Download files', 'category' => 'projects'],
@@ -41,7 +41,7 @@ class SyncPermissions extends Command
         ['name' => 'tenant.team:view', 'description' => 'View team members', 'category' => 'team'],
         ['name' => 'tenant.team:invite', 'description' => 'Invite members', 'category' => 'team'],
         ['name' => 'tenant.team:remove', 'description' => 'Remove members', 'category' => 'team'],
-        ['name' => 'tenant.team:manage-roles', 'description' => 'Manage roles', 'category' => 'team'],
+        ['name' => 'tenant.team:manageRoles', 'description' => 'Manage roles', 'category' => 'team'],
         ['name' => 'tenant.team:activity', 'description' => 'View activity logs', 'category' => 'team'],
 
         // Settings (3 permissions)
@@ -55,9 +55,9 @@ class SyncPermissions extends Command
         ['name' => 'tenant.billing:invoices', 'description' => 'Download invoices', 'category' => 'billing'],
 
         // API Tokens (3 permissions)
-        ['name' => 'tenant.api-tokens:view', 'description' => 'View API tokens', 'category' => 'api-tokens'],
-        ['name' => 'tenant.api-tokens:create', 'description' => 'Create API tokens', 'category' => 'api-tokens'],
-        ['name' => 'tenant.api-tokens:delete', 'description' => 'Delete API tokens', 'category' => 'api-tokens'],
+        ['name' => 'tenant.apiTokens:view', 'description' => 'View API tokens', 'category' => 'apiTokens'],
+        ['name' => 'tenant.apiTokens:create', 'description' => 'Create API tokens', 'category' => 'apiTokens'],
+        ['name' => 'tenant.apiTokens:delete', 'description' => 'Delete API tokens', 'category' => 'apiTokens'],
     ];
 
     /**
@@ -73,7 +73,7 @@ class SyncPermissions extends Command
                 'tenant.projects:view',
                 'tenant.projects:create',
                 'tenant.projects:edit',
-                'tenant.projects:edit-own',
+                'tenant.projects:editOwn',
                 'tenant.projects:delete',
                 'tenant.projects:upload',
                 'tenant.projects:download',
@@ -82,7 +82,7 @@ class SyncPermissions extends Command
                 'tenant.team:view',
                 'tenant.team:invite',
                 'tenant.team:remove',
-                'tenant.team:manage-roles',
+                'tenant.team:manageRoles',
                 'tenant.team:activity',
                 // Settings
                 'tenant.settings:view',
@@ -93,9 +93,9 @@ class SyncPermissions extends Command
                 'tenant.billing:manage',
                 'tenant.billing:invoices',
                 // API Tokens (owner only)
-                'tenant.api-tokens:view',
-                'tenant.api-tokens:create',
-                'tenant.api-tokens:delete',
+                'tenant.apiTokens:view',
+                'tenant.apiTokens:create',
+                'tenant.apiTokens:delete',
             ],
         ],
         'admin' => [
@@ -113,7 +113,7 @@ class SyncPermissions extends Command
                 'tenant.team:view',
                 'tenant.team:invite',
                 'tenant.team:remove',
-                'tenant.team:manage-roles',
+                'tenant.team:manageRoles',
                 'tenant.team:activity',
                 // Settings (view and edit, no danger)
                 'tenant.settings:view',
@@ -125,10 +125,10 @@ class SyncPermissions extends Command
             'display_name' => 'Membro',
             'description' => 'Cria e edita próprios projetos',
             'permissions' => [
-                // Projects (view, create, edit-own, download)
+                // Projects (view, create, editOwn, download)
                 'tenant.projects:view',
                 'tenant.projects:create',
-                'tenant.projects:edit-own',
+                'tenant.projects:editOwn',
                 'tenant.projects:download',
                 // Team (view only)
                 'tenant.team:view',

@@ -10,25 +10,28 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 - ✅ **Metadata rica**: Cada permission tem `description` e `category`
 - ✅ **Display names**: Roles têm `display_name` para UI
 - ✅ **Nomenclatura clara**: `tenant.resource:action` (ex: `tenant.projects:view`)
+- ✅ **TypeScript-safe**: Categories e actions usam camelCase para gerar tipos válidos
 
 ---
 
 ## 📋 Índice
 
 1. [Estrutura Completa](#estrutura-completa)
-2. [Comando de Sincronização](#comando-de-sincronização)
-3. [Como Usar Permissions](#como-usar-permissions)
-4. [Como Adicionar Novas Permissions](#como-adicionar-novas-permissions)
-5. [Roles MVP](#roles-mvp)
-6. [Arquitetura](#arquitetura)
-7. [Testing](#testing)
-8. [Troubleshooting](#troubleshooting)
+2. [Convenções de Nomenclatura](#convenções-de-nomenclatura)
+3. [Comando de Sincronização](#comando-de-sincronização)
+4. [Backend: Como Usar Permissions](#backend-como-usar-permissions)
+5. [Frontend: Como Usar Permissions](#frontend-como-usar-permissions)
+6. [Como Adicionar Novas Permissions](#como-adicionar-novas-permissions)
+7. [Roles MVP](#roles-mvp)
+8. [Arquitetura](#arquitetura)
+9. [Testing](#testing)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Estrutura Completa
 
-### Permissions (19 total)
+### Permissions (22 total)
 
 #### 📦 Projects (8 permissions)
 
@@ -37,7 +40,7 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 | `tenant.projects:view` | View all projects | ✅ | ✅ | ✅ |
 | `tenant.projects:create` | Create new projects | ✅ | ✅ | ✅ |
 | `tenant.projects:edit` | Edit any project | ✅ | ✅ | ❌ |
-| `tenant.projects:edit-own` | Edit own projects only | ✅ | ❌ | ✅ |
+| `tenant.projects:editOwn` | Edit own projects only | ✅ | ❌ | ✅ |
 | `tenant.projects:delete` | Delete projects | ✅ | ❌ | ❌ |
 | `tenant.projects:upload` | Upload files | ✅ | ✅ | ❌ |
 | `tenant.projects:download` | Download files | ✅ | ✅ | ✅ |
@@ -50,7 +53,7 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 | `tenant.team:view` | View team members | ✅ | ✅ | ✅ |
 | `tenant.team:invite` | Invite members | ✅ | ✅ | ❌ |
 | `tenant.team:remove` | Remove members | ✅ | ✅ | ❌ |
-| `tenant.team:manage-roles` | Manage roles | ✅ | ✅ | ❌ |
+| `tenant.team:manageRoles` | Manage roles | ✅ | ✅ | ❌ |
 | `tenant.team:activity` | View activity logs | ✅ | ✅ | ❌ |
 
 #### ⚙️ Settings (3 permissions)
@@ -69,6 +72,61 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 | `tenant.billing:manage` | Manage subscriptions | ✅ | ❌ | ❌ |
 | `tenant.billing:invoices` | Download invoices | ✅ | ❌ | ❌ |
 
+#### 🔑 API Tokens (3 permissions)
+
+| Permission | Descrição | Owner | Admin | Member |
+|------------|-----------|-------|-------|--------|
+| `tenant.apiTokens:view` | View API tokens | ✅ | ❌ | ❌ |
+| `tenant.apiTokens:create` | Create API tokens | ✅ | ❌ | ❌ |
+| `tenant.apiTokens:delete` | Delete API tokens | ✅ | ❌ | ❌ |
+
+---
+
+## Convenções de Nomenclatura
+
+### ⚠️ IMPORTANTE: TypeScript Compatibility
+
+**Padrão obrigatório**: Use **camelCase** para categories e actions com múltiplas palavras para gerar tipos TypeScript válidos.
+
+**❌ ERRADO** (gera tipos inválidos):
+```php
+['name' => 'tenant.api-tokens:view', 'category' => 'api-tokens']  // ❌ Hífen
+// Gera: export type Api-tokensPermission (INVÁLIDO no TypeScript)
+
+['name' => 'tenant.team:manage-roles', 'category' => 'team']  // ❌ Hífen
+// TypeScript quebra ao processar 'manage-roles'
+```
+
+**✅ CORRETO** (gera tipos válidos):
+```php
+['name' => 'tenant.apiTokens:view', 'category' => 'apiTokens']  // ✅ camelCase
+// Gera: export type ApiTokensPermission (VÁLIDO no TypeScript)
+
+['name' => 'tenant.team:manageRoles', 'category' => 'team']  // ✅ camelCase
+// Gera: 'tenant.team:manageRoles' (VÁLIDO no TypeScript)
+```
+
+### Padrão de Nomenclatura
+
+**Formato**: `tenant.{resource}:{action}`
+
+**Examples**:
+- ✅ `tenant.projects:view`
+- ✅ `tenant.team:invite`
+- ✅ `tenant.apiTokens:create` (camelCase para multi-word categories)
+- ✅ `tenant.projects:editOwn` (camelCase para multi-word actions)
+- ✅ `tenant.team:manageRoles` (camelCase para multi-word actions)
+- ❌ `tenant.api-tokens:create` (NUNCA usar hífens em categories)
+- ❌ `tenant.projects:edit-own` (NUNCA usar hífens em actions)
+
+**Categories**: Sempre em camelCase quando tiver múltiplas palavras
+- ✅ `apiTokens`, `userProfiles`, `customFields`
+- ❌ `api-tokens`, `user-profiles`, `custom-fields`
+
+**Actions**: Sempre em camelCase quando tiver múltiplas palavras
+- ✅ `editOwn`, `manageRoles`, `viewAll`
+- ❌ `edit-own`, `manage-roles`, `view-all`
+
 ---
 
 ## Comando de Sincronização
@@ -77,9 +135,6 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 
 ```bash
 # Sincronizar permissions (insert or update)
-php artisan permissions:sync
-
-# Com Sail
 ./vendor/bin/sail artisan permissions:sync
 ```
 
@@ -87,55 +142,55 @@ php artisan permissions:sync
 
 ```bash
 # Limpar tudo e recriar do zero (⚠️ CUIDADO: apaga tudo)
-php artisan permissions:sync --fresh
+./vendor/bin/sail artisan permissions:sync --fresh
 ```
 
 ### O que o comando faz
 
-1. ✅ Cria/atualiza todas as 19 permissions
-2. ✅ Cria/atualiza as 3 roles (owner, admin, member)
-3. ✅ Sincroniza permissions de cada role
-4. ✅ Limpa cache do Spatie Permission
-5. ✅ Exibe summary com tabelas
+1. ✅ Cria role "Super Admin" global (sem tenant_id)
+2. ✅ Cria/atualiza todas as 22 permissions
+3. ✅ Cria/atualiza as 3 roles (owner, admin, member)
+4. ✅ Sincroniza permissions de cada role
+5. ✅ Limpa cache do Spatie Permission
+6. ✅ **Gera TypeScript types automaticamente**
+7. ✅ Exibe summary com tabelas
 
 **Output Exemplo**:
 ```
 🔄 Syncing Roles & Permissions...
 
+👑 Syncing Global Super Admin Role...
+  ✓ Created global role: Super Admin
+    → Bypasses all permission checks via Gate::before()
+
 📝 Syncing Permissions...
   ✓ Created: tenant.projects:view
-  ✓ Created: tenant.projects:create
+  ✓ Created: tenant.projects:editOwn
+  ✓ Created: tenant.team:manageRoles
   ...
-  ✅ 19 permissions created, 0 updated.
+  ✅ 22 permissions created.
 
 👥 Syncing Roles...
   ✓ Created role: owner (Proprietário)
-    → Synced 19 permissions
+    → Synced 22 permissions
   ✓ Created role: admin (Administrador)
     → Synced 13 permissions
   ✓ Created role: member (Membro)
     → Synced 6 permissions
-  ✅ 3 roles created, 0 updated.
 
-📊 Summary:
-+----------+-------+
-| Category | Count |
-+----------+-------+
-| projects | 8     |
-| team     | 5     |
-| settings | 3     |
-| billing  | 3     |
-| TOTAL    | 19    |
-+----------+-------+
+📝 Generating TypeScript types...
+✅ TypeScript types generated.
+
+🎉 Roles & Permissions synced successfully!
 ```
 
 ---
 
-## Como Usar Permissions
+## Backend: Como Usar Permissions
 
-### ✅ Abordagem Recomendada: `middleware()` static no Controller (Laravel 12+)
+### ✅ Método Recomendado: `middleware()` static (Laravel 12+)
 
-A melhor prática é usar o método static `middleware()` no controller. Mantém as permissions declaradas junto com a lógica de negócio e as rotas limpas.
+Use o método static `middleware()` no controller para manter permissions declaradas junto com a lógica:
 
 ```php
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -143,15 +198,12 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class TeamController extends Controller implements HasMiddleware
 {
-    /**
-     * Get the middleware that should be assigned to the controller.
-     */
     public static function middleware(): array
     {
         return [
             new Middleware('permission:tenant.team:view', only: ['index']),
             new Middleware('permission:tenant.team:invite', only: ['invite']),
-            new Middleware('permission:tenant.team:manage-roles', only: ['updateRole']),
+            new Middleware('permission:tenant.team:manageRoles', only: ['updateRole']),
             new Middleware('permission:tenant.team:remove', only: ['remove']),
         ];
     }
@@ -167,43 +219,13 @@ class TeamController extends Controller implements HasMiddleware
 }
 ```
 
-### Usando Policies para Ownership (Projetos)
+**Exemplo real**: `app/Http/Controllers/Tenant/TeamController.php:23-31`
 
-Para recursos que precisam verificar ownership, use policies com `can:`:
+### Usando Policies para Ownership
 
-```php
-class ProjectController extends Controller implements HasMiddleware
-{
-    public static function middleware(): array
-    {
-        return [
-            // Permissions diretas (sem model binding)
-            new Middleware('permission:tenant.projects:view', only: ['index']),
-            new Middleware('permission:tenant.projects:create', only: ['create', 'store']),
-
-            // Policies (com model binding - verificam ownership)
-            new Middleware('can:view,project', only: ['show']),
-            new Middleware('can:update,project', only: ['edit', 'update']),
-            new Middleware('can:delete,project', only: ['destroy']),
-        ];
-    }
-}
-```
-
-### Vantagens desta Abordagem
-
-✅ **Auto-documentado**: Permissions visíveis ao abrir o controller
-✅ **Rotas limpas**: Sem poluir o arquivo de rotas
-✅ **Type-safe**: `only:` e `except:` evitam typos
-✅ **Padrão Laravel 12**: Segue as convenções modernas
-✅ **DRY**: Uma permission pode proteger múltiplos métodos
-✅ **Melhor que Gate::authorize()**: Falha mais cedo (antes do método executar)
-
-### Em Policies
+Para recursos que precisam verificar ownership (como projetos), use policies:
 
 ```php
-namespace App\Policies;
-
 class ProjectPolicy
 {
     public function viewAny(User $user): bool
@@ -218,230 +240,225 @@ class ProjectPolicy
             return true;
         }
 
-        // Ou se tem "edit-own" E é o criador
-        return $user->can('tenant.projects:edit-own')
+        // Ou se tem permission "editOwn" E é o criador
+        return $user->can('tenant.projects:editOwn')
             && $project->user_id === $user->id;
     }
 }
 ```
 
-### Em React/Inertia (Frontend)
+**Exemplo real**: `app/Policies/ProjectPolicy.php:39-48`
 
-**IMPORTANTE**: Permissions são **automaticamente** passadas para o frontend via `HandleInertiaRequests` middleware.
+### Vantagens desta Abordagem
 
-#### Acesso via usePage()
+✅ **Auto-documentado**: Permissions visíveis ao abrir o controller
+✅ **Rotas limpas**: Sem poluir o arquivo de rotas
+✅ **Type-safe**: `only:` e `except:` evitam typos
+✅ **Padrão Laravel 12**: Segue as convenções modernas
+✅ **DRY**: Uma permission pode proteger múltiplos métodos
 
-```tsx
-import { usePage } from '@inertiajs/react';
-import { PageProps } from '@/types';
-import { Button } from '@/components/ui/button';
+---
 
-function ProjectsPage() {
-    const { auth } = usePage<PageProps>().props;
-    const { permissions } = auth;
+## Frontend: Como Usar Permissions
 
-    return (
-        <div>
-            {/* ✅ RECOMENDADO: Permissions granulares */}
-            {permissions?.projects.create && (
-                <Button onClick={handleCreate}>
-                    Create Project
-                </Button>
-            )}
+### 🎯 Hook `usePermissions()` - Método Recomendado
 
-            {permissions?.projects.edit && (
-                <Button onClick={handleEdit}>
-                    Edit
-                </Button>
-            )}
+**Este é o método principal e recomendado para verificar permissions no frontend.**
 
-            {permissions?.projects.delete && (
-                <Button variant="destructive" onClick={handleDelete}>
-                    Delete
-                </Button>
-            )}
+```typescript
+import { usePermissions } from '@/hooks/use-permissions';
 
-            {permissions?.projects.upload && (
-                <input type="file" onChange={handleUpload} />
-            )}
-        </div>
-    );
+export function ProjectsPage() {
+  const { has, hasAny, hasAll, role, isOwner } = usePermissions();
+
+  return (
+    <div>
+      {/* ✅ Single permission check */}
+      {has('tenant.projects:create') && (
+        <Button>Create Project</Button>
+      )}
+
+      {/* ✅ OR logic - user tem edit OU editOwn */}
+      {hasAny('tenant.projects:edit', 'tenant.projects:editOwn') && (
+        <Button>Edit Project</Button>
+      )}
+
+      {/* ✅ AND logic - user tem view E download */}
+      {hasAll('tenant.projects:view', 'tenant.projects:download') && (
+        <Button>Download Project</Button>
+      )}
+
+      {/* ✅ Role info (UI only - badges, display) */}
+      {isOwner && <Badge>Owner</Badge>}
+      <span>Role: {role?.name}</span>
+    </div>
+  );
 }
 ```
 
-#### Permissions Disponíveis no Frontend
+**Métodos disponíveis**:
+- `has(permission)` - Verifica single permission
+- `hasAny(...permissions)` - OR logic (qualquer uma)
+- `hasAll(...permissions)` - AND logic (todas)
+- `all()` - Retorna array de todas permissions do user
+- `role` - Role metadata (apenas para UI display)
+- `isOwner`, `isAdmin`, `isAdminOrOwner`, `isSuperAdmin` - Atalhos para role checks
 
-Todas as permissions são automaticamente passadas em:
-```tsx
-auth.permissions.projects.{view, create, edit, editOwn, delete, upload, download, archive}
-auth.permissions.team.{view, invite, remove, manageRoles, activity}
-auth.permissions.settings.{view, edit, danger}
-auth.permissions.billing.{view, manage, invoices}
-```
+**Implementação**: `resources/js/hooks/use-permissions.ts`
 
-#### Exemplo Completo de Componente
+### 🔧 Hook `useCan()` - Para Checks Simples
 
-```tsx
-// resources/js/pages/projects/index.tsx
-import { usePage, Link } from '@inertiajs/react';
-import { PageProps } from '@/types';
-import { Button } from '@/components/ui/button';
-import { PlusIcon, TrashIcon } from 'lucide-react';
+Ideal para verificações simples e inline:
 
-export default function ProjectsIndex({ projects }: { projects: Project[] }) {
-    const { auth } = usePage<PageProps>().props;
-    const { permissions } = auth;
+```typescript
+import { useCan } from '@/hooks/use-permissions';
 
-    return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                <h1>Projects</h1>
+export function CreateProjectButton() {
+  const canCreate = useCan('tenant.projects:create');
 
-                {/* Show create button only if user can create */}
-                {permissions?.projects.create && (
-                    <Link href="/projects/create">
-                        <Button>
-                            <PlusIcon className="mr-2" />
-                            Create Project
-                        </Button>
-                    </Link>
-                )}
-            </div>
+  if (!canCreate) return null;
 
-            <div className="grid gap-4">
-                {projects.map((project) => {
-                    // Can edit if has global edit OR (has edit-own AND is owner)
-                    const canEdit = permissions?.projects.edit ||
-                        (permissions?.projects.editOwn && project.user_id === auth.user?.id);
-
-                    return (
-                        <div key={project.id} className="border p-4 rounded">
-                            <h3>{project.name}</h3>
-
-                            <div className="flex gap-2 mt-4">
-                                {/* Edit button */}
-                                {canEdit && (
-                                    <Link href={`/projects/${project.id}/edit`}>
-                                        <Button variant="outline">Edit</Button>
-                                    </Link>
-                                )}
-
-                                {/* Delete button - only if user can delete */}
-                                {permissions?.projects.delete && (
-                                    <Button
-                                        variant="destructive"
-                                        onClick={() => handleDelete(project.id)}
-                                    >
-                                        <TrashIcon className="mr-2" />
-                                        Delete
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-    );
+  return <Button>Create Project</Button>;
 }
 ```
 
-#### Helper Hooks (Opcional)
+### 🎨 Componente `<Can>` - Para JSX Declarativo
 
-Criar hook customizado para simplificar uso:
+Perfeito para JSX limpo e condicional:
 
-```tsx
-// resources/js/hooks/use-permissions.ts
-import { usePage } from '@inertiajs/react';
-import { PageProps } from '@/types';
+```typescript
+import { Can } from '@/components/can';
 
-export function usePermissions() {
-    const { auth } = usePage<PageProps>().props;
-    return auth.permissions;
+export function ProjectsPage() {
+  return (
+    <div>
+      {/* ✅ Single permission */}
+      <Can permission="tenant.projects:create">
+        <CreateButton />
+      </Can>
+
+      {/* ✅ OR logic - qualquer uma das permissions */}
+      <Can any={["tenant.projects:edit", "tenant.projects:editOwn"]}>
+        <EditButton />
+      </Can>
+
+      {/* ✅ AND logic - todas as permissions */}
+      <Can all={["tenant.projects:view", "tenant.projects:download"]}>
+        <DownloadButton />
+      </Can>
+
+      {/* ✅ Com fallback */}
+      <Can
+        permission="tenant.billing:manage"
+        fallback={<UpgradePrompt />}
+      >
+        <BillingSettings />
+      </Can>
+    </div>
+  );
 }
-
-export function useHasPermission(path: string): boolean {
-    const permissions = usePermissions();
-    const [category, action] = path.split('.');
-
-    if (!permissions || !category || !action) return false;
-
-    return permissions[category]?.[action] ?? false;
-}
-
-// Uso:
-function MyComponent() {
-    const canCreate = useHasPermission('projects.create');
-    const canDelete = useHasPermission('projects.delete');
-
-    return (
-        <div>
-            {canCreate && <Button>Create</Button>}
-            {canDelete && <Button>Delete</Button>}
-        </div>
-    );
-}
 ```
 
-#### ⚠️ IMPORTANTE: Role Checks no Frontend
+**Props disponíveis**:
+- `permission?: Permission` - Single permission check
+- `any?: Permission[]` - OR logic (qualquer uma)
+- `all?: Permission[]` - AND logic (todas)
+- `fallback?: ReactNode` - Renderizar se permissão negada
 
-**Roles são apenas para display (badges, labels) - NÃO para autorização!**
+**Implementação**: `resources/js/components/can.tsx`
 
-```tsx
-// ✅ OK: Usar role para display
-<div className="badge">
-    {permissions?.isOwner && <span>Owner</span>}
-    {permissions?.isAdmin && <span>Admin</span>}
-    {permissions?.role === 'member' && <span>Member</span>}
-</div>
+### ⚠️ Role Checks vs Permission Checks
 
-// ❌ ERRADO: Não usar role para autorização
-{permissions?.isOwner && <Button>Delete Project</Button>}
+**REGRA DE OURO**: Roles são apenas para UI display! Sempre use permissions para autorização.
 
-// ✅ CORRETO: Usar permission
-{permissions?.projects.delete && <Button>Delete Project</Button>}
+```typescript
+const { has, role, isOwner } = usePermissions();
+
+// ❌ ERRADO: Usar role para autorização
+{isOwner && <DeleteButton />}
+
+// ✅ CORRETO: Usar permission para autorização
+{has('tenant.projects:delete') && <DeleteButton />}
+
+// ✅ OK: Usar role para UI display
+<Badge>{role?.name}</Badge>  // "owner", "admin", "member"
+{isOwner && <Crown className="text-yellow-500" />}  // Badge visual
 ```
 
-#### Exemplo Completo
+**Por quê?**
+- Roles podem ter permissions customizadas no futuro
+- Segurança deve ser sempre via permissions
+- Role é metadata para UX apenas
 
-Ver arquivo completo com mais exemplos:
-```
-resources/js/examples/PermissionsUsageExample.tsx
-```
+### 📚 Exemplos Completos
 
-### Em Middleware
+Ver arquivo com todos os exemplos práticos:
+
+**`resources/js/examples/PermissionsUsageExample.tsx`**
+
+Este arquivo contém:
+- ✅ `usePermissions()` com has/hasAny/hasAll
+- ✅ `useCan()` para single checks
+- ✅ `<Can>` component com permission/any/all
+- ✅ Exemplos de Projects, Team, Settings, Billing
+- ✅ Role display vs permission authorization
+- ✅ Complex permission logic
+- ✅ Listing all user permissions
+- ✅ Comparação de uso correto vs incorreto
+
+### 🔄 Como Funciona (Internamente)
+
+Permissions são automaticamente passadas do backend para o frontend via `HandleInertiaRequests` middleware:
 
 ```php
-// routes/tenant.php
-Route::middleware(['auth', 'can:tenant.projects:create'])
-    ->post('/projects', [ProjectController::class, 'store']);
-```
-
-### Check Direto no User
-
-```php
-$user = auth()->user();
-
-// Check single permission
-if ($user->can('tenant.projects:view')) {
-    // ...
-}
-
-// Check multiple permissions (any)
-if ($user->hasAnyPermission(['tenant.projects:edit', 'tenant.projects:delete'])) {
-    // ...
-}
-
-// Check multiple permissions (all)
-if ($user->hasAllPermissions(['tenant.projects:view', 'tenant.projects:create'])) {
-    // ...
-}
-
-// Via role (menos recomendado)
-if ($user->hasRole('owner')) {
-    // ...
+// app/Http/Middleware/HandleInertiaRequests.php
+public function share(Request $request): array
+{
+    return [
+        'auth' => [
+            'user' => $request->user(),
+            'permissions' => $request->user()
+                ? $request->user()->getAllPermissions()->pluck('name')
+                : [],
+            'role' => [
+                'name' => $request->user()?->roles?->first()?->name,
+                'isOwner' => /* ... */,
+                'isAdmin' => /* ... */,
+                // ...
+            ],
+        ],
+    ];
 }
 ```
+
+### 📝 TypeScript Types
+
+Os types são **auto-gerados** a partir do backend:
+
+```typescript
+// resources/js/types/permissions.d.ts (auto-generated)
+
+export type Permission =
+  | 'tenant.projects:view'
+  | 'tenant.projects:create'
+  | 'tenant.projects:edit'
+  | 'tenant.projects:editOwn'  // camelCase
+  | 'tenant.team:manageRoles'  // camelCase
+  | 'tenant.apiTokens:view'    // camelCase
+  // ... todas as 22 permissions
+
+export interface Auth {
+  user: any | null;
+  permissions: Permission[];  // Array dinâmico
+  role: Role | null;
+}
+```
+
+**Vantagens**:
+- ✅ Autocomplete funcionando em `has('tenant.pro...')` → sugere todas
+- ✅ Compile-time errors se usar permission inexistente
+- ✅ Único source of truth: `SyncPermissions.php`
+- ✅ Sempre sincronizado com backend
 
 ---
 
@@ -461,13 +478,15 @@ protected array $permissions = [
 ];
 ```
 
+**⚠️ IMPORTANTE**: Use camelCase para multi-word names:
+- ✅ `tenant.userReports:viewAll`
+- ❌ `tenant.user-reports:view-all`
+
 ### Passo 2: Adicionar às Roles
 
 ```php
 protected array $roles = [
     'owner' => [
-        'display_name' => 'Proprietário',
-        'description' => 'Acesso total incluindo billing',
         'permissions' => [
             // ... permissions existentes ...
             'tenant.reports:view',
@@ -475,29 +494,34 @@ protected array $roles = [
         ],
     ],
     'admin' => [
-        // ... adicionar apenas tenant.reports:view
+        'permissions' => [
+            'tenant.reports:view',
+            // admin não pode export
+        ],
     ],
-    // ...
 ];
 ```
 
 ### Passo 3: Sincronizar
 
 ```bash
-php artisan permissions:sync
+./vendor/bin/sail artisan permissions:sync
 ```
 
-### Passo 4: Usar no Código
+Isso irá:
+1. Criar as novas permissions no banco
+2. Atribuir às roles especificadas
+3. **Gerar TypeScript types automaticamente**
 
-```php
-// Em Policy
-public function exportReport(User $user): bool
-{
-    return $user->can('tenant.reports:export');
-}
+### Passo 4: Usar no Frontend
 
-// Em Controller
-Gate::authorize('tenant.reports:export');
+```typescript
+// Autocomplete já funcionando!
+const { has } = usePermissions();
+
+{has('tenant.reports:export') && (
+  <Button onClick={handleExport}>Export Report</Button>
+)}
 ```
 
 ### Passo 5: Testar
@@ -521,7 +545,7 @@ public function admin_cannot_export_reports()
 
 ### Owner (Proprietário)
 
-**Permissions**: 19 (todas)
+**Permissions**: 22 (todas)
 
 **Descrição**: Acesso total incluindo billing e danger zone.
 
@@ -530,34 +554,23 @@ public function admin_cannot_export_reports()
 - Pessoa que paga a conta
 - Responsável legal
 
-**Limitações**: Nenhuma (acesso completo)
-
----
-
 ### Admin (Administrador)
 
 **Permissions**: 13
 
 **Descrição**: Gerencia projetos e equipe, mas sem acesso a billing e danger zone.
 
-**Quando usar**:
-- Gerente de projeto
-- Team lead
-- Pessoa de confiança que pode gerenciar tudo exceto billing
-
 **Não pode**:
 - ❌ Gerenciar billing
 - ❌ Deletar projetos
-- ❌ Acessar danger zone (delete tenant)
-- ❌ Upload de arquivos (apenas owner e admin com tenant.projects:upload)
+- ❌ Acessar danger zone
+- ❌ Gerenciar API tokens
 
 **Pode**:
 - ✅ Editar qualquer projeto
 - ✅ Convidar/remover membros
-- ✅ Gerenciar roles
+- ✅ Gerenciar roles (manageRoles)
 - ✅ Editar settings
-
----
 
 ### Member (Membro)
 
@@ -565,26 +578,20 @@ public function admin_cannot_export_reports()
 
 **Descrição**: Cria e edita próprios projetos. Read-only para team e settings.
 
-**Quando usar**:
-- Colaborador individual
-- Desenvolvedor
-- Designer
-- Qualquer pessoa que trabalha no tenant
-
 **Não pode**:
-- ❌ Editar projetos de outros
+- ❌ Editar projetos de outros (só próprios via editOwn)
 - ❌ Deletar projetos
 - ❌ Convidar pessoas
 - ❌ Gerenciar billing
 - ❌ Editar settings
 
 **Pode**:
-- ✅ Ver todos os projetos
-- ✅ Criar novos projetos
-- ✅ Editar próprios projetos
-- ✅ Download de arquivos
-- ✅ Ver team members
-- ✅ Ver settings
+- ✅ Ver todos os projetos (view)
+- ✅ Criar novos projetos (create)
+- ✅ Editar próprios projetos (editOwn)
+- ✅ Download de arquivos (download)
+- ✅ Ver team members (view)
+- ✅ Ver settings (view)
 
 ---
 
@@ -613,7 +620,7 @@ role_id, model_type, model_id, tenant_id
 
 ### Integração com Tenancy
 
-**Critical**: Sempre que `tenancy()->initialize()` é chamado, deve-se chamar `setPermissionsTeamId()`:
+**CRÍTICO**: Sempre que `tenancy()->initialize()` é chamado, deve-se chamar `setPermissionsTeamId()`:
 
 ```php
 tenancy()->initialize($tenant);
@@ -627,24 +634,11 @@ $user->assignRole('admin');
 - ✅ `VerifyTenantAccess` middleware
 - ✅ `TenantTestCase::setUp()`
 - ✅ `User::roleOn()`
-- ✅ `User::switchToTenant()`
 - ✅ `TeamController::acceptInvitation()`
-- ✅ `Tenant::getUsersByRole()`
 
-### Performance: Tenant Access Verification
+### Performance: Zero Queries na Verificação de Acesso
 
 O middleware `VerifyTenantAccess` foi otimizado para **zero queries** ao verificar se o usuário pertence ao tenant.
-
-#### ❌ Problema Anterior
-
-```php
-// Fazia query ao banco em TODA requisição
-$belongsToTenant = $user->tenants()
-    ->where('tenant_id', $tenantId)
-    ->exists();  // 1 query por request!
-```
-
-**Impacto**: 1000 req/min = 1000 queries/min
 
 #### ✅ Solução Otimizada
 
@@ -660,29 +654,17 @@ $hasAnyRole = $user->getRoleNames()->isNotEmpty();
 
 **Benefícios**:
 - ✅ **Zero queries** após cache aquecido (~0.1ms vs 5-20ms)
-- ✅ **Usa cache existente** do Spatie Permission (já configurado)
-- ✅ **Sem gerenciamento manual** - Spatie invalida automaticamente
-- ✅ **Future-proof** - Funciona com qualquer role (owner, admin, member, custom)
-- ✅ **Consistente** - Mesma infraestrutura de cache do sistema
-
-**Como funciona**:
-1. Quando user tem role no tenant → `getRoleNames()` retorna array com roles
-2. `isNotEmpty()` verifica se tem alguma role
-3. Se tem role = pertence ao tenant
-4. Cache é invalidado automaticamente quando roles mudam
-
-**Impacto**: 1000 req/min = ~0 queries/min 🚀 (99% redução)
+- ✅ **99% redução**: 1000 queries/min → ~0 queries/min
+- ✅ **Usa cache existente** do Spatie Permission
+- ✅ **Future-proof** - Funciona com qualquer role
 
 ### Super Admin (Global Platform Admin)
 
-O sistema implementa Super Admin como uma **role global** (sem `tenant_id`), seguindo as melhores práticas do Spatie Laravel Permission.
-
-#### Implementação
+Super Admin é uma **role global** (sem `tenant_id`) que bypassa todas as permissions:
 
 ```php
 // app/Providers/AppServiceProvider.php
 Gate::before(function (User $user, string $ability) {
-    // Check Super Admin role globally (without tenant_id)
     $currentTeamId = getPermissionsTeamId();
     setPermissionsTeamId(null);
     $isSuperAdmin = $user->hasRole('Super Admin');
@@ -692,42 +674,15 @@ Gate::before(function (User $user, string $ability) {
 });
 ```
 
-#### Características
+**Características**:
+- ✅ Role Global: `tenant_id = null`
+- ✅ Bypass Total: Ignora todas as verificações
+- ✅ Multi-Tenant: Acessa qualquer tenant
+- ✅ Frontend: Disponível em `auth.role.isSuperAdmin`
 
-- ✅ **Role Global**: `tenant_id = null` - acesso a todos os tenants
-- ✅ **Bypass Total**: Ignora todas as verificações de permissions
-- ✅ **Multi-Tenant**: Pode acessar qualquer tenant sem ser membro
-- ✅ **Criado via Seeder**: Automaticamente criado ao rodar `permissions:sync`
-
-#### Quando Usar
-
-**Super Admin**:
-- Administrador da plataforma (não de um tenant específico)
-- Suporte técnico que precisa acessar qualquer tenant
-- Debugging e troubleshooting
-- Gerenciamento de todos os tenants
-
-**Owner** (tenant-specific):
-- Dono de um tenant específico
-- Paga pela conta daquele tenant
-- Gerencia apenas aquele tenant
-
-#### Verificação
-
-```php
-// Verificar se é Super Admin (globalmente)
-setPermissionsTeamId(null);
-$isSuperAdmin = $user->hasRole('Super Admin');
-
-// Verificar se é Owner de um tenant específico
-setPermissionsTeamId($tenant->id);
-$isOwner = $user->hasRole('owner');
-```
-
-**Importante**:
-- Para usuários normais (incluindo owners), **TODAS as permissions** devem ser atribuídas explicitamente via roles
-- Super Admin é a **única exceção** - tem bypass automático de todas as permissions
-- No frontend, está disponível em `auth.role.isSuperAdmin` (apenas para UI display)
+**Quando Usar**:
+- **Super Admin**: Administrador da plataforma, suporte técnico
+- **Owner**: Dono de um tenant específico
 
 ---
 
@@ -739,8 +694,6 @@ $isOwner = $user->hasRole('owner');
 protected function setUp(): void
 {
     parent::setUp();
-
-    // ... criar tenant e user ...
 
     tenancy()->initialize($this->tenant);
     setPermissionsTeamId($this->tenant->id);
@@ -770,24 +723,19 @@ public function member_cannot_delete_projects()
 }
 
 #[Test]
-public function admin_can_edit_any_project()
+public function member_can_edit_own_project()
 {
-    $admin = $this->createTenantUser('admin');
-    $this->actingAs($admin);
+    $member = $this->createTenantUser('member');
+    $this->actingAs($member);
 
-    $project = Project::factory()->create([
-        'user_id' => $this->user->id, // projeto do owner
-    ]);
+    // Projeto do próprio member
+    $project = Project::factory()->create(['user_id' => $member->id]);
 
     $response = $this->patch("/projects/{$project->id}", [
-        'name' => 'Updated by Admin',
+        'name' => 'Updated by Member',
     ]);
 
     $response->assertRedirect();
-    $this->assertDatabaseHas('projects', [
-        'id' => $project->id,
-        'name' => 'Updated by Admin',
-    ]);
 }
 ```
 
@@ -795,6 +743,7 @@ public function admin_can_edit_any_project()
 
 ```php
 // Usar helper do TenantTestCase
+$owner = $this->user;  // Owner já criado no setUp
 $admin = $this->createTenantUser('admin');
 $member = $this->createTenantUser('member');
 
@@ -807,470 +756,113 @@ $member = $this->createTenantUser('member');
 
 ### Permission não funciona
 
-**Problema**: `$user->can('tenant.projects:view')` retorna `false` mesmo tendo a role correta.
+**Problema**: `$user->can('tenant.projects:view')` retorna `false`.
 
 **Soluções**:
+
 1. Verificar se permission existe:
 ```bash
-php artisan tinker
->>> \App\Models\Permission::where('name', 'tenant.projects:view')->get();
+./vendor/bin/sail artisan tinker
+>>> \App\Models\Permission::where('name', 'tenant.projects:view')->first();
 ```
 
 2. Verificar se role tem a permission:
 ```bash
->>> \App\Models\Role::with('permissions')->find(1);
+>>> $role = \App\Models\Role::findByName('admin', 'web');
+>>> $role->permissions->pluck('name');
 ```
 
 3. Verificar se `setPermissionsTeamId()` foi chamado:
 ```php
-// Deve ser chamado após tenancy()->initialize()
 tenancy()->initialize($tenant);
 setPermissionsTeamId($tenant->id);  // OBRIGATÓRIO
 ```
 
 4. Limpar cache:
 ```bash
-php artisan permission:cache-reset
+./vendor/bin/sail artisan permission:cache-reset
 ```
 
----
+### TypeScript Types Desatualizados
 
-### Role não encontrada em testes
+**Problema**: Autocomplete não mostra novas permissions.
 
-**Problema**: `RoleDoesNotExist` exception em testes.
-
-**Solução**: Garantir que `syncPermissionsForTests()` é chamado no `setUp()`:
-
-```php
-protected function setUp(): void
-{
-    parent::setUp();
-    // ...
-    tenancy()->initialize($this->tenant);
-    setPermissionsTeamId($this->tenant->id);
-    $this->syncPermissionsForTests();  // ← Isso cria todas as roles
-}
-```
-
----
-
-### Permissions duplicadas
-
-**Problema**: Rodando `permissions:sync` várias vezes criou duplicatas.
-
-**Solução**: O comando é idempotente e **não deveria** criar duplicatas. Se aconteceu:
-
-1. Limpar tudo:
+**Solução**:
 ```bash
-php artisan permissions:sync --fresh
+./vendor/bin/sail artisan permissions:sync
+# OU
+./vendor/bin/sail artisan permissions:generate-types
 ```
 
-2. Verificar unique constraints:
-```sql
-SELECT name, guard_name, tenant_id, COUNT(*)
-FROM permissions
-GROUP BY name, guard_name, tenant_id
-HAVING COUNT(*) > 1;
-```
+### Permissions com Hífens Não Funcionam no Frontend
 
----
+**Problema**: `has('tenant.projects:edit-own')` não funciona.
 
-### Owner bypass não funciona
+**Solução**: Use camelCase: `has('tenant.projects:editOwn')`
 
-**Problema**: Owner não consegue fazer algo que deveria poder.
-
-**Verificações**:
-1. Tem a role `owner`?
-```php
-$user->hasRole('owner'); // deve ser true
-```
-
-2. É permission nova (com `tenant.` prefix)?
-```php
-// Owner bypass NÃO funciona para permissions tenant.*
-// Owner precisa ter a permission via role
-$owner->hasPermissionTo('tenant.projects:delete'); // deve ser true
-```
-
-3. Verificar se owner role tem todas as permissions:
-```bash
-php artisan permissions:sync  # Re-sincronizar
-```
-
----
-
-## Sistema Dinâmico de Permissões (Frontend)
-
-### Visão Geral
-
-O sistema de permissões frontend foi projetado para ser **dinâmico**, **escalável** e **type-safe**:
-
-- ✅ **Dinâmico**: Envia apenas permissions que o usuário TEM (não todas com booleans)
-- ✅ **Performático**: 1 query vs 19+ queries (`getAllPermissions` vs múltiplos `can()`)
-- ✅ **Escalável**: Funciona com 100+ permissions sem impacto
-- ✅ **Type-safe**: Types TypeScript auto-gerados do backend
-- ✅ **Flexível**: Múltiplas formas de verificar permissions (hook, component, inline)
-
-###  Geração Automática de TypeScript Types
-
-As permissions TypeScript são **auto-geradas** a partir do backend, garantindo sincronização perfeita.
-
-#### Gerar Types
-
-```bash
-# Gerar manualmente
-php artisan permissions:generate-types
-
-# Automaticamente ao rodar permissions:sync
-php artisan permissions:sync  # já gera os types
-```
-
-#### Arquivo Gerado
-
-`resources/js/types/permissions.d.ts`:
-
-```typescript
-/**
- * Auto-generated TypeScript types for Laravel permissions
- * DO NOT EDIT THIS FILE MANUALLY
- */
-
-export type Permission =
-  | 'tenant.projects:view'
-  | 'tenant.projects:create'
-  | 'tenant.projects:edit'
-  // ... todas as 19 permissions
-
-export interface Role {
-  name: string | null;
-  isOwner: boolean;
-  isAdmin: boolean;
-  isAdminOrOwner: boolean;
-}
-
-export interface Auth {
-  user: any | null;
-  permissions: Permission[];  // Array simples
-  role: Role | null;
-}
-```
-
-**Vantagens**:
-- Autocomplete funcionando em `has('tenant.pro...')` → sugere todas
-- Compile-time errors se usar permission inexistente
-- Único source of truth: `SyncPermissions.php`
-- Sempre sincronizado com backend
-
-### 🎯 Frontend: Como Usar Permissions
-
-#### Abordagem 1: Hook `usePermissions()`
-
-**Recomendado para múltiplas verificações ou lógica complexa.**
-
-```typescript
-import { usePermissions } from '@/hooks/use-permissions';
-
-export function ProjectsPage() {
-  const { has, hasAny, hasAll, role } = usePermissions();
-
-  return (
-    <div>
-      {/* Single permission */}
-      {has('tenant.projects:create') && <CreateButton />}
-
-      {/* OR logic - user tem edit OU edit-own */}
-      {hasAny('tenant.projects:edit', 'tenant.projects:edit-own') && (
-        <EditButton />
-      )}
-
-      {/* AND logic - user tem view E download */}
-      {hasAll('tenant.projects:view', 'tenant.projects:download') && (
-        <DownloadButton />
-      )}
-
-      {/* Role info (UI only - não usar para autorização!) */}
-      <Badge>{role?.name}</Badge>
-    </div>
-  );
-}
-```
-
-**Métodos disponíveis**:
-- `has(permission)` - Verifica single permission
-- `hasAny(...permissions)` - OR logic
-- `hasAll(...permissions)` - AND logic
-- `all()` - Retorna array de todas permissions do user
-- `role` - Role metadata (apenas para UI)
-- `isOwner`, `isAdmin`, `isAdminOrOwner` - Atalhos para role checks
-
-#### Abordagem 2: Hook `useCan()`
-
-**Ideal para verificações simples e inline.**
-
-```typescript
-import { useCan } from '@/hooks/use-permissions';
-
-export function CreateProjectButton() {
-  const canCreate = useCan('tenant.projects:create');
-
-  if (!canCreate) return null;
-
-  return <Button>Create Project</Button>;
-}
-```
-
-#### Abordagem 3: Componente `<Can>`
-
-**Perfeito para JSX limpo e declarativo.**
-
-```typescript
-import { Can } from '@/components/can';
-
-export function ProjectsPage() {
-  return (
-    <div>
-      {/* Single permission */}
-      <Can permission="tenant.projects:create">
-        <CreateButton />
-      </Can>
-
-      {/* OR logic */}
-      <Can any={["tenant.projects:edit", "tenant.projects:edit-own"]}>
-        <EditButton />
-      </Can>
-
-      {/* AND logic */}
-      <Can all={["tenant.projects:view", "tenant.projects:download"]}>
-        <DownloadButton />
-      </Can>
-
-      {/* Com fallback */}
-      <Can
-        permission="tenant.billing:manage"
-        fallback={<UpgradePrompt />}
-      >
-        <BillingSettings />
-      </Can>
-    </div>
-  );
-}
-```
-
-**Props disponíveis**:
-- `permission?: Permission` - Single permission check
-- `any?: Permission[]` - OR logic (qualquer uma)
-- `all?: Permission[]` - AND logic (todas)
-- `fallback?: ReactNode` - Renderizar se permissão negada
-
-### ⚠️ Role Checks vs Permission Checks
-
-**IMPORTANTE**: Roles são apenas para UI display! Sempre use permissions para autorização.
-
-```typescript
-const { has, role, isOwner } = usePermissions();
-
-// ❌ ERRADO: Usar role para autorização
-{isOwner && <DeleteButton />}
-
-// ✅ CORRETO: Usar permission
-{has('tenant.projects:delete') && <DeleteButton />}
-
-// ✅ OK: Usar role para UI display
-<Badge>{role?.name}</Badge>  // "owner", "admin", "member"
-{isOwner && <Crown className="text-yellow-500" />}  // Badge visual
-```
-
-**Por quê?**
-- Roles podem ter permissions customizadas no futuro
-- Segurança deve ser sempre via permissions
-- Role é metadata para UX apenas
-
-### 📊 Payload Comparison
-
-**Antes (Nested Structure)**:
-```json
-{
-  "permissions": {
-    "projects": {
-      "view": true,
-      "create": true,
-      "edit": false,
-      "editOwn": true,
-      "delete": false,
-      "upload": false,
-      "download": true,
-      "archive": false
-    },
-    "team": { /* 5 booleans */ },
-    "settings": { /* 3 booleans */ },
-    "billing": { /* 3 booleans */ },
-    "role": "member",
-    "isOwner": false,
-    "isAdmin": false,
-    "isAdminOrOwner": false
-  }
-}
-```
-**Payload**: ~500 bytes, 19+ queries
-
-**Depois (Dynamic Array)**:
-```json
-{
-  "permissions": [
-    "tenant.projects:view",
-    "tenant.projects:create",
-    "tenant.projects:edit-own",
-    "tenant.projects:download",
-    "tenant.team:view",
-    "tenant.settings:view"
-  ],
-  "role": {
-    "name": "member",
-    "isOwner": false,
-    "isAdmin": false,
-    "isAdminOrOwner": false
-  }
-}
-```
-**Payload**: ~150 bytes (member), 1 query
-
-**Benefícios**:
-- 70% menos dados trafegando
-- 95% menos queries (1 vs 19+)
-- 100+ permissions sem impacto
-- Type-safe com autocomplete
-
-### 🔄 Migration Guide (Old → New)
-
-Se você tem código usando o sistema antigo, migre assim:
-
-```typescript
-// ❌ OLD: Nested structure
-const { permissions } = auth;
-if (permissions?.projects.create) { /* ... */ }
-
-// ✅ NEW: usePermissions hook
-const { has } = usePermissions();
-if (has('tenant.projects:create')) { /* ... */ }
-```
-
-```typescript
-// ❌ OLD: Can with legacy names
-<Can permission="canManageTeam">
-  <Button />
-</Can>
-
-// ✅ NEW: Can with granular permissions
-<Can permission="tenant.team:invite">
-  <Button />
-</Can>
-```
-
-```typescript
-// ❌ OLD: Direct access to permissions object
-{permissions?.isOwner && <Badge>Owner</Badge>}
-
-// ✅ NEW: usePermissions hook
-const { isOwner } = usePermissions();
-{isOwner && <Badge>Owner</Badge>}
-```
-
-### 📚 Exemplos Práticos
-
-Ver arquivo completo com exemplos: `resources/js/examples/PermissionsUsageExample.tsx`
-
-Contém exemplos de:
-- ✅ Hook `usePermissions()` com has/hasAny/hasAll
-- ✅ Hook `useCan()` para single checks
-- ✅ Component `<Can>` com permission/any/all
-- ✅ Role display vs permission authorization
-- ✅ Complex permission logic
-- ✅ Listing all user permissions
+**Migração**:
+1. Atualize `SyncPermissions.php` com nomes camelCase
+2. Rode `sail artisan permissions:sync`
+3. Atualize código frontend com novos nomes
 
 ---
 
 ## Referências
 
-- [Spatie Laravel Permission Docs](https://spatie.be/docs/laravel-permission)
-- [Stancl Tenancy Docs](https://tenancyforlaravel.com/)
-- [Laravel Authorization Docs](https://laravel.com/docs/authorization)
+- **Hooks**: `resources/js/hooks/use-permissions.ts`
+- **Component**: `resources/js/components/can.tsx`
+- **Exemplos**: `resources/js/examples/PermissionsUsageExample.tsx`
+- **Comando Sync**: `app/Console/Commands/SyncPermissions.php`
+- **Policies**: `app/Policies/ProjectPolicy.php`
+- **Controllers**: `app/Http/Controllers/Tenant/TeamController.php`
+- **Middleware**: `app/Http/Middleware/HandleInertiaRequests.php`
+
+**Documentação Externa**:
+- [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission)
+- [Stancl Tenancy](https://tenancyforlaravel.com/)
+- [Laravel Authorization](https://laravel.com/docs/authorization)
 
 ---
 
 ## Changelog
 
+### v2.2.0 (2025-11-20)
+
+**camelCase Convention + Documentation Update** 🎨:
+
+**Permission Naming Standardization**:
+- ✅ **Categories**: `tenant.apiTokens:*` (was `tenant.api-tokens:*`)
+- ✅ **Actions**: `tenant.projects:editOwn` (was `edit-own`)
+- ✅ **Actions**: `tenant.team:manageRoles` (was `manage-roles`)
+- ✅ **TypeScript**: All generated types now valid (no hyphens)
+- ✅ **Convention**: camelCase for all multi-word names
+
+**Files Updated (11 total)**:
+- Backend: `SyncPermissions.php`, `TeamController.php`, `ApiTokenController.php`, `ProjectPolicy.php`
+- Frontend: `team/index.tsx`, `PermissionsUsageExample.tsx`, `can.tsx`, `use-permissions.ts`
+- Docs: `PERMISSIONS.md`, `permissions.d.ts` (auto-generated)
+
+**Database Cleanup**:
+- ✅ Deleted old hyphenated permissions
+- ✅ Verified 22 unique camelCase permission names
+- ✅ Re-synced all permissions and roles
+
+**Documentation Rewrite**:
+- ✅ **Focused on `usePermissions()` hook** as primary method
+- ✅ **Removed outdated frontend references**
+- ✅ **Added complete examples** from `PermissionsUsageExample.tsx`
+- ✅ **Clear comparison**: Role checks (UI only) vs Permission checks (authorization)
+- ✅ **Step-by-step guide** for adding new permissions with camelCase
+- ✅ **Troubleshooting section** for hyphenated permission migration
+
 ### v2.1.0 (2025-11-20)
 
-**Super Admin como Role Global + Performance** 🚀:
-
-**Super Admin Refactoring**:
-- ✅ **Removido `is_super_admin` column** - Agora usa role "Super Admin"
-- ✅ **Role Global**: Super Admin com `tenant_id = null`
-- ✅ **Gate::before()**: Implementado no `AppServiceProvider`
-- ✅ **Best Practices**: Segue guia oficial do Spatie Permission
-- ✅ **Multi-Tenant**: Super Admin acessa todos os tenants sem ser membro
-- ✅ **Frontend**: Disponível em `auth.role.isSuperAdmin`
-- ✅ **TypeScript**: Tipo `Role` atualizado com `isSuperAdmin: boolean`
-
-**Performance Optimization**:
-- ✅ **Zero Queries**: `VerifyTenantAccess` usa cache do Spatie Permission
-- ✅ **99% Redução**: 1000 queries/min → ~0 queries/min
-- ✅ **Latência**: 5-20ms → ~0.1ms (cache hit)
-- ✅ **Simples**: Usa `getRoleNames().isNotEmpty()` em vez de query
-- ✅ **Future-proof**: Funciona com qualquer role (owner, admin, member, custom)
-- ✅ **Auto-invalidação**: Spatie gerencia cache automaticamente
-
-**Migrations**:
-- ✅ Created: `2025_11_20_163632_remove_is_super_admin_from_users_table.php`
-- ✅ Updated: Permission pivot tables para suportar `tenant_id = null`
-- ✅ Updated: `SyncPermissions` command cria "Super Admin" role global
-
-**Files Updated**:
-- `app/Providers/AppServiceProvider.php` - Gate::before() para Super Admin
-- `app/Http/Middleware/VerifyTenantAccess.php` - Otimizado com cache do Spatie
-- `app/Http/Middleware/HandleInertiaRequests.php` - `isSuperAdmin` em role metadata
-- `app/Console/Commands/GeneratePermissionTypes.php` - Gera `isSuperAdmin` em types
-- `resources/js/types/index.d.ts` - Removido `is_super_admin` de User
-- `resources/js/types/permissions.d.ts` - Adicionado `isSuperAdmin` em Role
-- `tests/Feature/SecurityAuditTest.php` - Atualizado para verificar ausência de `is_super_admin`
-
-**Documentation**:
-- ✅ Updated: `docs/PERMISSIONS.md` com seções de Super Admin e Performance
-- ✅ Added: Guia completo de Super Admin vs Owner
-- ✅ Added: Comparação de performance (antes vs depois)
-
-**Tests**: 79/79 passando ✅
+**Super Admin como Role Global + Performance** 🚀
 
 ### v2.0.0 (2025-11-20)
 
-**Sistema Dinâmico de Permissões** 🚀:
-- ✅ **Performance**: Redução de 95% em queries (1 vs 19+)
-- ✅ **Payload**: 70% menor (~150 bytes vs ~500 bytes para member)
-- ✅ **TypeScript auto-gerado**: Comando `permissions:generate-types`
-- ✅ **Type-safe**: Union type `Permission` com autocomplete completo
-- ✅ **Hooks refatorados**: `usePermissions()` com has/hasAny/hasAll
-- ✅ **Component refatorado**: `<Can>` com permission/any/all props
-- ✅ **Backend otimizado**: `getAllPermissions()` vs múltiplos `can()`
-- ✅ **Frontend**: Apenas permissions que user TEM (dynamic array)
-- ✅ **Escalável**: Suporta 100+ permissions sem impacto
-- ✅ **Exemplos completos**: `PermissionsUsageExample.tsx`
-- ✅ **Migration guide**: Documentação completa old → new
-- ✅ **79 testes passando**: Sem breaking changes no backend
-
-**Breaking Changes (Frontend Only)**:
-- `auth.permissions` agora é array de strings (não nested object)
-- `auth.role` agora é object separado (não dentro de permissions)
-- `usePermissions()` retorna methods (has, hasAny) em vez de object
-- `<Can>` aceita Permission type (não keyof Permissions)
+**Sistema Dinâmico de Permissões** 🚀
 
 ### v1.0.0 (2025-11-20)
 
-**Initial Release**:
-- ✅ 19 permissions organizadas em 4 categorias
-- ✅ 3 roles MVP (owner, admin, member)
-- ✅ Comando idempotente `permissions:sync`
-- ✅ Integração completa com multi-tenancy
-- ✅ Metadata rica (description, category, display_name)
-- ✅ Nomenclatura padronizada `tenant.resource:action`
-- ✅ 79 testes passando
-- ✅ Documentação completa
+**Initial Release**

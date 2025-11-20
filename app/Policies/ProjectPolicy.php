@@ -43,8 +43,8 @@ class ProjectPolicy
             return true;
         }
 
-        // Ou se tem permission "edit-own" E é o criador do project
-        return $user->can('tenant.projects:edit-own') && $project->user_id === $user->id;
+        // Ou se tem permission "editOwn" E é o criador do project
+        return $user->can('tenant.projects:editOwn') && $project->user_id === $user->id;
     }
 
     /**

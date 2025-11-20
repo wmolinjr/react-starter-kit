@@ -159,7 +159,7 @@ export default function TeamIndex({ members, tenant }: Props) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Can any={["tenant.team:manage-roles", "tenant.team:remove"]}>
+                      <Can any={["tenant.team:manageRoles", "tenant.team:remove"]}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">

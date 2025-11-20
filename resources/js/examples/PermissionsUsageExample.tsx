@@ -29,7 +29,7 @@ export function ProjectsExample() {
             )}
 
             {/* Show edit button only if user can edit any project OR their own */}
-            {(has('tenant.projects:edit') || has('tenant.projects:edit-own')) && (
+            {(has('tenant.projects:edit') || has('tenant.projects:editOwn')) && (
                 <Button onClick={handleEdit}>Edit</Button>
             )}
 
@@ -56,8 +56,8 @@ export function ProjectsWithComponent() {
                 <Button onClick={handleCreate}>Create Project</Button>
             </Can>
 
-            {/* OR logic: Show if user has edit OR edit-own */}
-            <Can any={['tenant.projects:edit', 'tenant.projects:edit-own']}>
+            {/* OR logic: Show if user has edit OR editOwn */}
+            <Can any={['tenant.projects:edit', 'tenant.projects:editOwn']}>
                 <Button onClick={handleEdit}>Edit</Button>
             </Can>
 
@@ -104,7 +104,7 @@ export function TeamExample() {
             )}
 
             {/* Role management - only for users with manageRoles permission */}
-            {has('tenant.team:manage-roles') && (
+            {has('tenant.team:manageRoles') && (
                 <select onChange={handleRoleChange}>
                     <option value="owner">Owner</option>
                     <option value="admin">Admin</option>
@@ -120,7 +120,7 @@ export function TeamExample() {
             )}
 
             {/* Multiple permissions check - OR logic */}
-            {hasAny('tenant.team:invite', 'tenant.team:manage-roles') && (
+            {hasAny('tenant.team:invite', 'tenant.team:manageRoles') && (
                 <div>You can manage team members</div>
             )}
         </div>
@@ -226,7 +226,7 @@ export function ComplexPermissionExample() {
     return (
         <div>
             {/* OR logic: Show if user has ANY of these permissions */}
-            {hasAny('tenant.projects:edit', 'tenant.projects:edit-own') && (
+            {hasAny('tenant.projects:edit', 'tenant.projects:editOwn') && (
                 <Button onClick={handleEdit}>Edit Project</Button>
             )}
 
@@ -237,7 +237,7 @@ export function ComplexPermissionExample() {
 
             {/* Complex logic: Combine multiple checks */}
             {has('tenant.projects:view') &&
-                (has('tenant.projects:edit') || has('tenant.projects:edit-own')) && (
+                (has('tenant.projects:edit') || has('tenant.projects:editOwn')) && (
                     <Button onClick={handleAdvancedEdit}>Advanced Edit</Button>
                 )}
         </div>

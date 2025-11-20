@@ -25,7 +25,7 @@ class TeamController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:tenant.team:view', only: ['index']),
             new Middleware('permission:tenant.team:invite', only: ['invite']),
-            new Middleware('permission:tenant.team:manage-roles', only: ['updateRole']),
+            new Middleware('permission:tenant.team:manageRoles', only: ['updateRole']),
             new Middleware('permission:tenant.team:remove', only: ['remove']),
         ];
     }

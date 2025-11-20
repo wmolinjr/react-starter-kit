@@ -50,8 +50,8 @@ type CanProps = CanPropsPermission | CanPropsAny | CanPropsAll;
  * </Can>
  *
  * @example
- * // OR logic - user can edit OR edit-own
- * <Can any={["tenant.projects:edit", "tenant.projects:edit-own"]}>
+ * // OR logic - user can edit OR editOwn
+ * <Can any={["tenant.projects:edit", "tenant.projects:editOwn"]}>
  *   <EditButton />
  * </Can>
  *
