@@ -23,13 +23,7 @@ export interface TenantInfo {
 }
 
 export interface Permissions {
-    // Legacy gates (deprecated - use granular permissions)
-    canManageTeam: boolean;
-    canManageBilling: boolean;
-    canManageSettings: boolean;
-    canCreateResources: boolean;
-
-    // Granular permissions (recommended)
+    // Granular permissions
     projects: {
         view: boolean;
         create: boolean;

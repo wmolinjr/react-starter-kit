@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -58,13 +57,7 @@ class HandleInertiaRequests extends Middleware
                     'is_current' => tenancy()->initialized && tenant('id') === $tenant->id,
                 ]) : [],
                 'permissions' => $user ? [
-                    // Legacy gates (manter para compatibilidade)
-                    'canManageTeam' => Gate::allows('manage-team'),
-                    'canManageBilling' => Gate::allows('manage-billing'),
-                    'canManageSettings' => Gate::allows('manage-settings'),
-                    'canCreateResources' => Gate::allows('create-resources'),
-
-                    // Permissions granulares (recomendado)
+                    // Granular permissions
                     'projects' => [
                         'view' => $user->can('tenant.projects:view'),
                         'create' => $user->can('tenant.projects:create'),

@@ -154,24 +154,6 @@ export function BillingExample() {
     );
 }
 
-// ❌ DEPRECATED: Avoid using legacy gates
-export function LegacyExample() {
-    const { auth } = usePage<PageProps>().props;
-    const { permissions } = auth;
-
-    return (
-        <div>
-            {/* ❌ Old way - less granular */}
-            {permissions?.canManageTeam && <Button>Manage Team</Button>}
-
-            {/* ✅ New way - more granular */}
-            {permissions?.team.invite && <Button>Invite Member</Button>}
-            {permissions?.team.remove && <Button>Remove Member</Button>}
-            {permissions?.team.manageRoles && <Button>Change Roles</Button>}
-        </div>
-    );
-}
-
 // ⚠️ IMPORTANT: Role checks are for UI display only!
 // Never rely on role checks for security - always use permissions
 export function RoleDisplayExample() {

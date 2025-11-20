@@ -20,7 +20,7 @@ class TeamController extends Controller
      */
     public function index()
     {
-        Gate::authorize('manage-team');
+        Gate::authorize('tenant.team:view');
 
         $tenant = tenant();
 
@@ -55,7 +55,7 @@ class TeamController extends Controller
      */
     public function invite(Request $request)
     {
-        Gate::authorize('manage-team');
+        Gate::authorize('tenant.team:invite');
 
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
@@ -200,7 +200,7 @@ class TeamController extends Controller
      */
     public function updateRole(Request $request, User $user)
     {
-        Gate::authorize('manage-team');
+        Gate::authorize('tenant.team:manage-roles');
 
         $validated = $request->validate([
             'role' => ['required', Rule::in(['owner', 'admin', 'member'])],
@@ -249,7 +249,7 @@ class TeamController extends Controller
      */
     public function remove(Request $request, User $user)
     {
-        Gate::authorize('manage-team');
+        Gate::authorize('tenant.team:remove');
 
         $tenant = tenant();
         $currentUser = $request->user();

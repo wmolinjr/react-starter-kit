@@ -373,18 +373,6 @@ Ver arquivo completo com mais exemplos:
 resources/js/examples/PermissionsUsageExample.tsx
 ```
 
-#### Legacy Gates (Deprecated)
-
-```tsx
-// ❌ Old way - menos granular (deprecated)
-{permissions?.canManageTeam && <Button>Manage Team</Button>}
-
-// ✅ New way - mais granular (recomendado)
-{permissions?.team.invite && <Button>Invite Member</Button>}
-{permissions?.team.remove && <Button>Remove Member</Button>}
-{permissions?.team.manageRoles && <Button>Change Roles</Button>}
-```
-
 ### Em Middleware
 
 ```php
@@ -607,28 +595,20 @@ $user->assignRole('admin');
 - ✅ `TeamController::acceptInvitation()`
 - ✅ `Tenant::getUsersByRole()`
 
-### Owner Bypass
+### Super Admin Bypass
 
-O sistema tem um bypass especial para owners, mas **APENAS para gates legacy**:
+O sistema tem um bypass para super admins (acesso total):
 
 ```php
 // AuthServiceProvider.php
 Gate::before(function (User $user, string $ability) {
-    // Não aplicar bypass para permissions com prefixo tenant.
-    if (str_starts_with($ability, 'tenant.')) {
-        return null; // Deixar verificação de permission continuar
-    }
-
-    // Bypass para gates legacy
-    if ($ability !== 'manage-billing' && tenancy()->initialized) {
-        if ($user->isOwner()) {
-            return true;
-        }
+    if ($user->is_super_admin) {
+        return true;
     }
 });
 ```
 
-**Importante**: Permissions novas (com prefixo `tenant.`) **NÃO** são bypassadas. Owners precisam ter as permissions explicitamente atribuídas via role.
+**Importante**: Para usuários normais (incluindo owners), **TODAS as permissions** devem ser atribuídas explicitamente via roles. Não há bypass automático.
 
 ---
 
