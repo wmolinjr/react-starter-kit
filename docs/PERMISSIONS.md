@@ -133,72 +133,71 @@ php artisan permissions:sync --fresh
 
 ## Como Usar Permissions
 
-### ✅ Abordagem Recomendada: Middleware nas Rotas
+### ✅ Abordagem Recomendada: `middleware()` static no Controller (Laravel 12+)
 
-A melhor prática é usar middleware `can:` nas rotas. Isso mantém os controllers limpos e centraliza a autorização.
-
-```php
-// routes/tenant.php
-
-// ✅ RECOMENDADO: Middleware nas rotas
-Route::prefix('team')->name('team.')->group(function () {
-    Route::get('/', [TeamController::class, 'index'])
-        ->middleware('can:tenant.team:view')
-        ->name('index');
-
-    Route::post('/invite', [TeamController::class, 'invite'])
-        ->middleware('can:tenant.team:invite')
-        ->name('invite');
-
-    Route::patch('/{user}/role', [TeamController::class, 'updateRole'])
-        ->middleware('can:tenant.team:manage-roles')
-        ->name('update-role');
-});
-
-// Para Policies (com route model binding)
-Route::prefix('projects')->name('projects.')->group(function () {
-    Route::get('/{project}', [ProjectController::class, 'show'])
-        ->middleware('can:view,project')  // usa ProjectPolicy::view()
-        ->name('show');
-
-    Route::patch('/{project}', [ProjectController::class, 'update'])
-        ->middleware('can:update,project')  // usa ProjectPolicy::update()
-        ->name('update');
-});
-```
-
-### Em Controllers
-
-Com middleware nas rotas, os controllers ficam limpos (sem `Gate::authorize()`):
+A melhor prática é usar o método static `middleware()` no controller. Mantém as permissions declaradas junto com a lógica de negócio e as rotas limpas.
 
 ```php
-class TeamController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TeamController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:tenant.team:view', only: ['index']),
+            new Middleware('permission:tenant.team:invite', only: ['invite']),
+            new Middleware('permission:tenant.team:manage-roles', only: ['updateRole']),
+            new Middleware('permission:tenant.team:remove', only: ['remove']),
+        ];
+    }
+
     public function index()
     {
         // Autorização já feita pelo middleware
         $tenant = tenant();
         $members = $tenant->users()->get();
 
-        return Inertia::render('tenant/team/index', [
-            'members' => $members,
-        ]);
-    }
-
-    public function invite(Request $request)
-    {
-        // Autorização já feita pelo middleware
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'role' => 'required|in:admin,member',
-        ]);
-
-        // ...
+        return Inertia::render('tenant/team/index', ['members' => $members]);
     }
 }
 ```
 
-**Nota**: Só use `Gate::authorize()` ou `$user->can()` no controller se a lógica de autorização for dinâmica e não puder ser feita no middleware.
+### Usando Policies para Ownership (Projetos)
+
+Para recursos que precisam verificar ownership, use policies com `can:`:
+
+```php
+class ProjectController extends Controller implements HasMiddleware
+{
+    public static function middleware(): array
+    {
+        return [
+            // Permissions diretas (sem model binding)
+            new Middleware('permission:tenant.projects:view', only: ['index']),
+            new Middleware('permission:tenant.projects:create', only: ['create', 'store']),
+
+            // Policies (com model binding - verificam ownership)
+            new Middleware('can:view,project', only: ['show']),
+            new Middleware('can:update,project', only: ['edit', 'update']),
+            new Middleware('can:delete,project', only: ['destroy']),
+        ];
+    }
+}
+```
+
+### Vantagens desta Abordagem
+
+✅ **Auto-documentado**: Permissions visíveis ao abrir o controller
+✅ **Rotas limpas**: Sem poluir o arquivo de rotas
+✅ **Type-safe**: `only:` e `except:` evitam typos
+✅ **Padrão Laravel 12**: Segue as convenções modernas
+✅ **DRY**: Uma permission pode proteger múltiplos métodos
+✅ **Melhor que Gate::authorize()**: Falha mais cedo (antes do método executar)
 
 ### Em Policies
 

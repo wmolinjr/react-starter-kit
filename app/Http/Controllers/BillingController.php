@@ -3,10 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class BillingController extends Controller
+class BillingController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:tenant.billing:view', only: ['index', 'success']),
+            new Middleware('permission:tenant.billing:manage', only: ['checkout', 'portal']),
+            new Middleware('permission:tenant.billing:invoices', only: ['invoice']),
+        ];
+    }
+
     /**
      * Página de billing
      */

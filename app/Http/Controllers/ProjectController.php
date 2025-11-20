@@ -4,11 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class ProjectController extends Controller
+class ProjectController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            // Permissions diretas (sem model binding)
+            new Middleware('permission:tenant.projects:view', only: ['index']),
+            new Middleware('permission:tenant.projects:create', only: ['create', 'store']),
+            new Middleware('permission:tenant.projects:upload', only: ['uploadFile']),
+            new Middleware('permission:tenant.projects:download', only: ['downloadFile']),
+            new Middleware('permission:tenant.projects:delete', only: ['deleteFile']),
+
+            // Policies (com model binding - verificam ownership)
+            new Middleware('can:view,project', only: ['show']),
+            new Middleware('can:update,project', only: ['edit', 'update']),
+            new Middleware('can:delete,project', only: ['destroy']),
+        ];
+    }
+
     /**
      * Lista de projects do tenant
      */

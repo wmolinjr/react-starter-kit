@@ -89,8 +89,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Alias para middleware customizado
         $middleware->alias([
             'tenant.access' => VerifyTenantAccess::class,
-            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'prevent.impersonation' => PreventActionsWhileImpersonating::class,
+            // Spatie Permission middlewares
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

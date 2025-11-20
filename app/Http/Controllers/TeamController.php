@@ -6,14 +6,29 @@ use App\Mail\TeamInvitation;
 use App\Models\TenantInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class TeamController extends Controller
+class TeamController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:tenant.team:view', only: ['index']),
+            new Middleware('permission:tenant.team:invite', only: ['invite']),
+            new Middleware('permission:tenant.team:manage-roles', only: ['updateRole']),
+            new Middleware('permission:tenant.team:remove', only: ['remove']),
+        ];
+    }
+
     /**
      * Display team management page with members list.
      */
