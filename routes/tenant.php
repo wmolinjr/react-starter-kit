@@ -95,9 +95,6 @@ Route::middleware([
             Route::get('/portal', [\App\Http\Controllers\BillingController::class, 'portal'])->name('portal');
             Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\BillingController::class, 'invoice'])->name('invoice');
         });
-
-        // Settings do tenant (já existe em routes/settings.php, mas podemos adicionar aqui também)
-        require __DIR__.'/settings.php';
     });
 
     /*

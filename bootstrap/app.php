@@ -60,6 +60,9 @@ return Application::configure(basePath: dirname(__DIR__))
             // Admin routes - managed by domain scoping in routes/admin.php
             require base_path('routes/admin.php');
 
+            // Universal routes (work in both central and tenant contexts)
+            require base_path('routes/settings.php');
+
             // Tenant routes - managed by TenancyServiceProvider->mapRoutes()
             // No need to load here as it's already loaded by the service provider
 
@@ -85,6 +88,10 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        // Universal routes middleware group (for routes that work in both central and tenant contexts)
+        // This is required by Stancl\Tenancy\Features\UniversalRoutes
+        $middleware->group('universal', []);
 
         // Middleware aliases
         $middleware->alias([
