@@ -86,13 +86,15 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        // Alias para middleware customizado
+        // Middleware aliases
         $middleware->alias([
+            // Custom middleware
             'tenant.access' => VerifyTenantAccess::class,
             'prevent.impersonation' => PreventActionsWhileImpersonating::class,
-            // Spatie Permission middlewares
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+
+            // Spatie Permission middleware (for permission-based authorization)
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
     })
