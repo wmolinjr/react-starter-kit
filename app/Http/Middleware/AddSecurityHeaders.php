@@ -108,9 +108,9 @@ class AddSecurityHeaders
             // Fonts: Allow self
             "font-src 'self' data:",
 
-            // Connect (AJAX, WebSocket): Allow self + Vite HMR in development
+            // Connect (AJAX, WebSocket): Allow self + Vite HMR + tenant subdomains in development
             $isLocal
-                ? "connect-src 'self' ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*"
+                ? "connect-src 'self' ws://localhost:* ws://127.0.0.1:* ws://*.localhost http://localhost:* http://127.0.0.1:* http://*.localhost"
                 : "connect-src 'self'",
 
             // Media: Allow self

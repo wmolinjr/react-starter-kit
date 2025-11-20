@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ImpersonationToken;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ImpersonationController extends Controller
 {
     /**
-     * Iniciar impersonation de tenant/usuário
+     * Iniciar impersonation de tenant/usuário via token
      */
     public function start(Tenant $tenant, User $user = null)
     {
@@ -18,22 +21,23 @@ class ImpersonationController extends Controller
             abort(403, 'Only super administrators can impersonate tenants.');
         }
 
-        // Armazenar tenant sendo impersonado
-        session()->put('impersonating_tenant', $tenant->id);
-
-        // Se usuário específico foi fornecido, fazer login como ele
+        // Se usuário específico foi fornecido, validar que pertence ao tenant
         if ($user) {
-            // Verificar se usuário pertence ao tenant
             if (!$user->tenants()->where('tenant_id', $tenant->id)->exists()) {
                 abort(403, 'User does not belong to this tenant.');
             }
-
-            session()->put('impersonating_user', $user->id);
-            auth()->login($user);
         }
 
-        // Redirecionar para dashboard do tenant
-        return redirect()->to($tenant->url() . '/dashboard');
+        // Criar token de impersonation com expiração de 5 minutos
+        $token = ImpersonationToken::create([
+            'token' => Str::random(64),
+            'tenant_id' => $tenant->id,
+            'user_id' => $user?->id,
+            'expires_at' => now()->addMinutes(5),
+        ]);
+
+        // Redirecionar para URL de consumo do token no domínio do tenant
+        return Inertia::location($tenant->url() . '/impersonate/' . $token->token);
     }
 
     /**

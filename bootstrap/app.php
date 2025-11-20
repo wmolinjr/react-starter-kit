@@ -57,13 +57,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ];
             });
 
-            // Admin routes
-            Route::middleware('web')
-                ->group(base_path('routes/admin.php'));
+            // Admin routes - managed by domain scoping in routes/admin.php
+            require base_path('routes/admin.php');
 
-            // Tenant routes
-            Route::middleware('web')
-                ->group(base_path('routes/tenant.php'));
+            // Tenant routes - managed by TenancyServiceProvider->mapRoutes()
+            // No need to load here as it's already loaded by the service provider
 
             // Route Model Binding tenant-aware
             // Garante que models com BelongsToTenant trait sejam filtrados pelo tenant atual

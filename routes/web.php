@@ -6,63 +6,77 @@ use Laravel\Fortify\Features;
 
 /*
 |--------------------------------------------------------------------------
-| Central App Routes (app.myapp.com ou www.myapp.com)
+| Central App Routes (localhost)
 |--------------------------------------------------------------------------
 |
 | Rotas da aplicação central (landing page, registro de tenants, pricing).
-| Estas rotas NÃO devem ter tenant context inicializado.
+| Estas rotas são explicitamente limitadas aos central_domains configurados
+| para evitar que a tenancy middleware seja inicializada.
+|
+| Pattern: Route::domain() para cada domínio central
 |
 */
 
-// Landing page
-Route::get('/', function () {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+// Impersonation token consumption (UNIVERSAL ROUTE - works on both central and tenant domains)
+// Must be registered BEFORE domain-scoped routes to be accessible on all domains
+Route::middleware('web')
+    ->get('/impersonate/{token}', [\App\Http\Controllers\TenantImpersonationController::class, 'consume'])
+    ->name('impersonate.consume');
 
-// Pricing page
-Route::get('/pricing', function () {
-    return Inertia::render('pricing');
-})->name('pricing');
+// Central domain routes - only accessible on localhost (or configured central domains)
+foreach (config('tenancy.central_domains') as $domain) {
+    Route::domain($domain)->middleware('web')->group(function () {
+        // Landing page
+        Route::get('/', function () {
+            return Inertia::render('welcome', [
+                'canRegister' => Features::enabled(Features::registration()),
+            ]);
+        })->name('home');
 
-// Login é gerenciado pelo Laravel Fortify (não precisa definir aqui)
+        // Pricing page
+        Route::get('/pricing', function () {
+            return Inertia::render('pricing');
+        })->name('pricing');
 
-// Register tenant + user (será implementado em RegisterController)
-// POST /register será adicionado quando criar o controller
+        // Login é gerenciado pelo Laravel Fortify (não precisa definir aqui)
 
-// Central dashboard (lista de tenants do usuário)
-Route::get('/dashboard', function () {
-    $user = auth()->user();
+        // Register tenant + user (será implementado em RegisterController)
+        // POST /register será adicionado quando criar o controller
 
-    $tenants = $user?->tenants()
-        ->withPivot('role', 'joined_at')
-        ->get()
-        ->map(function ($tenant) {
-            return [
-                'id' => $tenant->id,
-                'name' => $tenant->name,
-                'slug' => $tenant->slug,
-                'role' => $tenant->pivot->role,
-                'joined_at' => $tenant->pivot->joined_at,
-                'url' => "http://{$tenant->slug}.".config('tenancy.central_domains')[0],
-            ];
-        }) ?? collect();
+        // Central dashboard (lista de tenants do usuário)
+        Route::get('/dashboard', function () {
+            $user = auth()->user();
 
-    return Inertia::render('dashboard', [
-        'tenants' => $tenants,
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+            $tenants = $user?->tenants()
+                ->withPivot('role', 'joined_at')
+                ->get()
+                ->map(function ($tenant) {
+                    return [
+                        'id' => $tenant->id,
+                        'name' => $tenant->name,
+                        'slug' => $tenant->slug,
+                        'role' => $tenant->pivot->role,
+                        'joined_at' => $tenant->pivot->joined_at,
+                        'url' => "http://{$tenant->slug}.".config('tenancy.central_domains')[0],
+                    ];
+                }) ?? collect();
 
-// Accept invitation (rota pública, pode não estar autenticado)
-Route::get('/accept-invitation', function () {
-    $token = request()->query('token');
+            return Inertia::render('dashboard', [
+                'tenants' => $tenants,
+            ]);
+        })->middleware(['auth', 'verified'])->name('dashboard');
 
-    return Inertia::render('accept-invitation', [
-        'token' => $token,
-    ]);
-})->name('accept-invitation');
+        // Accept invitation (rota pública, pode não estar autenticado)
+        Route::get('/accept-invitation', function () {
+            $token = request()->query('token');
 
-Route::post('/accept-invitation', [\App\Http\Controllers\TeamController::class, 'acceptInvitation'])
-    ->middleware('auth')
-    ->name('accept-invitation.store');
+            return Inertia::render('accept-invitation', [
+                'token' => $token,
+            ]);
+        })->name('accept-invitation');
+
+        Route::post('/accept-invitation', [\App\Http\Controllers\TeamController::class, 'acceptInvitation'])
+            ->middleware('auth')
+            ->name('accept-invitation.store');
+    });
+}
