@@ -41,10 +41,11 @@ class ImpersonationController extends Controller
         $token = tenancy()->impersonate($tenant, (string) $user->id, $redirectUrl);
 
         // Redirecionar para URL de consumo do token no domínio do tenant
-        // Usa CrossDomainRedirect feature para redirect type-safe entre domínios
-        return redirect()
-            ->route('impersonate.consume', $token->token)
-            ->domain($tenant->primaryDomain()->domain);
+        // Usa Inertia::location() para external redirect (evita CORS issue com router.post)
+        $domain = $tenant->primaryDomain()->domain;
+        $protocol = request()->secure() ? 'https' : 'http';
+
+        return Inertia::location("{$protocol}://{$domain}/impersonate/{$token->token}");
     }
 
     /**
