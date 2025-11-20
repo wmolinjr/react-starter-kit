@@ -37,6 +37,19 @@ Route::middleware([
         return UserImpersonation::makeResponse($token);
     })->name('impersonate.consume');
 
+    // Accept team invitation (rota pública, usuário pode não estar autenticado)
+    Route::get('/accept-invitation', function () {
+        $token = request()->query('token');
+
+        return Inertia::render('tenant/accept-invitation', [
+            'token' => $token,
+        ]);
+    })->name('invitation.show');
+
+    Route::post('/accept-invitation', [\App\Http\Controllers\Tenant\TeamController::class, 'acceptInvitation'])
+        ->middleware('auth')
+        ->name('invitation.accept');
+
     // Redirect root para dashboard
     Route::get('/', function () {
         return redirect()->route('tenant.dashboard');
@@ -54,46 +67,46 @@ Route::middleware([
         // Projects (CRUD + File Upload)
         Route::prefix('projects')->name('projects.')->group(function () {
             // Read operations (no rate limiting)
-            Route::get('/', [\App\Http\Controllers\ProjectController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\ProjectController::class, 'create'])->name('create');
-            Route::get('/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])->name('show');
-            Route::get('/{project}/edit', [\App\Http\Controllers\ProjectController::class, 'edit'])->name('edit');
+            Route::get('/', [\App\Http\Controllers\Tenant\ProjectController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Tenant\ProjectController::class, 'create'])->name('create');
+            Route::get('/{project}', [\App\Http\Controllers\Tenant\ProjectController::class, 'show'])->name('show');
+            Route::get('/{project}/edit', [\App\Http\Controllers\Tenant\ProjectController::class, 'edit'])->name('edit');
 
             // Write operations (rate limited)
             Route::middleware('throttle:tenant-actions')->group(function () {
-                Route::post('/', [\App\Http\Controllers\ProjectController::class, 'store'])->name('store');
-                Route::patch('/{project}', [\App\Http\Controllers\ProjectController::class, 'update'])->name('update');
-                Route::delete('/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('destroy');
+                Route::post('/', [\App\Http\Controllers\Tenant\ProjectController::class, 'store'])->name('store');
+                Route::patch('/{project}', [\App\Http\Controllers\Tenant\ProjectController::class, 'update'])->name('update');
+                Route::delete('/{project}', [\App\Http\Controllers\Tenant\ProjectController::class, 'destroy'])->name('destroy');
             });
 
             // Media Management (stricter rate limiting for uploads)
             // Note: Media isolation is handled by BelongsToTenant global scope
             // Route model binding automatically filters by tenant_id
-            Route::middleware('throttle:uploads')->post('/{project}/media', [\App\Http\Controllers\ProjectController::class, 'uploadFile'])->name('media.upload');
-            Route::get('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'downloadFile'])->name('media.download');
-            Route::middleware('throttle:tenant-actions')->delete('/{project}/media/{media}', [\App\Http\Controllers\ProjectController::class, 'deleteFile'])->name('media.delete');
+            Route::middleware('throttle:uploads')->post('/{project}/media', [\App\Http\Controllers\Tenant\ProjectController::class, 'uploadFile'])->name('media.upload');
+            Route::get('/{project}/media/{media}', [\App\Http\Controllers\Tenant\ProjectController::class, 'downloadFile'])->name('media.download');
+            Route::middleware('throttle:tenant-actions')->delete('/{project}/media/{media}', [\App\Http\Controllers\Tenant\ProjectController::class, 'deleteFile'])->name('media.delete');
         });
 
         // Team Management
         Route::prefix('team')->name('team.')->group(function () {
             // Read operations
-            Route::get('/', [\App\Http\Controllers\TeamController::class, 'index'])->name('index');
+            Route::get('/', [\App\Http\Controllers\Tenant\TeamController::class, 'index'])->name('index');
 
             // Write operations (rate limited)
             Route::middleware('throttle:tenant-actions')->group(function () {
-                Route::post('/invite', [\App\Http\Controllers\TeamController::class, 'invite'])->name('invite');
-                Route::patch('/{user}/role', [\App\Http\Controllers\TeamController::class, 'updateRole'])->name('update-role');
-                Route::delete('/{user}', [\App\Http\Controllers\TeamController::class, 'remove'])->name('remove');
+                Route::post('/invite', [\App\Http\Controllers\Tenant\TeamController::class, 'invite'])->name('invite');
+                Route::patch('/{user}/role', [\App\Http\Controllers\Tenant\TeamController::class, 'updateRole'])->name('update-role');
+                Route::delete('/{user}', [\App\Http\Controllers\Tenant\TeamController::class, 'remove'])->name('remove');
             });
         });
 
         // Billing (Laravel Cashier)
         Route::prefix('billing')->name('billing.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\BillingController::class, 'index'])->name('index');
-            Route::post('/checkout', [\App\Http\Controllers\BillingController::class, 'checkout'])->name('checkout');
-            Route::get('/success', [\App\Http\Controllers\BillingController::class, 'success'])->name('success');
-            Route::get('/portal', [\App\Http\Controllers\BillingController::class, 'portal'])->name('portal');
-            Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\BillingController::class, 'invoice'])->name('invoice');
+            Route::get('/', [\App\Http\Controllers\Tenant\BillingController::class, 'index'])->name('index');
+            Route::post('/checkout', [\App\Http\Controllers\Tenant\BillingController::class, 'checkout'])->name('checkout');
+            Route::get('/success', [\App\Http\Controllers\Tenant\BillingController::class, 'success'])->name('success');
+            Route::get('/portal', [\App\Http\Controllers\Tenant\BillingController::class, 'portal'])->name('portal');
+            Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\Tenant\BillingController::class, 'invoice'])->name('invoice');
         });
     });
 
@@ -111,13 +124,13 @@ Route::middleware([
         ->name('api.')
         ->group(function () {
             // API Tokens Management
-            Route::get('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'index'])->name('tokens.index');
-            Route::post('/tokens', [\App\Http\Controllers\ApiTokenController::class, 'store'])->name('tokens.store');
-            Route::patch('/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'update'])->name('tokens.update');
-            Route::delete('/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('tokens.destroy');
+            Route::get('/tokens', [\App\Http\Controllers\Tenant\ApiTokenController::class, 'index'])->name('tokens.index');
+            Route::post('/tokens', [\App\Http\Controllers\Tenant\ApiTokenController::class, 'store'])->name('tokens.store');
+            Route::patch('/tokens/{tokenId}', [\App\Http\Controllers\Tenant\ApiTokenController::class, 'update'])->name('tokens.update');
+            Route::delete('/tokens/{tokenId}', [\App\Http\Controllers\Tenant\ApiTokenController::class, 'destroy'])->name('tokens.destroy');
 
             // Projects API (tenant-scoped)
-            Route::apiResource('projects', \App\Http\Controllers\Api\ProjectController::class);
+            Route::apiResource('projects', \App\Http\Controllers\Tenant\Api\ProjectController::class);
         });
 });
 
@@ -132,16 +145,16 @@ Route::middleware([
     'prevent.impersonation',
 ])->prefix('tenant-settings')->name('tenant.settings.')->group(function () {
     // Read operations
-    Route::get('/', [\App\Http\Controllers\TenantSettingsController::class, 'index'])->name('index');
-    Route::get('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'branding'])->name('branding');
-    Route::get('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'domains'])->name('domains');
+    Route::get('/', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'index'])->name('index');
+    Route::get('/branding', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'branding'])->name('branding');
+    Route::get('/domains', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'domains'])->name('domains');
 
     // Write operations (rate limited)
     Route::middleware('throttle:tenant-actions')->group(function () {
-        Route::post('/branding', [\App\Http\Controllers\TenantSettingsController::class, 'updateBranding'])->name('branding.update');
-        Route::post('/domains', [\App\Http\Controllers\TenantSettingsController::class, 'addDomain'])->name('domains.add');
-        Route::delete('/domains/{domainId}', [\App\Http\Controllers\TenantSettingsController::class, 'removeDomain'])->name('domains.remove');
-        Route::post('/features', [\App\Http\Controllers\TenantSettingsController::class, 'updateFeatures'])->name('features.update');
-        Route::post('/notifications', [\App\Http\Controllers\TenantSettingsController::class, 'updateNotifications'])->name('notifications.update');
+        Route::post('/branding', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'updateBranding'])->name('branding.update');
+        Route::post('/domains', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'addDomain'])->name('domains.add');
+        Route::delete('/domains/{domainId}', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'removeDomain'])->name('domains.remove');
+        Route::post('/features', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'updateFeatures'])->name('features.update');
+        Route::post('/notifications', [\App\Http\Controllers\Tenant\TenantSettingsController::class, 'updateNotifications'])->name('notifications.update');
     });
 });

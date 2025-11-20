@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Tenant;
+use App\Http\Controllers\Controller;
 
 use App\Http\Middleware\VerifyTenantAccess;
 use App\Mail\TeamInvitation;
@@ -142,6 +143,9 @@ class TeamController extends Controller implements HasMiddleware
 
     /**
      * Accept invitation via token.
+     *
+     * IMPORTANTE: Esta rota está no contexto do tenant (routes/tenant.php)
+     * O tenant já foi inicializado pelo middleware, não precisa initialize/end
      */
     public function acceptInvitation(Request $request)
     {
@@ -159,40 +163,41 @@ class TeamController extends Controller implements HasMiddleware
         $invitation = TenantInvitation::findByToken($validated['token']);
 
         if (! $invitation) {
-            return redirect()->route('home')->with('error', 'Convite inválido, expirado ou já aceito.');
+            return redirect()->route('tenant.dashboard')->with('error', 'Convite inválido, expirado ou já aceito.');
         }
 
         // Verificar se o convite é para o usuário autenticado
         if ($invitation->user_id !== $user->id) {
-            return redirect()->route('home')->with('error', 'Este convite não é para você.');
+            return redirect()->route('tenant.dashboard')->with('error', 'Este convite não é para você.');
+        }
+
+        // Verificar se o convite é para o tenant atual
+        $tenantId = tenant('id');
+        if ($invitation->tenant_id !== $tenantId) {
+            return redirect()->route('tenant.dashboard')->with('error', 'Este convite não é para este tenant.');
         }
 
         DB::beginTransaction();
 
         try {
-            $tenant = $invitation->tenant;
-
             // Atualizar joined_at e limpar token na pivot table
             DB::table('tenant_user')
                 ->where('user_id', $user->id)
-                ->where('tenant_id', $tenant->id)
+                ->where('tenant_id', $tenantId)
                 ->update([
                     'joined_at' => now(),
                     'invitation_token' => null,
                 ]);
 
-            // Inicializar tenant context para atribuir role via Spatie Permission
-            tenancy()->initialize($tenant);
-            setPermissionsTeamId($tenant->id);
+            // Tenant context já está inicializado pelo middleware
+            // Apenas atualizar permissões para o tenant atual
+            setPermissionsTeamId($tenantId);
 
             // Atribuir role ao usuário
             $user->assignRole($invitation->role);
 
             // Invalidar cache de acesso ao tenant
-            VerifyTenantAccess::invalidateUserAccess($user->id, $tenant->id);
-
-            // Finalizar tenant context
-            tenancy()->end();
+            VerifyTenantAccess::invalidateUserAccess($user->id, $tenantId);
 
             // Marcar convite como aceito
             $invitation->update(['accepted_at' => now()]);
@@ -200,12 +205,12 @@ class TeamController extends Controller implements HasMiddleware
             DB::commit();
 
             return redirect()
-                ->to("http://{$tenant->slug}.".config('tenancy.central_domains')[0]."/dashboard")
+                ->route('tenant.dashboard')
                 ->with('success', 'Convite aceito! Bem-vindo ao time.');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->route('home')->with('error', 'Erro ao aceitar convite: '.$e->getMessage());
+            return redirect()->route('tenant.dashboard')->with('error', 'Erro ao aceitar convite: '.$e->getMessage());
         }
     }
 

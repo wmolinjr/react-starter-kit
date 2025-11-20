@@ -42,7 +42,11 @@ class TeamInvitation extends Mailable implements ShouldQueue
      */
     public function content(): Content
     {
-        $acceptUrl = url("/accept-invitation?token={$this->token}");
+        // Gerar URL do tenant domain (não do domínio central)
+        // O convite deve ser aceito diretamente no tenant
+        $domain = $this->tenant->primaryDomain()->domain;
+        $protocol = request()->secure() ? 'https' : 'http';
+        $acceptUrl = "{$protocol}://{$domain}/accept-invitation?token={$this->token}";
 
         return new Content(
             view: 'emails.team-invitation',

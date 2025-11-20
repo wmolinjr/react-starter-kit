@@ -22,15 +22,10 @@ foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->middleware('web')->group(function () {
         // Landing page
         Route::get('/', function () {
-            return Inertia::render('welcome', [
+            return Inertia::render('central/welcome', [
                 'canRegister' => Features::enabled(Features::registration()),
             ]);
         })->name('home');
-
-        // Pricing page
-        Route::get('/pricing', function () {
-            return Inertia::render('pricing');
-        })->name('pricing');
 
         // Login é gerenciado pelo Laravel Fortify (não precisa definir aqui)
 
@@ -54,22 +49,9 @@ foreach (config('tenancy.central_domains') as $domain) {
                     ];
                 }) ?? collect();
 
-            return Inertia::render('dashboard', [
+            return Inertia::render('central/dashboard', [
                 'tenants' => $tenants,
             ]);
         })->middleware(['auth', 'verified'])->name('dashboard');
-
-        // Accept invitation (rota pública, pode não estar autenticado)
-        Route::get('/accept-invitation', function () {
-            $token = request()->query('token');
-
-            return Inertia::render('accept-invitation', [
-                'token' => $token,
-            ]);
-        })->name('accept-invitation');
-
-        Route::post('/accept-invitation', [\App\Http\Controllers\TeamController::class, 'acceptInvitation'])
-            ->middleware('auth')
-            ->name('accept-invitation.store');
     });
 }

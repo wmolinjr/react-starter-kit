@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Central;
 
+use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class AdminController extends Controller
             ->latest()
             ->paginate(15);
 
-        return Inertia::render('admin/dashboard', [
+        return Inertia::render('central/admin/dashboard', [
             'tenants' => $tenants,
             'isImpersonating' => session()->has('impersonating_tenant'),
             'impersonatingTenant' => session()->get('impersonating_tenant'),

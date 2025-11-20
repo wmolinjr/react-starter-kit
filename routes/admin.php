@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ImpersonationController;
+use App\Http\Controllers\Central\AdminController;
+use App\Http\Controllers\Central\ImpersonationController;
 use Illuminate\Support\Facades\Route;
 
 /*
