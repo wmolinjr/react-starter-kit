@@ -9,10 +9,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -68,11 +71,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * User pertence a muitos tenants (N:N via pivot)
+     *
+     * NOTA: roles e permissions agora gerenciados via Spatie Permission
      */
     public function tenants(): BelongsToMany
     {
         return $this->belongsToMany(Tenant::class)
-            ->withPivot('role', 'permissions', 'invited_at', 'invitation_token', 'joined_at')
+            ->withPivot('invited_at', 'invitation_token', 'joined_at')
             ->withTimestamps();
     }
 
@@ -90,6 +95,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Role do usuário no tenant atual
+     *
+     * NOTA: Usa Spatie Permission
      */
     public function currentTenantRole(): ?string
     {
@@ -97,72 +104,81 @@ class User extends Authenticatable implements MustVerifyEmail
             return null;
         }
 
-        return $this->tenants()
-            ->where('tenant_id', tenant('id'))
-            ->first()
-            ?->pivot
-            ->role;
+        // Obter primeira role do usuário no tenant context atual
+        return $this->roles()->first()?->name;
     }
 
     /**
      * Get user's role on a specific tenant
+     *
+     * NOTA: Usa Spatie Permission - requer tenant context
      */
     public function roleOn(Tenant|int $tenant): ?string
     {
         $tenantId = $tenant instanceof Tenant ? $tenant->id : $tenant;
 
-        return $this->tenants()
-            ->where('tenant_id', $tenantId)
-            ->first()
-            ?->pivot
-            ->role;
-    }
+        // Verificar se user pertence ao tenant
+        if (!$this->tenants()->where('tenant_id', $tenantId)->exists()) {
+            return null;
+        }
 
-    /**
-     * Verificar se user tem role específico no tenant atual
-     */
-    public function hasRole(string $role): bool
-    {
-        return $this->currentTenantRole() === $role;
-    }
+        // Salvar contexto atual
+        $currentTenantId = tenancy()->initialized ? tenant('id') : null;
 
-    /**
-     * Verificar se user tem um dos roles no tenant atual
-     */
-    public function hasAnyRole(array $roles): bool
-    {
-        return in_array($this->currentTenantRole(), $roles);
+        // Inicializar tenant context para obter role
+        $tenantModel = $tenant instanceof Tenant ? $tenant : Tenant::find($tenantId);
+        if (!$tenantModel) {
+            return null;
+        }
+
+        tenancy()->initialize($tenantModel);
+
+        // Obter primeira role do usuário (normalmente só terá uma)
+        $roleName = $this->roles()->first()?->name;
+
+        // Restaurar contexto original
+        if ($currentTenantId) {
+            tenancy()->initialize(Tenant::find($currentTenantId));
+        } else {
+            tenancy()->end();
+        }
+
+        return $roleName;
     }
 
     /**
      * Verificar se user é owner do tenant atual
+     *
+     * NOTA: Usa Spatie Permission via trait HasRoles
      */
     public function isOwner(): bool
     {
-        return $this->hasRole('owner');
+        return tenancy()->initialized && $this->hasRole('owner');
     }
 
     /**
      * Verificar se user é admin ou owner do tenant atual
+     *
+     * NOTA: Usa Spatie Permission via trait HasRoles
      */
     public function isAdminOrOwner(): bool
     {
-        return $this->hasAnyRole(['owner', 'admin']);
+        return tenancy()->initialized && $this->hasAnyRole(['owner', 'admin']);
     }
 
     /**
      * Verificar se user tem permissão específica no tenant atual
+     *
+     * NOTA: Usa Spatie Permission via trait HasRoles
+     * Use hasPermissionTo() diretamente para checagens de permissions
      */
     public function hasPermissionInTenant(string $permission): bool
     {
-        $role = $this->currentTenantRole();
+        if (!tenancy()->initialized) {
+            return false;
+        }
 
-        return match($role) {
-            'owner', 'admin' => true,
-            'member' => in_array($permission, ['read', 'create', 'update']),
-            'guest' => in_array($permission, ['read']),
-            default => false,
-        };
+        return $this->hasPermissionTo($permission);
     }
 
     /**
@@ -199,5 +215,16 @@ class User extends Authenticatable implements MustVerifyEmail
         tenancy()->initialize($tenant);
 
         return true;
+    }
+
+    /**
+     * Activity Log Options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

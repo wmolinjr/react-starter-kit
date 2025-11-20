@@ -6,12 +6,14 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Project extends Model implements HasMedia
 {
-    use HasFactory, BelongsToTenant, InteractsWithMedia;
+    use HasFactory, BelongsToTenant, InteractsWithMedia, LogsActivity;
 
     /**
      * Mass assignment protection
@@ -72,5 +74,16 @@ class Project extends Model implements HasMedia
     public function scopeArchived($query)
     {
         return $query->where('status', 'archived');
+    }
+
+    /**
+     * Activity Log Options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'description', 'status'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

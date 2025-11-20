@@ -42,14 +42,13 @@ foreach (config('tenancy.central_domains') as $domain) {
             $user = auth()->user();
 
             $tenants = $user?->tenants()
-                ->withPivot('role', 'joined_at')
                 ->get()
-                ->map(function ($tenant) {
+                ->map(function ($tenant) use ($user) {
                     return [
                         'id' => $tenant->id,
                         'name' => $tenant->name,
                         'slug' => $tenant->slug,
-                        'role' => $tenant->pivot->role,
+                        'role' => $user->roleOn($tenant), // Usa Spatie Permission
                         'joined_at' => $tenant->pivot->joined_at,
                         'url' => "http://{$tenant->slug}.".config('tenancy.central_domains')[0],
                     ];

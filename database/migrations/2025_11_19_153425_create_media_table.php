@@ -11,6 +11,9 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table) {
             $table->id();
 
+            // Tenant isolation - CRITICAL for security
+            $table->unsignedBigInteger('tenant_id')->nullable()->index();
+
             $table->morphs('model');
             $table->uuid()->nullable()->unique();
             $table->string('collection_name');
@@ -27,6 +30,12 @@ return new class extends Migration
             $table->unsignedInteger('order_column')->nullable()->index();
 
             $table->nullableTimestamps();
+
+            // Foreign key to tenants table
+            $table->foreign('tenant_id')
+                ->references('id')
+                ->on('tenants')
+                ->onDelete('cascade');
         });
     }
 };

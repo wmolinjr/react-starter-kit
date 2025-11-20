@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('tenant_user', function (Blueprint $table) {
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->enum('role', ['owner', 'admin', 'member', 'guest'])->default('member');
-            $table->json('permissions')->nullable();
+
+            // ROLES & PERMISSIONS: Gerenciados via Spatie laravel-permission
+            // Removido: enum('role') e json('permissions')
+            // Agora usa: model_has_roles e model_has_permissions tables
+
             $table->timestamp('invited_at')->nullable();
             $table->string('invitation_token')->nullable()->unique();
             $table->timestamp('joined_at')->nullable();

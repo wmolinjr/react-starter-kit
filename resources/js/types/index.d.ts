@@ -15,7 +15,7 @@ export interface User {
 }
 
 export interface TenantInfo {
-    id: string;
+    id: number;
     name: string;
     slug: string;
     role: string | null;
@@ -48,7 +48,7 @@ export interface TenantSubscription {
 }
 
 export interface Tenant {
-    id: string;
+    id: number;
     name: string;
     slug: string;
     domain: string;

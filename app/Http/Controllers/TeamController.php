@@ -24,15 +24,14 @@ class TeamController extends Controller
         $tenant = tenant();
 
         $members = $tenant->users()
-            ->withPivot('role', 'permissions', 'invited_at', 'joined_at', 'invitation_token')
             ->get()
             ->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'role' => $user->pivot->role,
-                    'permissions' => $user->pivot->permissions,
+                    'role' => $user->roles()->first()?->name, // Spatie Permission
+                    'permissions' => $user->getAllPermissions()->pluck('name'), // Spatie Permission
                     'invited_at' => $user->pivot->invited_at,
                     'joined_at' => $user->pivot->joined_at,
                     'is_pending' => is_null($user->pivot->joined_at),
@@ -95,11 +94,14 @@ class TeamController extends Controller
 
             // Adicionar ao tenant com status pendente
             $tenant->users()->attach($user->id, [
-                'role' => $validated['role'],
                 'invited_at' => now(),
                 'joined_at' => null,
                 'invitation_token' => $invitationToken,
             ]);
+
+            // TODO: Store pending role in session or separate table
+            // For now, role will be assigned when invitation is accepted
+            // Could use: session(["invitation_{$invitationToken}" => $validated['role']])
 
             // Enviar email de convite
             Mail::to($user->email)->send(new TeamInvitation(
@@ -181,11 +183,8 @@ class TeamController extends Controller
             return back()->with('error', 'Você não pode alterar sua própria role.');
         }
 
-        // Apenas owners podem alterar role de outros owners
-        $isTargetOwner = $tenant->users()
-            ->wherePivot('user_id', $user->id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        // Verificar se target user é owner (via Spatie Permission)
+        $isTargetOwner = $user->hasRole('owner');
 
         $currentUserRole = $currentUser->roleOn($tenant);
 
@@ -194,25 +193,22 @@ class TeamController extends Controller
         }
 
         // Prevenir remoção do último owner
-        if ($validated['role'] !== 'owner') {
-            $ownerCount = $tenant->users()
-                ->wherePivot('role', 'owner')
-                ->count();
+        if ($validated['role'] !== 'owner' && $isTargetOwner) {
+            // Contar owners usando Spatie Permission
+            $ownerCount = \Spatie\Permission\Models\Role::findByName('owner')->users()->count();
 
-            $isTargetOwner = $tenant->users()
-                ->wherePivot('user_id', $user->id)
-                ->wherePivot('role', 'owner')
-                ->exists();
-
-            if ($ownerCount === 1 && $isTargetOwner) {
+            if ($ownerCount === 1) {
                 return back()->with('error', 'Não é possível alterar a role do único owner. Promova outro membro primeiro.');
             }
         }
 
-        // Atualizar role
-        $tenant->users()->updateExistingPivot($user->id, [
-            'role' => $validated['role'],
-        ]);
+        // Atualizar role via Spatie Permission
+        DB::transaction(function () use ($user, $validated) {
+            // Remove todas as roles anteriores
+            $user->syncRoles([]);
+            // Atribui nova role
+            $user->assignRole($validated['role']);
+        });
 
         return back()->with('success', 'Role atualizada com sucesso!');
     }
@@ -233,10 +229,8 @@ class TeamController extends Controller
         }
 
         // Prevenir remoção de qualquer owner (deve rebaixar primeiro)
-        $isTargetOwner = $tenant->users()
-            ->wherePivot('user_id', $user->id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        // Verifica via Spatie Permission
+        $isTargetOwner = $user->hasRole('owner');
 
         if ($isTargetOwner) {
             abort(403, 'Não é possível remover um owner diretamente. Altere a role primeiro.');

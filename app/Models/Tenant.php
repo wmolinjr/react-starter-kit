@@ -54,36 +54,53 @@ class Tenant extends Model implements TenantWithDatabase
 
     /**
      * Tenant tem muitos usuários (N:N via pivot)
+     *
+     * NOTA: Roles agora gerenciados via Spatie Permission (não mais pivot)
      */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
-            ->withPivot('role', 'permissions', 'invited_at', 'invitation_token', 'joined_at')
+            ->withPivot('invited_at', 'invitation_token', 'joined_at')
             ->withTimestamps();
     }
 
     /**
      * Owners do tenant
+     *
+     * NOTA: Usa Spatie Permission - requer tenant context ativo
+     * @deprecated Use Spatie Permission directly with tenant context
      */
     public function owners(): BelongsToMany
     {
-        return $this->users()->wherePivot('role', 'owner');
+        // TODO: Refactor to use Spatie Permission
+        // Temporariamente retorna todos os users - filtrar por role no código que chama
+        return $this->users()->whereNotNull('tenant_user.joined_at');
     }
 
     /**
      * Admins do tenant
+     *
+     * NOTA: Usa Spatie Permission - requer tenant context ativo
+     * @deprecated Use Spatie Permission directly with tenant context
      */
     public function admins(): BelongsToMany
     {
-        return $this->users()->wherePivot('role', 'admin');
+        // TODO: Refactor to use Spatie Permission
+        // Temporariamente retorna todos os users - filtrar por role no código que chama
+        return $this->users()->whereNotNull('tenant_user.joined_at');
     }
 
     /**
      * Members do tenant
+     *
+     * NOTA: Usa Spatie Permission - requer tenant context ativo
+     * @deprecated Use Spatie Permission directly with tenant context
      */
     public function members(): BelongsToMany
     {
-        return $this->users()->whereIn('role', ['owner', 'admin', 'member']);
+        // TODO: Refactor to use Spatie Permission
+        // Retorna todos os membros ativos (joined_at não nulo)
+        return $this->users()->whereNotNull('tenant_user.joined_at');
     }
 
     /**

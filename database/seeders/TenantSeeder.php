@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -57,11 +59,17 @@ class TenantSeeder extends Seeder
         DB::table('tenant_user')->insert([
             'tenant_id' => $tenant1Id,
             'user_id' => $tenant1Owner->id,
-            'role' => 'owner',
             'joined_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Assign owner role via Spatie Permission (requires tenant context)
+        $tenant1 = Tenant::find($tenant1Id);
+        tenancy()->initialize($tenant1);
+        Role::findOrCreate('owner', 'web'); // Create role if doesn't exist
+        $tenant1Owner->assignRole('owner');
+        tenancy()->end();
 
         // Tenant 2
         $tenant2Id = DB::table('tenants')->insertGetId([
@@ -98,11 +106,17 @@ class TenantSeeder extends Seeder
         DB::table('tenant_user')->insert([
             'tenant_id' => $tenant2Id,
             'user_id' => $tenant2Owner->id,
-            'role' => 'owner',
             'joined_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Assign owner role via Spatie Permission (requires tenant context)
+        $tenant2 = Tenant::find($tenant2Id);
+        tenancy()->initialize($tenant2);
+        Role::findOrCreate('owner', 'web'); // Create role if doesn't exist
+        $tenant2Owner->assignRole('owner');
+        tenancy()->end();
 
         $this->command->info('✅ Tenants created successfully!');
         $this->command->info('  - tenant1.localhost (john@acme.com / password)');
