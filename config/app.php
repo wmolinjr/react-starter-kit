@@ -43,6 +43,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Content Security Policy (CSP)
+    |--------------------------------------------------------------------------
+    |
+    | Enable or disable Content Security Policy headers. In development, you
+    | may want to disable CSP if you're having issues with Vite or browser
+    | extensions. Always keep enabled in production for security.
+    |
+    */
+
+    'csp_enabled' => env('CSP_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |

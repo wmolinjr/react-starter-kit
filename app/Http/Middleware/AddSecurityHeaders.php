@@ -83,10 +83,17 @@ class AddSecurityHeaders
      * - Self-hosted scripts, styles, images
      * - Vite dev server in development
      * - No inline scripts/styles (use nonce or hash if needed)
+     *
+     * To disable CSP in development (for debugging), set CSP_ENABLED=false in .env
      */
     protected function getContentSecurityPolicy(Request $request): string
     {
         $isLocal = app()->environment('local');
+
+        // Allow disabling CSP in development for debugging
+        if ($isLocal && config('app.csp_enabled', true) === false) {
+            return '';
+        }
 
         $directives = [
             // Default fallback for all resources
@@ -97,21 +104,23 @@ class AddSecurityHeaders
                 ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:*"
                 : "script-src 'self'",
 
-            // Styles: Allow self + Vite in development
+            // Styles: Allow self + Vite in development + Bunny Fonts (GDPR-compliant font service)
             $isLocal
-                ? "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*"
-                : "style-src 'self' 'unsafe-inline'", // unsafe-inline needed for dynamic styles
+                ? "style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.bunny.net"
+                : "style-src 'self' 'unsafe-inline' https://fonts.bunny.net", // unsafe-inline needed for dynamic styles
 
             // Images: Allow self, data URLs, and HTTPS images
             "img-src 'self' data: https:",
 
-            // Fonts: Allow self
-            "font-src 'self' data:",
-
-            // Connect (AJAX, WebSocket): Allow self + Vite HMR + tenant subdomains in development
+            // Fonts: Allow self + Vite in development + Bunny Fonts (GDPR-compliant font service)
             $isLocal
-                ? "connect-src 'self' ws://localhost:* ws://127.0.0.1:* ws://*.localhost http://localhost:* http://127.0.0.1:* http://*.localhost"
-                : "connect-src 'self'",
+                ? "font-src 'self' data: http://localhost:* http://127.0.0.1:* https://fonts.bunny.net"
+                : "font-src 'self' data: https://fonts.bunny.net",
+
+            // Connect (AJAX, WebSocket): Allow self + Vite HMR + tenant subdomains in development + Bunny Fonts
+            $isLocal
+                ? "connect-src 'self' ws://localhost:* ws://127.0.0.1:* ws://*.localhost http://localhost:* http://127.0.0.1:* http://*.localhost https://fonts.bunny.net"
+                : "connect-src 'self' https://fonts.bunny.net",
 
             // Media: Allow self
             "media-src 'self'",
