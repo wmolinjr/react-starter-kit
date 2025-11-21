@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Laravel\Pennant\Feature;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -151,6 +152,7 @@ class HandleInertiaRequests extends Middleware
             'domain' => $request->getHost(),
             'settings' => current_tenant()->settings,
             'subscription' => $this->getTenantSubscription(current_tenant()),
+            'plan' => $this->getPlanData(current_tenant()),
         ];
     }
 
@@ -175,6 +177,55 @@ class HandleInertiaRequests extends Middleware
             'on_trial' => $subscription->onTrial(),
             'ends_at' => $subscription->ends_at?->toISOString(),
             'trial_ends_at' => $subscription->trial_ends_at?->toISOString(),
+        ];
+    }
+
+    /**
+     * Get plan data for the current tenant.
+     */
+    protected function getPlanData($tenant): ?array
+    {
+        if (! $tenant || ! $tenant->plan) {
+            return null;
+        }
+
+        $plan = $tenant->plan;
+
+        // Get features using Pennant
+        $features = [
+            'customRoles' => Feature::for($tenant)->active('customRoles'),
+            'apiAccess' => Feature::for($tenant)->active('apiAccess'),
+            'advancedReports' => Feature::for($tenant)->active('advancedReports'),
+            'sso' => Feature::for($tenant)->active('sso'),
+            'whiteLabel' => Feature::for($tenant)->active('whiteLabel'),
+        ];
+
+        // Get limits using Pennant (rich values)
+        $limits = [
+            'users' => Feature::for($tenant)->value('maxUsers'),
+            'projects' => Feature::for($tenant)->value('maxProjects'),
+            'storage' => Feature::for($tenant)->value('storageLimit'),
+        ];
+
+        // Get current usage
+        $usage = [
+            'users' => $tenant->getCurrentUsage('users'),
+            'projects' => $tenant->getCurrentUsage('projects'),
+            'storage' => $tenant->getCurrentUsage('storage'),
+        ];
+
+        return [
+            'id' => $plan->id,
+            'name' => $plan->name,
+            'slug' => $plan->slug,
+            'description' => $plan->description,
+            'price' => $plan->price,
+            'formatted_price' => $plan->formatted_price,
+            'features' => $features,
+            'limits' => $limits,
+            'usage' => $usage,
+            'is_on_trial' => $tenant->isOnTrial(),
+            'trial_ends_at' => $tenant->trial_ends_at?->toISOString(),
         ];
     }
 }

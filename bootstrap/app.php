@@ -110,6 +110,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant.access' => VerifyTenantAccess::class,
             'prevent.impersonation' => PreventActionsWhileImpersonating::class,
 
+            // Plan middleware (feature and limit enforcement)
+            'feature' => \App\Http\Middleware\CheckFeature::class,
+            'limit' => \App\Http\Middleware\CheckLimit::class,
+
             // Spatie Permission middleware (for permission-based authorization)
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,

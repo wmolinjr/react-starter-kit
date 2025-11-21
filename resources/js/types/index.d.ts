@@ -41,6 +41,40 @@ export interface TenantSubscription {
     trial_ends_at: string | null;
 }
 
+export interface PlanFeatures {
+    customRoles: boolean;
+    apiAccess: boolean;
+    advancedReports: boolean;
+    sso: boolean;
+    whiteLabel: boolean;
+}
+
+export interface PlanLimits {
+    users: number;
+    projects: number;
+    storage: number;
+}
+
+export interface PlanUsage {
+    users: number;
+    projects: number;
+    storage: number;
+}
+
+export interface Plan {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    price: number;
+    formatted_price: string;
+    features: PlanFeatures;
+    limits: PlanLimits;
+    usage: PlanUsage;
+    is_on_trial: boolean;
+    trial_ends_at: string | null;
+}
+
 export interface Tenant {
     id: number;
     name: string;
@@ -48,6 +82,7 @@ export interface Tenant {
     domain: string;
     settings: Record<string, unknown> | null;
     subscription: TenantSubscription | null;
+    plan: Plan | null;
 }
 
 export interface Impersonation {

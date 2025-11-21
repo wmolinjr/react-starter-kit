@@ -58,6 +58,29 @@ class SyncPermissions extends Command
         ['name' => 'tenant.apiTokens:view', 'description' => 'View API tokens', 'category' => 'apiTokens'],
         ['name' => 'tenant.apiTokens:create', 'description' => 'Create API tokens', 'category' => 'apiTokens'],
         ['name' => 'tenant.apiTokens:delete', 'description' => 'Delete API tokens', 'category' => 'apiTokens'],
+
+        // Custom Roles (Pro+) - 4 permissions
+        ['name' => 'tenant.roles:view', 'description' => 'View custom roles', 'category' => 'roles'],
+        ['name' => 'tenant.roles:create', 'description' => 'Create custom roles', 'category' => 'roles'],
+        ['name' => 'tenant.roles:edit', 'description' => 'Edit custom roles', 'category' => 'roles'],
+        ['name' => 'tenant.roles:delete', 'description' => 'Delete custom roles', 'category' => 'roles'],
+
+        // Advanced Reports (Enterprise) - 4 permissions
+        ['name' => 'tenant.reports:view', 'description' => 'View reports', 'category' => 'reports'],
+        ['name' => 'tenant.reports:export', 'description' => 'Export reports', 'category' => 'reports'],
+        ['name' => 'tenant.reports:schedule', 'description' => 'Schedule reports', 'category' => 'reports'],
+        ['name' => 'tenant.reports:customize', 'description' => 'Customize reports', 'category' => 'reports'],
+
+        // SSO (Enterprise) - 3 permissions
+        ['name' => 'tenant.sso:configure', 'description' => 'Configure SSO', 'category' => 'sso'],
+        ['name' => 'tenant.sso:manage', 'description' => 'Manage SSO providers', 'category' => 'sso'],
+        ['name' => 'tenant.sso:testConnection', 'description' => 'Test SSO connection', 'category' => 'sso'],
+
+        // White Label (Enterprise) - 4 permissions
+        ['name' => 'tenant.branding:view', 'description' => 'View branding', 'category' => 'branding'],
+        ['name' => 'tenant.branding:edit', 'description' => 'Edit branding', 'category' => 'branding'],
+        ['name' => 'tenant.branding:preview', 'description' => 'Preview branding', 'category' => 'branding'],
+        ['name' => 'tenant.branding:publish', 'description' => 'Publish branding', 'category' => 'branding'],
     ];
 
     /**
