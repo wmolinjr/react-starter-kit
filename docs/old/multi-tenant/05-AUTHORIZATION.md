@@ -461,7 +461,7 @@ export default function Dashboard() {
 
 ## Próximo Passo
 
-➡️ **[06-TEAM-MANAGEMENT.md](./06-TEAM-MANAGEMENT.md)** - Gerenciamento de Equipes
+➡️ **[06-TEAM-MANAGEMENT.md](06-TEAM-MANAGEMENT.md)** - Gerenciamento de Equipes
 
 ---
 

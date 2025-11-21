@@ -609,7 +609,7 @@ export function InviteMemberDialog({ open, onClose, roles }: Props) {
 
 ## Próximo Passo
 
-➡️ **[07-BILLING.md](./07-BILLING.md)** - Sistema de Assinaturas
+➡️ **[07-BILLING.md](07-BILLING.md)** - Sistema de Assinaturas
 
 ---
 

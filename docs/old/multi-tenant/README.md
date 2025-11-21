@@ -23,43 +23,43 @@ Este boilerplate fornece uma base sólida para criar aplicações SaaS multi-ten
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 00 | [OVERVIEW.md](./00-OVERVIEW.md) | Visão geral da arquitetura e decisões técnicas | ✅ |
-| 01 | [SETUP.md](./01-SETUP.md) | Instalação de pacotes e configuração inicial | ✅ |
-| 02 | [DATABASE.md](./02-DATABASE.md) | Schema completo e migrations | ✅ |
-| 03 | [MODELS.md](./03-MODELS.md) | Models, relacionamentos e traits | ✅ |
+| 00 | [OVERVIEW.md](00-OVERVIEW.md) | Visão geral da arquitetura e decisões técnicas | ✅ |
+| 01 | [SETUP.md](01-SETUP.md) | Instalação de pacotes e configuração inicial | ✅ |
+| 02 | [DATABASE.md](02-DATABASE.md) | Schema completo e migrations | ✅ |
+| 03 | [MODELS.md](03-MODELS.md) | Models, relacionamentos e traits | ✅ |
 
 ### Core Features
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 04 | [ROUTING.md](./04-ROUTING.md) | Estratégia de rotas (central vs tenant) | ✅ |
-| 05 | [AUTHORIZATION.md](./05-AUTHORIZATION.md) | Roles, permissões e gates | ✅ |
-| 06 | [TEAM-MANAGEMENT.md](./06-TEAM-MANAGEMENT.md) | Sistema de convites e gerenciamento de equipe | ✅ |
-| 07 | [BILLING.md](./07-BILLING.md) | Cashier, Stripe, planos e assinaturas | ✅ |
+| 04 | [ROUTING.md](04-ROUTING.md) | Estratégia de rotas (central vs tenant) | ✅ |
+| 05 | [AUTHORIZATION.md](05-AUTHORIZATION.md) | Roles, permissões e gates | ✅ |
+| 06 | [TEAM-MANAGEMENT.md](06-TEAM-MANAGEMENT.md) | Sistema de convites e gerenciamento de equipe | ✅ |
+| 07 | [BILLING.md](07-BILLING.md) | Cashier, Stripe, planos e assinaturas | ✅ |
 
 ### Advanced Features
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 08 | [FILE-STORAGE.md](./08-FILE-STORAGE.md) | Spatie MediaLibrary tenant-isolated | ✅ |
-| 09 | [IMPERSONATION.md](./09-IMPERSONATION.md) | Super admin impersonation | ✅ |
-| 10 | [API-TOKENS.md](./10-API-TOKENS.md) | Laravel Sanctum tenant-scoped | ✅ |
-| 11 | [TENANT-SETTINGS.md](./11-TENANT-SETTINGS.md) | Settings JSON, branding, custom domains | ✅ |
+| 08 | [FILE-STORAGE.md](08-FILE-STORAGE.md) | Spatie MediaLibrary tenant-isolated | ✅ |
+| 09 | [IMPERSONATION.md](09-IMPERSONATION.md) | Super admin impersonation | ✅ |
+| 10 | [API-TOKENS.md](10-API-TOKENS.md) | Laravel Sanctum tenant-scoped | ✅ |
+| 11 | [TENANT-SETTINGS.md](11-TENANT-SETTINGS.md) | Settings JSON, branding, custom domains | ✅ |
 
 ### Frontend & Testing
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 12 | [INERTIA-INTEGRATION.md](./12-INERTIA-INTEGRATION.md) | Shared props, hooks, TypeScript types | ✅ |
-| 13 | [TESTING.md](./13-TESTING.md) | Feature tests com tenant isolation | ✅ |
+| 12 | [INERTIA-INTEGRATION.md](12-INERTIA-INTEGRATION.md) | Shared props, hooks, TypeScript types | ✅ |
+| 13 | [TESTING.md](13-TESTING.md) | Feature tests com tenant isolation | ✅ |
 
 ### Production
 
 | # | Arquivo | Descrição | Status |
 |---|---------|-----------|--------|
-| 14 | [DEPLOYMENT.md](./14-DEPLOYMENT.md) | Nginx, SSL, queue workers, deploy | ✅ |
-| 15 | [SECURITY.md](./15-SECURITY.md) | Checklist completo de segurança | ✅ |
-| 99 | [TROUBLESHOOTING.md](./99-TROUBLESHOOTING.md) | Problemas comuns e soluções | ✅ |
+| 14 | [DEPLOYMENT.md](14-DEPLOYMENT.md) | Nginx, SSL, queue workers, deploy | ✅ |
+| 15 | [SECURITY.md](15-SECURITY.md) | Checklist completo de segurança | ✅ |
+| 99 | [TROUBLESHOOTING.md](99-TROUBLESHOOTING.md) | Problemas comuns e soluções | ✅ |
 
 ---
 
@@ -67,7 +67,7 @@ Este boilerplate fornece uma base sólida para criar aplicações SaaS multi-ten
 
 ### 1. Leia a Visão Geral
 
-Comece por [00-OVERVIEW.md](./00-OVERVIEW.md) para entender a arquitetura geral.
+Comece por [00-OVERVIEW.md](00-OVERVIEW.md) para entender a arquitetura geral.
 
 ### 2. Siga em Ordem
 
@@ -313,7 +313,7 @@ Criamos um **agente especializado** que implementa o sistema seguindo rigorosame
 
 ### Como Usar o Agente
 
-**Leia primeiro:** [HOW-TO-USE-AGENT.md](./HOW-TO-USE-AGENT.md)
+**Leia primeiro:** [HOW-TO-USE-AGENT.md](HOW-TO-USE-AGENT.md)
 
 **Quick Start:**
 ```
@@ -333,9 +333,9 @@ Comece pela Etapa 1 (Setup Inicial)."
 
 | Arquivo | Descrição |
 |---------|-----------|
-| [AGENT-GUIDE.md](./AGENT-GUIDE.md) | Guia completo do agente (workflow, regras, princípios) |
-| [HOW-TO-USE-AGENT.md](./HOW-TO-USE-AGENT.md) | Como invocar e interagir com o agente |
-| [IMPLEMENTATION-LOG.md](./IMPLEMENTATION-LOG.md) | Log de progresso (atualizado pelo agente) |
+| [AGENT-GUIDE.md](AGENT-GUIDE.md) | Guia completo do agente (workflow, regras, princípios) |
+| [HOW-TO-USE-AGENT.md](HOW-TO-USE-AGENT.md) | Como invocar e interagir com o agente |
+| [IMPLEMENTATION-LOG.md](IMPLEMENTATION-LOG.md) | Log de progresso (atualizado pelo agente) |
 
 ---
 

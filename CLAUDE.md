@@ -288,6 +288,54 @@ sail artisan permissions:sync
 
 **See**: [docs/PERMISSIONS.md](docs/PERMISSIONS.md) for complete permission list and usage.
 
+## Plans System (Hybrid Architecture)
+
+**⚠️ CRITICAL**: Before making ANY changes to the Plans system, read `docs/PLANS-REFERENCE.md`
+
+**Architecture**: Database + Laravel Pennant + Spatie Permission
+
+**Quick Commands**:
+```bash
+# Sync plan permissions
+sail artisan plans:sync-permissions
+
+# Seed plans (Starter, Professional, Enterprise)
+sail artisan db:seed --class=PlanSeeder
+
+# Run plan tests
+sail artisan test --filter=Plan
+```
+
+**Key Concepts**:
+- **Plans** (Database): Defines subscription tiers with features, limits, and permission mappings
+- **Pennant** (Feature Flags): Resolves features and limits at runtime
+- **Spatie Permission**: Maps plan features to granular user permissions
+
+**Usage**:
+```php
+// Backend - Check features
+use Laravel\Pennant\Feature;
+if (Feature::for($tenant)->active('customRoles')) { }
+
+// Backend - Check limits
+if ($tenant->hasReachedLimit('users')) { }
+
+// Frontend - React hook
+const { hasFeature, hasReachedLimit } = usePlan();
+```
+
+**⚠️ DO NOT**:
+- Change the three-pillar architecture (Database + Pennant + Spatie)
+- Bypass `Feature::for()` by checking plan JSON directly
+- Modify `plan_enabled_permissions` manually (auto-generated)
+- Remove observer triggers (breaks permission sync)
+- Hardcode plan checks (use features instead)
+
+**Documentation**:
+- **[docs/PLANS-REFERENCE.md](docs/PLANS-REFERENCE.md)** - Complete reference guide (READ THIS FIRST)
+- **[docs/PLANS-IMPLEMENTATION-COMPLETE.md](docs/PLANS-IMPLEMENTATION-COMPLETE.md)** - Implementation summary
+- **[docs/PLANS-HYBRID-ARCHITECTURE.md](docs/PLANS-HYBRID-ARCHITECTURE.md)** - Architecture deep dive
+
 ## Testing
 
 ```bash

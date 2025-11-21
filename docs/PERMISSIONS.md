@@ -17,21 +17,24 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 ## 📋 Índice
 
 1. [Estrutura Completa](#estrutura-completa)
-2. [Convenções de Nomenclatura](#convenções-de-nomenclatura)
-3. [Comando de Sincronização](#comando-de-sincronização)
-4. [Backend: Como Usar Permissions](#backend-como-usar-permissions)
-5. [Frontend: Como Usar Permissions](#frontend-como-usar-permissions)
-6. [Como Adicionar Novas Permissions](#como-adicionar-novas-permissions)
-7. [Roles MVP](#roles-mvp)
-8. [Arquitetura](#arquitetura)
-9. [Testing](#testing)
-10. [Troubleshooting](#troubleshooting)
+2. [Plans System Integration](#plans-system-integration) ⭐ NEW
+3. [Convenções de Nomenclatura](#convenções-de-nomenclatura)
+4. [Comando de Sincronização](#comando-de-sincronização)
+5. [Backend: Como Usar Permissions](#backend-como-usar-permissions)
+6. [Frontend: Como Usar Permissions](#frontend-como-usar-permissions)
+7. [Como Adicionar Novas Permissions](#como-adicionar-novas-permissions)
+8. [Roles MVP](#roles-mvp)
+9. [Arquitetura](#arquitetura)
+10. [Testing](#testing)
+11. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Estrutura Completa
 
-### Permissions (22 total)
+### Permissions (37 total: 22 base + 15 enterprise)
+
+**⚠️ IMPORTANTE**: Este sistema está integrado com o **Plans System**. Permissions enterprise (15) são habilitadas apenas para tenants com planos que incluem as features correspondentes. Ver [Plans System Integration](#plans-system-integration).
 
 #### 📦 Projects (8 permissions)
 
@@ -79,6 +82,228 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 | `tenant.apiTokens:view` | View API tokens | ✅ | ❌ | ❌ |
 | `tenant.apiTokens:create` | Create API tokens | ✅ | ❌ | ❌ |
 | `tenant.apiTokens:delete` | Delete API tokens | ✅ | ❌ | ❌ |
+
+---
+
+### Enterprise Permissions (15 total)
+
+**⚠️ PLAN-GATED**: These permissions are only available to tenants with plans that include the corresponding features.
+
+#### 🎭 Custom Roles (4 permissions)
+
+**Required Plan Feature**: `customRoles` (Professional+)
+
+| Permission | Descrição | Available When |
+|------------|-----------|----------------|
+| `tenant.roles:view` | View custom roles | Plan has `customRoles` feature |
+| `tenant.roles:create` | Create custom roles | Plan has `customRoles` feature |
+| `tenant.roles:edit` | Edit custom roles | Plan has `customRoles` feature |
+| `tenant.roles:delete` | Delete custom roles | Plan has `customRoles` feature |
+
+#### 📊 Advanced Reports (4 permissions)
+
+**Required Plan Feature**: `advancedReports` (Enterprise only)
+
+| Permission | Descrição | Available When |
+|------------|-----------|----------------|
+| `tenant.reports:view` | View advanced reports | Plan has `advancedReports` feature |
+| `tenant.reports:create` | Create custom reports | Plan has `advancedReports` feature |
+| `tenant.reports:edit` | Edit custom reports | Plan has `advancedReports` feature |
+| `tenant.reports:export` | Export reports | Plan has `advancedReports` feature |
+
+#### 🔐 Single Sign-On (3 permissions)
+
+**Required Plan Feature**: `sso` (Enterprise only)
+
+| Permission | Descrição | Available When |
+|------------|-----------|----------------|
+| `tenant.sso:view` | View SSO settings | Plan has `sso` feature |
+| `tenant.sso:configure` | Configure SSO | Plan has `sso` feature |
+| `tenant.sso:manage` | Manage SSO providers | Plan has `sso` feature |
+
+#### 🎨 White Label (4 permissions)
+
+**Required Plan Feature**: `whiteLabel` (Enterprise only)
+
+| Permission | Descrição | Available When |
+|------------|-----------|----------------|
+| `tenant.branding:view` | View branding settings | Plan has `whiteLabel` feature |
+| `tenant.branding:edit` | Edit branding | Plan has `whiteLabel` feature |
+| `tenant.branding:uploadLogo` | Upload custom logo | Plan has `whiteLabel` feature |
+| `tenant.branding:customDomain` | Configure custom domain | Plan has `whiteLabel` feature |
+
+---
+
+## Plans System Integration
+
+**CRITICAL**: Este sistema de permissions está integrado com o **Hybrid Plans Architecture** (Database + Laravel Pennant + Spatie Permission).
+
+### Como Funciona
+
+```
+┌─────────────────┐
+│   PLAN MODEL    │  Features: {customRoles: true, sso: true}
+│  (Database)     │  Permission Map: {customRoles: ["tenant.roles:*"]}
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ PENNANT FEATURES│  Feature::for($tenant)->active('customRoles')
+│   (Runtime)     │  Returns: true/false based on plan + overrides
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ GATE::BEFORE()  │  Checks if permission is in plan_enabled_permissions
+│ (Authorization) │  If YES: proceed to Spatie check
+└────────┬────────┘  If NO: deny access
+         │
+         ▼
+┌─────────────────┐
+│ SPATIE PERMISSION│ $user->can('tenant.roles:view')
+│  (User-level)   │  Checks if USER has the permission via role
+└─────────────────┘
+```
+
+### Wildcard Expansion
+
+**Example**: Professional plan enables `customRoles` feature
+
+```json
+// Plan.permission_map
+{
+  "customRoles": ["tenant.roles:*"]
+}
+```
+
+When tenant upgrades to Professional plan:
+1. `tenant.roles:*` expands to all 4 permissions: `view`, `create`, `edit`, `delete`
+2. These 4 permissions are added to `tenant.plan_enabled_permissions` (cached)
+3. `Gate::before()` allows access if permission is in cache
+4. Spatie checks if USER (not just tenant) has the permission
+
+**Expansion happens in**: `app/Models/Plan.php:98-116` (expandPermissions method)
+
+### Permission Sync on Plan Change
+
+When a tenant's plan changes, permissions are automatically synced via **TenantObserver**:
+
+```php
+// app/Observers/TenantObserver.php
+public function updated(Tenant $tenant): void
+{
+    if ($tenant->isDirty('plan_id')) {
+        // 1. Regenerate plan permissions
+        $tenant->regeneratePlanPermissions();
+
+        // 2. Flush Pennant cache
+        Feature::flushCache($tenant);
+    }
+}
+```
+
+### Checking Plan Permissions in Code
+
+#### Backend
+
+```php
+use Laravel\Pennant\Feature;
+
+// Check if tenant's plan allows the feature
+if (Feature::for($tenant)->active('customRoles')) {
+    // Feature is enabled by plan
+
+    // Still need to check if USER has the permission
+    if ($user->can('tenant.roles:view')) {
+        // User has both: plan feature + user permission
+        return view('roles.index');
+    }
+}
+```
+
+**Gate::before() in AppServiceProvider.php:61-77**:
+```php
+Gate::before(function (User $user, string $ability) {
+    // If ability starts with "tenant.", check plan permissions
+    if (str_starts_with($ability, 'tenant.')) {
+        $tenant = tenant();
+
+        // Check if permission is enabled by tenant's plan
+        $planPermissions = $tenant?->getPlanEnabledPermissions() ?? [];
+        if (!in_array($ability, $planPermissions)) {
+            return false; // Plan doesn't allow this permission
+        }
+    }
+
+    // Continue to Spatie Permission check
+    return null;
+});
+```
+
+#### Frontend
+
+```tsx
+import { usePlan } from '@/hooks/use-plan';
+import { usePermissions } from '@/hooks/use-permissions';
+
+export function RolesPage() {
+    const { hasFeature } = usePlan();
+    const { has } = usePermissions();
+
+    // Check both: plan feature AND user permission
+    if (!hasFeature('customRoles')) {
+        return <UpgradePrompt feature="Custom Roles" />;
+    }
+
+    if (!has('tenant.roles:view')) {
+        return <NoAccessMessage />;
+    }
+
+    return <RolesList />;
+}
+```
+
+### Two-Level Authorization
+
+**Level 1: Plan (Tenant-level)**
+- Does the tenant's subscription plan include this feature?
+- Checked via: `Feature::for($tenant)->active('customRoles')`
+- Controls: What features are available to the tenant
+
+**Level 2: Permission (User-level)**
+- Does the user have permission to perform this action?
+- Checked via: `$user->can('tenant.roles:view')`
+- Controls: What individual users can do within enabled features
+
+**Example**:
+- Tenant has Professional plan → `customRoles` feature enabled → `tenant.roles:*` permissions available
+- User A has role "owner" → has `tenant.roles:view` permission → ✅ Can view roles
+- User B has role "member" → NO `tenant.roles:view` permission → ❌ Cannot view roles
+
+### Commands Reference
+
+```bash
+# Sync base permissions (creates all 37 permissions)
+sail artisan permissions:sync
+
+# Sync plan permission maps (updates plan_enabled_permissions for all tenants)
+sail artisan plans:sync-permissions
+
+# Full setup (correct order)
+sail artisan migrate
+sail artisan permissions:sync
+sail artisan db:seed --class=PlanSeeder
+sail artisan plans:sync-permissions
+```
+
+### Documentation
+
+**Complete Plans System documentation**:
+- **[docs/PLANS-REFERENCE.md](PLANS-REFERENCE.md)** - Complete reference guide (READ FIRST)
+- **[docs/PLANS-QUICK-START.md](PLANS-QUICK-START.md)** - Quick guide for common tasks
+- **[docs/PLANS-README.md](PLANS-README.md)** - System overview and index
+
+**See also**: `CLAUDE.md` Plans System section (line 291-337)
 
 ---
 
@@ -148,7 +373,7 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 ### O que o comando faz
 
 1. ✅ Cria role "Super Admin" global (sem tenant_id)
-2. ✅ Cria/atualiza todas as 22 permissions
+2. ✅ Cria/atualiza todas as **37 permissions** (22 base + 15 enterprise)
 3. ✅ Cria/atualiza as 3 roles (owner, admin, member)
 4. ✅ Sincroniza permissions de cada role
 5. ✅ Limpa cache do Spatie Permission
@@ -167,12 +392,16 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
   ✓ Created: tenant.projects:view
   ✓ Created: tenant.projects:editOwn
   ✓ Created: tenant.team:manageRoles
+  ✓ Created: tenant.roles:view
+  ✓ Created: tenant.reports:export
+  ✓ Created: tenant.sso:configure
+  ✓ Created: tenant.branding:uploadLogo
   ...
-  ✅ 22 permissions created.
+  ✅ 37 permissions created (22 base + 15 enterprise).
 
 👥 Syncing Roles...
   ✓ Created role: owner (Proprietário)
-    → Synced 22 permissions
+    → Synced 22 base permissions (enterprise permissions are plan-gated)
   ✓ Created role: admin (Administrador)
     → Synced 13 permissions
   ✓ Created role: member (Membro)
@@ -183,6 +412,8 @@ Este projeto utiliza um sistema robusto de permissões baseado em [Spatie Larave
 
 🎉 Roles & Permissions synced successfully!
 ```
+
+**Note**: Enterprise permissions (15) are created but only accessible when tenant's plan includes the corresponding feature. See [Plans System Integration](#plans-system-integration).
 
 ---
 
@@ -545,14 +776,23 @@ public function admin_cannot_export_reports()
 
 ### Owner (Proprietário)
 
-**Permissions**: 22 (todas)
+**Base Permissions**: 22 (todas as permissions base)
 
-**Descrição**: Acesso total incluindo billing e danger zone.
+**Enterprise Permissions**: Acesso a enterprise permissions é **plan-gated** (depende do plano do tenant)
+
+**Descrição**: Acesso total incluindo billing e danger zone. Acesso a features enterprise (roles, reports, sso, branding) depende do plano do tenant.
 
 **Quando usar**:
 - Criador do tenant
 - Pessoa que paga a conta
 - Responsável legal
+
+**Plan-Gated Access**:
+- ✅ All 22 base permissions (always available)
+- 🔒 Custom Roles (4 permissions) - Requires `customRoles` feature (Professional+)
+- 🔒 Advanced Reports (4 permissions) - Requires `advancedReports` feature (Enterprise)
+- 🔒 SSO (3 permissions) - Requires `sso` feature (Enterprise)
+- 🔒 White Label (4 permissions) - Requires `whiteLabel` feature (Enterprise)
 
 ### Admin (Administrador)
 
@@ -809,6 +1049,7 @@ setPermissionsTeamId($tenant->id);  // OBRIGATÓRIO
 
 ## Referências
 
+**Code Files**:
 - **Hooks**: `resources/js/hooks/use-permissions.ts`
 - **Component**: `resources/js/components/can.tsx`
 - **Exemplos**: `resources/js/examples/PermissionsUsageExample.tsx`
@@ -816,15 +1057,58 @@ setPermissionsTeamId($tenant->id);  // OBRIGATÓRIO
 - **Policies**: `app/Policies/ProjectPolicy.php`
 - **Controllers**: `app/Http/Controllers/Tenant/TeamController.php`
 - **Middleware**: `app/Http/Middleware/HandleInertiaRequests.php`
+- **Observer**: `app/Observers/TenantObserver.php` (plan permission sync)
+- **Plan Model**: `app/Models/Plan.php` (wildcard expansion)
 
-**Documentação Externa**:
+**Plans System Documentation**:
+- **[PLANS-REFERENCE.md](PLANS-REFERENCE.md)** - Complete reference guide (READ FIRST)
+- **[PLANS-QUICK-START.md](PLANS-QUICK-START.md)** - Quick guide for common tasks
+- **[PLANS-README.md](PLANS-README.md)** - System overview and index
+
+**Project Documentation**:
+- **[CLAUDE.md](../CLAUDE.md)** - Project overview (includes Plans System section)
+- **[STANCL-FEATURES.md](STANCL-FEATURES.md)** - Multi-tenancy integration
+
+**External Documentation**:
 - [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission)
+- [Laravel Pennant](https://laravel.com/docs/pennant) (feature flags)
 - [Stancl Tenancy](https://tenancyforlaravel.com/)
 - [Laravel Authorization](https://laravel.com/docs/authorization)
 
 ---
 
 ## Changelog
+
+### v3.0.0 (2025-11-21)
+
+**Plans System Integration + Enterprise Permissions** 🚀:
+
+**New Features**:
+- ✅ **15 Enterprise Permissions**: Custom Roles (4), Advanced Reports (4), SSO (3), White Label (4)
+- ✅ **Total: 37 permissions** (22 base + 15 enterprise)
+- ✅ **Plans System Integration**: Permissions now integrated with Hybrid Plans Architecture
+- ✅ **Two-Level Authorization**: Plan-level (tenant) + Permission-level (user)
+- ✅ **Wildcard Expansion**: `tenant.roles:*` → expands to all 4 roles permissions
+- ✅ **Auto-Sync on Plan Change**: TenantObserver regenerates permissions automatically
+- ✅ **Gate::before()**: Checks `plan_enabled_permissions` before Spatie check
+
+**Documentation**:
+- ✅ New section: **Plans System Integration** (160+ lines)
+- ✅ Enterprise permissions documented with plan requirements
+- ✅ Wildcard expansion explained
+- ✅ Two-level authorization flow diagram
+- ✅ Frontend + Backend examples for plan-gated permissions
+- ✅ Links to complete Plans System documentation
+
+**Files Updated**:
+- `docs/PERMISSIONS.md` - Added 15 enterprise permissions + Plans integration
+- `app/Console/Commands/SyncPermissions.php` - Creates all 37 permissions
+- `app/Observers/TenantObserver.php` - Auto-syncs permissions on plan change
+- `app/Providers/AppServiceProvider.php` - Gate::before() checks plan permissions
+
+**Breaking Changes**:
+- None - Existing 22 base permissions unchanged
+- Enterprise permissions are additive and plan-gated
 
 ### v2.2.0 (2025-11-20)
 

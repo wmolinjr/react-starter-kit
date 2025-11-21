@@ -261,7 +261,7 @@ export function TenantSwitcher() {
 
 ## Próximo Passo
 
-➡️ **[13-TESTING.md](./13-TESTING.md)** - Estratégias de Teste
+➡️ **[13-TESTING.md](13-TESTING.md)** - Estratégias de Teste
 
 ---
 

@@ -508,7 +508,7 @@ Fortify::authenticateUsing(function (Request $request) {
 
 ## Próximo Passo
 
-➡️ **[05-AUTHORIZATION.md](./05-AUTHORIZATION.md)** - Roles e Permissões
+➡️ **[05-AUTHORIZATION.md](05-AUTHORIZATION.md)** - Roles e Permissões
 
 ---
 

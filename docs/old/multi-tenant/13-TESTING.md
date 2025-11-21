@@ -174,7 +174,7 @@ class ProjectFactory extends Factory
 
 ## Próximo Passo
 
-➡️ **[14-DEPLOYMENT.md](./14-DEPLOYMENT.md)** - Deploy e Produção
+➡️ **[14-DEPLOYMENT.md](14-DEPLOYMENT.md)** - Deploy e Produção
 
 ---
 

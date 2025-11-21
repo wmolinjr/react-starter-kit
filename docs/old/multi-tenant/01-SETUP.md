@@ -626,7 +626,7 @@ Antes de prosseguir para o próximo passo, certifique-se:
 
 Agora que o setup está completo, vamos criar o schema do banco de dados:
 
-➡️ **[02-DATABASE.md](./02-DATABASE.md)** - Schema e Migrations
+➡️ **[02-DATABASE.md](02-DATABASE.md)** - Schema e Migrations
 
 ---
 

@@ -406,13 +406,13 @@ users (global)
 
 Agora que você entendeu a visão geral, siga a documentação em ordem:
 
-1. **[01-SETUP.md](./01-SETUP.md)** - Instalação e configuração inicial
-2. **[02-DATABASE.md](./02-DATABASE.md)** - Schema e migrations
-3. **[03-MODELS.md](./03-MODELS.md)** - Models e relacionamentos
-4. **[04-ROUTING.md](./04-ROUTING.md)** - Estratégia de rotas
-5. **[05-AUTHORIZATION.md](./05-AUTHORIZATION.md)** - Roles e permissões
-6. **[06-TEAM-MANAGEMENT.md](./06-TEAM-MANAGEMENT.md)** - Gerenciamento de equipes
-7. **[07-BILLING.md](./07-BILLING.md)** - Sistema de assinaturas
+1. **[01-SETUP.md](01-SETUP.md)** - Instalação e configuração inicial
+2. **[02-DATABASE.md](02-DATABASE.md)** - Schema e migrations
+3. **[03-MODELS.md](03-MODELS.md)** - Models e relacionamentos
+4. **[04-ROUTING.md](04-ROUTING.md)** - Estratégia de rotas
+5. **[05-AUTHORIZATION.md](05-AUTHORIZATION.md)** - Roles e permissões
+6. **[06-TEAM-MANAGEMENT.md](06-TEAM-MANAGEMENT.md)** - Gerenciamento de equipes
+7. **[07-BILLING.md](07-BILLING.md)** - Sistema de assinaturas
 8. E mais...
 
 ---

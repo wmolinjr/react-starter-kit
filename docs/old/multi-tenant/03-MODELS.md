@@ -814,7 +814,7 @@ $tenant->owners; // Deve retornar 1 user
 
 Agora que os models estão prontos, vamos configurar as rotas:
 
-➡️ **[04-ROUTING.md](./04-ROUTING.md)** - Estratégia de Rotas
+➡️ **[04-ROUTING.md](04-ROUTING.md)** - Estratégia de Rotas
 
 ---
 

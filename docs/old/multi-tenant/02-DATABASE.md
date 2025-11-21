@@ -730,7 +730,7 @@ mysql -u sail -p -e "SHOW TABLES FROM laravel;"
 
 Agora que o schema está pronto, vamos criar os Models com relacionamentos:
 
-➡️ **[03-MODELS.md](./03-MODELS.md)** - Models e Relacionamentos
+➡️ **[03-MODELS.md](03-MODELS.md)** - Models e Relacionamentos
 
 ---
 

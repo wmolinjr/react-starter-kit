@@ -205,7 +205,7 @@ echo "Deployment completed successfully!"
 
 ## Próximo Passo
 
-➡️ **[15-SECURITY.md](./15-SECURITY.md)** - Checklist de Segurança
+➡️ **[15-SECURITY.md](15-SECURITY.md)** - Checklist de Segurança
 
 ---
 

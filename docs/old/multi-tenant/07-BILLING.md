@@ -507,7 +507,7 @@ export default function BillingIndex({ plans, subscription, invoices }: Props) {
 
 ## Próximo Passo
 
-➡️ **[08-FILE-STORAGE.md](./08-FILE-STORAGE.md)** - Armazenamento de Arquivos
+➡️ **[08-FILE-STORAGE.md](08-FILE-STORAGE.md)** - Armazenamento de Arquivos
 
 ---
 
