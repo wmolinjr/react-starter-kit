@@ -28,6 +28,30 @@ class CreateTenantsTable extends Migration
             $table->string('pm_type')->nullable();
             $table->string('pm_last_four', 4)->nullable();
             $table->timestamp('trial_ends_at')->nullable();
+
+            $table->foreignUuid('plan_id')
+                ->nullable()
+                ->after('id')
+                ->constrained('plans')
+                ->nullOnDelete();
+
+            // Custom overrides for this tenant (optional)
+            // Overrides plan defaults when non-null
+            $table->json('plan_features_override')->nullable();
+            $table->json('plan_limits_override')->nullable();
+
+            // Note: trial_ends_at already exists in create_tenants_table migration
+
+            // Usage tracking (for quotas)
+            $table->json('current_usage')->nullable();
+            // { "users": 5, "projects": 23, "storage": 2048, "apiCalls": 1523 }
+
+            // ⭐ Cache of permissions enabled by plan
+            // Regenerated when plan changes
+            $table->json('plan_enabled_permissions')->nullable();
+
+            $table->index('plan_id');
+
             $table->timestamps();
         });
     }
