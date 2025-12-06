@@ -70,7 +70,7 @@ class TeamService
     /**
      * Invite a new member to the team.
      *
-     * @throws \App\Exceptions\TeamException
+     * @throws \App\Exceptions\Tenant\TeamException
      */
     public function inviteMember(
         Tenant $tenant,
@@ -80,12 +80,12 @@ class TeamService
     ): TenantInvitation {
         // Check user limit
         if ($tenant->hasReachedUserLimit()) {
-            throw new \App\Exceptions\TeamException(__('flash.team.user_limit_reached'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.user_limit_reached'));
         }
 
         // Check if already a member
         if (User::where('email', $email)->exists()) {
-            throw new \App\Exceptions\TeamException(__('flash.team.user_already_member'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.user_already_member'));
         }
 
         // Check for pending invitation
@@ -97,7 +97,7 @@ class TeamService
             ->exists();
 
         if ($existingInvitation) {
-            throw new \App\Exceptions\TeamException(__('flash.team.invite_already_pending'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.invite_already_pending'));
         }
 
         // Generate invitation token
@@ -128,7 +128,7 @@ class TeamService
     /**
      * Accept an invitation via token.
      *
-     * @throws \App\Exceptions\TeamException
+     * @throws \App\Exceptions\Tenant\TeamException
      */
     public function acceptInvitation(User $user, string $token, string $tenantId): void
     {
@@ -141,12 +141,12 @@ class TeamService
             ->first();
 
         if (! $invitation) {
-            throw new \App\Exceptions\TeamException(__('flash.team.invite_invalid'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.invite_invalid'));
         }
 
         // Verify the invitation email matches (case-insensitive)
         if (strtolower($invitation->email) !== strtolower($user->email)) {
-            throw new \App\Exceptions\TeamException(__('flash.team.invite_wrong_email'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.invite_wrong_email'));
         }
 
         DB::beginTransaction();
@@ -161,7 +161,7 @@ class TeamService
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \App\Exceptions\TeamException(
+            throw new \App\Exceptions\Tenant\TeamException(
                 __('flash.team.invite_accept_error', ['error' => $e->getMessage()])
             );
         }
@@ -170,14 +170,14 @@ class TeamService
     /**
      * Update a member's role.
      *
-     * @throws \App\Exceptions\TeamException
+     * @throws \App\Exceptions\Tenant\TeamException
      * @throws TeamAuthorizationException
      */
     public function updateMemberRole(User $target, string $newRole, User $currentUser): void
     {
         // Prevent self-update
         if ($target->id === $currentUser->id) {
-            throw new \App\Exceptions\TeamException(__('flash.team.cannot_change_own_role'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.cannot_change_own_role'));
         }
 
         // Check if target user is owner
@@ -193,7 +193,7 @@ class TeamService
             $ownerCount = User::role('owner')->count();
 
             if ($ownerCount === 1) {
-                throw new \App\Exceptions\TeamException(__('flash.team.cannot_change_only_owner'));
+                throw new \App\Exceptions\Tenant\TeamException(__('flash.team.cannot_change_only_owner'));
             }
         }
 
@@ -206,14 +206,14 @@ class TeamService
     /**
      * Remove a member from the team.
      *
-     * @throws \App\Exceptions\TeamException
+     * @throws \App\Exceptions\Tenant\TeamException
      * @throws TeamAuthorizationException
      */
     public function removeMember(User $member, User $currentUser): void
     {
         // Prevent self-removal
         if ($member->id === $currentUser->id) {
-            throw new \App\Exceptions\TeamException(__('flash.team.cannot_remove_self'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.cannot_remove_self'));
         }
 
         // Prevent removal of any owner (must demote first)
@@ -236,12 +236,12 @@ class TeamService
     /**
      * Resend an invitation email.
      *
-     * @throws \App\Exceptions\TeamException
+     * @throws \App\Exceptions\Tenant\TeamException
      */
     public function resendInvitation(TenantInvitation $invitation, Tenant $tenant, User $invitedBy): void
     {
         if ($invitation->isAccepted()) {
-            throw new \App\Exceptions\TeamException(__('flash.team.invite_already_accepted'));
+            throw new \App\Exceptions\Tenant\TeamException(__('flash.team.invite_already_accepted'));
         }
 
         if ($invitation->isExpired()) {

@@ -763,6 +763,7 @@
   "tenant.config.currency_settings_description": "Set the default currency for billing and invoices.",
   "tenant.config.default_currency": "Default Currency",
   "tenant.config.select_currency": "Select a currency",
+  "tenant.config.app_name": "Application Name",
   "tenant.config.locale": "Language",
   "tenant.config.mail_from_address": "From Address",
   "tenant.config.mail_from_name": "From Name",

@@ -763,6 +763,7 @@
   "tenant.config.currency_settings_description": "Defina a moeda padrão para cobranças e faturas.",
   "tenant.config.default_currency": "Moeda Padrão",
   "tenant.config.select_currency": "Selecione uma moeda",
+  "tenant.config.app_name": "Nome da Aplicação",
   "tenant.config.locale": "Idioma",
   "tenant.config.mail_from_address": "Endereço de Envio",
   "tenant.config.mail_from_name": "Nome do Remetente",

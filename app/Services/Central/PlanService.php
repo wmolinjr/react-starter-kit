@@ -198,12 +198,12 @@ class PlanService
     /**
      * Delete a plan.
      *
-     * @throws \App\Exceptions\PlanException
+     * @throws \App\Exceptions\Central\PlanException
      */
     public function deletePlan(Plan $plan): void
     {
         if ($plan->tenants()->exists()) {
-            throw new \App\Exceptions\PlanException(__('flash.plan.cannot_delete_with_tenants'));
+            throw new \App\Exceptions\Central\PlanException(__('flash.plan.cannot_delete_with_tenants'));
         }
 
         $plan->addons()->detach();

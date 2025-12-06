@@ -12,6 +12,9 @@ namespace App\Enums;
  */
 enum TenantConfigKey: string
 {
+    // Branding
+    case APP_NAME = 'app_name';
+
     // Localization
     case LOCALE = 'locale';
     case TIMEZONE = 'timezone';
@@ -32,6 +35,7 @@ enum TenantConfigKey: string
     public function configKeys(): array
     {
         return match ($this) {
+            self::APP_NAME => ['app.name'],
             self::LOCALE => ['app.locale'],
             self::TIMEZONE => ['app.timezone'],
             self::MAIL_FROM_ADDRESS => ['mail.from.address'],
@@ -56,6 +60,7 @@ enum TenantConfigKey: string
     public function defaultValue(): mixed
     {
         return match ($this) {
+            self::APP_NAME => null, // Falls back to config('app.name')
             self::LOCALE => 'en',
             self::TIMEZONE => 'UTC',
             self::MAIL_FROM_ADDRESS => null,
@@ -73,6 +78,7 @@ enum TenantConfigKey: string
     public function validationRules(): array
     {
         return match ($this) {
+            self::APP_NAME => ['nullable', 'string', 'max:100'],
             self::LOCALE => ['string', 'in:' . implode(',', config('app.locales', ['en']))],
             self::TIMEZONE => ['string', 'timezone'],
             self::MAIL_FROM_ADDRESS => ['nullable', 'email', 'max:255'],
@@ -88,6 +94,7 @@ enum TenantConfigKey: string
     public function label(): string
     {
         return match ($this) {
+            self::APP_NAME => __('tenant.config.app_name'),
             self::LOCALE => __('tenant.config.locale'),
             self::TIMEZONE => __('tenant.config.timezone'),
             self::MAIL_FROM_ADDRESS => __('tenant.config.mail_from_address'),

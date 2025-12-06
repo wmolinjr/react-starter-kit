@@ -1,6 +1,6 @@
 # Config Review & TenantConfigBootstrapper Integration Plan
 
-> **Status:** Fase 1 Concluída ✅
+> **Status:** Fase 1 ✅ | Fase 2 Backend ✅ | Fase 2 Frontend ⏳
 > **Data:** 2025-12-06
 > **Prioridade:** Alta para bugs, Média para melhorias
 
@@ -231,13 +231,14 @@ Este documento apresenta uma análise completa de todos os arquivos de configura
 - [x] Rodar `sail artisan config:clear`
 - [x] Rodar testes para verificar não quebrou nada (420 passed)
 
-### Fase 2: Melhorias
-- [ ] Adicionar `APP_TIMEZONE=UTC` ao `.env.example`
-- [ ] Adicionar case `app_name` ao enum `TenantConfigKey`
-- [ ] Atualizar `TenancyServiceProvider` para mapear `app_name`
-- [ ] Criar migration para adicionar `app_name` às tenant_settings
-- [ ] Atualizar TenantSettingsController para incluir app_name
-- [ ] Atualizar frontend de configurações
+### Fase 2: Melhorias (Parcial - 2025-12-06)
+- [x] Adicionar `APP_TIMEZONE=UTC` ao `.env.example`
+- [x] Adicionar case `app_name` ao enum `TenantConfigKey`
+- [x] Atualizar mapeamento (automático via `toStorageConfigMap()`)
+- [x] Adicionar traduções `tenant.config.app_name` em en.json e pt_BR.json
+- [x] Corrigir namespaces de Exceptions em PlanService e TeamService
+- [ ] Atualizar UI de configurações do tenant para incluir app_name (Frontend)
+- [ ] Criar campo app_name no formulário de configurações
 
 ### Fase 3: Enterprise (Futuro)
 - [ ] Documentar feature SMTP customizado
