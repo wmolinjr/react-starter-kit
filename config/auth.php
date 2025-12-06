@@ -52,10 +52,19 @@ return [
             'provider' => 'admins',
         ],
 
+        // Sanctum guards - using smart PersonalAccessToken model that auto-detects context
+        // @see App\Models\Shared\PersonalAccessToken
+
         // API tokens for tenant users (Sanctum)
-        'sanctum' => [
+        'tenant-sanctum' => [
             'driver' => 'sanctum',
             'provider' => 'users',
+        ],
+
+        // API tokens for central admins (Sanctum)
+        'central-sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
         ],
     ],
 

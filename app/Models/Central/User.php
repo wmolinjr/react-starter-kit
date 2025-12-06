@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
@@ -19,6 +20,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * - Technical support who accesses tenants via impersonation (role: support-admin)
  *
  * Uses Spatie Permission with guard 'central'.
+ * Uses Sanctum for API token authentication.
  * NOT tenant users - tenant users are in App\Models\Tenant\User.
  *
  * @property string $id UUID primary key
@@ -32,6 +34,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
 class User extends Authenticatable
 {
     use CentralConnection;
+    use HasApiTokens;
     use HasFactory;
     use HasRoles;
     use HasUuids;

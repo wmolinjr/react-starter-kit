@@ -51,6 +51,18 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
             ]);
         })->name('home');
 
+        /**
+         * Sanctum CSRF Cookie Route for Central Context.
+         *
+         * Required for SPA authentication with central admin API.
+         * Uses the same pattern as tenant routes for consistency.
+         *
+         * @see https://v4.tenancyforlaravel.com/integrations/sanctum/
+         */
+        Route::get('/sanctum/csrf-cookie', [\Laravel\Sanctum\Http\Controllers\CsrfCookieController::class, 'show'])
+            ->middleware('web')
+            ->name('sanctum.csrf-cookie');
+
         // Fortify home redirect (role-based routing after auth)
         // - Users with central roles → Admin Dashboard
         // - Regular users → User Panel (manage tenants)

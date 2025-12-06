@@ -1,28 +1,41 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 /**
- * Central Migration: Personal Access Tokens (DEPRECATED in Option C)
+ * Central Migration: Admin Personal Access Tokens
  *
  * OPTION C ARCHITECTURE:
- * - API tokens are stored in tenant databases (per-tenant isolation)
- * - Users exist only in tenant databases
- * - Tokens belong to tenant users
+ * - Admin API tokens are stored in central database (admin_personal_access_tokens)
+ * - Tenant user tokens are stored in tenant databases (personal_access_tokens)
  *
- * This migration is kept empty for compatibility with migration history.
+ * Uses UUID for primary key and uuidMorphs for tokenable (Central\User).
  *
- * @see database/migrations/tenant/0001_01_01_000003_create_personal_access_tokens_table.php
+ * @see App\Models\Central\PersonalAccessToken
+ * @see database/migrations/tenant/2025_12_01_000003_create_tenant_personal_access_tokens_table.php
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        // Option C: Personal access tokens are in tenant databases
+        Schema::create('admin_personal_access_tokens', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->uuidMorphs('tokenable'); // UUID for Central\User model
+            $table->string('name');
+            $table->string('token', 64)->unique();
+            $table->text('abilities')->nullable();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamps();
+
+            $table->index('expires_at');
+        });
     }
 
     public function down(): void
     {
-        // Nothing to drop
+        Schema::dropIfExists('admin_personal_access_tokens');
     }
 };

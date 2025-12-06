@@ -41,6 +41,20 @@ Route::middleware([
     */
 
     /**
+     * CSRF Cookie route for Sanctum SPA authentication.
+     *
+     * TENANCY v4 INTEGRATION:
+     * Sanctum's default /sanctum/csrf-cookie route doesn't work with tenancy
+     * because it runs outside tenant context. This route provides the same
+     * functionality but with proper tenancy middleware.
+     *
+     * @see https://v4.tenancyforlaravel.com/integrations/sanctum/
+     */
+    Route::get('/sanctum/csrf-cookie', [\Laravel\Sanctum\Http\Controllers\CsrfCookieController::class, 'show'])
+        ->middleware('web')
+        ->name('sanctum.csrf-cookie');
+
+    /**
      * Impersonation token consumption with Admin Mode support.
      *
      * TENANT-ONLY ARCHITECTURE (Option C):

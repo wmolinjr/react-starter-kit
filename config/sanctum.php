@@ -6,6 +6,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Sanctum Routes
+    |--------------------------------------------------------------------------
+    |
+    | TENANCY v4 INTEGRATION:
+    | Disable Sanctum's default routes (including /sanctum/csrf-cookie).
+    | The CSRF cookie route is defined manually in routes/tenant.php
+    | with proper tenancy middleware.
+    |
+    | @see https://v4.tenancyforlaravel.com/integrations/sanctum/
+    |
+    */
+
+    'routes' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Stateful Domains
     |--------------------------------------------------------------------------
     |
