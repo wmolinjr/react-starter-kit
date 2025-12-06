@@ -101,7 +101,8 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function regular_admin_cannot_access_impersonation_page(): void
     {
-        $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
+        // Admin without role cannot access impersonation
+        $regularAdmin = Admin::factory()->create();
 
         $response = $this->actingAs($regularAdmin, 'central')
             ->get($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate"));
@@ -126,7 +127,8 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function regular_admin_cannot_enter_admin_mode(): void
     {
-        $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
+        // Admin without role cannot enter admin mode
+        $regularAdmin = Admin::factory()->create();
 
         $response = $this->actingAs($regularAdmin, 'central')
             ->post($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate/admin-mode"));
@@ -155,7 +157,8 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function regular_admin_cannot_impersonate_user(): void
     {
-        $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
+        // Admin without role cannot impersonate
+        $regularAdmin = Admin::factory()->create();
         // Use a fake UUID since we can't guarantee users exist
         $fakeUserId = '00000000-0000-0000-0000-000000000000';
 
@@ -200,7 +203,8 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function regular_admin_cannot_access_tenant(): void
     {
-        $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
+        // Admin without impersonate permission cannot access tenant
+        $regularAdmin = Admin::factory()->create();
 
         $this->assertFalse($regularAdmin->canAccessTenant($this->tenant));
     }

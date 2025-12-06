@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Schema;
  * Central Migration: Admins Table
  *
  * TENANT-ONLY USERS ARCHITECTURE (Option C):
- * - Admin model is for central super admins only
- * - Used for tenant management, impersonation, billing
+ * - Admin model is for central administrators
+ * - Uses Spatie Permission with guard 'central' for roles/permissions
+ * - Roles: super-admin, central-admin, support-admin
  * - NOT for tenant users (those are in tenant databases)
  *
  * Uses UUID for primary key (best practice for multi-tenant SaaS).
@@ -24,7 +25,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('is_super_admin')->default(false);
             $table->string('locale', 10)->default('pt_BR');
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
@@ -32,7 +32,6 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->index('is_super_admin');
             $table->index('email');
         });
 

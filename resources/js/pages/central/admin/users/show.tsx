@@ -15,7 +15,9 @@ interface User {
     email: string;
     email_verified_at: string | null;
     created_at: string;
-    is_super_admin: boolean;
+    role: string | null;
+    role_display_name: string | null;
+    isSuperAdmin: boolean;
 }
 
 interface Props {
@@ -96,16 +98,16 @@ export default function UserShow({ user }: Props) {
                                 <div className="flex items-center justify-between rounded-lg border p-3">
                                     <div>
                                         <p className="font-medium">
-                                            {user.is_super_admin ? 'Super Admin' : 'Admin'}
+                                            {user.role_display_name || user.role || t('common.no_role')}
                                         </p>
                                         <p className="text-muted-foreground text-xs">
-                                            {user.is_super_admin
+                                            {user.isSuperAdmin
                                                 ? t('admin.users.super_admin_description')
                                                 : t('admin.users.admin_description')}
                                         </p>
                                     </div>
-                                    <Badge variant={user.is_super_admin ? 'default' : 'secondary'}>
-                                        {user.is_super_admin ? 'Super Admin' : 'Admin'}
+                                    <Badge variant={user.isSuperAdmin ? 'default' : 'secondary'}>
+                                        {user.role_display_name || user.role || t('common.no_role')}
                                     </Badge>
                                 </div>
                             </div>

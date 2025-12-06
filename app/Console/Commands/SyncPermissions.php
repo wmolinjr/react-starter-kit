@@ -26,16 +26,34 @@ class SyncPermissions extends Command
     protected $description = 'Sync roles and permissions (insert or update) - MVP Structure';
 
     /**
-     * Central Admin role (global, stored in central database)
-     * Has all central category permissions for admin panel access.
+     * Central roles (stored in central database with guard 'central')
      * display_name and description use multi-language format.
      *
      * MULTI-DATABASE TENANCY: No tenant_id column - isolation at database level.
+     * Guard 'central' uses 'admins' provider (Central\User model).
      */
     protected array $centralRoles = [
-        'Central Admin' => [
+        'super-admin' => [
+            'display_name' => ['en' => 'Super Administrator', 'pt_BR' => 'Super Administrador'],
+            'description' => ['en' => 'Full platform access', 'pt_BR' => 'Acesso total à plataforma'],
+            'all_permissions' => true, // Gets ALL central permissions
+        ],
+        'central-admin' => [
             'display_name' => ['en' => 'Central Administrator', 'pt_BR' => 'Administrador Central'],
             'description' => ['en' => 'Access to central admin panel', 'pt_BR' => 'Acesso ao painel administrativo central'],
+            'all_permissions' => true, // Gets ALL central permissions
+        ],
+        'support-admin' => [
+            'display_name' => ['en' => 'Support Administrator', 'pt_BR' => 'Administrador de Suporte'],
+            'description' => ['en' => 'View and impersonate tenants', 'pt_BR' => 'Visualizar e impersonar tenants'],
+            'permissions' => [
+                'tenants:view',
+                'tenants:show',
+                'tenants:impersonate',
+                'users:view',
+                'users:show',
+                'addons:view',
+            ],
         ],
     ];
 
@@ -65,11 +83,10 @@ class SyncPermissions extends Command
 
         // Step 1: Sync Central Permissions from enum (single source of truth)
         // Note: Tenant permissions are seeded in tenant databases via SeedTenantDatabase job
-        $this->syncPermissions(CentralPermission::toSeederArray(), 'Central Admin');
+        $this->syncCentralPermissions();
 
-        // Step 2: Sync Roles (after permissions exist)
-        $this->syncSuperAdminRole();
-        $this->syncCentralAdminRole();
+        // Step 2: Sync Central Roles (after permissions exist)
+        $this->syncCentralRoles();
 
         // Clear cache
         $this->info('🧹 Clearing permission cache...');
@@ -93,94 +110,22 @@ class SyncPermissions extends Command
     }
 
     /**
-     * Sync Super Admin role globally.
-     * This role bypasses all permission checks via Gate::before()
+     * Sync Central Permissions from enum (single source of truth).
+     * Uses guard 'central' for admin panel access.
      *
-     * MULTI-DATABASE TENANCY: No tenant_id column needed.
-     * Stored in central database's roles table.
+     * MULTI-DATABASE TENANCY: Stored in central database's permissions table.
      */
-    protected function syncSuperAdminRole(): void
+    protected function syncCentralPermissions(): void
     {
-        $this->info('👑 Syncing Global Super Admin Role...');
+        $this->info('📝 Syncing Central Permissions...');
 
-        $role = Role::updateOrCreate(
-            ['name' => 'Super Admin', 'guard_name' => 'tenant'],
-            [
-                'display_name' => ['en' => 'Super Administrator', 'pt_BR' => 'Super Administrador'],
-                'description' => ['en' => 'Full platform access (global)', 'pt_BR' => 'Acesso total à plataforma (global)'],
-            ]
-        );
-
-        if ($role->wasRecentlyCreated) {
-            $this->line("  ✓ Created global role: {$role->name}");
-        } else {
-            $this->line("  ↻ Updated global role: {$role->name}");
-        }
-
-        // Note: Super Admin doesn't need explicit permissions
-        // Gate::before() in AppServiceProvider grants all permissions automatically
-        $this->line("    → Bypasses all permission checks via Gate::before()");
-
-        $this->info('  ✅ Super Admin role synced.');
-        $this->newLine();
-    }
-
-    /**
-     * Sync Central Admin role globally.
-     * This role has all central category permissions for admin panel access.
-     *
-     * MULTI-DATABASE TENANCY: No tenant_id column needed.
-     * Stored in central database's roles table.
-     */
-    protected function syncCentralAdminRole(): void
-    {
-        $this->info('🏛️  Syncing Global Central Admin Role...');
-
-        // Get all central permissions from registry
-        $centralPermissions = CentralPermission::values();
-
-        foreach ($this->centralRoles as $roleName => $roleData) {
-            $role = Role::updateOrCreate(
-                ['name' => $roleName, 'guard_name' => 'tenant'],
-                [
-                    'display_name' => $roleData['display_name'],
-                    'description' => $roleData['description'],
-                ]
-            );
-
-            if ($role->wasRecentlyCreated) {
-                $this->line("  ✓ Created global role: {$role->name}");
-            } else {
-                $this->line("  ↻ Updated global role: {$role->name}");
-            }
-
-            // Sync central permissions
-            $role->syncPermissions($centralPermissions);
-            $permCount = count($centralPermissions);
-            $this->line("    → Synced {$permCount} central permissions");
-        }
-
-        $this->info('  ✅ Central Admin role synced.');
-        $this->newLine();
-    }
-
-    /**
-     * Sync permissions (insert or update)
-     * Category and description are derived from enums via model accessors.
-     *
-     * @param array $permissions Array of permission definitions from enum
-     * @param string $type Label for display (Tenant/Central Admin)
-     */
-    protected function syncPermissions(array $permissions, string $type): void
-    {
-        $this->info("📝 Syncing {$type} Permissions...");
-
+        $permissions = CentralPermission::toSeederArray();
         $created = 0;
         $updated = 0;
 
         foreach ($permissions as $permData) {
             $permission = Permission::firstOrCreate(
-                ['name' => $permData['name'], 'guard_name' => 'tenant']
+                ['name' => $permData['name'], 'guard_name' => 'central']
             );
 
             if ($permission->wasRecentlyCreated) {
@@ -191,7 +136,60 @@ class SyncPermissions extends Command
             }
         }
 
-        $this->info("  ✅ {$created} {$type} permissions created, {$updated} existing.");
+        $this->info("  ✅ {$created} Central permissions created, {$updated} existing.");
+        $this->newLine();
+    }
+
+    /**
+     * Sync Central Roles from $centralRoles array.
+     * Uses guard 'central' for admin panel access.
+     * NO BYPASS - all roles use explicit permissions.
+     *
+     * MULTI-DATABASE TENANCY: Stored in central database's roles table.
+     */
+    protected function syncCentralRoles(): void
+    {
+        $this->info('👥 Syncing Central Roles...');
+
+        // Get all central permissions
+        $allCentralPermissions = CentralPermission::values();
+
+        foreach ($this->centralRoles as $roleName => $roleData) {
+            $role = Role::updateOrCreate(
+                ['name' => $roleName, 'guard_name' => 'central'],
+                [
+                    'display_name' => $roleData['display_name'],
+                    'description' => $roleData['description'],
+                ]
+            );
+
+            if ($role->wasRecentlyCreated) {
+                $this->line("  ✓ Created role: {$role->name}");
+            } else {
+                $this->line("  ↻ Updated role: {$role->name}");
+            }
+
+            // Determine which permissions to assign
+            if ($roleData['all_permissions'] ?? false) {
+                // Role gets ALL central permissions
+                $permissionsToSync = $allCentralPermissions;
+            } else {
+                // Role gets specific permissions
+                $permissionsToSync = $roleData['permissions'] ?? [];
+            }
+
+            // Sync permissions with guard 'central'
+            $role->syncPermissions(
+                Permission::where('guard_name', 'central')
+                    ->whereIn('name', $permissionsToSync)
+                    ->get()
+            );
+
+            $permCount = count($permissionsToSync);
+            $this->line("    → Synced {$permCount} permissions");
+        }
+
+        $this->info('  ✅ Central roles synced.');
         $this->newLine();
     }
 
@@ -210,7 +208,7 @@ class SyncPermissions extends Command
             ->map->count()
             ->sortKeys();
 
-        $this->info('🏛️  Central Admin Permissions (in central database):');
+        $this->info('🏛️  Central Permissions (guard: central):');
         $centralData = [];
         foreach ($centralCategories as $category => $count) {
             $centralData[] = [$category, $count];
@@ -221,13 +219,13 @@ class SyncPermissions extends Command
 
         // Show tenant permission count (for reference - seeded per tenant database)
         $tenantPermissions = TenantPermission::toSeederArray();
-        $this->info("📋 Tenant Permissions (seeded per tenant database): " . count($tenantPermissions) . " permissions");
+        $this->info("📋 Tenant Permissions (guard: tenant, seeded per tenant database): " . count($tenantPermissions) . " permissions");
         $this->newLine();
 
-        // Roles with permission count (central database roles)
-        $this->info('👥 Roles (Central Database):');
+        // Central Roles with permission count
+        $this->info('👥 Central Roles (guard: central):');
         $rolesData = [];
-        foreach (Role::all() as $role) {
+        foreach (Role::where('guard_name', 'central')->get() as $role) {
             $rolesData[] = [
                 $role->name,
                 $role->trans('display_name') ?: '-',
@@ -235,9 +233,13 @@ class SyncPermissions extends Command
             ];
         }
 
-        $this->table(
-            ['Role', 'Display Name', 'Permissions'],
-            $rolesData
-        );
+        if (empty($rolesData)) {
+            $this->warn('  No central roles found.');
+        } else {
+            $this->table(
+                ['Role', 'Display Name', 'Permissions'],
+                $rolesData
+            );
+        }
     }
 }

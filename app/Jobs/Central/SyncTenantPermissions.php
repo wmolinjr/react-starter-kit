@@ -161,8 +161,10 @@ class SyncTenantPermissions implements ShouldQueue
                 // Use TenantRole enum for filtering
                 $rolePermissions = $tenantRole->filterPermissions($allowedPermissions);
 
-                // Get permission models
-                $permissionModels = Permission::whereIn('name', $rolePermissions)->get();
+                // Get permission models (filter by tenant guard)
+                $permissionModels = Permission::whereIn('name', $rolePermissions)
+                    ->where('guard_name', 'tenant')
+                    ->get();
 
                 // Sync permissions (removes old, adds new)
                 $role->syncPermissions($permissionModels);

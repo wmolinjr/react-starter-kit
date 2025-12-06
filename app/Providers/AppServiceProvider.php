@@ -64,22 +64,17 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Project::observe(ProjectObserver::class);
 
-        // Super Admin: bypass all permission checks
-        // Plan permission check: grant if enabled by plan (for admin/owner), deny if not
+        // Permission check: All permissions are checked via Spatie roles/permissions.
+        // NO bypass - all users (Central\User and Tenant\User) use explicit permissions.
+        // Central\User uses guard 'central', Tenant\User uses guard 'tenant'.
         Gate::before(function ($user, $ability) {
-            // 1. Central Admin bypass (Central\User model from central database)
-            // Option C: Central\User uses isSuperAdmin() instead of Spatie roles
+            // Central\User: Let Spatie handle via HasRoles trait (guard: central)
+            // No bypass - permissions are assigned via roles (super-admin, central-admin, support-admin)
             if ($user instanceof \App\Models\Central\User) {
-                return $user->isSuperAdmin() ? true : null;
+                return null; // Let normal permission check proceed
             }
 
-            // 2. Super Admin bypass for User model (tenant database)
-            // Multi-database tenancy: SpatiePermissionsBootstrapper handles DB switching
-            if (method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) {
-                return true;
-            }
-
-            // 2. ⭐ Check plan-enabled permissions for tenant context
+            // Tenant\User: Check plan-enabled permissions for tenant context
             $tenant = tenant();
             if ($tenant && str_starts_with($ability, 'tenant.')) {
                 $isPlanEnabled = $tenant->isPlanPermissionEnabled($ability);

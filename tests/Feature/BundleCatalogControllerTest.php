@@ -30,11 +30,8 @@ class BundleCatalogControllerTest extends TestCase
     {
         parent::setUp();
 
-        // OPTION C: Create super admin using Admin model
-        // Admin model uses is_super_admin flag instead of Spatie roles
-        $this->adminUser = Admin::factory()->create([
-            'is_super_admin' => true,
-        ]);
+        // OPTION C: Create super admin using Admin model with super-admin role
+        $this->adminUser = Admin::factory()->superAdmin()->create();
 
         // Seed plans, addons and bundles
         $this->seed(PlanSeeder::class);
@@ -59,10 +56,8 @@ class BundleCatalogControllerTest extends TestCase
     #[Test]
     public function non_super_admin_cannot_access_bundle_index(): void
     {
-        // OPTION C: Create regular admin (not super admin)
-        $regularAdmin = Admin::factory()->create([
-            'is_super_admin' => false,
-        ]);
+        // Admin without role cannot access bundle index
+        $regularAdmin = Admin::factory()->create();
 
         $response = $this->actingAs($regularAdmin, 'central')
             ->get($this->centralUrl('/admin/bundles'));
@@ -370,11 +365,8 @@ class BundleCatalogControllerTest extends TestCase
     #[Test]
     public function non_super_admin_cannot_sync(): void
     {
-        // OPTION C: Create regular admin (not super admin)
-        // Non-super admins don't have permission to sync
-        $regularAdmin = Admin::factory()->create([
-            'is_super_admin' => false,
-        ]);
+        // Admin without role cannot sync bundles
+        $regularAdmin = Admin::factory()->create();
 
         $bundle = AddonBundle::first();
 

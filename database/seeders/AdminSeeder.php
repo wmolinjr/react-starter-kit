@@ -10,13 +10,17 @@ use Illuminate\Database\Seeder;
  *
  * OPTION C: TENANT-ONLY USERS
  * - Creates administrative users in the CENTRAL database
- * - Uses Admin model (not User)
- * - These accounts can access central admin panel
- * - Can impersonate into tenant domains
+ * - Uses Admin model (Central\User)
+ * - Assigns roles via Spatie Permission (guard: central)
+ *
+ * Roles:
+ * - super-admin: Full platform access
+ * - central-admin: Admin panel access
+ * - support-admin: View and impersonate only
  *
  * Test accounts:
- * - admin@setor3.app / password (super admin)
- * - support@setor3.app / password (support)
+ * - admin@setor3.app / password (super-admin)
+ * - support@setor3.app / password (support-admin)
  */
 class AdminSeeder extends Seeder
 {
@@ -31,26 +35,34 @@ class AdminSeeder extends Seeder
                 'name' => 'Super Admin',
                 'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-                'is_super_admin' => true,
                 'locale' => 'pt_BR',
             ]
         );
 
-        $this->command->info("  - Super Admin: {$superAdmin->email} (is_super_admin: true)");
+        // Assign super-admin role (has all permissions)
+        if (!$superAdmin->hasRole('super-admin')) {
+            $superAdmin->assignRole('super-admin');
+        }
 
-        // Support Admin (can impersonate but not super admin)
+        $this->command->info("  - Super Admin: {$superAdmin->email} (role: super-admin)");
+
+        // Support Admin (can view and impersonate, but not edit/delete)
         $supportAdmin = Admin::firstOrCreate(
             ['email' => 'support@setor3.app'],
             [
                 'name' => 'Support Team',
                 'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-                'is_super_admin' => true, // Allow impersonation for support
                 'locale' => 'pt_BR',
             ]
         );
 
-        $this->command->info("  - Support Admin: {$supportAdmin->email}");
+        // Assign support-admin role (limited permissions)
+        if (!$supportAdmin->hasRole('support-admin')) {
+            $supportAdmin->assignRole('support-admin');
+        }
+
+        $this->command->info("  - Support Admin: {$supportAdmin->email} (role: support-admin)");
 
         $this->command->info('Admin users seeded successfully!');
     }

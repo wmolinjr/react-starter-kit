@@ -7,23 +7,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
  * Central User - Administrative users in the central database.
  *
  * Used ONLY for:
- * - Super admins who manage tenants
- * - Technical support who accesses tenants via impersonation
- * - Billing and plan operations
+ * - Super admins who manage tenants (role: super-admin)
+ * - Central admins for admin panel access (role: central-admin)
+ * - Technical support who accesses tenants via impersonation (role: support-admin)
  *
- * NOT tenant users. Do not have tenant roles/permissions.
+ * Uses Spatie Permission with guard 'central'.
+ * NOT tenant users - tenant users are in App\Models\Tenant\User.
  *
  * @property string $id UUID primary key
  * @property string $name
  * @property string $email
  * @property string $password
- * @property bool $is_super_admin
  * @property string $locale
  * @property \Carbon\Carbon|null $email_verified_at
  * @property \Carbon\Carbon|null $two_factor_confirmed_at
@@ -32,9 +33,16 @@ class User extends Authenticatable
 {
     use CentralConnection;
     use HasFactory;
+    use HasRoles;
     use HasUuids;
     use Notifiable;
     use TwoFactorAuthenticatable;
+
+    /**
+     * The guard name for Spatie Permission.
+     * Must match the guard in config/auth.php that uses 'admins' provider.
+     */
+    protected string $guard_name = 'central';
 
     /**
      * Create a new factory instance for the model.
@@ -60,7 +68,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_super_admin',
         'locale',
     ];
 
@@ -99,37 +106,55 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_super_admin' => 'boolean',
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
 
     /**
      * Check if the admin can access a specific tenant.
-     * Super admins can access any tenant.
+     * Admins with 'tenants:impersonate' permission can access any tenant.
      */
     public function canAccessTenant(Tenant $tenant): bool
     {
-        return $this->is_super_admin;
+        return $this->can('tenants:impersonate');
     }
 
     /**
-     * Scope for super admins only.
+     * Scope for super admins only (those with super-admin role).
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeSuperAdmins($query)
     {
-        return $query->where('is_super_admin', true);
+        return $query->whereHas('roles', function ($q) {
+            $q->where('name', 'super-admin');
+        });
     }
 
     /**
-     * Check if the admin is a super admin.
+     * Check if the admin has the super-admin role.
      */
     public function isSuperAdmin(): bool
     {
-        return $this->is_super_admin === true;
+        return $this->hasRole('super-admin');
+    }
+
+    /**
+     * Get the admin's role name for display.
+     */
+    public function getRoleName(): ?string
+    {
+        return $this->roles->first()?->name;
+    }
+
+    /**
+     * Get the admin's role display name (translated).
+     */
+    public function getRoleDisplayName(): ?string
+    {
+        $role = $this->roles->first();
+        return $role?->trans('display_name') ?? $role?->name;
     }
 
     /**

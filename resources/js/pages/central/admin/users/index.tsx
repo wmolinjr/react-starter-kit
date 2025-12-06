@@ -18,7 +18,8 @@ interface User {
     email: string;
     email_verified_at: string | null;
     created_at: string;
-    is_super_admin: boolean;
+    role: string | null;
+    role_display_name: string | null;
 }
 
 interface Props {
@@ -99,10 +100,12 @@ export default function UsersIndex({ users, filters }: Props) {
                                         <TableCell className="font-medium">{user.name}</TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>
-                                            {user.is_super_admin ? (
-                                                <Badge variant="default">Super Admin</Badge>
+                                            {user.role ? (
+                                                <Badge variant={user.role === 'super-admin' ? 'default' : 'secondary'}>
+                                                    {user.role_display_name || user.role}
+                                                </Badge>
                                             ) : (
-                                                <Badge variant="secondary">Admin</Badge>
+                                                <Badge variant="outline">{t('common.no_role')}</Badge>
                                             )}
                                         </TableCell>
                                         <TableCell>

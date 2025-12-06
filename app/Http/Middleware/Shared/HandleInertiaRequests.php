@@ -97,14 +97,16 @@ class HandleInertiaRequests extends Middleware
             ];
         }
 
-        // OPTION C: Handle Admin model (central database) differently
-        // Admin uses isSuperAdmin() flag, not Spatie roles/permissions
+        // Central\User: Uses Spatie roles/permissions with guard 'central'
+        // Roles: super-admin, central-admin, support-admin
+        // NO bypass - permissions are explicit via assigned roles
         if ($user instanceof \App\Models\Central\User) {
             return [
                 'user' => $user->toArray(),
-                'tenant' => null, // Admins don't belong to tenants
-                'permissions' => $user->isSuperAdmin() ? ['*'] : [], // Super admins have all permissions
-                'role' => $user->isSuperAdmin() ? 'super_admin' : 'admin',
+                'tenant' => null, // Central admins don't belong to tenants
+                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+                'role' => $user->getRoleName(),
+                'isSuperAdmin' => $user->isSuperAdmin(),
             ];
         }
 

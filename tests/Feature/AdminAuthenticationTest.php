@@ -208,9 +208,8 @@ class AdminAuthenticationTest extends TestCase
     #[Test]
     public function regular_admin_cannot_access_dashboard(): void
     {
-        $admin = Admin::factory()->create([
-            'is_super_admin' => false,
-        ]);
+        // Admin without any role cannot access dashboard
+        $admin = Admin::factory()->create();
 
         $response = $this->actingAs($admin, 'central')
             ->get($this->centralUrl('/admin/dashboard'));
@@ -271,7 +270,7 @@ class AdminAuthenticationTest extends TestCase
 
     /*
     |--------------------------------------------------------------------------
-    | Super Admin Flag Tests
+    | Super Admin Role Tests
     |--------------------------------------------------------------------------
     */
 
@@ -279,7 +278,7 @@ class AdminAuthenticationTest extends TestCase
     public function is_super_admin_method_returns_correct_value(): void
     {
         $superAdmin = Admin::factory()->superAdmin()->create();
-        $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
+        $regularAdmin = Admin::factory()->create(); // No role assigned
 
         $this->assertTrue($superAdmin->isSuperAdmin());
         $this->assertFalse($regularAdmin->isSuperAdmin());
@@ -293,12 +292,12 @@ class AdminAuthenticationTest extends TestCase
 
         // Create new super admins and regular admin
         Admin::factory()->superAdmin()->count(2)->create();
-        Admin::factory()->create(['is_super_admin' => false]);
+        Admin::factory()->create(); // No role assigned
 
         $superAdmins = Admin::superAdmins()->get();
 
         // Should have 2 more super admins than initial
         $this->assertCount($initialCount + 2, $superAdmins);
-        $superAdmins->each(fn ($admin) => $this->assertTrue($admin->is_super_admin));
+        $superAdmins->each(fn ($admin) => $this->assertTrue($admin->isSuperAdmin()));
     }
 }

@@ -25,10 +25,20 @@ class UserManagementController extends Controller implements HasMiddleware
     public function index(Request $request): Response
     {
         $users = User::query()
+            ->with('roles')
             ->when($request->search, fn ($q, $s) => $q->where('name', 'ilike', "%{$s}%")->orWhere('email', 'ilike', "%{$s}%"))
             ->latest()
             ->paginate(20)
-            ->withQueryString();
+            ->withQueryString()
+            ->through(fn ($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at,
+                'created_at' => $user->created_at,
+                'role' => $user->getRoleName(),
+                'role_display_name' => $user->getRoleDisplayName(),
+            ]);
 
         return Inertia::render('central/admin/users/index', [
             'users' => $users,
@@ -38,8 +48,19 @@ class UserManagementController extends Controller implements HasMiddleware
 
     public function show(User $user): Response
     {
+        $user->load('roles');
+
         return Inertia::render('central/admin/users/show', [
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at,
+                'created_at' => $user->created_at,
+                'role' => $user->getRoleName(),
+                'role_display_name' => $user->getRoleDisplayName(),
+                'isSuperAdmin' => $user->isSuperAdmin(),
+            ],
         ]);
     }
 

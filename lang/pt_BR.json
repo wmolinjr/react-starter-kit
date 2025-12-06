@@ -20,6 +20,7 @@
   "common.default": "Padrão",
   "common.permissions": "Permissões",
   "common.role": "Função",
+  "common.no_role": "Sem Função",
   "common.users": "Usuários",
   "common.permissions_count": ":count permissões",
   "common.users_count": ":count usuários",

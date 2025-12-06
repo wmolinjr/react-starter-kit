@@ -9,6 +9,9 @@ use Illuminate\Support\Str;
 /**
  * Factory for Central User model (central database administrators).
  *
+ * Uses Spatie Permission with guard 'central'.
+ * Roles: super-admin, central-admin, support-admin
+ *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Central\User>
  */
 class AdminFactory extends Factory
@@ -37,20 +40,73 @@ class AdminFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= 'password',
-            'is_super_admin' => false,
             'locale' => 'pt_BR',
             'remember_token' => Str::random(10),
         ];
     }
 
     /**
-     * Indicate that the admin is a super admin.
+     * Indicate that the admin has the super-admin role.
      */
     public function superAdmin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_super_admin' => true,
-        ]);
+        return $this->afterCreating(function (User $admin) {
+            $this->ensureRoleExists('super-admin');
+            $admin->assignRole('super-admin');
+        });
+    }
+
+    /**
+     * Indicate that the admin has the central-admin role.
+     */
+    public function centralAdmin(): static
+    {
+        return $this->afterCreating(function (User $admin) {
+            $this->ensureRoleExists('central-admin');
+            $admin->assignRole('central-admin');
+        });
+    }
+
+    /**
+     * Indicate that the admin has the support-admin role.
+     */
+    public function supportAdmin(): static
+    {
+        return $this->afterCreating(function (User $admin) {
+            $this->ensureRoleExists('support-admin');
+            $admin->assignRole('support-admin');
+        });
+    }
+
+    /**
+     * Ensure a role exists in the database (for tests with fresh database).
+     * Also ensures the role has all central permissions.
+     */
+    protected function ensureRoleExists(string $roleName): void
+    {
+        $role = \App\Models\Shared\Role::firstOrCreate(
+            ['name' => $roleName, 'guard_name' => 'central'],
+            ['display_name' => ['en' => $roleName], 'description' => ['en' => $roleName]]
+        );
+
+        // Sync all central permissions for super-admin and central-admin roles
+        if (in_array($roleName, ['super-admin', 'central-admin']) && $role->permissions->isEmpty()) {
+            $this->ensureCentralPermissionsExist();
+            $permissions = \App\Models\Shared\Permission::where('guard_name', 'central')->get();
+            $role->syncPermissions($permissions);
+        }
+    }
+
+    /**
+     * Ensure central permissions exist in the database.
+     */
+    protected function ensureCentralPermissionsExist(): void
+    {
+        foreach (\App\Enums\CentralPermission::values() as $permName) {
+            \App\Models\Shared\Permission::firstOrCreate(
+                ['name' => $permName, 'guard_name' => 'central']
+            );
+        }
     }
 
     /**
