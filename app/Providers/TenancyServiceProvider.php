@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\TenantConfigKey;
 use App\Jobs\SeedTenantDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Stancl\JobPipeline\JobPipeline;
+use Stancl\Tenancy\Bootstrappers\TenantConfigBootstrapper;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
@@ -144,6 +146,11 @@ class TenancyServiceProvider extends ServiceProvider
         $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
+
+        // Configure TenantConfigBootstrapper to map tenant settings to Laravel config keys
+        // This enables automatic config overrides when tenancy is initialized
+        // Example: tenant.settings['config.locale'] -> config('app.locale')
+        TenantConfigBootstrapper::$storageToConfigMap = TenantConfigKey::toStorageConfigMap();
 
         // Configure InitializeTenancyByDomain to handle failures gracefully
         // This covers: central domains, already initialized tenancy, or unknown domains

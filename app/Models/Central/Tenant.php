@@ -4,6 +4,7 @@ namespace App\Models\Central;
 
 use App\Enums\AddonType;
 use App\Enums\PlanLimit;
+use App\Enums\TenantConfigKey;
 use App\Models\Tenant\User as TenantUser;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -266,6 +267,57 @@ class Tenant extends Model implements TenantWithDatabase
         data_set($settings, $key, $value);
 
         return $this->update(['settings' => $settings]);
+    }
+
+    // ==========================================
+    // Config Methods (TenantConfigBootstrapper)
+    // ==========================================
+
+    /**
+     * Get a config setting with fallback to Laravel default.
+     *
+     * Config settings are stored in settings['config'] and automatically
+     * override Laravel config via TenantConfigBootstrapper.
+     */
+    public function getConfig(TenantConfigKey $key): mixed
+    {
+        $value = $this->getSetting($key->settingsPath());
+
+        if ($value === null) {
+            // Fallback to current Laravel config (which may be the default)
+            $configKeys = $key->configKeys();
+
+            return config($configKeys[0], $key->defaultValue());
+        }
+
+        return $value;
+    }
+
+    /**
+     * Update a config setting.
+     *
+     * This updates the tenant settings which will be applied via
+     * TenantConfigBootstrapper on the next request.
+     */
+    public function updateConfig(TenantConfigKey $key, mixed $value): bool
+    {
+        return $this->updateSetting($key->settingsPath(), $value);
+    }
+
+    /**
+     * Get all config settings as array.
+     *
+     * @return array<string, mixed>
+     */
+    public function getAllConfig(): array
+    {
+        $config = [];
+
+        foreach (TenantConfigKey::cases() as $key) {
+            $config[$key->value] = $this->getConfig($key);
+        }
+
+        return $config;
     }
 
     /**

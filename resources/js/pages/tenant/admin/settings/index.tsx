@@ -17,6 +17,7 @@ import {
     Languages,
     Palette,
     Settings,
+    Settings2,
     Shield,
 } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
@@ -67,6 +68,12 @@ export default function SettingsIndex({ tenant: tenantData, domains }: Props) {
             description: t('tenant.settings.language_description'),
             href: admin.settings.language.url(),
             icon: Languages,
+        },
+        {
+            title: t('tenant.config.title'),
+            description: t('tenant.config.description', { name: tenantData.name }),
+            href: admin.settings.config.url(),
+            icon: Settings2,
         },
         {
             title: 'API Tokens',

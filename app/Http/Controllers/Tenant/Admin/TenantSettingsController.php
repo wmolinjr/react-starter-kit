@@ -29,12 +29,12 @@ class TenantSettingsController extends Controller implements HasMiddleware
     {
         return [
             // View permissions
-            new Middleware('permission:'.TenantPermission::SETTINGS_VIEW->value, only: ['index', 'branding', 'domains', 'language']),
+            new Middleware('permission:'.TenantPermission::SETTINGS_VIEW->value, only: ['index', 'branding', 'domains', 'language', 'config']),
             new Middleware('permission:'.TenantPermission::API_TOKENS_VIEW->value, only: ['apiTokens']),
             new Middleware('permission:'.TenantPermission::SETTINGS_DANGER->value, only: ['danger']),
 
             // Edit permissions
-            new Middleware('permission:'.TenantPermission::SETTINGS_EDIT->value, only: ['updateBranding', 'addDomain', 'removeDomain', 'updateFeatures', 'updateNotifications', 'updateLanguage']),
+            new Middleware('permission:'.TenantPermission::SETTINGS_EDIT->value, only: ['updateBranding', 'addDomain', 'removeDomain', 'updateFeatures', 'updateNotifications', 'updateLanguage', 'updateConfig']),
             new Middleware('permission:'.TenantPermission::SETTINGS_DANGER->value, only: ['destroy']),
         ];
     }
@@ -197,6 +197,48 @@ class TenantSettingsController extends Controller implements HasMiddleware
         } catch (SettingsException $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Display configuration settings page.
+     *
+     * Shows locale, timezone, email, and currency settings that override
+     * Laravel config via TenantConfigBootstrapper.
+     */
+    public function config(): Response
+    {
+        return Inertia::render(
+            'tenant/admin/settings/config',
+            $this->settingsService->getConfigSettings(tenant())
+        );
+    }
+
+    /**
+     * Update configuration settings.
+     */
+    public function updateConfig(Request $request): RedirectResponse
+    {
+        $availableLocales = config('app.locales');
+
+        $request->validate([
+            'locale' => ['sometimes', 'string', 'in:'.implode(',', $availableLocales)],
+            'timezone' => ['sometimes', 'string', 'timezone'],
+            'mail_from_address' => ['nullable', 'email', 'max:255'],
+            'mail_from_name' => ['nullable', 'string', 'max:100'],
+            'currency' => ['sometimes', 'string', 'size:3'],
+            'currency_locale' => ['sometimes', 'string', 'max:10'],
+        ]);
+
+        $this->settingsService->updateConfig(tenant(), $request->only([
+            'locale',
+            'timezone',
+            'mail_from_address',
+            'mail_from_name',
+            'currency',
+            'currency_locale',
+        ]));
+
+        return back()->with('success', __('flash.settings.config_updated'));
     }
 
     /**

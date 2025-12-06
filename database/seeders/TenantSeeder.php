@@ -35,7 +35,7 @@ class TenantSeeder extends Seeder
             return;
         }
 
-        // Tenant 1 - Professional Plan
+        // Tenant 1 - Professional Plan (Brazilian company)
         $this->createTenant(
             name: 'Acme Corporation',
             slug: 'acme',
@@ -43,10 +43,21 @@ class TenantSeeder extends Seeder
             ownerName: 'John Doe',
             ownerEmail: 'john@acme.com',
             plan: $professionalPlan,
-            settings: ['branding' => ['primary_color' => '#3b82f6']]
+            settings: [
+                'branding' => ['primary_color' => '#3b82f6'],
+                'config' => [
+                    'locale' => 'pt_BR',
+                    'timezone' => 'America/Sao_Paulo',
+                    'currency' => 'brl',
+                    'currency_locale' => 'pt_BR',
+                    'mail_from_address' => 'contato@acme.com.br',
+                    'mail_from_name' => 'Acme Brasil',
+                ],
+                'language' => ['default' => 'pt_BR'],
+            ]
         );
 
-        // Tenant 2 - Starter Plan
+        // Tenant 2 - Starter Plan (US company)
         $this->createTenant(
             name: 'Startup Inc',
             slug: 'startup',
@@ -54,10 +65,19 @@ class TenantSeeder extends Seeder
             ownerName: 'Jane Smith',
             ownerEmail: 'jane@startup.com',
             plan: $starterPlan,
-            settings: ['branding' => ['primary_color' => '#10b981']]
+            settings: [
+                'branding' => ['primary_color' => '#10b981'],
+                'config' => [
+                    'locale' => 'en',
+                    'timezone' => 'America/New_York',
+                    'currency' => 'usd',
+                    'currency_locale' => 'en_US',
+                ],
+                'language' => ['default' => 'en'],
+            ]
         );
 
-        // Tenant 3 - Enterprise Plan
+        // Tenant 3 - Enterprise Plan (Spanish company)
         $this->createTenant(
             name: 'Enterprise Corp',
             slug: 'enterprise',
@@ -65,14 +85,25 @@ class TenantSeeder extends Seeder
             ownerName: 'Mike Johnson',
             ownerEmail: 'mike@enterprise.com',
             plan: $enterprisePlan,
-            settings: ['branding' => ['primary_color' => '#8b5cf6']]
+            settings: [
+                'branding' => ['primary_color' => '#8b5cf6'],
+                'config' => [
+                    'locale' => 'es',
+                    'timezone' => 'Europe/Madrid',
+                    'currency' => 'eur',
+                    'currency_locale' => 'es_ES',
+                    'mail_from_address' => 'info@enterprise.es',
+                    'mail_from_name' => 'Enterprise España',
+                ],
+                'language' => ['default' => 'es'],
+            ]
         );
 
         $this->command->info('');
         $this->command->info('Tenants created successfully!');
-        $this->command->info('  - tenant1.localhost (john@acme.com / password) - Professional Plan');
-        $this->command->info('  - tenant2.localhost (jane@startup.com / password) - Starter Plan');
-        $this->command->info('  - tenant3.localhost (mike@enterprise.com / password) - Enterprise Plan');
+        $this->command->info('  - tenant1.localhost (john@acme.com / password) - Professional Plan [pt_BR, BRL, America/Sao_Paulo]');
+        $this->command->info('  - tenant2.localhost (jane@startup.com / password) - Starter Plan [en, USD, America/New_York]');
+        $this->command->info('  - tenant3.localhost (mike@enterprise.com / password) - Enterprise Plan [es, EUR, Europe/Madrid]');
     }
 
     /**

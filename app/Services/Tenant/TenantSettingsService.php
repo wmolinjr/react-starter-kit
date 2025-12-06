@@ -2,10 +2,13 @@
 
 namespace App\Services\Tenant;
 
+use App\Enums\TenantConfigKey;
 use App\Exceptions\SettingsException;
 use App\Models\Central\Tenant;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 /**
  * TenantSettingsService
@@ -215,6 +218,79 @@ class TenantSettingsService
         }
 
         $tenant->updateSetting('language.default', $language);
+    }
+
+    // ==========================================
+    // Config Settings (TenantConfigBootstrapper)
+    // ==========================================
+
+    /**
+     * Get all configuration settings for the config page.
+     *
+     * @return array{
+     *     config: array<string, mixed>,
+     *     availableLocales: array<string>,
+     *     localeLabels: array<string, string>,
+     *     availableTimezones: array<string>,
+     *     availableCurrencies: array<string, string>
+     * }
+     */
+    public function getConfigSettings(Tenant $tenant): array
+    {
+        return [
+            'config' => $tenant->getAllConfig(),
+            'availableLocales' => config('app.locales', ['en']),
+            'localeLabels' => collect(config('app.locale_labels', []))
+                ->only(config('app.locales', ['en']))
+                ->toArray(),
+            'availableTimezones' => $this->getGroupedTimezones(),
+            'availableCurrencies' => TenantConfigKey::availableCurrencies(),
+        ];
+    }
+
+    /**
+     * Update configuration settings.
+     *
+     * @param  array<string, mixed>  $data
+     *
+     * @throws ValidationException
+     */
+    public function updateConfig(Tenant $tenant, array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $configKey = TenantConfigKey::tryFrom($key);
+
+            if (! $configKey) {
+                continue;
+            }
+
+            // Skip null/empty values for optional fields
+            if ($value === null || $value === '') {
+                if (in_array($configKey, [TenantConfigKey::MAIL_FROM_ADDRESS, TenantConfigKey::MAIL_FROM_NAME])) {
+                    $tenant->updateConfig($configKey, null);
+
+                    continue;
+                }
+            }
+
+            $tenant->updateConfig($configKey, $value);
+        }
+
+        // Backward compatibility: sync locale with language.default
+        if (isset($data['locale'])) {
+            $tenant->updateSetting('language.default', $data['locale']);
+        }
+    }
+
+    /**
+     * Get timezones grouped by region for better UX.
+     *
+     * @return array<string>
+     */
+    protected function getGroupedTimezones(): array
+    {
+        // Return flat list - grouping can be done in frontend if needed
+        return timezone_identifiers_list();
     }
 
     /**
