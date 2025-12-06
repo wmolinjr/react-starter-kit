@@ -4,16 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CentralAdminLayout from '@/layouts/central-admin-layout';
 import admin from '@/routes/central/admin';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Building2, Calendar, Mail } from 'lucide-react';
+import { ArrowLeft, Calendar, Mail, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-
-interface Tenant {
-    id: string;
-    name: string;
-    domains: { domain: string }[];
-}
 
 interface User {
     id: string;
@@ -21,7 +15,7 @@ interface User {
     email: string;
     email_verified_at: string | null;
     created_at: string;
-    tenants: Tenant[];
+    is_super_admin: boolean;
 }
 
 interface Props {
@@ -93,37 +87,28 @@ export default function UserShow({ user }: Props) {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Building2 className="h-5 w-5" />
-                                Tenants ({user.tenants.length})
+                                <Shield className="h-5 w-5" />
+                                {t('common.role')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {user.tenants.length > 0 ? (
-                                <div className="space-y-3">
-                                    {user.tenants.map((tenant) => (
-                                        <div
-                                            key={tenant.id}
-                                            className="flex items-center justify-between rounded-lg border p-3"
-                                        >
-                                            <div>
-                                                <p className="font-medium">{tenant.name}</p>
-                                                {tenant.domains[0] && (
-                                                    <p className="text-muted-foreground text-xs">
-                                                        {tenant.domains[0].domain}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/admin/tenants/${tenant.id}`}>{t('common.view')}</Link>
-                                            </Button>
-                                        </div>
-                                    ))}
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between rounded-lg border p-3">
+                                    <div>
+                                        <p className="font-medium">
+                                            {user.is_super_admin ? 'Super Admin' : 'Admin'}
+                                        </p>
+                                        <p className="text-muted-foreground text-xs">
+                                            {user.is_super_admin
+                                                ? t('admin.users.super_admin_description')
+                                                : t('admin.users.admin_description')}
+                                        </p>
+                                    </div>
+                                    <Badge variant={user.is_super_admin ? 'default' : 'secondary'}>
+                                        {user.is_super_admin ? 'Super Admin' : 'Admin'}
+                                    </Badge>
                                 </div>
-                            ) : (
-                                <p className="text-muted-foreground text-sm">
-                                    {t('admin.users.no_tenant_membership')}
-                                </p>
-                            )}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

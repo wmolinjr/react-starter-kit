@@ -19,6 +19,7 @@
   "common.protected": "Protected",
   "common.default": "Default",
   "common.permissions": "Permissions",
+  "common.role": "Role",
   "common.users": "Users",
   "common.permissions_count": ":count permissions",
   "common.users_count": ":count users",
@@ -409,6 +410,8 @@
   "admin.users.email_verified": "Email Verified",
   "admin.users.pending_verification": "Pending Verification",
   "admin.users.no_tenant_membership": "This user does not belong to any tenant",
+  "admin.users.super_admin_description": "Full access to all tenants and system settings",
+  "admin.users.admin_description": "Limited administrative access",
 
   "admin.plans.title": "Plan Catalog",
   "admin.plans.description": "Manage available subscription plans",

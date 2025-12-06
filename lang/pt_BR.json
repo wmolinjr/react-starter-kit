@@ -19,6 +19,7 @@
   "common.protected": "Protegido",
   "common.default": "Padrão",
   "common.permissions": "Permissões",
+  "common.role": "Função",
   "common.users": "Usuários",
   "common.permissions_count": ":count permissões",
   "common.users_count": ":count usuários",
@@ -409,6 +410,8 @@
   "admin.users.email_verified": "E-mail Verificado",
   "admin.users.pending_verification": "Verificação Pendente",
   "admin.users.no_tenant_membership": "Este usuário não pertence a nenhuma contratação",
+  "admin.users.super_admin_description": "Acesso total a todos os tenants e configurações do sistema",
+  "admin.users.admin_description": "Acesso administrativo limitado",
 
   "admin.plans.title": "Catálogo de Planos",
   "admin.plans.description": "Gerencie os planos disponíveis para assinatura",

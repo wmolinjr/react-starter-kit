@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\CentralPermission;
 use App\Http\Controllers\Controller;
-use App\Models\Tenant\User;
+use App\Models\Central\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -25,7 +25,6 @@ class UserManagementController extends Controller implements HasMiddleware
     public function index(Request $request): Response
     {
         $users = User::query()
-            ->with('tenants')
             ->when($request->search, fn ($q, $s) => $q->where('name', 'ilike', "%{$s}%")->orWhere('email', 'ilike', "%{$s}%"))
             ->latest()
             ->paginate(20)
@@ -39,8 +38,6 @@ class UserManagementController extends Controller implements HasMiddleware
 
     public function show(User $user): Response
     {
-        $user->load('tenants.domains');
-
         return Inertia::render('central/admin/users/show', [
             'user' => $user,
         ]);
@@ -48,7 +45,6 @@ class UserManagementController extends Controller implements HasMiddleware
 
     public function destroy(User $user)
     {
-        $user->tenants()->detach();
         $user->delete();
 
         return back()->with('success', __('flash.user.deleted'));

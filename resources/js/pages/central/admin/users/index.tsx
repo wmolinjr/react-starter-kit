@@ -18,7 +18,7 @@ interface User {
     email: string;
     email_verified_at: string | null;
     created_at: string;
-    tenants: { id: string; name: string }[];
+    is_super_admin: boolean;
 }
 
 interface Props {
@@ -87,7 +87,7 @@ export default function UsersIndex({ users, filters }: Props) {
                                 <TableRow>
                                     <TableHead>{t('common.name')}</TableHead>
                                     <TableHead>{t('common.email')}</TableHead>
-                                    <TableHead>Tenants</TableHead>
+                                    <TableHead>{t('common.role')}</TableHead>
                                     <TableHead>{t('admin.users.verified')}</TableHead>
                                     <TableHead>{t('common.created')}</TableHead>
                                     <TableHead className="w-24">{t('common.actions')}</TableHead>
@@ -99,18 +99,11 @@ export default function UsersIndex({ users, filters }: Props) {
                                         <TableCell className="font-medium">{user.name}</TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>
-                                            <div className="flex flex-wrap gap-1">
-                                                {user.tenants.slice(0, 3).map((t) => (
-                                                    <Badge key={t.id} variant="outline" className="text-xs">
-                                                        {t.name}
-                                                    </Badge>
-                                                ))}
-                                                {user.tenants.length > 3 && (
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        +{user.tenants.length - 3}
-                                                    </Badge>
-                                                )}
-                                            </div>
+                                            {user.is_super_admin ? (
+                                                <Badge variant="default">Super Admin</Badge>
+                                            ) : (
+                                                <Badge variant="secondary">Admin</Badge>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             {user.email_verified_at ? (
