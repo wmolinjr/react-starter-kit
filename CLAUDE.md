@@ -574,15 +574,15 @@ sail artisan migrate:fresh --seed     # Reset database and seed test users
 
 | Type | Email | Password | Domain | Guard | Model |
 |------|-------|----------|--------|-------|-------|
-| Super Admin | `admin@setor3.app` | `password` | localhost/admin/login | `admin` | Central\\User |
-| Support Admin | `support@setor3.app` | `password` | localhost/admin/login | `admin` | Central\\User |
-| Tenant 1 Owner | `john@acme.com` | `password` | tenant1.localhost | `web` | Tenant\\User |
-| Tenant 2 Owner | `jane@startup.com` | `password` | tenant2.localhost | `web` | Tenant\\User |
-| Tenant 3 Owner | `mike@enterprise.com` | `password` | tenant3.localhost | `web` | Tenant\\User |
+| Super Admin | `admin@setor3.app` | `password` | localhost/admin/login | `central` | Central\\User |
+| Support Admin | `support@setor3.app` | `password` | localhost/admin/login | `central` | Central\\User |
+| Tenant 1 Owner | `john@acme.com` | `password` | tenant1.localhost | `tenant` | Tenant\\User |
+| Tenant 2 Owner | `jane@startup.com` | `password` | tenant2.localhost | `tenant` | Tenant\\User |
+| Tenant 3 Owner | `mike@enterprise.com` | `password` | tenant3.localhost | `tenant` | Tenant\\User |
 
 **Authentication Guards (Option C)**:
-- `admin` guard: Central administrators (Central\\User) at `localhost/admin/login`
-- `web` guard: Tenant users (Tenant\\User) at `{tenant}.localhost/login`
+- `central` guard: Central administrators (Central\\User) at `localhost/admin/login`
+- `tenant` guard: Tenant users (Tenant\\User) at `{tenant}.localhost/login`
 
 **See**: [docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md#usuários-de-teste-seeders) for detailed test scenarios.
 

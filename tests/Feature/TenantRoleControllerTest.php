@@ -48,7 +48,7 @@ class TenantRoleControllerTest extends TenantTestCase
         foreach ($permissions as $permData) {
             Permission::firstOrCreate([
                 'name' => $permData['name'],
-                'guard_name' => 'web',
+                'guard_name' => 'tenant',
             ], [
                 'category' => $permData['category'],
             ]);
@@ -127,7 +127,7 @@ class TenantRoleControllerTest extends TenantTestCase
         // Create an enterprise permission that Pro plan shouldn't have
         Permission::firstOrCreate([
             'name' => 'sso:configure',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
         ], [
             'category' => 'sso',
         ]);
@@ -167,7 +167,7 @@ class TenantRoleControllerTest extends TenantTestCase
             Role::create([
                 'name' => "custom-role-{$i}",
                 'display_name' => "Custom Role {$i}",
-                'guard_name' => 'web',
+                'guard_name' => 'tenant',
                 'is_protected' => false,
             ]);
         }
@@ -190,7 +190,7 @@ class TenantRoleControllerTest extends TenantTestCase
         $role = Role::create([
             'name' => 'custom-manager',
             'display_name' => 'Custom Manager',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => false,
         ]);
         $role->givePermissionTo('projects:view');
@@ -198,7 +198,7 @@ class TenantRoleControllerTest extends TenantTestCase
         // Create an enterprise permission that Pro plan shouldn't have
         Permission::firstOrCreate([
             'name' => 'sso:manage',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
         ], [
             'category' => 'sso',
         ]);
@@ -255,7 +255,7 @@ class TenantRoleControllerTest extends TenantTestCase
         $role = Role::create([
             'name' => 'test-role-edit',
             'display_name' => 'Test Role for Edit',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => false,
         ]);
         $role->givePermissionTo(['projects:view', 'team:view']);

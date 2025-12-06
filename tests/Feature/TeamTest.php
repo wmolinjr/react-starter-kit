@@ -41,7 +41,7 @@ class TeamTest extends TenantTestCase
         $member = $this->createTenantUser('member');
 
         // Pre-create admin role for this tenant
-        \App\Models\Universal\Role::findOrCreate('admin', 'web');
+        \App\Models\Universal\Role::findOrCreate('admin', 'tenant');
 
         $response = $this->patch($this->tenantRoute('tenant.admin.team.update-role', ['user' => $member]), [
             'role' => 'admin',

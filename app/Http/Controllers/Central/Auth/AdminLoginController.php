@@ -15,7 +15,7 @@ use Inertia\Response;
  * Handles authentication for central admins.
  *
  * TENANT-ONLY ARCHITECTURE (Option C):
- * - Uses 'admin' guard for authentication (central database)
+ * - Uses 'central' guard for authentication (central database)
  * - Separate from tenant user authentication (Fortify)
  * - Admins can impersonate tenants via ImpersonationController
  */
@@ -53,8 +53,8 @@ class AdminLoginController extends Controller
             ]);
         }
 
-        // Login with admin guard
-        Auth::guard('admin')->login($admin, $request->boolean('remember'));
+        // Login with central guard
+        Auth::guard('central')->login($admin, $request->boolean('remember'));
 
         // Regenerate session for security
         $request->session()->regenerate();

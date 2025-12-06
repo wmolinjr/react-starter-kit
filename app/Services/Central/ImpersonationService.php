@@ -97,12 +97,12 @@ class ImpersonationService
     /**
      * Get the authenticated admin user.
      *
-     * Supports both new 'admin' guard and legacy 'web' guard with Super Admin role.
+     * Supports both new 'central' guard and legacy 'tenant' guard with Super Admin role.
      */
     public function getAuthenticatedAdmin(): CentralUser|TenantUser|null
     {
-        // Try admin guard first (new architecture)
-        $admin = auth('admin')->user();
+        // Try central guard first (new architecture)
+        $admin = auth('central')->user();
         if ($admin) {
             return $admin;
         }

@@ -87,9 +87,9 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         // Redirect /admin to /admin/dashboard
         Route::get('/admin', function () {
             return redirect()->route('central.admin.dashboard');
-        })->middleware(['auth:admin']);
+        })->middleware(['auth:central']);
 
-        Route::middleware(['auth:admin'])
+        Route::middleware(['auth:central'])
             ->prefix('admin')
             ->name('admin.')
             ->group(function () {

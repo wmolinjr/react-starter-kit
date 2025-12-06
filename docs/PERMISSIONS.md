@@ -616,7 +616,7 @@ protected function seedTenantRolesForTests(): void
     foreach (TenantPermission::toSeederArray() as $permData) {
         Permission::firstOrCreate([
             'name' => $permData['name'],
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
         ], [
             'category' => $permData['category'],
             'description' => $permData['description'],
@@ -626,7 +626,7 @@ protected function seedTenantRolesForTests(): void
     // Seed roles usando TenantRole enum
     foreach (TenantRole::systemRoles() as $tenantRole) {
         $role = Role::firstOrCreate(
-            ['name' => $tenantRole->value, 'guard_name' => 'web'],
+            ['name' => $tenantRole->value, 'guard_name' => 'tenant'],
             [...]
         );
         $rolePermissions = $tenantRole->filterPermissions($allPermissions);

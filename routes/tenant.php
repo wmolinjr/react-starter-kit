@@ -82,7 +82,7 @@ Route::middleware([
         }
 
         // Login as the tenant user
-        Auth::guard($impersonationToken->auth_guard ?? 'web')->login($user);
+        Auth::guard($impersonationToken->auth_guard ?? 'tenant')->login($user);
 
         // Set impersonation flag, ensure NOT in admin mode
         session()->put('tenancy_impersonating', true);

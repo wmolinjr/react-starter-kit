@@ -87,7 +87,7 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function super_admin_can_access_impersonation_page(): void
     {
-        $response = $this->actingAs($this->superAdmin, 'admin')
+        $response = $this->actingAs($this->superAdmin, 'central')
             ->get($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate"));
 
         $response->assertOk();
@@ -103,7 +103,7 @@ class AdminImpersonationTest extends TestCase
     {
         $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
 
-        $response = $this->actingAs($regularAdmin, 'admin')
+        $response = $this->actingAs($regularAdmin, 'central')
             ->get($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate"));
 
         $response->assertForbidden();
@@ -128,7 +128,7 @@ class AdminImpersonationTest extends TestCase
     {
         $regularAdmin = Admin::factory()->create(['is_super_admin' => false]);
 
-        $response = $this->actingAs($regularAdmin, 'admin')
+        $response = $this->actingAs($regularAdmin, 'central')
             ->post($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate/admin-mode"));
 
         $response->assertForbidden();
@@ -146,7 +146,7 @@ class AdminImpersonationTest extends TestCase
         // Use a valid UUID format that doesn't exist
         $fakeUserId = '00000000-0000-0000-0000-000000000000';
 
-        $response = $this->actingAs($this->superAdmin, 'admin')
+        $response = $this->actingAs($this->superAdmin, 'central')
             ->post($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate/as/{$fakeUserId}"));
 
         $response->assertNotFound();
@@ -159,7 +159,7 @@ class AdminImpersonationTest extends TestCase
         // Use a fake UUID since we can't guarantee users exist
         $fakeUserId = '00000000-0000-0000-0000-000000000000';
 
-        $response = $this->actingAs($regularAdmin, 'admin')
+        $response = $this->actingAs($regularAdmin, 'central')
             ->post($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate/as/{$fakeUserId}"));
 
         // Should be forbidden before checking if user exists
@@ -175,7 +175,7 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function impersonation_page_shows_tenant_info(): void
     {
-        $response = $this->actingAs($this->superAdmin, 'admin')
+        $response = $this->actingAs($this->superAdmin, 'central')
             ->get($this->centralUrl("/admin/tenants/{$this->tenant->id}/impersonate"));
 
         $response->assertOk();
@@ -214,7 +214,7 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function impersonation_page_returns_404_for_nonexistent_tenant(): void
     {
-        $response = $this->actingAs($this->superAdmin, 'admin')
+        $response = $this->actingAs($this->superAdmin, 'central')
             ->get($this->centralUrl('/admin/tenants/nonexistent-uuid/impersonate'));
 
         $response->assertNotFound();
@@ -223,7 +223,7 @@ class AdminImpersonationTest extends TestCase
     #[Test]
     public function admin_mode_returns_404_for_nonexistent_tenant(): void
     {
-        $response = $this->actingAs($this->superAdmin, 'admin')
+        $response = $this->actingAs($this->superAdmin, 'central')
             ->post($this->centralUrl('/admin/tenants/nonexistent-uuid/impersonate/admin-mode'));
 
         $response->assertNotFound();

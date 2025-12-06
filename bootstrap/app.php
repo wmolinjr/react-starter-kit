@@ -59,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Central admin routes - managed by domain scoping in routes/central.php
             require base_path('routes/central.php');
 
-            // Central admin authentication routes (uses 'admin' guard)
+            // Central admin authentication routes (uses 'central' guard)
             // TENANT-ONLY ARCHITECTURE: Separate auth for admins vs tenant users
             require base_path('routes/central-admin.php');
 
@@ -96,8 +96,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Configure redirect for authenticated users (trying to access login pages)
         // Check which guard the user is authenticated with to redirect to correct dashboard
         $middleware->redirectUsersTo(function (Request $request) {
-            // If authenticated as admin, redirect to central admin dashboard
-            if (auth('admin')->check()) {
+            // If authenticated as central admin, redirect to central admin dashboard
+            if (auth('central')->check()) {
                 return route('central.admin.dashboard');
             }
             // If authenticated as regular user, redirect to tenant dashboard

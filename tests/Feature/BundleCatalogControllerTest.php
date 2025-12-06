@@ -20,7 +20,7 @@ use Tests\TestCase;
  *
  * Tests the bundle catalog management endpoints for the central admin.
  *
- * OPTION C: Uses Admin model with 'admin' guard for central admin routes.
+ * OPTION C: Uses Admin model with 'central' guard for central admin routes.
  */
 class BundleCatalogControllerTest extends TestCase
 {
@@ -64,7 +64,7 @@ class BundleCatalogControllerTest extends TestCase
             'is_super_admin' => false,
         ]);
 
-        $response = $this->actingAs($regularAdmin, 'admin')
+        $response = $this->actingAs($regularAdmin, 'central')
             ->get($this->centralUrl('/admin/bundles'));
 
         $response->assertForbidden();
@@ -73,7 +73,7 @@ class BundleCatalogControllerTest extends TestCase
     #[Test]
     public function admin_can_access_bundle_index(): void
     {
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->get($this->centralUrl('/admin/bundles'));
 
         $response->assertOk();
@@ -87,7 +87,7 @@ class BundleCatalogControllerTest extends TestCase
     #[Test]
     public function bundle_index_shows_bundles_with_correct_data(): void
     {
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->get($this->centralUrl('/admin/bundles'));
 
         $response->assertOk();
@@ -118,7 +118,7 @@ class BundleCatalogControllerTest extends TestCase
     #[Test]
     public function admin_can_access_bundle_create_form(): void
     {
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->get($this->centralUrl('/admin/bundles/create'));
 
         $response->assertOk();
@@ -148,7 +148,7 @@ class BundleCatalogControllerTest extends TestCase
             ])->toArray(),
         ];
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->post($this->centralUrl('/admin/bundles'), $bundleData);
 
         $response->assertRedirect();
@@ -173,7 +173,7 @@ class BundleCatalogControllerTest extends TestCase
             ],
         ];
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->post($this->centralUrl('/admin/bundles'), $bundleData);
 
         $response->assertSessionHasErrors('addons');
@@ -190,7 +190,7 @@ class BundleCatalogControllerTest extends TestCase
     {
         $bundle = AddonBundle::first();
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->get($this->centralUrl("/admin/bundles/{$bundle->id}/edit"));
 
         $response->assertOk();
@@ -221,7 +221,7 @@ class BundleCatalogControllerTest extends TestCase
             ])->toArray(),
         ];
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->put($this->centralUrl("/admin/bundles/{$bundle->id}"), $updateData);
 
         $response->assertRedirect();
@@ -243,7 +243,7 @@ class BundleCatalogControllerTest extends TestCase
     {
         $bundle = AddonBundle::factory()->create(['active' => false]);
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->delete($this->centralUrl("/admin/bundles/{$bundle->id}"));
 
         $response->assertRedirect();
@@ -278,7 +278,7 @@ class BundleCatalogControllerTest extends TestCase
 
         $bundle = AddonBundle::first();
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->post($this->centralUrl("/admin/bundles/{$bundle->id}/sync"));
 
         $response->assertRedirect();
@@ -302,7 +302,7 @@ class BundleCatalogControllerTest extends TestCase
 
         $bundle = AddonBundle::first();
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->post($this->centralUrl("/admin/bundles/{$bundle->id}/sync"));
 
         $response->assertRedirect();
@@ -331,7 +331,7 @@ class BundleCatalogControllerTest extends TestCase
 
         $this->app->instance(StripeSyncService::class, $mockService);
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->post($this->centralUrl('/admin/bundles/sync-all'));
 
         $response->assertRedirect();
@@ -360,7 +360,7 @@ class BundleCatalogControllerTest extends TestCase
 
         $this->app->instance(StripeSyncService::class, $mockService);
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->post($this->centralUrl('/admin/bundles/sync-all'));
 
         $response->assertRedirect();
@@ -378,7 +378,7 @@ class BundleCatalogControllerTest extends TestCase
 
         $bundle = AddonBundle::first();
 
-        $response = $this->actingAs($regularAdmin, 'admin')
+        $response = $this->actingAs($regularAdmin, 'central')
             ->post($this->centralUrl("/admin/bundles/{$bundle->id}/sync"));
 
         $response->assertForbidden();
@@ -405,7 +405,7 @@ class BundleCatalogControllerTest extends TestCase
             'active' => true,
         ]);
 
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->get($this->centralUrl('/admin/bundles'));
 
         $response->assertOk();
@@ -422,7 +422,7 @@ class BundleCatalogControllerTest extends TestCase
     #[Test]
     public function bundle_includes_effective_pricing(): void
     {
-        $response = $this->actingAs($this->adminUser, 'admin')
+        $response = $this->actingAs($this->adminUser, 'central')
             ->get($this->centralUrl('/admin/bundles'));
 
         $response->assertOk();

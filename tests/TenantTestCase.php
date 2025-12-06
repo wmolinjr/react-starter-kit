@@ -65,7 +65,7 @@ abstract class TenantTestCase extends TestCase
         $this->user = User::factory()->create();
 
         // Assign owner role (requires tenant context for Spatie Permission)
-        $ownerRole = Role::findByName('owner', 'web');
+        $ownerRole = Role::findByName('owner', 'tenant');
         $this->user->assignRole($ownerRole);
         $this->user->load('roles');
 
@@ -134,7 +134,7 @@ abstract class TenantTestCase extends TestCase
         $user = User::factory()->create();
 
         // Tenant context is already initialized in setUp
-        $roleModel = Role::findOrCreate($role, 'web');
+        $roleModel = Role::findOrCreate($role, 'tenant');
         $user->assignRole($roleModel);
         $user->load('roles');
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -196,14 +196,14 @@ abstract class TenantTestCase extends TestCase
         foreach ($allPermissions as $permissionName) {
             \App\Models\Universal\Permission::firstOrCreate([
                 'name' => $permissionName,
-                'guard_name' => 'web',
+                'guard_name' => 'tenant',
             ]);
         }
 
         // Seed roles using TenantRole enum (single source of truth)
         foreach (TenantRole::systemRoles() as $tenantRole) {
             $role = Role::firstOrCreate(
-                ['name' => $tenantRole->value, 'guard_name' => 'web'],
+                ['name' => $tenantRole->value, 'guard_name' => 'tenant'],
                 [
                     'display_name' => $tenantRole->displayName(),
                     'description' => $tenantRole->description(),

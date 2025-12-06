@@ -172,7 +172,7 @@ class RoleService
             'name' => $data['name'],
             'display_name' => $data['display_name'],
             'description' => $data['description'] ?? null,
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => false, // Custom roles are not protected
         ]);
 

@@ -15,10 +15,10 @@ use Inertia\Inertia;
  *
  * TENANT-ONLY ARCHITECTURE (Option C):
  * This controller supports both authentication methods during migration:
- * - 'admin' guard: New Admin model (central database)
- * - 'web' guard: Legacy User model with Super Admin role (deprecated)
+ * - 'central' guard: New Admin model (central database)
+ * - 'tenant' guard: Legacy User model with Super Admin role (deprecated)
  *
- * After full migration, only 'admin' guard will be supported.
+ * After full migration, only 'central' guard will be supported.
  */
 class DashboardController extends Controller
 {
@@ -26,21 +26,21 @@ class DashboardController extends Controller
      * Admin dashboard with platform stats.
      *
      * Access control:
-     * - If using 'admin' guard: must be a super admin (Admin model)
-     * - If using 'web' guard: must have 'Super Admin' role (legacy, deprecated)
+     * - If using 'central' guard: must be a super admin (Admin model)
+     * - If using 'tenant' guard: must have 'Super Admin' role (legacy, deprecated)
      */
     public function dashboard()
     {
-        // Check if authenticated via admin guard (new architecture)
-        if (Auth::guard('admin')->check()) {
-            $admin = Auth::guard('admin')->user();
+        // Check if authenticated via central guard (new architecture)
+        if (Auth::guard('central')->check()) {
+            $admin = Auth::guard('central')->user();
             if (! $admin instanceof CentralUser || ! $admin->isSuperAdmin()) {
                 abort(403, 'Only super administrators can access this area.');
             }
         }
-        // Legacy: Check if authenticated via web guard with Super Admin role
-        elseif (Auth::guard('web')->check()) {
-            $user = Auth::guard('web')->user();
+        // Legacy: Check if authenticated via tenant guard with Super Admin role
+        elseif (Auth::guard('tenant')->check()) {
+            $user = Auth::guard('tenant')->user();
             if (! $user->hasRole('Super Admin')) {
                 abort(403, 'Only super administrators can access this area.');
             }

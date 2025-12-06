@@ -51,12 +51,12 @@ class SyncTenantPermissionsTest extends TestCase
         // Permissions should have been created
         $this->assertDatabaseHas('permissions', [
             'name' => 'projects:view',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
         ]);
 
         $this->assertDatabaseHas('permissions', [
             'name' => 'roles:view',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
         ]);
 
         tenancy()->end();
@@ -114,7 +114,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         $customRole = Role::create([
             'name' => 'custom-manager',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => false,
         ]);
 
@@ -171,21 +171,21 @@ class SyncTenantPermissionsTest extends TestCase
         // Create default roles with minimal permissions
         $ownerRole = Role::create([
             'name' => 'owner',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => true,
         ]);
         $ownerRole->givePermissionTo('projects:view');
 
         $adminRole = Role::create([
             'name' => 'admin',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => true,
         ]);
         $adminRole->givePermissionTo('projects:view');
 
         $memberRole = Role::create([
             'name' => 'member',
-            'guard_name' => 'web',
+            'guard_name' => 'tenant',
             'is_protected' => true,
         ]);
         $memberRole->givePermissionTo('projects:view');
@@ -257,7 +257,7 @@ class SyncTenantPermissionsTest extends TestCase
         $this->seedTenantPermissions();
 
         $memberRole = Role::firstOrCreate(
-            ['name' => 'member', 'guard_name' => 'web'],
+            ['name' => 'member', 'guard_name' => 'tenant'],
             ['is_protected' => true]
         );
 
@@ -328,7 +328,7 @@ class SyncTenantPermissionsTest extends TestCase
         foreach ($permissions as $permData) {
             Permission::firstOrCreate([
                 'name' => $permData['name'],
-                'guard_name' => 'web',
+                'guard_name' => 'tenant',
             ], [
                 'category' => $permData['category'],
             ]);

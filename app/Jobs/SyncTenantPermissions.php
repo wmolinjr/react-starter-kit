@@ -118,7 +118,7 @@ class SyncTenantPermissions implements ShouldQueue
         foreach ($permissions as $permissionName) {
             Permission::firstOrCreate([
                 'name' => $permissionName,
-                'guard_name' => 'web',
+                'guard_name' => 'tenant',
             ]);
         }
     }

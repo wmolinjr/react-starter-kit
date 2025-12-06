@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 | These routes handle authentication for central administrators.
 |
 | TENANT-ONLY ARCHITECTURE (Option C):
-| - Uses 'admin' guard for authentication (central database)
+| - Uses 'central' guard for authentication (central database)
 | - Separate from tenant user authentication (Fortify)
 | - Admins can impersonate tenants via ImpersonationController
 |
@@ -33,7 +33,7 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         |----------------------------------------------------------------------
         */
 
-        Route::middleware('guest:admin')->group(function () {
+        Route::middleware('guest:central')->group(function () {
             // Admin login form
             Route::get('/admin/login', [AdminLoginController::class, 'create'])
                 ->name('login');
@@ -49,7 +49,7 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         |----------------------------------------------------------------------
         */
 
-        Route::middleware('auth:admin')->group(function () {
+        Route::middleware('auth:central')->group(function () {
             // Admin logout
             Route::post('/admin/logout', [AdminLogoutController::class, 'destroy'])
                 ->name('logout');

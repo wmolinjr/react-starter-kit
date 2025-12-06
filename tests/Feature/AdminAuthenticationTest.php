@@ -13,8 +13,8 @@ use Tests\TestCase;
  *
  * Tests the central admin authentication system (Option C architecture).
  *
- * OPTION C: Admin model in central database with 'admin' guard.
- * Users exist only in tenant databases with 'web' guard.
+ * OPTION C: Admin model in central database with 'central' guard.
+ * Users exist only in tenant databases with 'tenant' guard.
  */
 class AdminAuthenticationTest extends TestCase
 {
@@ -48,7 +48,7 @@ class AdminAuthenticationTest extends TestCase
     {
         $admin = Admin::factory()->superAdmin()->create();
 
-        $response = $this->actingAs($admin, 'admin')
+        $response = $this->actingAs($admin, 'central')
             ->get($this->centralUrl('/admin/login'));
 
         $response->assertRedirect();
@@ -75,7 +75,7 @@ class AdminAuthenticationTest extends TestCase
         ]);
 
         $response->assertRedirect(route('central.admin.dashboard'));
-        $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertAuthenticatedAs($admin, 'central');
     }
 
     #[Test]
@@ -93,7 +93,7 @@ class AdminAuthenticationTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors('email');
-        $this->assertGuest('admin');
+        $this->assertGuest('central');
     }
 
     #[Test]
@@ -105,7 +105,7 @@ class AdminAuthenticationTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors('email');
-        $this->assertGuest('admin');
+        $this->assertGuest('central');
     }
 
     #[Test]
@@ -152,7 +152,7 @@ class AdminAuthenticationTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertAuthenticatedAs($admin, 'central');
 
         // Check remember token was set
         $admin->refresh();
@@ -170,11 +170,11 @@ class AdminAuthenticationTest extends TestCase
     {
         $admin = Admin::factory()->superAdmin()->create();
 
-        $response = $this->actingAs($admin, 'admin')
+        $response = $this->actingAs($admin, 'central')
             ->post($this->centralUrl('/admin/logout'));
 
         $response->assertRedirect();
-        $this->assertGuest('admin');
+        $this->assertGuest('central');
     }
 
     #[Test]
@@ -196,7 +196,7 @@ class AdminAuthenticationTest extends TestCase
     {
         $admin = Admin::factory()->superAdmin()->create();
 
-        $response = $this->actingAs($admin, 'admin')
+        $response = $this->actingAs($admin, 'central')
             ->get($this->centralUrl('/admin/dashboard'));
 
         $response->assertOk();
@@ -212,7 +212,7 @@ class AdminAuthenticationTest extends TestCase
             'is_super_admin' => false,
         ]);
 
-        $response = $this->actingAs($admin, 'admin')
+        $response = $this->actingAs($admin, 'central')
             ->get($this->centralUrl('/admin/dashboard'));
 
         $response->assertForbidden();
@@ -233,18 +233,18 @@ class AdminAuthenticationTest extends TestCase
     */
 
     #[Test]
-    public function admin_guard_is_separate_from_web_guard(): void
+    public function central_guard_is_separate_from_tenant_guard(): void
     {
         $admin = Admin::factory()->superAdmin()->create();
 
-        // Login with admin guard
-        $this->actingAs($admin, 'admin');
+        // Login with central guard
+        $this->actingAs($admin, 'central');
 
-        // Admin guard should be authenticated
-        $this->assertAuthenticatedAs($admin, 'admin');
+        // Central guard should be authenticated
+        $this->assertAuthenticatedAs($admin, 'central');
 
-        // Web guard should NOT be authenticated
-        $this->assertGuest('web');
+        // Tenant guard should NOT be authenticated
+        $this->assertGuest('tenant');
     }
 
     #[Test]
@@ -266,7 +266,7 @@ class AdminAuthenticationTest extends TestCase
         ]);
 
         // Session should be regenerated (different from initial)
-        $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertAuthenticatedAs($admin, 'central');
     }
 
     /*

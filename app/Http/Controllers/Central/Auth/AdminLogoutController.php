@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
  * Handles logout for central admins.
  *
  * TENANT-ONLY ARCHITECTURE (Option C):
- * - Uses 'admin' guard for logout
+ * - Uses 'central' guard for logout
  * - Separate from tenant user logout (Fortify)
  */
 class AdminLogoutController extends Controller
@@ -21,8 +21,8 @@ class AdminLogoutController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        // Logout from admin guard
-        Auth::guard('admin')->logout();
+        // Logout from central guard
+        Auth::guard('central')->logout();
 
         // Invalidate session and regenerate token
         $request->session()->invalidate();

@@ -104,7 +104,7 @@ class SyncPermissions extends Command
         $this->info('👑 Syncing Global Super Admin Role...');
 
         $role = Role::updateOrCreate(
-            ['name' => 'Super Admin', 'guard_name' => 'web'],
+            ['name' => 'Super Admin', 'guard_name' => 'tenant'],
             [
                 'display_name' => ['en' => 'Super Administrator', 'pt_BR' => 'Super Administrador'],
                 'description' => ['en' => 'Full platform access (global)', 'pt_BR' => 'Acesso total à plataforma (global)'],
@@ -141,7 +141,7 @@ class SyncPermissions extends Command
 
         foreach ($this->centralRoles as $roleName => $roleData) {
             $role = Role::updateOrCreate(
-                ['name' => $roleName, 'guard_name' => 'web'],
+                ['name' => $roleName, 'guard_name' => 'tenant'],
                 [
                     'display_name' => $roleData['display_name'],
                     'description' => $roleData['description'],
@@ -180,7 +180,7 @@ class SyncPermissions extends Command
 
         foreach ($permissions as $permData) {
             $permission = Permission::firstOrCreate(
-                ['name' => $permData['name'], 'guard_name' => 'web']
+                ['name' => $permData['name'], 'guard_name' => 'tenant']
             );
 
             if ($permission->wasRecentlyCreated) {

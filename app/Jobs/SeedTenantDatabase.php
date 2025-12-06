@@ -73,7 +73,7 @@ class SeedTenantDatabase implements ShouldQueue
         foreach ($allowedPermissions as $permissionName) {
             Permission::firstOrCreate([
                 'name' => $permissionName,
-                'guard_name' => 'web',
+                'guard_name' => 'tenant',
             ]);
         }
     }
@@ -95,7 +95,7 @@ class SeedTenantDatabase implements ShouldQueue
     {
         foreach (TenantRole::systemRoles() as $tenantRole) {
             $role = Role::firstOrCreate(
-                ['name' => $tenantRole->value, 'guard_name' => 'web'],
+                ['name' => $tenantRole->value, 'guard_name' => 'tenant'],
                 ['is_protected' => $tenantRole->isSystemRole()]
             );
 

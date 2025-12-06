@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
+        'guard' => env('AUTH_GUARD', 'tenant'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -28,8 +28,8 @@ return [
     | which utilizes session storage plus the Eloquent user provider.
     |
     | TENANT-ONLY ARCHITECTURE (Option C):
-    | - 'web': Guard for tenant users (users in tenant database)
-    | - 'admin': Guard for central admins (admins in central database)
+    | - 'tenant': Guard for tenant users (users in tenant database)
+    | - 'central': Guard for central admins (admins in central database)
     |
     | All authentication guards have a user provider, which defines how the
     | users are actually retrieved out of your database or other storage
@@ -41,13 +41,13 @@ return [
 
     'guards' => [
         // Guard for tenant users (tenant database)
-        'web' => [
+        'tenant' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
 
         // Guard for central admins (central database)
-        'admin' => [
+        'central' => [
             'driver' => 'session',
             'provider' => 'admins',
         ],
