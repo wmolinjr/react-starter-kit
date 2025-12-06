@@ -1,6 +1,6 @@
 # Config Review & TenantConfigBootstrapper Integration Plan
 
-> **Status:** Fase 1 ✅ | Fase 2 Backend ✅ | Fase 2 Frontend ⏳
+> **Status:** ✅ CONCLUÍDO (Fase 1, 2 e 3)
 > **Data:** 2025-12-06
 > **Prioridade:** Alta para bugs, Média para melhorias
 
@@ -13,9 +13,10 @@ Este documento apresenta uma análise completa de todos os arquivos de configura
 **TenantConfigBootstrapper Já Implementado:**
 - Habilitado em `config/tenancy.php` (linha 139)
 - Configurado em `TenancyServiceProvider.php` (linha 153)
-- `TenantConfigKey` enum define mapeamentos para: locale, timezone, mail_from_address, mail_from_name, currency, currency_locale
+- `TenantConfigKey` enum define mapeamentos para: app_name, locale, timezone, mail_from_address, mail_from_name, currency, currency_locale
 - Testes existem em `tests/Feature/TenantConfigBootstrapperTest.php`
 - Controller e Service de UI totalmente implementados
+- Frontend com seção "Branding" para app_name (white-label)
 
 ---
 
@@ -166,6 +167,7 @@ Este documento apresenta uma análise completa de todos os arquivos de configura
 
 | Setting | Laravel Config Key | Status |
 |---------|-------------------|--------|
+| `app_name` | `app.name` | ✅ Implementado |
 | `locale` | `app.locale` | ✅ Implementado |
 | `timezone` | `app.timezone` | ✅ Implementado |
 | `mail_from_address` | `mail.from.address` | ✅ Implementado |
@@ -173,11 +175,10 @@ Este documento apresenta uma análise completa de todos os arquivos de configura
 | `currency` | `cashier.currency` | ✅ Implementado |
 | `currency_locale` | `cashier.currency_locale` | ✅ Implementado |
 
-### Adições Propostas
+### Adições Propostas (Futuro)
 
 | Setting | Laravel Config Key | Use Case | Prioridade |
 |---------|-------------------|----------|------------|
-| `app_name` | `app.name` | White-label branding | Média |
 | `date_format` | `app.date_format` (novo) | Formatação regional | Baixa |
 | `smtp_host` | `mail.mailers.smtp.host` | Enterprise SMTP | Baixa |
 | `smtp_port` | `mail.mailers.smtp.port` | Enterprise SMTP | Baixa |
@@ -231,18 +232,21 @@ Este documento apresenta uma análise completa de todos os arquivos de configura
 - [x] Rodar `sail artisan config:clear`
 - [x] Rodar testes para verificar não quebrou nada (420 passed)
 
-### Fase 2: Melhorias (Parcial - 2025-12-06)
+### Fase 2: Melhorias ✅ CONCLUÍDO (2025-12-06)
 - [x] Adicionar `APP_TIMEZONE=UTC` ao `.env.example`
 - [x] Adicionar case `app_name` ao enum `TenantConfigKey`
 - [x] Atualizar mapeamento (automático via `toStorageConfigMap()`)
 - [x] Adicionar traduções `tenant.config.app_name` em en.json e pt_BR.json
 - [x] Corrigir namespaces de Exceptions em PlanService e TeamService
-- [ ] Atualizar UI de configurações do tenant para incluir app_name (Frontend)
-- [ ] Criar campo app_name no formulário de configurações
+- [x] Atualizar UI de configurações do tenant para incluir app_name (Frontend)
+- [x] Criar seção "Branding" com campo app_name no formulário de configurações
+- [x] Testar com Playwright - formulário funciona corretamente
 
-### Fase 3: Enterprise (Futuro)
-- [ ] Documentar feature SMTP customizado
-- [ ] Implementar MailTenancyBootstrapper quando necessário
+### Fase 3: Enterprise ✅ CONCLUÍDO (2025-12-06)
+- [x] Documentar feature SMTP customizado (docs/CUSTOM-SMTP.md)
+- [x] Configurar MailTenancyBootstrapper (preparado, desabilitado por padrão)
+- [x] Adicionar credentialsMap no TenancyServiceProvider
+- [x] Adicionar bootstrapper comentado em config/tenancy.php
 
 ---
 

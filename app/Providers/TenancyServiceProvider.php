@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Stancl\JobPipeline\JobPipeline;
+use Stancl\Tenancy\Bootstrappers\MailConfigBootstrapper;
 use Stancl\Tenancy\Bootstrappers\TenantConfigBootstrapper;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
@@ -151,6 +152,15 @@ class TenancyServiceProvider extends ServiceProvider
         // This enables automatic config overrides when tenancy is initialized
         // Example: tenant.settings['config.locale'] -> config('app.locale')
         TenantConfigBootstrapper::$storageToConfigMap = TenantConfigKey::toStorageConfigMap();
+
+        // Configure MailConfigBootstrapper for custom SMTP per tenant (Enterprise feature)
+        // Requires enabling MailConfigBootstrapper in config/tenancy.php bootstrappers array
+        // Note: Default mailer 'smtp' already has preset mappings in MailConfigBootstrapper::$mapPresets
+        // We only add smtp_encryption here since it's not in the default preset
+        // See docs/CUSTOM-SMTP.md for full implementation guide
+        MailConfigBootstrapper::$credentialsMap = [
+            'mail.mailers.smtp.encryption' => 'smtp_encryption',
+        ];
 
         // Configure InitializeTenancyByDomain to handle failures gracefully
         // This covers: central domains, already initialized tenancy, or unknown domains

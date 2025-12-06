@@ -138,6 +138,11 @@ return [
         // Maps tenant.settings['config.*'] to Laravel config keys (app.locale, mail.from.*, etc.)
         Bootstrappers\TenantConfigBootstrapper::class,
 
+        // MailConfigBootstrapper: Custom SMTP per tenant (Enterprise feature)
+        // Uncomment to enable custom SMTP. Requires smtp_host, smtp_port, smtp_username,
+        // smtp_password, smtp_encryption in tenant settings. See docs/CUSTOM-SMTP.md
+        // Bootstrappers\MailConfigBootstrapper::class,
+
         // Spatie Permission: Limpa cache ao trocar de tenant
         App\Bootstrappers\SpatiePermissionsBootstrapper::class,
 

@@ -1,29 +1,37 @@
 # TenantConfig Implementation Plan
 
+> **Status:** ✅ CONCLUÍDO
+> **Data:** 2025-12-06
+
 ## Resumo Executivo
 
-Implementar o TenantConfigBootstrapper do Stancl/Tenancy v4 para sobrescrever automaticamente configurações do Laravel com valores específicos por tenant.
+~~Implementar~~ O TenantConfigBootstrapper do Stancl/Tenancy v4 **foi implementado** para sobrescrever automaticamente configurações do Laravel com valores específicos por tenant.
 
-### Estado Atual
+### Estado Implementado ✅
 
-O projeto já possui:
+O projeto agora possui:
 - Modelo `Tenant` com campo `settings` (JSON)
-- Métodos `getSetting()` e `updateSetting()`
-- `TenantSettingsService` para branding, domains, features, notifications, language
-- Middleware `SetLocale` que lê `language.default` do tenant
-- UI completa para configurações de idioma (`/tenant-settings/language`)
+- Métodos `getSetting()`, `updateSetting()`, `getConfig()`, `updateConfig()`, `getAllConfig()`
+- `TenantSettingsService` para branding, domains, features, notifications, language, **config**
+- `TenantConfigKey` enum com: app_name, locale, timezone, mail_from_address, mail_from_name, currency, currency_locale
+- TenantConfigBootstrapper habilitado e configurado
+- UI completa em `/admin/tenant-settings/config` com seções:
+  - Branding (app_name para white-label)
+  - Localização (idioma, fuso horário)
+  - Email (endereço/nome do remetente)
+  - Moeda
 
-### Gap Identificado
+### ~~Gap Identificado~~ Resolvido ✅
 
-- Settings são armazenados mas **NÃO aplicados automaticamente** ao config do Laravel
-- Requer chamadas manuais `$tenant->getSetting()` em vez de `config()`
-- Sem integração com TenantConfigBootstrapper
+- ~~Settings são armazenados mas **NÃO aplicados automaticamente** ao config do Laravel~~
+- ~~Requer chamadas manuais `$tenant->getSetting()` em vez de `config()`~~
+- ~~Sem integração com TenantConfigBootstrapper~~
 
-### Solução
+**Agora**: `config('app.name')`, `config('app.locale')`, etc. são automaticamente sobrescritos por tenant.
 
-- Habilitar TenantConfigBootstrapper para override automático de config keys
-- Criar enum tipado para chaves de config do tenant
-- Adicionar MailTenancyBootstrapper para SMTP customizado (enterprise)
+### Futuro (Enterprise)
+
+- MailTenancyBootstrapper para SMTP customizado por tenant
 
 ---
 
@@ -686,35 +694,39 @@ public function test_mail_from_uses_tenant_settings(): void
 
 ## Checklist de Implementação
 
-### Fase 1: Core
-- [ ] Criar `app/Enums/TenantConfigKey.php`
-- [ ] Habilitar `TenantConfigBootstrapper` em `config/tenancy.php`
-- [ ] Configurar `$storageToConfigMap` em `TenancyServiceProvider`
-- [ ] Adicionar métodos accessor ao modelo `Tenant`
+> **Status:** ✅ TODAS AS FASES CONCLUÍDAS (exceto Enterprise/Futuro)
+> **Data de Conclusão:** 2025-12-06
 
-### Fase 2: Service Layer
-- [ ] Adicionar `getConfigSettings()` ao `TenantSettingsService`
-- [ ] Adicionar `updateConfig()` ao `TenantSettingsService`
-- [ ] Adicionar validação
+### Fase 1: Core ✅
+- [x] Criar `app/Enums/TenantConfigKey.php`
+- [x] Habilitar `TenantConfigBootstrapper` em `config/tenancy.php`
+- [x] Configurar `$storageToConfigMap` em `TenancyServiceProvider`
+- [x] Adicionar métodos accessor ao modelo `Tenant`
 
-### Fase 3: Controller/Routes
-- [ ] Adicionar métodos `config()` e `updateConfig()` ao controller
-- [ ] Adicionar rotas em `routes/tenant.php`
-- [ ] Adicionar chaves de tradução
+### Fase 2: Service Layer ✅
+- [x] Adicionar `getConfigSettings()` ao `TenantSettingsService`
+- [x] Adicionar `updateConfig()` ao `TenantSettingsService`
+- [x] Adicionar validação
 
-### Fase 4: UI
-- [ ] Criar componente React `config.tsx`
-- [ ] Adicionar à navegação de settings
-- [ ] Testar interações do formulário
+### Fase 3: Controller/Routes ✅
+- [x] Adicionar métodos `config()` e `updateConfig()` ao controller
+- [x] Adicionar rotas em `routes/tenant.php`
+- [x] Adicionar chaves de tradução
 
-### Fase 5: Migration
-- [ ] Criar migration para tenants existentes
-- [ ] Executar migration
+### Fase 4: UI ✅
+- [x] Criar componente React `config.tsx`
+- [x] Adicionar à navegação de settings
+- [x] Testar interações do formulário
+- [x] Adicionar seção "Branding" com campo app_name
 
-### Fase 6: Testes
-- [ ] Unit tests para enum
-- [ ] Feature tests para bootstrapper
-- [ ] Integration tests para UI
+### Fase 5: Migration ✅
+- [x] Criar migration para tenants existentes (não necessário - usa JSON settings)
+- [x] Executar migration
+
+### Fase 6: Testes ✅
+- [x] Unit tests para enum (`tests/Unit/TenantConfigKeyTest.php`)
+- [x] Feature tests para bootstrapper (`tests/Feature/TenantConfigBootstrapperTest.php`)
+- [x] Integration tests para UI (Playwright)
 
 ### Fase 7: Enterprise (Futuro)
 - [ ] MailTenancyBootstrapper para SMTP customizado
