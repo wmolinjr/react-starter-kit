@@ -72,7 +72,6 @@ $table->uuidMorphs('model'); // For MediaLibrary, Activity Log, etc.
 | `AddonBundle` | UUID | Bundle of addons |
 | `AddonSubscription` | UUID | Tenant add-on subscriptions |
 | `AddonPurchase` | UUID | Purchase history |
-| `TenantInvitation` | UUID | Team invitations |
 
 ### Tenant Database (`App\Models\Tenant\`)
 
@@ -83,6 +82,7 @@ $table->uuidMorphs('model'); // For MediaLibrary, Activity Log, etc.
 | `Activity` | UUID | Spatie Activity Log |
 | `Media` | UUID | Spatie MediaLibrary |
 | `TenantTranslationOverride` | UUID | White-label translations |
+| `UserInvitation` | UUID | Team invitations (isolated per tenant) |
 
 ### Shared (`App\Models\Shared\`)
 

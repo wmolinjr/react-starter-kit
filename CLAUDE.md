@@ -441,8 +441,7 @@ import { store } from '@/routes/register'
 - ✅ **CacheTenancyBootstrapper**: Cache prefixing por tenant
 - ✅ **FilesystemTenancyBootstrapper**: Storage paths isolados
 - ✅ **QueueTenancyBootstrapper**: Jobs mantêm contexto do tenant
-- ✅ **RedisTenancyBootstrapper**: Redis keys prefixadas por tenant
-- ✅ **DatabaseSessionBootstrapper**: Sessões em banco isoladas (v4)
+- ✅ **RedisTenancyBootstrapper**: Redis keys prefixadas por tenant (sessions included)
 - ✅ **FortifyRouteBootstrapper**: Redirects tenant-aware para Fortify (v4)
 - ✅ **SpatiePermissionsBootstrapper**: Cache de permissions por tenant
 

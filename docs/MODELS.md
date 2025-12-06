@@ -10,7 +10,7 @@ Models are organized into namespaces based on their database context, following 
 
 ```
 app/Models/
-├── Central/                    # Central Database Models (9 files)
+├── Central/                    # Central Database Models (8 files)
 │   ├── Addon.php               # Add-on catalog
 │   ├── AddonBundle.php         # Add-on bundles
 │   ├── AddonPurchase.php       # One-time addon purchases
@@ -18,15 +18,15 @@ app/Models/
 │   ├── Domain.php              # Tenant domains
 │   ├── Plan.php                # Subscription plans
 │   ├── Tenant.php              # Tenant model (Stancl)
-│   ├── TenantInvitation.php    # Team invitations
 │   └── User.php                # Central admin users
 │
-├── Tenant/                     # Tenant Database Models (5 files)
+├── Tenant/                     # Tenant Database Models (6 files)
 │   ├── Activity.php            # Spatie Activity Log
 │   ├── Media.php               # Spatie MediaLibrary
 │   ├── Project.php             # Tenant projects
 │   ├── TenantTranslationOverride.php # White-label translations
-│   └── User.php                # Tenant users
+│   ├── User.php                # Tenant users
+│   └── UserInvitation.php      # Team invitations (isolated per tenant)
 │
 └── Shared/                  # Works in Both Contexts (2 files)
     ├── Permission.php          # Spatie Permission
@@ -49,7 +49,6 @@ Models stored in the central database (`laravel`). All use `CentralConnection` t
 | `AddonBundle` | Add-on bundles | `HasTranslations`, `HasUuids` |
 | `AddonSubscription` | Active subscriptions | `HasUuids` |
 | `AddonPurchase` | Purchase history | `HasUuids` |
-| `TenantInvitation` | Team invites | `HasUuids` |
 
 ### Tenant Models (`App\Models\Tenant\`)
 
@@ -62,6 +61,7 @@ Models stored in each tenant's database (`tenant_{id}`). No `CentralConnection` 
 | `Activity` | Activity log | Spatie Activity Log |
 | `Media` | Media files | Spatie MediaLibrary |
 | `TenantTranslationOverride` | White-label translations | `HasUuids` |
+| `UserInvitation` | Team invitations | `HasUuids` |
 
 ### Shared Models (`App\Models\Shared\`)
 

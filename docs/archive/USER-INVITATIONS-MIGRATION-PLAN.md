@@ -1,5 +1,10 @@
 # USER INVITATIONS MIGRATION PLAN
 
+> **STATUS: ✅ IMPLEMENTED** (2025-12-06)
+>
+> This migration has been successfully completed. All files have been created/updated,
+> tests pass (419 tests), and documentation has been updated.
+
 ## Executive Summary
 
 This plan details the migration of `tenant_invitations` table from the Central database to the Tenant database as `user_invitations`. The key challenge is handling invitation acceptance without tenant context (user clicks link from email).
@@ -351,16 +356,16 @@ Update `tests/Feature/TeamTest.php` to use new model and verify tenant isolation
 
 ## Deployment Checklist
 
-1. [ ] Create tenant migration file
-2. [ ] Create UserInvitation model
-3. [ ] Create UserInvitationFactory
-4. [ ] Update TeamService
-5. [ ] Update TeamController
-6. [ ] Rename/Update Resource
-7. [ ] Run `sail artisan tenants:migrate` on all tenants
-8. [ ] Test invitation flow end-to-end
-9. [ ] Delete old central migration
-10. [ ] Delete old TenantInvitation model
+1. [x] Create tenant migration file
+2. [x] Create UserInvitation model
+3. [x] Create UserInvitationFactory
+4. [x] Update TeamService
+5. [x] Update TeamController
+6. [x] Rename/Update Resource (TenantInvitationResource → UserInvitationResource)
+7. [x] Run `sail artisan tenants:migrate` on all tenants
+8. [x] Test invitation flow end-to-end (419 tests pass)
+9. [x] Delete old central migration
+10. [x] Delete old TenantInvitation model
 
 ---
 

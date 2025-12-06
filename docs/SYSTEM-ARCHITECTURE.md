@@ -690,10 +690,10 @@ class RoleService
 class TeamService
 {
     public function getTeamMembers(): Collection;
-    public function invite(string $email, string $role): TenantInvitation;
-    public function acceptInvitation(string $token, array $userData): User;
-    public function updateMemberRole(User $user, string $role): void;
-    public function removeMember(User $user): void;
+    public function inviteMember(Tenant $tenant, string $email, string $role, User $invitedBy): UserInvitation;
+    public function acceptInvitation(User $user, string $token): void;
+    public function updateMemberRole(User $target, string $newRole, User $currentUser): void;
+    public function removeMember(User $member, User $currentUser): void;
 }
 ```
 
@@ -904,14 +904,14 @@ app/Models/
 │   ├── Domain.php
 │   ├── Plan.php
 │   ├── Tenant.php
-│   ├── TenantInvitation.php
 │   └── User.php       # Admins centrais (Super Admin, Central Admin)
 ├── Tenant/            # Banco do tenant (dados isolados)
 │   ├── Activity.php
 │   ├── Media.php
 │   ├── Project.php
 │   ├── TenantTranslationOverride.php
-│   └── User.php       # Usuarios do tenant (owner, admin, member)
+│   ├── User.php       # Usuarios do tenant (owner, admin, member)
+│   └── UserInvitation.php  # Team invitations (isolated per tenant)
 └── Shared/         # Funcionam em ambos contextos
     ├── Permission.php
     └── Role.php

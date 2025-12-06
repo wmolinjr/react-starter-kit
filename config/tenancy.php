@@ -130,9 +130,6 @@ return [
         Bootstrappers\QueueTenancyBootstrapper::class,
         Bootstrappers\RedisTenancyBootstrapper::class,
 
-        // Adds support for the database session driver
-        Bootstrappers\DatabaseSessionBootstrapper::class,
-
         // TenantConfigBootstrapper: Override Laravel config with tenant-specific values
         // Maps tenant.settings['config.*'] to Laravel config keys (app.locale, mail.from.*, etc.)
         Bootstrappers\TenantConfigBootstrapper::class,

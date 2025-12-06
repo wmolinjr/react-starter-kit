@@ -33,7 +33,7 @@ app/Http/Resources/
 │   ├── ProjectEditResource.php   # Project for edit forms
 │   ├── ActivityResource.php      # Audit log entry
 │   ├── MediaResource.php         # Media file info
-│   └── TenantInvitationResource.php # Pending invitation
+│   └── UserInvitationResource.php # Pending team invitation
 │
 └── Shared/                    # Resources for models in both contexts
     ├── RoleResource.php          # Role listing view
@@ -316,7 +316,7 @@ public function getTeamMembers(): Collection
 | `ProjectEditResource` | `Project` | Edit form |
 | `ActivityResource` | `Activity` | Audit log entry |
 | `MediaResource` | `Media` | Media file info |
-| `TenantInvitationResource` | `TenantInvitation` | Pending invitation |
+| `UserInvitationResource` | `UserInvitation` | Pending team invitation |
 | `RoleResource` | `Role` | List with counts |
 | `RoleDetailResource` | `Role` | With permissions/users |
 | `RoleEditResource` | `Role` | Edit form |
