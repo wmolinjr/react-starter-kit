@@ -23,6 +23,7 @@ class SyncTenantPermissionsCommand extends Command
                             {tenant? : Tenant ID or slug (optional if using --all)}
                             {--all : Sync permissions for all tenants}
                             {--cleanup : Remove unauthorized permissions from roles}
+                            {--cache-only : Only update plan_enabled_permissions cache (skip tenant DB sync)}
                             {--dry-run : Show what would be changed without making changes}';
 
     protected $description = 'Sync tenant permissions based on their subscription plan';
@@ -88,6 +89,8 @@ class SyncTenantPermissionsCommand extends Command
 
                 if ($this->option('dry-run')) {
                     $this->showDryRun($tenant, $resolver);
+                } elseif ($this->option('cache-only')) {
+                    $this->updateCacheOnly($tenant, $resolver);
                 } else {
                     $this->syncTenantSync($tenant, $resolver);
                 }
@@ -132,6 +135,12 @@ class SyncTenantPermissionsCommand extends Command
             return Command::SUCCESS;
         }
 
+        if ($this->option('cache-only')) {
+            $this->updateCacheOnly($tenant, $resolver);
+            $this->info('Cache updated successfully!');
+            return Command::SUCCESS;
+        }
+
         $isDowngrade = $this->option('cleanup');
 
         if ($isDowngrade) {
@@ -155,6 +164,19 @@ class SyncTenantPermissionsCommand extends Command
     {
         $job = new SyncTenantPermissions($tenant, $isDowngrade);
         $job->handle($resolver);
+    }
+
+    /**
+     * Only update the plan_enabled_permissions cache (skip tenant DB operations).
+     * Useful when you only need to refresh the cache without touching tenant database.
+     */
+    protected function updateCacheOnly(Tenant $tenant, PlanPermissionResolver $resolver): void
+    {
+        $newPermissions = $resolver->resolve($tenant);
+
+        $tenant->forceFill([
+            'plan_enabled_permissions' => $newPermissions,
+        ])->saveQuietly();
     }
 
     /**
