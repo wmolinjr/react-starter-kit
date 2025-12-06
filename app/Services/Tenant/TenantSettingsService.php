@@ -266,7 +266,7 @@ class TenantSettingsService
 
             // Skip null/empty values for optional fields
             if ($value === null || $value === '') {
-                if (in_array($configKey, [TenantConfigKey::MAIL_FROM_ADDRESS, TenantConfigKey::MAIL_FROM_NAME])) {
+                if (in_array($configKey, [TenantConfigKey::APP_NAME, TenantConfigKey::MAIL_FROM_ADDRESS, TenantConfigKey::MAIL_FROM_NAME])) {
                     $tenant->updateConfig($configKey, null);
 
                     continue;

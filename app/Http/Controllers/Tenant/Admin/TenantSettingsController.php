@@ -221,6 +221,7 @@ class TenantSettingsController extends Controller implements HasMiddleware
         $availableLocales = config('app.locales');
 
         $request->validate([
+            'app_name' => ['nullable', 'string', 'max:100'],
             'locale' => ['sometimes', 'string', 'in:'.implode(',', $availableLocales)],
             'timezone' => ['sometimes', 'string', 'timezone'],
             'mail_from_address' => ['nullable', 'email', 'max:255'],
@@ -230,6 +231,7 @@ class TenantSettingsController extends Controller implements HasMiddleware
         ]);
 
         $this->settingsService->updateConfig(tenant(), $request->only([
+            'app_name',
             'locale',
             'timezone',
             'mail_from_address',

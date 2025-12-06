@@ -745,6 +745,11 @@
 
   "tenant.config.title": "Configuração",
   "tenant.config.description": "Configure as definições do sistema para :name",
+  "tenant.config.branding": "Marca",
+  "tenant.config.branding_description": "Personalize como sua aplicação aparece para os usuários.",
+  "tenant.config.app_name_label": "Nome da Aplicação",
+  "tenant.config.app_name_placeholder": "Minha Empresa",
+  "tenant.config.app_name_note": "Deixe vazio para usar o nome padrão da aplicação.",
   "tenant.config.localization": "Localização",
   "tenant.config.localization_description": "Defina o idioma e fuso horário padrão para sua organização.",
   "tenant.config.language": "Idioma",

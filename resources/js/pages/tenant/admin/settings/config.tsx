@@ -19,7 +19,7 @@ import {
 import TenantAdminLayout from '@/layouts/tenant-admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowLeft, Check, Clock, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
+import { ArrowLeft, Building2, Check, Clock, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
 import { type BreadcrumbItem } from '@/types';
@@ -27,6 +27,7 @@ import { type BreadcrumbItem } from '@/types';
 interface Props {
     tenant: { id: string; name: string };
     config: {
+        app_name: string | null;
         locale: string;
         timezone: string;
         mail_from_address: string | null;
@@ -58,6 +59,7 @@ export default function ConfigSettings({
     ];
 
     const { data, setData, post, processing, recentlySuccessful, errors } = useForm({
+        app_name: config.app_name ?? '',
         locale: config.locale,
         timezone: config.timezone,
         mail_from_address: config.mail_from_address ?? '',
@@ -126,6 +128,39 @@ export default function ConfigSettings({
 
                 <PageContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Branding Section */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Building2 className="h-5 w-5" />
+                                    {t('tenant.config.branding')}
+                                </CardTitle>
+                                <CardDescription>
+                                    {t('tenant.config.branding_description')}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2 max-w-md">
+                                    <Label htmlFor="app_name">
+                                        {t('tenant.config.app_name_label')}
+                                    </Label>
+                                    <Input
+                                        id="app_name"
+                                        type="text"
+                                        placeholder={t('tenant.config.app_name_placeholder')}
+                                        value={data.app_name}
+                                        onChange={(e) => setData('app_name', e.target.value)}
+                                    />
+                                    {errors.app_name && (
+                                        <p className="text-sm text-destructive">{errors.app_name}</p>
+                                    )}
+                                    <p className="text-sm text-muted-foreground">
+                                        {t('tenant.config.app_name_note')}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         {/* Localization Section */}
                         <Card>
                             <CardHeader>
