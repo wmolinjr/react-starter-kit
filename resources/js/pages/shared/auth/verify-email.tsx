@@ -3,7 +3,7 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import UniversalLayout from '@/layouts/universal-layout';
+import SharedLayout from '@/layouts/shared-layout';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 import { Form, Head } from '@inertiajs/react';
@@ -14,7 +14,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <UniversalLayout>
+        <SharedLayout>
             <Head title={t('Email verification')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -55,6 +55,6 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </CardContent>
                 </Card>
             </div>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

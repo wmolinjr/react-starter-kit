@@ -298,7 +298,7 @@ app/
 │   │   ├── Tenant/
 │   │   │   ├── Admin/           # Thin controllers
 │   │   │   └── Auth/
-│   │   └── Universal/
+│   │   └── Shared/
 │   │       └── Settings/
 │   ├── Requests/
 │   │   ├── Central/             # NEW
@@ -309,7 +309,7 @@ app/
 │   │   │   ├── InviteMemberRequest.php
 │   │   │   ├── StoreRoleRequest.php
 │   │   │   └── ...
-│   │   └── Universal/
+│   │   └── Shared/
 │   │       └── Settings/
 │   └── Resources/
 │       ├── Central/             # NEW
@@ -334,7 +334,7 @@ app/
 │   │   ├── RoleService.php
 │   │   ├── BillingService.php
 │   │   └── TenantSettingsService.php
-│   └── Universal/
+│   └── Shared/
 │       └── .gitkeep
 ```
 

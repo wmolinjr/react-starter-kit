@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import UniversalLayout from '@/layouts/universal-layout';
+import SharedLayout from '@/layouts/shared-layout';
 import { type BreadcrumbItem } from '@/types';
 import { store } from '@/routes/password/confirm';
 import { Form, Head } from '@inertiajs/react';
@@ -26,7 +26,7 @@ export default function ConfirmPassword() {
     const breadcrumbs = useBreadcrumbs();
 
     return (
-        <UniversalLayout breadcrumbs={breadcrumbs}>
+        <SharedLayout breadcrumbs={breadcrumbs}>
             <Head title={t('auth.confirm_password.page_title')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -71,6 +71,6 @@ export default function ConfirmPassword() {
                     </CardContent>
                 </Card>
             </div>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

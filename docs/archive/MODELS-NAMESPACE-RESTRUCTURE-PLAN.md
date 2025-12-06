@@ -62,7 +62,7 @@ app/Models/
 │   ├── Media.php
 │   └── TenantTranslationOverride.php
 │
-└── Universal/
+└── Shared/
     ├── Role.php              # Funciona em ambos contextos
     └── Permission.php
 ```
@@ -89,8 +89,8 @@ App\Models\Tenant\Media::class
 App\Models\Tenant\TenantTranslationOverride::class
 
 // Universal Models
-App\Models\Universal\Role::class
-App\Models\Universal\Permission::class
+App\Models\Shared\Role::class
+App\Models\Shared\Permission::class
 ```
 
 ---
@@ -367,7 +367,7 @@ sail npm run test:e2e
 ### Fase 1: Preparação
 - [ ] Criar `app/Models/Central/`
 - [ ] Criar `app/Models/Tenant/`
-- [ ] Criar `app/Models/Universal/`
+- [ ] Criar `app/Models/Shared/`
 - [ ] Corrigir AddonBundle (adicionar CentralConnection)
 
 ### Fase 2: Central Models

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Universal\Settings;
+namespace App\Http\Controllers\Shared\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Universal\Settings\TwoFactorAuthenticationRequest;
+use App\Http\Requests\Shared\Settings\TwoFactorAuthenticationRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
@@ -29,7 +29,7 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
     {
         $request->ensureStateIsValid();
 
-        return Inertia::render('universal/settings/two-factor', [
+        return Inertia::render('shared/settings/two-factor', [
             'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Universal\Settings;
+namespace App\Http\Requests\Shared\Settings;
 
 use App\Models\Tenant\User;
 use Illuminate\Contracts\Validation\ValidationRule;

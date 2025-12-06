@@ -386,7 +386,7 @@ Exemplo:
 ### Conceito
 Sistema de controle de acesso baseado em **Spatie Laravel Permission** com isolamento por tenant.
 
-### Model: `App\Models\Universal\Role`
+### Model: `App\Models\Shared\Role`
 
 ```php
 // Estende Spatie Role - isolado por banco de dados
@@ -396,7 +396,7 @@ class Role extends SpatieRole {
 }
 ```
 
-### Model: `App\Models\Universal\Permission`
+### Model: `App\Models\Shared\Permission`
 
 ```php
 class Permission extends SpatiePermission {
@@ -912,7 +912,7 @@ app/Models/
 │   ├── Project.php
 │   ├── TenantTranslationOverride.php
 │   └── User.php       # Usuarios do tenant (owner, admin, member)
-└── Universal/         # Funcionam em ambos contextos
+└── Shared/         # Funcionam em ambos contextos
     ├── Permission.php
     └── Role.php
 ```
@@ -940,8 +940,8 @@ app/Models/
 | `app/Models/Central/AddonSubscription.php` | Add-ons ativos |
 | `app/Models/Central/User.php` | Admins centrais |
 | `app/Models/Tenant/User.php` | Usuarios do tenant |
-| `app/Models/Universal/Role.php` | Roles (isolado por banco) |
-| `app/Models/Universal/Permission.php` | Permissoes (isolado por banco) |
+| `app/Models/Shared/Role.php` | Roles (isolado por banco) |
+| `app/Models/Shared/Permission.php` | Permissoes (isolado por banco) |
 
 ### Services
 

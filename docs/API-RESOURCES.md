@@ -35,7 +35,7 @@ app/Http/Resources/
 │   ├── MediaResource.php         # Media file info
 │   └── TenantInvitationResource.php # Pending invitation
 │
-└── Universal/                    # Resources for models in both contexts
+└── Shared/                    # Resources for models in both contexts
     ├── RoleResource.php          # Role listing view
     ├── RoleDetailResource.php    # Role with permissions/users
     ├── RoleEditResource.php      # Role for edit forms

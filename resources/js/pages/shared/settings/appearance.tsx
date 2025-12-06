@@ -9,9 +9,9 @@ import { Separator } from '@/components/ui/separator';
 import { type BreadcrumbItem } from '@/types';
 
 import SettingsLayout from '@/layouts/settings/layout';
-import UniversalLayout from '@/layouts/universal-layout';
-import { edit as editPreferences } from '@/routes/universal/settings/appearance';
-import { edit as editProfile } from '@/routes/universal/settings/profile';
+import SharedLayout from '@/layouts/shared-layout';
+import { edit as editPreferences } from '@/routes/shared/settings/appearance';
+import { edit as editProfile } from '@/routes/shared/settings/profile';
 
 function useBreadcrumbs(): BreadcrumbItem[] {
     const { t } = useLaravelReactI18n();
@@ -32,7 +32,7 @@ export default function Appearance() {
     const breadcrumbs = useBreadcrumbs();
 
     return (
-        <UniversalLayout breadcrumbs={breadcrumbs}>
+        <SharedLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.preferences.page_title')} />
 
             <SettingsLayout>
@@ -63,6 +63,6 @@ export default function Appearance() {
                     <AppearanceTabs />
                 </div>
             </SettingsLayout>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

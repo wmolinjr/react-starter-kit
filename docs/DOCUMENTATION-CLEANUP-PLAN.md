@@ -117,8 +117,8 @@ app/Services/
 - May reference `App\Models\Permission` without full namespace
 
 **Required Updates**:
-1. Update to `App\Models\Universal\Permission`
-2. Update to `App\Models\Universal\Role`
+1. Update to `App\Models\Shared\Permission`
+2. Update to `App\Models\Shared\Role`
 
 ---
 

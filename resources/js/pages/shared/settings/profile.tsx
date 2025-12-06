@@ -1,4 +1,4 @@
-import ProfileController from '@/actions/App/Http/Controllers/Universal/Settings/ProfileController';
+import ProfileController from '@/actions/App/Http/Controllers/Shared/Settings/ProfileController';
 import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
@@ -13,8 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import SettingsLayout from '@/layouts/settings/layout';
-import UniversalLayout from '@/layouts/universal-layout';
-import { edit } from '@/routes/universal/settings/profile';
+import SharedLayout from '@/layouts/shared-layout';
+import { edit } from '@/routes/shared/settings/profile';
 
 function useBreadcrumbs(): BreadcrumbItem[] {
     const { t } = useLaravelReactI18n();
@@ -50,7 +50,7 @@ export default function Profile({
     const user = auth.user;
 
     return (
-        <UniversalLayout breadcrumbs={breadcrumbs}>
+        <SharedLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.profile.page_title')} />
 
             <SettingsLayout>
@@ -160,6 +160,6 @@ export default function Profile({
 
                 <DeleteUser />
             </SettingsLayout>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

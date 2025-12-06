@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Universal\Settings;
+namespace App\Http\Controllers\Shared\Settings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +16,7 @@ class PasswordController extends Controller
      */
     public function edit(): Response
     {
-        return Inertia::render('universal/settings/password');
+        return Inertia::render('shared/settings/password');
     }
 
     /**

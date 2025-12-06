@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Universal;
+namespace App\Models\Shared;
 
 use App\Traits\HasTenantTranslations;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
 /**
  * Role Model
  *
- * UNIVERSAL MODEL:
+ * SHARED MODEL:
  * - Works in both central and tenant contexts
  * - Central roles: Stored in central database (Super Admin, Central Admin)
  * - Tenant roles: Stored in each tenant's database (owner, admin, member)

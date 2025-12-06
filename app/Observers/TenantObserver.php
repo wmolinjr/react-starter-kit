@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Central\Tenant;
-use App\Models\Universal\Permission;
-use App\Models\Universal\Role;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use Illuminate\Support\Facades\Log;
 use Laravel\Pennant\Feature;
 

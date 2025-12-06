@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Jobs\SyncTenantPermissions;
-use App\Models\Universal\Permission;
+use App\Models\Shared\Permission;
 use App\Models\Central\Plan;
-use App\Models\Universal\Role;
+use App\Models\Shared\Role;
 use App\Models\Central\Tenant;
 use App\Services\Central\PlanPermissionResolver;
 use Illuminate\Support\Facades\Queue;

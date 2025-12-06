@@ -2,7 +2,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| Universal Settings Routes
+| Shared Settings Routes
 |--------------------------------------------------------------------------
 |
 | These routes work in both central and tenant contexts.
@@ -18,16 +18,16 @@
 |
 */
 
-use App\Http\Controllers\Universal\Settings\PasswordController;
-use App\Http\Controllers\Universal\Settings\ProfileController;
-use App\Http\Controllers\Universal\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\Shared\Settings\PasswordController;
+use App\Http\Controllers\Shared\Settings\ProfileController;
+use App\Http\Controllers\Shared\Settings\TwoFactorAuthenticationController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware(['web', 'universal', InitializeTenancyByDomain::class, 'auth'])
     ->prefix('settings')
-    ->name('universal.settings.')
+    ->name('shared.settings.')
     ->group(function () {
         Route::redirect('/', '/settings/profile');
 
@@ -43,7 +43,7 @@ Route::middleware(['web', 'universal', InitializeTenancyByDomain::class, 'auth']
             ->name('password.update');
 
         Route::get('appearance', function () {
-            return Inertia::render('universal/settings/appearance');
+            return Inertia::render('shared/settings/appearance');
         })->name('appearance.edit');
 
         Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])

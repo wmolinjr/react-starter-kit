@@ -5,10 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import SettingsLayout from '@/layouts/settings/layout';
-import UniversalLayout from '@/layouts/universal-layout';
+import SharedLayout from '@/layouts/shared-layout';
 import { disable, enable } from '@/routes/two-factor';
-import { edit as editProfile } from '@/routes/universal/settings/profile';
-import { show } from '@/routes/universal/settings/two-factor';
+import { edit as editProfile } from '@/routes/shared/settings/profile';
+import { show } from '@/routes/shared/settings/two-factor';
 import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -53,7 +53,7 @@ export default function TwoFactor({
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
-        <UniversalLayout breadcrumbs={breadcrumbs}>
+        <SharedLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.two_factor.title')} />
             <SettingsLayout>
                 <div className="space-y-6">
@@ -138,6 +138,6 @@ export default function TwoFactor({
                     />
                 </div>
             </SettingsLayout>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

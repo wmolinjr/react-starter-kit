@@ -6,7 +6,7 @@ use App\Enums\TenantPermission;
 use App\Enums\TenantRole;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
-use App\Models\Universal\Role;
+use App\Models\Shared\Role;
 
 /**
  * Base test case for tenant-scoped tests.
@@ -194,7 +194,7 @@ abstract class TenantTestCase extends TestCase
 
         // Seed tenant permissions (category/description derived from enum via accessors)
         foreach ($allPermissions as $permissionName) {
-            \App\Models\Universal\Permission::firstOrCreate([
+            \App\Models\Shared\Permission::firstOrCreate([
                 'name' => $permissionName,
                 'guard_name' => 'tenant',
             ]);

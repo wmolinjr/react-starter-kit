@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Universal\Permission;
-use App\Models\Universal\Role;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use App\Enums\CentralPermission;
 use App\Enums\TenantPermission;
 use Illuminate\Console\Command;

@@ -82,30 +82,30 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn (Request $request) => Inertia::render('universal/auth/login', [
+        Fortify::loginView(fn (Request $request) => Inertia::render('shared/auth/login', [
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'canRegister' => Features::enabled(Features::registration()),
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::resetPasswordView(fn (Request $request) => Inertia::render('universal/auth/reset-password', [
+        Fortify::resetPasswordView(fn (Request $request) => Inertia::render('shared/auth/reset-password', [
             'email' => $request->email,
             'token' => $request->route('token'),
         ]));
 
-        Fortify::requestPasswordResetLinkView(fn (Request $request) => Inertia::render('universal/auth/forgot-password', [
+        Fortify::requestPasswordResetLinkView(fn (Request $request) => Inertia::render('shared/auth/forgot-password', [
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::verifyEmailView(fn (Request $request) => Inertia::render('universal/auth/verify-email', [
+        Fortify::verifyEmailView(fn (Request $request) => Inertia::render('shared/auth/verify-email', [
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => Inertia::render('universal/auth/register'));
+        Fortify::registerView(fn () => Inertia::render('shared/auth/register'));
 
-        Fortify::twoFactorChallengeView(fn () => Inertia::render('universal/auth/two-factor-challenge'));
+        Fortify::twoFactorChallengeView(fn () => Inertia::render('shared/auth/two-factor-challenge'));
 
-        Fortify::confirmPasswordView(fn () => Inertia::render('universal/auth/confirm-password'));
+        Fortify::confirmPasswordView(fn () => Inertia::render('shared/auth/confirm-password'));
     }
 
     /**

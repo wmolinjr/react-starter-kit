@@ -342,11 +342,11 @@ return [
             'team.update-role',
 
             // Password - prevent credential changes
-            'universal.settings.password.*',
+            'shared.settings.password.*',
             'password.update',
 
             // Two-factor authentication - prevent security changes
-            'universal.settings.two-factor.*',
+            'shared.settings.two-factor.*',
             'two-factor.*',
 
             // Tenant deletion - prevent destructive actions

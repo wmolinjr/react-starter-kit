@@ -28,7 +28,7 @@ app/Models/
 │   ├── TenantTranslationOverride.php # White-label translations
 │   └── User.php                # Tenant users
 │
-└── Universal/                  # Works in Both Contexts (2 files)
+└── Shared/                  # Works in Both Contexts (2 files)
     ├── Permission.php          # Spatie Permission
     └── Role.php                # Spatie Role
 ```
@@ -63,7 +63,7 @@ Models stored in each tenant's database (`tenant_{id}`). No `CentralConnection` 
 | `Media` | Media files | Spatie MediaLibrary |
 | `TenantTranslationOverride` | White-label translations | `HasUuids` |
 
-### Universal Models (`App\Models\Universal\`)
+### Universal Models (`App\Models\Shared\`)
 
 Models that exist in both central and tenant databases with identical structure.
 
@@ -346,7 +346,7 @@ class Project extends Model implements HasMedia
 Extends Spatie Role with UUID and translations.
 
 ```php
-namespace App\Models\Universal;
+namespace App\Models\Shared;
 
 class Role extends SpatieRole
 {
@@ -375,7 +375,7 @@ class Role extends SpatieRole
 Extends Spatie Permission with UUID.
 
 ```php
-namespace App\Models\Universal;
+namespace App\Models\Shared;
 
 class Permission extends SpatiePermission
 {
@@ -474,7 +474,7 @@ Schema::create('roles', function (Blueprint $table) {
 
 - Central operations → `App\Models\Central\`
 - Tenant operations → `App\Models\Tenant\`
-- Works in both → `App\Models\Universal\`
+- Works in both → `App\Models\Shared\`
 
 ### 2. Create Model
 

@@ -14,7 +14,7 @@ Após a reestruturação dos models para os namespaces `Central/`, `Tenant/`, e 
 |-----------|--------|-----------|
 | `App\Models\Central\` | 9 | Addon, AddonBundle, AddonPurchase, AddonSubscription, Domain, Plan, Tenant, TenantInvitation, User |
 | `App\Models\Tenant\` | 5 | Activity, Media, Project, TenantTranslationOverride, User |
-| `App\Models\Universal\` | 2 | Permission, Role |
+| `App\Models\Shared\` | 2 | Permission, Role |
 
 ---
 
@@ -221,7 +221,7 @@ A tabela existe e é usada pelo Stancl Tenancy v4 para impersonation tokens.
 7. ~~**Atualizar DATABASE-IDS.md e PERMISSIONS.md**~~ ✅ Atualizados
    - `TenantAddon` → `AddonSubscription`
    - `TenantAddonPurchase` → `AddonPurchase`
-   - `App\Models\Permission` → `App\Models\Universal\Permission`
+   - `App\Models\Permission` → `App\Models\Shared\Permission`
 
 ---
 
@@ -279,4 +279,4 @@ A tabela existe e é usada pelo Stancl Tenancy v4 para impersonation tokens.
 O codebase está totalmente alinhado com a nova arquitetura de namespaces:
 - `App\Models\Central\*` - Models do banco central
 - `App\Models\Tenant\*` - Models do banco do tenant
-- `App\Models\Universal\*` - Models compartilhados (Role, Permission)
+- `App\Models\Shared\*` - Models compartilhados (Role, Permission)

@@ -1,7 +1,7 @@
-import PasswordController from '@/actions/App/Http/Controllers/Universal/Settings/PasswordController';
+import PasswordController from '@/actions/App/Http/Controllers/Shared/Settings/PasswordController';
 import InputError from '@/components/input-error';
 import SettingsLayout from '@/layouts/settings/layout';
-import UniversalLayout from '@/layouts/universal-layout';
+import SharedLayout from '@/layouts/shared-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
@@ -12,8 +12,8 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/universal/settings/password';
-import { edit as editProfile } from '@/routes/universal/settings/profile';
+import { edit } from '@/routes/shared/settings/password';
+import { edit as editProfile } from '@/routes/shared/settings/profile';
 
 function useBreadcrumbs(): BreadcrumbItem[] {
     const { t } = useLaravelReactI18n();
@@ -36,7 +36,7 @@ export default function Password() {
     const breadcrumbs = useBreadcrumbs();
 
     return (
-        <UniversalLayout breadcrumbs={breadcrumbs}>
+        <SharedLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.password.page_title')} />
 
             <SettingsLayout>
@@ -152,6 +152,6 @@ export default function Password() {
                     </Form>
                 </div>
             </SettingsLayout>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

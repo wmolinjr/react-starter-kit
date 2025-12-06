@@ -45,7 +45,7 @@ app/Http/
 │   │   ├── Api/
 │   │   │   └── ProjectController.php
 │   │   └── ApiTokenController.php
-│   └── Universal/
+│   └── Shared/
 │       └── Settings/               # Works in both contexts
 │           ├── PasswordController.php
 │           ├── ProfileController.php
@@ -69,7 +69,7 @@ app/Http/
         ├── UpdateProjectRequest.php
         ├── UpdateRoleRequest.php
         └── UploadFileRequest.php
-    └── Universal/
+    └── Shared/
         └── Settings/
             ├── ProfileUpdateRequest.php
             └── TwoFactorAuthenticationRequest.php

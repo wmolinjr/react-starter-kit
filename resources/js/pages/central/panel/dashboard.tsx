@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import UniversalLayout from '@/layouts/universal-layout';
+import SharedLayout from '@/layouts/shared-layout';
 import central from '@/routes/central';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -51,7 +51,7 @@ export default function Dashboard({ tenants = [] }: DashboardProps) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <UniversalLayout breadcrumbs={breadcrumbs}>
+        <SharedLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-6">
                 {/* Header */}
@@ -161,6 +161,6 @@ export default function Dashboard({ tenants = [] }: DashboardProps) {
                     </div>
                 )}
             </div>
-        </UniversalLayout>
+        </SharedLayout>
     );
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Universal;
+namespace App\Models\Shared;
 
 use App\Enums\CentralPermission;
 use App\Enums\TenantPermission;
@@ -12,7 +12,7 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
 /**
  * Permission Model
  *
- * UNIVERSAL MODEL:
+ * SHARED MODEL:
  * - Works in both central and tenant contexts
  * - Stored in respective database (central or tenant)
  * - Isolation is at the database level

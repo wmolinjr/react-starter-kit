@@ -6,8 +6,8 @@ use App\Enums\TenantPermission;
 use App\Exceptions\RoleException;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
-use App\Models\Universal\Permission;
-use App\Models\Universal\Role;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 

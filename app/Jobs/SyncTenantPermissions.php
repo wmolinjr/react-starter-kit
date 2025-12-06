@@ -4,8 +4,8 @@ namespace App\Jobs;
 
 use App\Enums\TenantRole;
 use App\Models\Central\Tenant;
-use App\Models\Universal\Permission;
-use App\Models\Universal\Role;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use App\Services\Central\PlanPermissionResolver;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -4,8 +4,8 @@ namespace App\Services\Central;
 
 use App\Enums\CentralPermission;
 use App\Exceptions\RoleException;
-use App\Models\Universal\Permission;
-use App\Models\Universal\Role;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use Illuminate\Support\Collection;
 
 /**

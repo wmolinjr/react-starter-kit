@@ -65,7 +65,7 @@ Esta inconsistência leva a:
 - Dificuldade em manter contratos de API consistentes
 - Nenhum lugar centralizado para tratar traduções (chamadas `trans()` espalhadas)
 
-**Solução Proposta**: Implementar Laravel API Resources com organização de namespace estruturada que espelha o padrão existente `Models/Central`, `Models/Tenant`, `Models/Universal`.
+**Solução Proposta**: Implementar Laravel API Resources com organização de namespace estruturada que espelha o padrão existente `Models/Central`, `Models/Tenant`, `Models/Shared`.
 
 ---
 
@@ -171,7 +171,7 @@ app/Http/Resources/
 │       ├── InvoiceCollection.php
 │       └── InvoiceDetailResource.php
 │
-├── Universal/                        # Funciona em ambos os contextos
+├── Shared/                        # Funciona em ambos os contextos
 │   ├── RoleResource.php              # Listagem de role
 │   ├── RoleDetailResource.php        # Role com permissions/users
 │   ├── RoleEditResource.php          # Role para formulário de edição
@@ -434,7 +434,7 @@ class TeamMemberResource extends BaseResource
 ```php
 <?php
 
-namespace App\Http\Resources\Universal;
+namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;

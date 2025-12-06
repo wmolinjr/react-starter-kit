@@ -63,8 +63,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // TENANT-ONLY ARCHITECTURE: Separate auth for admins vs tenant users
             require base_path('routes/central-admin.php');
 
-            // Universal routes (work in both central and tenant contexts)
-            require base_path('routes/universal.php');
+            // Shared routes (work in both central and tenant contexts)
+            require base_path('routes/shared.php');
 
             // Webhook routes (Stripe, etc.) - no CSRF, no auth
             Route::middleware('api')->group(base_path('routes/webhooks.php'));

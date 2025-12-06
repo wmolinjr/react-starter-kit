@@ -111,7 +111,7 @@ app/Services/
 │   └── StripeSyncService.php
 ├── Tenant/
 │   └── .gitkeep
-└── Universal/
+└── Shared/
     └── .gitkeep
 ```
 
@@ -239,7 +239,7 @@ $addon = \App\Models\Central\Addon::where('slug', $addonSlug)->first();
 ### Migração
 - [ ] Criar diretório `app/Services/Central/`
 - [ ] Criar diretório `app/Services/Tenant/` (com .gitkeep)
-- [ ] Criar diretório `app/Services/Universal/` (com .gitkeep)
+- [ ] Criar diretório `app/Services/Shared/` (com .gitkeep)
 - [ ] Mover e atualizar `AddonService.php`
 - [ ] Mover e atualizar `CheckoutService.php`
 - [ ] Mover e atualizar `StripeSyncService.php`
@@ -283,6 +283,6 @@ app/Services/
 │   └── StripeSyncService.php      # Sync de produtos com Stripe
 ├── Tenant/
 │   └── .gitkeep                   # Placeholder para futuros services
-└── Universal/
+└── Shared/
     └── .gitkeep                   # Placeholder para futuros services
 ```

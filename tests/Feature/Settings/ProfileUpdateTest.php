@@ -10,7 +10,7 @@ class ProfileUpdateTest extends TenantTestCase
     public function test_profile_page_is_displayed()
     {
         $response = $this
-            ->get(route('universal.settings.profile.edit'));
+            ->get(route('shared.settings.profile.edit'));
 
         $response->assertOk();
     }
@@ -18,14 +18,14 @@ class ProfileUpdateTest extends TenantTestCase
     public function test_profile_information_can_be_updated()
     {
         $response = $this
-            ->patch(route('universal.settings.profile.update'), [
+            ->patch(route('shared.settings.profile.update'), [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('universal.settings.profile.edit'));
+            ->assertRedirect(route('shared.settings.profile.edit'));
 
         $this->user->refresh();
 
@@ -37,14 +37,14 @@ class ProfileUpdateTest extends TenantTestCase
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()
     {
         $response = $this
-            ->patch(route('universal.settings.profile.update'), [
+            ->patch(route('shared.settings.profile.update'), [
                 'name' => 'Test User',
                 'email' => $this->user->email,
             ]);
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('universal.settings.profile.edit'));
+            ->assertRedirect(route('shared.settings.profile.edit'));
 
         $this->assertNotNull($this->user->refresh()->email_verified_at);
     }
@@ -54,7 +54,7 @@ class ProfileUpdateTest extends TenantTestCase
         $userId = $this->user->id;
 
         $response = $this
-            ->delete(route('universal.settings.profile.destroy'), [
+            ->delete(route('shared.settings.profile.destroy'), [
                 'password' => 'password',
             ]);
 
@@ -70,14 +70,14 @@ class ProfileUpdateTest extends TenantTestCase
     public function test_correct_password_must_be_provided_to_delete_account()
     {
         $response = $this
-            ->from(route('universal.settings.profile.edit'))
-            ->delete(route('universal.settings.profile.destroy'), [
+            ->from(route('shared.settings.profile.edit'))
+            ->delete(route('shared.settings.profile.destroy'), [
                 'password' => 'wrong-password',
             ]);
 
         $response
             ->assertSessionHasErrors('password')
-            ->assertRedirect(route('universal.settings.profile.edit'));
+            ->assertRedirect(route('shared.settings.profile.edit'));
 
         $this->assertNotNull($this->user->fresh());
     }

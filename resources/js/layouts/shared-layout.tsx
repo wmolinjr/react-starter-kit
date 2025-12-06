@@ -6,12 +6,12 @@ import { useTenant } from '@/hooks/use-tenant';
 import { type BreadcrumbItem } from '@/types';
 import { type PropsWithChildren } from 'react';
 
-interface UniversalLayoutProps extends PropsWithChildren {
+interface SharedLayoutProps extends PropsWithChildren {
     breadcrumbs?: BreadcrumbItem[];
 }
 
 /**
- * Universal Layout - automatically selects the appropriate layout
+ * Shared Layout - automatically selects the appropriate layout
  * based on the current context and user role.
  *
  * - Tenant context → TenantAdminLayout
@@ -19,20 +19,20 @@ interface UniversalLayoutProps extends PropsWithChildren {
  * - Central context + Regular user → CentralPanelLayout
  *
  * @example
- * // In a universal page component:
+ * // In a shared page component:
  * export default function ConfirmPassword() {
  *     return (
- *         <UniversalLayout breadcrumbs={breadcrumbs}>
+ *         <SharedLayout breadcrumbs={breadcrumbs}>
  *             <Head title="Confirm Password" />
  *             <YourContent />
- *         </UniversalLayout>
+ *         </SharedLayout>
  *     );
  * }
  */
-export default function UniversalLayout({
+export default function SharedLayout({
     children,
     breadcrumbs = [],
-}: UniversalLayoutProps) {
+}: SharedLayoutProps) {
     const { isTenantContext } = useTenant();
     const { isSuperAdmin } = usePermissions();
 

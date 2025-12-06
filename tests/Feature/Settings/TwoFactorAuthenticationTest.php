@@ -28,9 +28,9 @@ class TwoFactorAuthenticationTest extends TenantTestCase
         ])->save();
 
         $this->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('universal.settings.two-factor.show'))
+            ->get(route('shared.settings.two-factor.show'))
             ->assertInertia(fn (Assert $page) => $page
-                ->component('universal/settings/two-factor')
+                ->component('shared/settings/two-factor')
                 ->where('twoFactorEnabled', false)
             );
     }
@@ -46,7 +46,7 @@ class TwoFactorAuthenticationTest extends TenantTestCase
             'confirmPassword' => true,
         ]);
 
-        $response = $this->get(route('universal.settings.two-factor.show'));
+        $response = $this->get(route('shared.settings.two-factor.show'));
 
         $response->assertRedirect(route('password.confirm'));
     }
@@ -62,10 +62,10 @@ class TwoFactorAuthenticationTest extends TenantTestCase
             'confirmPassword' => false,
         ]);
 
-        $this->get(route('universal.settings.two-factor.show'))
+        $this->get(route('shared.settings.two-factor.show'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('universal/settings/two-factor')
+                ->component('shared/settings/two-factor')
             );
     }
 
@@ -78,7 +78,7 @@ class TwoFactorAuthenticationTest extends TenantTestCase
         config(['fortify.features' => []]);
 
         $this->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('universal.settings.two-factor.show'))
+            ->get(route('shared.settings.two-factor.show'))
             ->assertForbidden();
     }
 }

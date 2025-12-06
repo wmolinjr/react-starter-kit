@@ -219,7 +219,7 @@ app/Models/
 ├── Tenant/            # Banco do tenant (dados isolados)
 │   ├── Activity.php, Media.php, Project.php, TenantTranslationOverride.php
 │   └── User.php       # Usuarios do tenant (owner, admin, member)
-└── Universal/         # Funcionam em ambos contextos
+└── Shared/         # Funcionam em ambos contextos
     ├── Permission.php
     └── Role.php
 ```
@@ -291,7 +291,7 @@ app/Http/Resources/
 ├── BaseResource.php          # Base class with helpers (trans, formatIso, etc.)
 ├── Central/                  # TenantResource, PlanResource, DomainResource, etc.
 ├── Tenant/                   # UserResource, ProjectResource, ActivityResource, etc.
-└── Universal/                # RoleResource, PermissionResource (works in both contexts)
+└── Shared/                # RoleResource, PermissionResource (works in both contexts)
 ```
 
 **Naming Conventions**:

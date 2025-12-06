@@ -660,7 +660,7 @@ public function member_cannot_delete_projects()
 ```bash
 # Verificar se existe
 sail artisan tinker
->>> \App\Models\Universal\Permission::where('name', 'projects:view')->first();
+>>> \App\Models\Shared\Permission::where('name', 'projects:view')->first();
 
 # Limpar cache
 sail artisan permission:cache-reset

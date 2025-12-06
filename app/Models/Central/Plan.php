@@ -2,7 +2,7 @@
 
 namespace App\Models\Central;
 
-use App\Models\Universal\Permission;
+use App\Models\Shared\Permission;
 use App\Traits\HasTenantTranslations;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

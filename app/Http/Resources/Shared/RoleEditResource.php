@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Universal;
+namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;

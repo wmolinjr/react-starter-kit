@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Central\Plan;
-use App\Models\Universal\Role;
+use App\Models\Shared\Role;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
 use Laravel\Pennant\Feature;
