@@ -34,6 +34,22 @@ class Tenant extends Model implements TenantWithDatabase
     use CentralConnection, HasFactory, HasUuids, Billable, HasDatabase, HasFeatures, HasInternalKeys, TenantRun, VirtualColumn;
 
     /**
+     * Bootstrap the model.
+     *
+     * In tests with TENANCY_TESTING_DATABASE, all tenants use the same
+     * testing_tenant database instead of dynamic tenant_{id} databases.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Tenant $tenant) {
+            // In tests, use fixed testing database for all tenants
+            if ($testingDb = env('TENANCY_TESTING_DATABASE')) {
+                $tenant->setInternal('db_name', $testingDb);
+            }
+        });
+    }
+
+    /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory(): \Database\Factories\TenantFactory
@@ -441,15 +457,7 @@ class Tenant extends Model implements TenantWithDatabase
             return [];
         }
 
-        // If DatabaseTenancyBootstrapper is disabled (single database mode),
-        // skip database existence checks
-        if (!$this->isMultiDatabaseEnabled()) {
-            $permissions = $this->plan->getAllEnabledPermissions();
-            $this->forceFill(['plan_enabled_permissions' => $permissions])->saveQuietly();
-            return $permissions;
-        }
-
-        // Check if tenant database exists (multi-database mode)
+        // Check if tenant database exists (skip during initial creation)
         $database = $this->database()->getName();
         if (!$this->database()->manager()->databaseExists($database)) {
             \Illuminate\Support\Facades\Log::info("Skipping regeneratePlanPermissions - tenant database {$database} does not exist yet");
@@ -484,17 +492,6 @@ class Tenant extends Model implements TenantWithDatabase
     public function isPlanPermissionEnabled(string $permission): bool
     {
         return in_array($permission, $this->getPlanEnabledPermissions());
-    }
-
-    /**
-     * Check if multi-database tenancy is enabled.
-     *
-     * When DatabaseTenancyBootstrapper is disabled (TENANCY_DB_BOOTSTRAPPER=false),
-     * all tenants share the same database and we skip database existence checks.
-     */
-    protected function isMultiDatabaseEnabled(): bool
-    {
-        return (bool) env('TENANCY_DB_BOOTSTRAPPER', true);
     }
 
     /**

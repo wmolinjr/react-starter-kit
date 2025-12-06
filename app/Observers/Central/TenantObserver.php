@@ -41,13 +41,6 @@ class TenantObserver
      */
     protected function syncPermissionsForPlanChange(Tenant $tenant): void
     {
-        // If DatabaseTenancyBootstrapper is disabled (single database mode),
-        // use simplified sync without database existence checks
-        if (!$this->isMultiDatabaseEnabled()) {
-            $this->syncPermissionsSimplified($tenant);
-            return;
-        }
-
         // Check if tenant database exists (skip during initial creation)
         $database = $tenant->database()->getName();
         if (!$tenant->database()->manager()->databaseExists($database)) {
@@ -96,43 +89,6 @@ class TenantObserver
         } finally {
             tenancy()->end();
         }
-    }
-
-    /**
-     * Check if multi-database tenancy is enabled.
-     *
-     * When DatabaseTenancyBootstrapper is disabled (TENANCY_DB_BOOTSTRAPPER=false),
-     * all tenants share the same database and we skip database existence checks.
-     */
-    protected function isMultiDatabaseEnabled(): bool
-    {
-        return (bool) env('TENANCY_DB_BOOTSTRAPPER', true);
-    }
-
-    /**
-     * Simplified permission sync for single-database mode.
-     *
-     * Used when DatabaseTenancyBootstrapper is disabled and all tenants
-     * share the same database (e.g., during testing with SQLite).
-     */
-    protected function syncPermissionsSimplified(Tenant $tenant): void
-    {
-        // Refresh the plan relationship
-        $tenant->load('plan');
-
-        if (!$tenant->plan) {
-            return;
-        }
-
-        // Get permissions for the plan
-        $permissions = $tenant->plan->getAllEnabledPermissions();
-
-        // Cache it
-        $tenant->forceFill(['plan_enabled_permissions' => $permissions])->saveQuietly();
-
-        // Clear Pennant cache
-        Feature::flushCache();
-        Feature::purge();
     }
 
     /**

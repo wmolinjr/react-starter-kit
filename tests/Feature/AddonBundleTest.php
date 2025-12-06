@@ -50,7 +50,7 @@ class AddonBundleTest extends TenantTestCase
         $this->assertDatabaseHas('addon_bundles', [
             'slug' => 'test_bundle',
             'discount_percent' => 20,
-        ]);
+        ], 'testing');
     }
 
     #[Test]

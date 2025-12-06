@@ -16,33 +16,42 @@ abstract class TestCase extends BaseTestCase
      * Setup the test environment.
      *
      * Runs migrate:fresh once per test class to ensure clean state.
+     * Uses separate databases to mirror production multi-database tenancy:
+     * - 'testing': Central database (Central\User, tenants, plans, etc.)
+     * - 'testing_tenant': Tenant database (Tenant\User, projects, etc.)
+     *
+     * The TenancyServiceProvider configures the 'tenant' connection to use
+     * 'testing_tenant' when TENANCY_TESTING_DATABASE is set (see phpunit.xml).
+     * This enables tenancy()->run() to use the correct test database.
+     *
      * No database transactions used to avoid deadlocks with stancl/tenancy.
      *
      * Trade-off: Data accumulates within a test class, but each class starts fresh.
      * Tests should be written to not depend on absolute counts.
      *
-     * @see https://tenancyforlaravel.com/docs/v3/testing
+     * @see https://v4.tenancyforlaravel.com/customizing-databases
      */
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Disable queued database operations for tests
+        // Disable queued database operations for tests (no dynamic DB creation)
         config(['tenancy.queue_database_creation' => false]);
         config(['tenancy.queue_database_deletion' => false]);
 
         // Run migrations once per test class
         if (! static::$classMigrationsRun) {
-            // Fresh migration for testing database
+            // Fresh migration for central testing database
             $this->artisan('migrate:fresh', [
                 '--database' => 'testing',
                 '--seed' => false,
             ]);
 
-            // Run tenant migrations (same database in tests - no multi-db)
-            $this->artisan('migrate', [
+            // Fresh migration for tenant testing database (separate DB)
+            $this->artisan('migrate:fresh', [
                 '--path' => 'database/migrations/tenant',
-                '--database' => 'testing',
+                '--database' => 'testing_tenant',
+                '--seed' => false,
             ]);
 
             static::$classMigrationsRun = true;

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Schema;
  * - Uses Spatie Permission with teams=false
  *
  * TESTING:
- * - In tests (SQLite), central tables already exist, so we skip creation
+ * - In tests, the testing_tenant database is pre-migrated, so we skip creation
  */
 return new class extends Migration
 {

@@ -5,10 +5,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Central Migration: Admins Table
+ * Central Migration: Users Table
  *
  * TENANT-ONLY USERS ARCHITECTURE (Option C):
- * - Admin model is for central administrators
+ * - Central\User model is for central users (various roles)
  * - Uses Spatie Permission with guard 'central' for roles/permissions
  * - Roles: super-admin, central-admin, support-admin
  * - NOT for tenant users (those are in tenant databases)
@@ -19,7 +19,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
@@ -35,8 +35,8 @@ return new class extends Migration
             $table->index('email');
         });
 
-        // Password reset tokens for admins (central)
-        Schema::create('admin_password_reset_tokens', function (Blueprint $table) {
+        // Password reset tokens for central users
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
@@ -45,7 +45,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('admin_password_reset_tokens');
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };

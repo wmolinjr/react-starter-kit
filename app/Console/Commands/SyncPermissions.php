@@ -30,7 +30,7 @@ class SyncPermissions extends Command
      * display_name and description use multi-language format.
      *
      * MULTI-DATABASE TENANCY: No tenant_id column - isolation at database level.
-     * Guard 'central' uses 'admins' provider (Central\User model).
+     * Guard 'central' uses 'central_users' provider (Central\User model).
      */
     protected array $centralRoles = [
         'super-admin' => [

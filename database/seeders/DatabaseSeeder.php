@@ -21,13 +21,13 @@ use Illuminate\Support\Facades\Artisan;
  * 2. AddonSeeder - Addon catalog
  * 3. AddonBundleSeeder - Addon bundles (packages)
  * 4. Permissions sync - Central roles (Super Admin, etc.)
- * 5. AdminSeeder - Central admin users (Admin model, NOT User)
+ * 5. CentralUserSeeder - Central users (Central\User model)
  * 6. TenantSeeder - Create tenants (triggers tenant DB creation & seeding)
  *
  * NOTE: Feature and Limit definitions are now in enums (PlanFeature, PlanLimit)
  *       and do not require database seeding.
  *
- * NOTE: User model is ONLY in tenant databases. Central uses Admin model.
+ * NOTE: Tenant\User is for tenant databases. Central\User is for central database.
  */
 class DatabaseSeeder extends Seeder
 {
@@ -57,8 +57,8 @@ class DatabaseSeeder extends Seeder
         Artisan::call('permissions:sync', [], $this->command->getOutput());
         $this->command->newLine();
 
-        // Seed admin users (Admin model in central database)
-        $this->call([AdminSeeder::class]);
+        // Seed central users (Central\User model)
+        $this->call([CentralUserSeeder::class]);
         $this->command->newLine();
 
         // Seed tenants (triggers automatic database creation, migration, seeding)

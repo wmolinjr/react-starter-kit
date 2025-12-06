@@ -2,10 +2,18 @@
 
 namespace Tests\Feature\Auth;
 
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_registration_screen_can_be_rendered()
     {
@@ -24,7 +32,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        // Fortify redirects to /home, which then redirects based on role
-        $response->assertRedirect(route('central.fortify.home', absolute: false));
+        // Tenant users are redirected to admin dashboard
+        $response->assertRedirect(route('tenant.admin.dashboard', absolute: false));
     }
 }

@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'tenant'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'passwords' => env('AUTH_PASSWORD_BROKER', 'tenant_users'),
     ],
 
     /*
@@ -28,8 +28,8 @@ return [
     | which utilizes session storage plus the Eloquent user provider.
     |
     | TENANT-ONLY ARCHITECTURE (Option C):
-    | - 'tenant': Guard for tenant users (users in tenant database)
-    | - 'central': Guard for central admins (admins in central database)
+    | - 'tenant': Guard for tenant users (users table in tenant database)
+    | - 'central': Guard for central users (users table in central database)
     |
     | All authentication guards have a user provider, which defines how the
     | users are actually retrieved out of your database or other storage
@@ -43,13 +43,13 @@ return [
         // Guard for tenant users (tenant database)
         'tenant' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'tenant_users',
         ],
 
-        // Guard for central admins (central database)
+        // Guard for central users (central database)
         'central' => [
             'driver' => 'session',
-            'provider' => 'admins',
+            'provider' => 'central_users',
         ],
 
         // Sanctum guards - using smart PersonalAccessToken model that auto-detects context
@@ -58,13 +58,13 @@ return [
         // API tokens for tenant users (Sanctum)
         'tenant-sanctum' => [
             'driver' => 'sanctum',
-            'provider' => 'users',
+            'provider' => 'tenant_users',
         ],
 
-        // API tokens for central admins (Sanctum)
+        // API tokens for central users (Sanctum)
         'central-sanctum' => [
             'driver' => 'sanctum',
-            'provider' => 'admins',
+            'provider' => 'central_users',
         ],
     ],
 
@@ -78,8 +78,9 @@ return [
     | system used by the application. Typically, Eloquent is utilized.
     |
     | TENANT-ONLY ARCHITECTURE (Option C):
-    | - 'users': Tenant users from tenant database (no CentralConnection)
-    | - 'admins': Central admins from central database (with CentralConnection)
+    | Both use 'users' table but in different databases:
+    | - 'tenant_users': Tenant\User model → users table in tenant database
+    | - 'central_users': Central\User model → users table in central database
     |
     | If you have multiple user tables or models you may configure multiple
     | providers to represent the model / table. These providers may then
@@ -90,14 +91,14 @@ return [
     */
 
     'providers' => [
-        // Tenant users (stored in each tenant's database)
-        'users' => [
+        // Tenant users (users table in each tenant's database)
+        'tenant_users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\Tenant\User::class),
         ],
 
-        // Central admins (stored in central database)
-        'admins' => [
+        // Central users (users table in central database)
+        'central_users' => [
             'driver' => 'eloquent',
             'model' => App\Models\Central\User::class,
         ],
@@ -113,8 +114,9 @@ return [
     | and the user provider that is invoked to actually retrieve users.
     |
     | TENANT-ONLY ARCHITECTURE (Option C):
-    | - 'users': Password reset for tenant users (tenant database)
-    | - 'admins': Password reset for central admins (central database)
+    | Both use 'password_reset_tokens' table but in different databases:
+    | - 'tenant_users': password_reset_tokens in tenant database
+    | - 'central_users': password_reset_tokens in central database
     |
     | The expiry time is the number of minutes that each reset token will be
     | considered valid. This security feature keeps tokens short-lived so
@@ -127,18 +129,18 @@ return [
     */
 
     'passwords' => [
-        // Password reset for tenant users (uses tenant database)
-        'users' => [
-            'provider' => 'users',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+        // Password reset for tenant users (tenant database)
+        'tenant_users' => [
+            'provider' => 'tenant_users',
+            'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],
 
-        // Password reset for central admins (uses central database)
-        'admins' => [
-            'provider' => 'admins',
-            'table' => 'admin_password_reset_tokens',
+        // Password reset for central users (central database)
+        'central_users' => [
+            'provider' => 'central_users',
+            'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
             'connection' => 'central', // Explicitly use central connection

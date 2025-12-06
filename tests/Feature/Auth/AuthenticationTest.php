@@ -5,10 +5,18 @@ namespace Tests\Feature\Auth;
 use App\Models\Tenant\User;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_login_screen_can_be_rendered()
     {
@@ -27,8 +35,8 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        // Fortify redirects to /home, which then redirects based on role
-        $response->assertRedirect(route('central.fortify.home', absolute: false));
+        // Tenant users are redirected to admin dashboard
+        $response->assertRedirect(route('tenant.admin.dashboard', absolute: false));
     }
 
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()

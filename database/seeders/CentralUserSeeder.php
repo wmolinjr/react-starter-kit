@@ -2,15 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Models\Central\User as Admin;
+use App\Models\Central\User;
 use Illuminate\Database\Seeder;
 
 /**
- * AdminSeeder
+ * CentralUserSeeder
  *
  * OPTION C: TENANT-ONLY USERS
- * - Creates administrative users in the CENTRAL database
- * - Uses Admin model (Central\User)
+ * - Creates users in the CENTRAL database
+ * - Uses Central\User model
  * - Assigns roles via Spatie Permission (guard: central)
  *
  * Roles:
@@ -22,14 +22,14 @@ use Illuminate\Database\Seeder;
  * - admin@setor3.app / password (super-admin)
  * - support@setor3.app / password (support-admin)
  */
-class AdminSeeder extends Seeder
+class CentralUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('Seeding admin users (central database)...');
+        $this->command->info('Seeding central users...');
 
         // Super Admin
-        $superAdmin = Admin::firstOrCreate(
+        $superAdmin = User::firstOrCreate(
             ['email' => 'admin@setor3.app'],
             [
                 'name' => 'Super Admin',
@@ -40,14 +40,14 @@ class AdminSeeder extends Seeder
         );
 
         // Assign super-admin role (has all permissions)
-        if (!$superAdmin->hasRole('super-admin')) {
+        if (! $superAdmin->hasRole('super-admin')) {
             $superAdmin->assignRole('super-admin');
         }
 
         $this->command->info("  - Super Admin: {$superAdmin->email} (role: super-admin)");
 
         // Support Admin (can view and impersonate, but not edit/delete)
-        $supportAdmin = Admin::firstOrCreate(
+        $supportAdmin = User::firstOrCreate(
             ['email' => 'support@setor3.app'],
             [
                 'name' => 'Support Team',
@@ -58,12 +58,12 @@ class AdminSeeder extends Seeder
         );
 
         // Assign support-admin role (limited permissions)
-        if (!$supportAdmin->hasRole('support-admin')) {
+        if (! $supportAdmin->hasRole('support-admin')) {
             $supportAdmin->assignRole('support-admin');
         }
 
         $this->command->info("  - Support Admin: {$supportAdmin->email} (role: support-admin)");
 
-        $this->command->info('Admin users seeded successfully!');
+        $this->command->info('Central users seeded successfully!');
     }
 }

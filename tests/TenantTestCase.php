@@ -11,11 +11,11 @@ use App\Models\Shared\Role;
 /**
  * Base test case for tenant-scoped tests.
  *
- * OPTION C: TENANT-ONLY USERS ARCHITECTURE
- * - In production, each tenant has a dedicated PostgreSQL database with its own users
- * - In tests, we use a single database with all migrations (central + tenant) applied
- * - tenancy()->initialize() sets up the context but doesn't switch databases in tests
- * - Users are created directly in the database (no pivot table)
+ * MULTI-DATABASE TENANCY (Option C: Tenant-Only Users):
+ * - Each tenant has a dedicated PostgreSQL database with its own users
+ * - Tests use a fixed `testing_tenant` database for all tenants
+ * - tenancy()->initialize() switches to tenant database connection
+ * - Users are created directly in the tenant database (no pivot table)
  *
  * Automatically creates a tenant, user, and initializes tenant context.
  * All tests extending this class will run within a tenant context.
@@ -54,8 +54,7 @@ abstract class TenantTestCase extends TestCase
         $this->tenantDomain = $domain->domain;
 
         // Initialize tenant context (Stancl Tenancy v4)
-        // In production: switches to tenant's dedicated database
-        // In tests: sets context only (same database with all migrations)
+        // Switches to tenant's database connection (testing_tenant in tests)
         tenancy()->initialize($this->tenant);
 
         // Sync permissions and roles for tests
@@ -146,10 +145,9 @@ abstract class TenantTestCase extends TestCase
      * Create another tenant (for testing central database operations).
      *
      * MULTI-DATABASE TENANCY NOTE:
-     * In production, each tenant has its own database, so cross-tenant
-     * data access is physically impossible. In tests with SQLite,
-     * all data is in the same database, so this is mainly useful for
-     * testing central database operations (not tenant isolation).
+     * Each tenant has its own database, so cross-tenant data access
+     * is physically impossible. This is useful for testing central
+     * database operations like tenant listing, plan management, etc.
      */
     protected function createOtherTenant(): Tenant
     {
@@ -168,10 +166,8 @@ abstract class TenantTestCase extends TestCase
     /**
      * Sync permissions and roles for current tenant in tests.
      *
-     * MULTI-DATABASE TENANCY:
-     * - In production, tenant roles are created by SeedTenantDatabase job
-     * - In tests with SQLite, we create them directly
-     * - permissions:sync creates central permissions and roles
+     * In production, tenant roles are created by SeedTenantDatabase job.
+     * In tests, we create them directly in the testing_tenant database.
      */
     protected function syncPermissionsForTests(): void
     {

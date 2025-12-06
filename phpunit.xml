@@ -36,6 +36,7 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="PENNANT_STORE" value="array"/>
-        <env name="TENANCY_DB_BOOTSTRAPPER" value="false"/>
+        <!-- Use fixed testing_tenant database instead of dynamic tenant databases -->
+        <env name="TENANCY_TESTING_DATABASE" value="testing_tenant"/>
     </php>
 </phpunit>

@@ -5,22 +5,23 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Central Migration: Admin Personal Access Tokens
+ * Central Migration: Personal Access Tokens (Sanctum)
  *
  * OPTION C ARCHITECTURE:
- * - Admin API tokens are stored in central database (admin_personal_access_tokens)
- * - Tenant user tokens are stored in tenant databases (personal_access_tokens)
+ * - Central user API tokens are stored in central database
+ * - Tenant user tokens are stored in tenant databases
  *
  * Uses UUID for primary key and uuidMorphs for tokenable (Central\User).
+ * Smart model detects context automatically.
  *
- * @see App\Models\Central\PersonalAccessToken
+ * @see App\Models\Shared\PersonalAccessToken
  * @see database/migrations/tenant/2025_12_01_000003_create_tenant_personal_access_tokens_table.php
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('admin_personal_access_tokens', function (Blueprint $table) {
+        Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuidMorphs('tokenable'); // UUID for Central\User model
             $table->string('name');
@@ -36,6 +37,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('admin_personal_access_tokens');
+        Schema::dropIfExists('personal_access_tokens');
     }
 };

@@ -119,13 +119,12 @@ return [
      * MULTI-DATABASE TENANCY: DatabaseTenancyBootstrapper is ENABLED
      * Each tenant has its own dedicated database for LGPD/HIPAA compliance.
      *
-     * TESTING: DatabaseTenancyBootstrapper is DISABLED via TENANCY_DB_BOOTSTRAPPER=false
-     * to use single SQLite database.
+     * TESTING: Uses a fixed `testing_tenant` database (TENANCY_TESTING_DATABASE env var)
+     * Bootstrapper still runs to switch connections, but no dynamic DB creation.
      */
-    'bootstrappers' => array_filter([
+    'bootstrappers' => [
         // DatabaseTenancyBootstrapper: ENABLED for multi-database tenancy (physical isolation)
-        // Set TENANCY_DB_BOOTSTRAPPER=false in phpunit.xml to disable for testing
-        env('TENANCY_DB_BOOTSTRAPPER', true) ? Bootstrappers\DatabaseTenancyBootstrapper::class : null,
+        Bootstrappers\DatabaseTenancyBootstrapper::class,
         Bootstrappers\CacheTenancyBootstrapper::class,
         Bootstrappers\FilesystemTenancyBootstrapper::class,
         Bootstrappers\QueueTenancyBootstrapper::class,
@@ -148,7 +147,7 @@ return [
 
         // FortifyRouteBootstrapper for tenant-aware Fortify redirects (v4 feature)
         Bootstrappers\Integrations\FortifyRouteBootstrapper::class,
-    ]),
+    ],
 
     /**
      * Database tenancy config. Used by DatabaseTenancyBootstrapper.

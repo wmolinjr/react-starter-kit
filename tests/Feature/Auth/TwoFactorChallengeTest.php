@@ -5,10 +5,18 @@ namespace Tests\Feature\Auth;
 use App\Models\Tenant\User;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class TwoFactorChallengeTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_two_factor_challenge_redirects_to_login_when_not_authenticated(): void
     {

@@ -54,7 +54,7 @@ class AddonSubscriptionTest extends TenantTestCase
             'addon_slug' => 'storage_50gb',
             'price' => 4900,
             'tenant_id' => $this->tenant->id,
-        ]);
+        ], 'testing');
 
         $this->assertTrue($addon->isActive());
         $this->assertFalse($addon->isExpired());
@@ -287,7 +287,7 @@ class AddonSubscriptionTest extends TenantTestCase
 
         $addon->delete();
 
-        $this->assertSoftDeleted('addon_subscriptions', ['id' => $addon->id]);
+        $this->assertSoftDeleted('addon_subscriptions', ['id' => $addon->id], 'testing');
         $this->assertNotNull(AddonSubscription::withTrashed()->find($addon->id));
     }
 }

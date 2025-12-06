@@ -16,9 +16,10 @@ use Laravel\Sanctum\Sanctum;
  * SANCTUM v4 + TENANCY v4 INTEGRATION:
  * - Uses smart PersonalAccessToken model that works in both contexts
  * - Tenant context: uses 'personal_access_tokens' table in tenant database
- * - Central context: uses 'admin_personal_access_tokens' table in central database
+ * - Central context: uses 'personal_access_tokens' table in central database
  * - Sanctum v4 no longer auto-loads migrations (no ignoreMigrations() needed)
  *
+ * @see App\Models\Shared\PersonalAccessToken
  * @see https://v4.tenancyforlaravel.com/integrations/sanctum/
  * @see https://github.com/laravel/sanctum/blob/4.x/UPGRADE.md
  */
@@ -39,8 +40,9 @@ class AuthServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Sanctum v4: Migrations are no longer auto-loaded
+        // Both central and tenant use 'personal_access_tokens' table in their respective databases
         // Migrations:
-        // - Central: database/migrations/2025_11_19_150407_create_personal_access_tokens_table.php (admin_personal_access_tokens)
+        // - Central: database/migrations/2025_11_19_150407_create_personal_access_tokens_table.php
         // - Tenant: database/migrations/tenant/2025_12_01_000003_create_tenant_personal_access_tokens_table.php
     }
 
@@ -51,7 +53,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Use smart PersonalAccessToken model that works in both contexts
         // - In tenant context: uses tenant database's personal_access_tokens table
-        // - In central context: uses central database's admin_personal_access_tokens table
+        // - In central context: uses central database's personal_access_tokens table
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
 
         // Note: Super Admin Gate::before() is now in AppServiceProvider

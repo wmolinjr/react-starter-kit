@@ -25,29 +25,33 @@ use Stancl\Tenancy\Middleware;
  * - DatabaseTenancyBootstrapper switches to tenant database on initialization
  * - Tenant database is created, migrated, and seeded on tenant creation
  *
- * CONFIGURATION:
- * - TENANCY_DB_BOOTSTRAPPER=true (default): Multi-database mode
- * - TENANCY_DB_BOOTSTRAPPER=false: Single-database mode (for tests)
+ * TESTING:
+ * - Tests use a fixed `testing_tenant` database (TENANCY_TESTING_DATABASE env var)
+ * - Bootstrapper still switches connections, but no dynamic DB creation
  */
 class TenancyServiceProvider extends ServiceProvider
 {
     public static string $controllerNamespace = '';
 
     /**
-     * Check if multi-database tenancy is enabled.
+     * Check if dynamic database creation should be enabled.
+     *
+     * In tests, we use a fixed testing_tenant database instead of creating
+     * dynamic databases per tenant. This is controlled by TENANCY_TESTING_DATABASE.
      */
-    protected function isMultiDatabaseEnabled(): bool
+    protected function shouldCreateDynamicDatabases(): bool
     {
-        return (bool) env('TENANCY_DB_BOOTSTRAPPER', true);
+        return !env('TENANCY_TESTING_DATABASE');
     }
 
     public function events()
     {
-        // Database jobs only run in multi-database mode
+        // Database jobs only run when dynamic database creation is enabled
+        // In tests with TENANCY_TESTING_DATABASE, we skip dynamic DB creation
         $tenantCreatedListeners = [];
         $tenantDeletedListeners = [];
 
-        if ($this->isMultiDatabaseEnabled()) {
+        if ($this->shouldCreateDynamicDatabases()) {
             $tenantCreatedListeners = [
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
@@ -67,14 +71,9 @@ class TenancyServiceProvider extends ServiceProvider
             ];
         }
 
-        // Bootstrappers only run in multi-database mode
-        $tenancyInitializedListeners = $this->isMultiDatabaseEnabled()
-            ? [Listeners\BootstrapTenancy::class]
-            : [];
-
-        $tenancyEndedListeners = $this->isMultiDatabaseEnabled()
-            ? [Listeners\RevertToCentralContext::class]
-            : [];
+        // Bootstrappers always run (switches to tenant database connection)
+        $tenancyInitializedListeners = [Listeners\BootstrapTenancy::class];
+        $tenancyEndedListeners = [Listeners\RevertToCentralContext::class];
 
         return [
             // Tenant events
@@ -147,6 +146,7 @@ class TenancyServiceProvider extends ServiceProvider
         $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
+        $this->configureTestingDatabase();
 
         // Configure TenantConfigBootstrapper to map tenant settings to Laravel config keys
         // This enables automatic config overrides when tenancy is initialized
@@ -224,5 +224,38 @@ class TenancyServiceProvider extends ServiceProvider
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
             $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
         }
+    }
+
+    /**
+     * Configure testing database for multi-database tenancy tests.
+     *
+     * When TENANCY_TESTING_DATABASE is set, all tenants use a fixed
+     * `testing_tenant` database instead of dynamic `tenant_{id}` databases.
+     * This allows running multi-database tests without creating databases
+     * dynamically for each test tenant.
+     *
+     * @see https://v4.tenancyforlaravel.com/customizing-databases
+     */
+    protected function configureTestingDatabase(): void
+    {
+        $testingDb = env('TENANCY_TESTING_DATABASE');
+
+        if (! $testingDb) {
+            return;
+        }
+
+        // Configure template_tenant_connection to use testing_tenant
+        // This ensures DatabaseTenancyBootstrapper creates connections with correct config
+        config([
+            'tenancy.database.template_tenant_connection' => 'testing_tenant',
+        ]);
+
+        // Also configure the tenant connection directly for immediate use
+        config([
+            'database.connections.tenant' => array_merge(
+                config('database.connections.testing_tenant', []),
+                ['database' => $testingDb]
+            ),
+        ]);
     }
 }

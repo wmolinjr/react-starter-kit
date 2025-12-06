@@ -53,12 +53,16 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Testing Database Connection (PostgreSQL)
+        | Testing Database Connections (PostgreSQL)
         |--------------------------------------------------------------------------
         |
-        | Dedicated connection for PHPUnit tests. Uses the 'testing' database
-        | to avoid conflicts with the main 'laravel' database.
-        | This avoids PHP 8.4 SQLite transaction issues.
+        | Dedicated connections for PHPUnit tests. Uses separate databases
+        | to mirror production multi-database tenancy architecture:
+        | - 'testing': Central database (Central\User, tenants, plans, etc.)
+        | - 'testing_tenant': Tenant database (Tenant\User, projects, etc.)
+        |
+        | This avoids PHP 8.4 SQLite transaction issues and properly tests
+        | multi-database isolation.
         |
         */
         'testing' => [
@@ -67,6 +71,21 @@ return [
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => 'testing',
+            'username' => env('DB_USERNAME', 'sail'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
+        'testing_tenant' => [
+            'driver' => 'pgsql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => 'testing_tenant',
             'username' => env('DB_USERNAME', 'sail'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),

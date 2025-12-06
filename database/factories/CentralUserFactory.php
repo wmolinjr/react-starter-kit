@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * Factory for Central User model (central database administrators).
+ * Factory for Central User model (central database users).
  *
  * Uses Spatie Permission with guard 'central'.
  * Roles: super-admin, central-admin, support-admin
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Central\User>
  */
-class AdminFactory extends Factory
+class CentralUserFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -46,35 +46,35 @@ class AdminFactory extends Factory
     }
 
     /**
-     * Indicate that the admin has the super-admin role.
+     * Indicate that the user has the super-admin role.
      */
     public function superAdmin(): static
     {
-        return $this->afterCreating(function (User $admin) {
+        return $this->afterCreating(function (User $user) {
             $this->ensureRoleExists('super-admin');
-            $admin->assignRole('super-admin');
+            $user->assignRole('super-admin');
         });
     }
 
     /**
-     * Indicate that the admin has the central-admin role.
+     * Indicate that the user has the central-admin role.
      */
     public function centralAdmin(): static
     {
-        return $this->afterCreating(function (User $admin) {
+        return $this->afterCreating(function (User $user) {
             $this->ensureRoleExists('central-admin');
-            $admin->assignRole('central-admin');
+            $user->assignRole('central-admin');
         });
     }
 
     /**
-     * Indicate that the admin has the support-admin role.
+     * Indicate that the user has the support-admin role.
      */
     public function supportAdmin(): static
     {
-        return $this->afterCreating(function (User $admin) {
+        return $this->afterCreating(function (User $user) {
             $this->ensureRoleExists('support-admin');
-            $admin->assignRole('support-admin');
+            $user->assignRole('support-admin');
         });
     }
 
@@ -110,7 +110,7 @@ class AdminFactory extends Factory
     }
 
     /**
-     * Indicate that the admin's email address should be unverified.
+     * Indicate that the user's email address should be unverified.
      */
     public function unverified(): static
     {
@@ -120,7 +120,7 @@ class AdminFactory extends Factory
     }
 
     /**
-     * Indicate that the admin has two-factor authentication configured.
+     * Indicate that the user has two-factor authentication configured.
      */
     public function withTwoFactor(): static
     {
@@ -141,7 +141,7 @@ class AdminFactory extends Factory
     }
 
     /**
-     * Indicate that the admin does not have two-factor authentication configured.
+     * Indicate that the user does not have two-factor authentication configured.
      */
     public function withoutTwoFactor(): static
     {
@@ -153,7 +153,7 @@ class AdminFactory extends Factory
     }
 
     /**
-     * Set a specific locale for the admin.
+     * Set a specific locale for the user.
      */
     public function withLocale(string $locale): static
     {

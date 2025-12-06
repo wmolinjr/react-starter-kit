@@ -127,11 +127,11 @@ class TeamTest extends TenantTestCase
         $member1 = $this->createTenantUser('member');
         $member2 = $this->createTenantUser('admin');
 
-        // OPTION C ARCHITECTURE:
-        // In production, each tenant has its own database, so cross-tenant user access
+        // MULTI-DATABASE TENANCY (Option C):
+        // Each tenant has its own database, so cross-tenant user access
         // is physically impossible. Users exist ONLY in their tenant's database.
         //
-        // In tests with single database, we verify that:
+        // This test verifies:
         // 1. Team page shows correct number of users
         // 2. Users created in tenant context are visible
 

@@ -6,10 +6,18 @@ use App\Models\Tenant\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class EmailVerificationTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_email_verification_screen_can_be_rendered()
     {
@@ -36,8 +44,8 @@ class EmailVerificationTest extends TestCase
 
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
-        // Fortify redirects to /home?verified=1, which then redirects based on role
-        $response->assertRedirect(route('central.fortify.home', absolute: false).'?verified=1');
+        // Tenant users are redirected to admin dashboard
+        $response->assertRedirect(route('tenant.admin.dashboard', absolute: false).'?verified=1');
     }
 
     public function test_email_is_not_verified_with_invalid_hash()
@@ -80,8 +88,8 @@ class EmailVerificationTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('verification.notice'));
 
-        // Verified users are redirected to /home (role-based routing)
-        $response->assertRedirect(route('central.fortify.home', absolute: false));
+        // Tenant users are redirected to admin dashboard
+        $response->assertRedirect(route('tenant.admin.dashboard', absolute: false));
     }
 
     public function test_already_verified_user_visiting_verification_link_is_redirected_without_firing_event_again(): void
@@ -99,7 +107,7 @@ class EmailVerificationTest extends TestCase
         );
 
         $this->actingAs($user)->get($verificationUrl)
-            ->assertRedirect(route('central.fortify.home', absolute: false).'?verified=1');
+            ->assertRedirect(route('tenant.admin.dashboard', absolute: false).'?verified=1');
 
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
         Event::assertNotDispatched(Verified::class);

@@ -10,9 +10,10 @@ use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
  *
  * MULTI-DATABASE TENANCY:
  * - In tenant context: uses 'personal_access_tokens' table in tenant database
- * - In central context: uses 'admin_personal_access_tokens' table in central database
+ * - In central context: uses 'personal_access_tokens' table in central database
  *
- * This model dynamically resolves the correct table and connection based on tenancy state.
+ * This model dynamically resolves the correct connection based on tenancy state.
+ * Both databases use the same table name for consistency.
  *
  * @see https://v4.tenancyforlaravel.com/integrations/sanctum/
  */
@@ -52,17 +53,12 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
 
     /**
      * Get the table associated with the model.
+     * Both contexts use 'personal_access_tokens' in their respective databases.
      *
      * @return string
      */
     public function getTable(): string
     {
-        // In tenant context, use personal_access_tokens
-        // In central context, use admin_personal_access_tokens
-        if (tenancy()->initialized) {
-            return 'personal_access_tokens';
-        }
-
-        return 'admin_personal_access_tokens';
+        return 'personal_access_tokens';
     }
 }

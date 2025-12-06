@@ -43,24 +43,21 @@ class User extends Authenticatable
 
     /**
      * The guard name for Spatie Permission.
-     * Must match the guard in config/auth.php that uses 'admins' provider.
+     * Must match the guard in config/auth.php that uses 'central_users' provider.
      */
     protected string $guard_name = 'central';
 
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): \Database\Factories\AdminFactory
+    protected static function newFactory(): \Database\Factories\CentralUserFactory
     {
-        return \Database\Factories\AdminFactory::new();
+        return \Database\Factories\CentralUserFactory::new();
     }
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'admins';
+    // Uses Laravel convention: 'users' table in central database
+    // In production: Central and tenant have separate databases, no conflict
+    // In testing: TestCase runs central-only or tenant-only migrations
 
     /**
      * The attributes that are mass assignable.

@@ -5,10 +5,18 @@ namespace Tests\Feature\Auth;
 use App\Models\Tenant\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class VerificationNotificationTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_sends_verification_notification(): void
     {
@@ -35,8 +43,8 @@ class VerificationNotificationTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('verification.send'))
-            // Verified users are redirected to /home (role-based routing)
-            ->assertRedirect(route('central.fortify.home', absolute: false));
+            // Tenant users are redirected to admin dashboard
+            ->assertRedirect(route('tenant.admin.dashboard', absolute: false));
 
         Notification::assertNothingSent();
     }

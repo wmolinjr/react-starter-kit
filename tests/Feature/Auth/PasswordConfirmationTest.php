@@ -4,10 +4,18 @@ namespace Tests\Feature\Auth;
 
 use App\Models\Tenant\User;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class PasswordConfirmationTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_confirm_password_screen_can_be_rendered()
     {

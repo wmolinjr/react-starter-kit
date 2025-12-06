@@ -5,10 +5,18 @@ namespace Tests\Feature\Auth;
 use App\Models\Tenant\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
+use Tests\Concerns\WithTenant;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
 {
+    use WithTenant;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->initializeTenant();
+    }
 
     public function test_reset_password_link_screen_can_be_rendered()
     {

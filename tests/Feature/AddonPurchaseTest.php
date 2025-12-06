@@ -45,7 +45,7 @@ class AddonPurchaseTest extends TenantTestCase
             'addon_slug' => 'storage_50gb',
             'amount_paid' => 4900,
             'tenant_id' => $this->tenant->id,
-        ]);
+        ], 'testing');
     }
 
     #[Test]
@@ -254,6 +254,6 @@ class AddonPurchaseTest extends TenantTestCase
 
         $purchase->delete();
 
-        $this->assertSoftDeleted('addon_purchases', ['id' => $purchase->id]);
+        $this->assertSoftDeleted('addon_purchases', ['id' => $purchase->id], 'testing');
     }
 }

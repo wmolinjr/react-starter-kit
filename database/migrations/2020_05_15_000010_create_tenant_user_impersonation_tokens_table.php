@@ -24,9 +24,10 @@ class CreateTenantUserImpersonationTokensTable extends Migration
         Schema::create('tenant_user_impersonation_tokens', function (Blueprint $table) {
             $table->string('token', 128)->primary();
             $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
-            // No FK constraint - user exists in tenant database, not central
-            $table->uuid('user_id')->index();
-            $table->string('auth_guard');
+            // Make user_id nullable for Admin Mode
+            $table->uuid('user_id')->nullable()->index();
+            // Make auth_guard nullable for Admin Mode (no authentication)
+            $table->string('auth_guard')->nullable();
             $table->boolean('remember')->default(false);
             $table->string('redirect_url');
             $table->timestamp('created_at');
