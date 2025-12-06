@@ -1,9 +1,15 @@
 <?php
 
-namespace App\Observers;
+namespace App\Observers\Tenant;
 
 use App\Models\Tenant\Project;
 
+/**
+ * TENANT OBSERVER
+ *
+ * Observes Project model in tenant databases.
+ * Tracks project usage for plan limits.
+ */
 class ProjectObserver
 {
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Observers;
+namespace App\Observers\Central;
 
 use App\Models\Central\Tenant;
 use App\Models\Shared\Permission;
@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Pennant\Feature;
 
 /**
- * TenantObserver
+ * CENTRAL OBSERVER
+ *
+ * Observes Tenant model in the central database.
  *
  * MULTI-DATABASE TENANCY:
  * - Each tenant has its own database

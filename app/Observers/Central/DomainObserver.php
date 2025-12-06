@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Observers;
+namespace App\Observers\Central;
 
 use App\Models\Central\Domain;
 use Illuminate\Support\Facades\Log;
 use Stancl\Tenancy\Resolvers\DomainTenantResolver;
 
 /**
- * DomainObserver
+ * CENTRAL OBSERVER
  *
+ * Observes Domain model in the central database.
  * Invalidates the tenant resolver cache when domain records change.
  * This is crucial when using cached tenant resolution (v4 feature).
  *

@@ -1,9 +1,15 @@
 <?php
 
-namespace App\Observers;
+namespace App\Observers\Tenant;
 
 use App\Models\Tenant\User;
 
+/**
+ * TENANT OBSERVER
+ *
+ * Observes User model in tenant databases.
+ * Tracks user usage for plan limits.
+ */
 class UserObserver
 {
     /**

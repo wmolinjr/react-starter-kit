@@ -1,10 +1,16 @@
 <?php
 
-namespace App\Observers;
+namespace App\Observers\Central;
 
 use App\Models\Central\AddonSubscription;
 use App\Services\Central\AddonService;
 
+/**
+ * CENTRAL OBSERVER
+ *
+ * Observes AddonSubscription model in the central database.
+ * Syncs tenant limits when addon subscriptions change.
+ */
 class AddonSubscriptionObserver
 {
     public function __construct(protected AddonService $addonService)

@@ -11,11 +11,11 @@ use App\Models\Central\Tenant;
 use App\Models\Central\User as CentralUser;
 use App\Models\Tenant\Project;
 use App\Models\Tenant\User;
-use App\Observers\AddonSubscriptionObserver;
-use App\Observers\DomainObserver;
-use App\Observers\ProjectObserver;
-use App\Observers\TenantObserver;
-use App\Observers\UserObserver;
+use App\Observers\Central\AddonSubscriptionObserver;
+use App\Observers\Central\DomainObserver;
+use App\Observers\Central\TenantObserver;
+use App\Observers\Tenant\ProjectObserver;
+use App\Observers\Tenant\UserObserver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -54,12 +54,15 @@ class AppServiceProvider extends ServiceProvider
             'addon_purchase' => AddonPurchase::class,
         ]);
 
-        // ⭐ Register observers
+        // ⭐ Register observers (organized by database context)
+        // Central observers (operate on central database)
         Tenant::observe(TenantObserver::class);
         AddonSubscription::observe(AddonSubscriptionObserver::class);
+        Domain::observe(DomainObserver::class);
+
+        // Tenant observers (operate on tenant databases)
         User::observe(UserObserver::class);
         Project::observe(ProjectObserver::class);
-        Domain::observe(DomainObserver::class); // v4: Invalidate resolver cache on domain changes
 
         // Super Admin: bypass all permission checks
         // Plan permission check: grant if enabled by plan (for admin/owner), deny if not
