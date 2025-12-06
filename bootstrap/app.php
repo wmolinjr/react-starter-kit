@@ -56,12 +56,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ];
             });
 
-            // Central admin routes - managed by domain scoping in routes/central.php
+            // Central routes (admin + panel + auth) - managed by domain scoping
             require base_path('routes/central.php');
-
-            // Central admin authentication routes (uses 'central' guard)
-            // TENANT-ONLY ARCHITECTURE: Separate auth for admins vs tenant users
-            require base_path('routes/central-admin.php');
 
             // Shared routes (work in both central and tenant contexts)
             require base_path('routes/shared.php');

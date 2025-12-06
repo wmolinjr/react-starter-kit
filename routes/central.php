@@ -8,11 +8,13 @@ use App\Http\Controllers\Central\Admin\BundleCatalogController;
 use App\Http\Controllers\Central\Admin\DashboardController;
 use App\Http\Controllers\Central\Admin\ImpersonationController;
 use App\Http\Controllers\Central\Admin\PlanCatalogController;
-use App\Http\Controllers\Central\Panel\DashboardController as PanelDashboardController;
-use App\Http\Controllers\Central\Panel\TenantAccessController;
 use App\Http\Controllers\Central\Admin\RoleManagementController;
 use App\Http\Controllers\Central\Admin\TenantManagementController;
 use App\Http\Controllers\Central\Admin\UserManagementController;
+use App\Http\Controllers\Central\Auth\AdminLoginController;
+use App\Http\Controllers\Central\Auth\AdminLogoutController;
+use App\Http\Controllers\Central\Panel\DashboardController as PanelDashboardController;
+use App\Http\Controllers\Central\Panel\TenantAccessController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -77,6 +79,29 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                 // Seamless login: redirect user to their tenant (generates token)
                 Route::get('/access/{tenant}', [TenantAccessController::class, 'redirect'])->name('access');
             });
+
+        /*
+        |----------------------------------------------------------------------
+        | Admin Authentication Routes (central.admin.auth.*)
+        |----------------------------------------------------------------------
+        |
+        | TENANT-ONLY ARCHITECTURE (Option C):
+        | - Uses 'central' guard for authentication (central database)
+        | - Separate from tenant user authentication (Fortify)
+        | - Admins can impersonate tenants via ImpersonationController
+        |
+        */
+
+        // Guest routes (admin login)
+        Route::middleware('guest:central')->prefix('admin')->name('admin.auth.')->group(function () {
+            Route::get('/login', [AdminLoginController::class, 'create'])->name('login');
+            Route::post('/login', [AdminLoginController::class, 'store'])->name('login.store');
+        });
+
+        // Authenticated routes (admin logout)
+        Route::middleware('auth:central')->prefix('admin')->name('admin.auth.')->group(function () {
+            Route::post('/logout', [AdminLogoutController::class, 'destroy'])->name('logout');
+        });
 
         /*
         |----------------------------------------------------------------------
