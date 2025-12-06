@@ -79,32 +79,80 @@ return redirect()->route('impersonate.consume', $token)
     ->domain($tenant->primaryDomain()->domain);
 ```
 
+### 4. TenantConfigBootstrapper ⭐⭐⭐⭐
+
+**O que faz:** Mapeia atributos do tenant para valores do Laravel `config()` durante boot.
+
+**Por que usar:**
+- Permite configurações por tenant (locale, timezone, moeda, mail)
+- Integração transparente com packages que leem de `config()`
+- Configurado via `TenantConfigKey` enum
+
+**Implementação:**
+
+```php
+// config/tenancy.php - bootstrappers
+Bootstrappers\TenantConfigBootstrapper::class,
+
+// TenancyServiceProvider.php
+TenantConfigBootstrapper::$storageToConfigMap = TenantConfigKey::toStorageConfigMap();
+
+// TenantConfigKey enum define o mapeamento:
+// tenant.settings['config.locale'] -> config('app.locale')
+// tenant.settings['config.timezone'] -> config('app.timezone')
+// tenant.settings['config.mail_from_address'] -> config('mail.from.address')
+```
+
+**Chaves disponíveis:**
+- `locale` → `app.locale`
+- `timezone` → `app.timezone`
+- `currency` / `currency_locale` → uso em formatadores
+- `mail_from_address` / `mail_from_name` → `mail.from.*`
+
+### 5. Universal Routes - Via Middleware Flag ⭐⭐⭐⭐
+
+**O que faz:** Permite rotas funcionarem em ambos os contextos (central + tenant).
+
+**Por que usar:**
+- Rotas de configurações (`/settings/*`) funcionam em ambos os contextos
+- Central Admin e Tenant Users compartilham mesma interface de perfil/senha/2FA
+- Sem duplicação de código/rotas
+
+**Como funciona (Stancl v4):**
+
+No v4, Universal Routes NÃO é uma feature separada - é um middleware flag:
+
+```php
+// routes/shared.php
+Route::middleware(['web', InitializeTenancyByDomain::class, 'universal', 'auth'])
+    ->prefix('settings')
+    ->name('shared.settings.')
+    ->group(function () {
+        Route::get('profile', [ProfileController::class, 'edit']);
+        // ...
+    });
+```
+
+**Fluxo:**
+1. `InitializeTenancyByDomain` detecta a flag `'universal'` na rota
+2. Chama `requestHasTenant()` para verificar se domínio é tenant
+3. Se domínio está em `central_domains` → NÃO inicializa tenancy
+4. Se domínio é tenant → INICIALIZA tenancy
+
+**Importante - Ordem do middleware:**
+```php
+// ✅ CORRETO (InitializeTenancyByDomain ANTES de 'universal')
+['web', InitializeTenancyByDomain::class, 'universal', 'auth']
+
+// ❌ ERRADO
+['web', 'universal', InitializeTenancyByDomain::class, 'auth']
+```
+
+@see https://v4.tenancyforlaravel.com/universal-routes
+
+---
+
 ## Features Desabilitadas (e Por Quê)
-
-### ⚠️ TenantConfig - Considerar Futuro
-
-**O que faz:** Mapeia atributos do tenant para valores do Laravel `config()`.
-
-**Por que NÃO usar agora:**
-- Coluna `settings` JSON já resolve (mais flexível)
-- Requer migrations para cada novo config
-- Overhead de event listeners
-- Não é crítico para MVP
-
-**Quando habilitar:**
-- Integração com Stripe/PayPal (chaves por tenant)
-- Packages que só leem de `config()`
-- Migração para database-per-tenant
-
-### ❌ UniversalRoutes - Não Necessário
-
-**O que faz:** Permite rotas funcionarem em ambos os domínios (central + tenant).
-
-**Por que NÃO usar:**
-- Arquitetura atual separa intencionalmente domínios
-- Nenhuma rota precisa funcionar em ambos
-- Adiciona complexidade sem benefício
-- Security model depende de isolamento estrito
 
 ### ❌ ViteBundler - Incompatível
 

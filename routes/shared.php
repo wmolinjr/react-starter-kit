@@ -2,19 +2,29 @@
 
 /*
 |--------------------------------------------------------------------------
-| Shared Settings Routes
+| Shared Settings Routes (Universal Routes)
 |--------------------------------------------------------------------------
 |
-| These routes work in both central and tenant contexts.
-| Middleware:
-| - web: Web middleware group
-| - universal: Flag for universal routes (required by Stancl\Tenancy\Features\UniversalRoutes)
-| - InitializeTenancyByDomain: Initializes tenancy if accessed from tenant domain (skips central via $onFail)
-| - auth: Requires authentication
+| These routes work in BOTH central and tenant contexts using Stancl/Tenancy v4
+| Universal Routes feature.
+|
+| Middleware Order (IMPORTANT - order matters!):
+| 1. web: Web middleware group (sessions, cookies, CSRF)
+| 2. InitializeTenancyByDomain: Checks domain and determines context
+| 3. universal: Flag that tells tenancy to NOT fail if tenant not found
+| 4. auth: Requires authentication
+|
+| How it works:
+| - InitializeTenancyByDomain checks if route is 'universal'
+| - For universal routes, it calls requestHasTenant() to check domain
+| - If domain is in central_domains (localhost) → tenancy NOT initialized
+| - If domain is a tenant domain (tenant1.localhost) → tenancy IS initialized
 |
 | Behavior:
-| - Central domain (localhost): Settings work without tenant context (for Super Admin)
-| - Tenant domain (*.setor3.app): Settings work with tenant context (for regular users)
+| - Central domain (localhost): Settings work without tenant context
+| - Tenant domain (*.localhost): Settings work WITH tenant context
+|
+| @see https://v4.tenancyforlaravel.com/universal-routes
 |
 */
 
@@ -25,7 +35,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware(['web', 'universal', InitializeTenancyByDomain::class, 'auth'])
+Route::middleware(['web', InitializeTenancyByDomain::class, 'universal', 'auth'])
     ->prefix('settings')
     ->name('shared.settings.')
     ->group(function () {

@@ -123,9 +123,8 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        // Universal routes middleware group (for routes that work in both central and tenant contexts)
-        // This is required by Stancl\Tenancy\Features\UniversalRoutes
-        $middleware->group('universal', []);
+        // Note: The 'universal' middleware group is registered by Stancl\Tenancy\TenancyServiceProvider
+        // It's just a flag - the actual logic is in InitializeTenancyByDomain middleware
 
         // Middleware aliases
         $middleware->alias([
