@@ -63,7 +63,7 @@ Models stored in each tenant's database (`tenant_{id}`). No `CentralConnection` 
 | `Media` | Media files | Spatie MediaLibrary |
 | `TenantTranslationOverride` | White-label translations | `HasUuids` |
 
-### Universal Models (`App\Models\Shared\`)
+### Shared Models (`App\Models\Shared\`)
 
 Models that exist in both central and tenant databases with identical structure.
 
@@ -339,7 +339,7 @@ class Project extends Model implements HasMedia
 
 ---
 
-## Universal Models Details
+## Shared Models Details
 
 ### Role Model
 
@@ -449,7 +449,7 @@ Schema::create('projects', function (Blueprint $table) {
 });
 ```
 
-### Universal Tables
+### Shared Tables
 
 Created in both central and tenant migrations:
 

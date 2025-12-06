@@ -234,9 +234,9 @@ JSON API endpoints for tenant resources.
 |-----------|---------|
 | `ProjectController` | Project API endpoints |
 
-### Universal Controllers
+### Shared Controllers
 
-**Settings** (`App\Http\Controllers\Universal\Settings\`):
+**Settings** (`App\Http\Controllers\Shared\Settings\`):
 Work in both central and tenant contexts.
 
 | Controller | Purpose |
@@ -364,7 +364,7 @@ class StoreProjectRequest extends FormRequest
 | `CheckoutRequest` | Plan checkout |
 | `UploadFileRequest` | File upload |
 
-### Universal Form Requests
+### Shared Form Requests
 
 | Request | Purpose |
 |---------|---------|
@@ -416,7 +416,7 @@ Route::prefix('admin')
 
 - Central admin operations → `App\Http\Controllers\Central\Admin\`
 - Tenant admin operations → `App\Http\Controllers\Tenant\Admin\`
-- Works in both contexts → `App\Http\Controllers\Universal\`
+- Works in both contexts → `App\Http\Controllers\Shared\`
 
 ### 2. Create Controller
 

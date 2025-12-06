@@ -21,7 +21,7 @@
 - `ProjectResource.php`, `ProjectDetailResource.php`, `ProjectEditResource.php`
 - `ActivityResource.php`, `MediaResource.php`, `TenantInvitationResource.php`
 
-**Universal Resources (4 files)**:
+**Shared Resources (4 files)**:
 - `RoleResource.php`, `RoleDetailResource.php`, `RoleEditResource.php`
 - `PermissionResource.php`
 
@@ -65,7 +65,7 @@ Esta inconsistência leva a:
 - Dificuldade em manter contratos de API consistentes
 - Nenhum lugar centralizado para tratar traduções (chamadas `trans()` espalhadas)
 
-**Solução Proposta**: Implementar Laravel API Resources com organização de namespace estruturada que espelha o padrão existente `Models/Central`, `Models/Tenant`, `Models/Shared`.
+**Solução Proposta**: Implementar Laravel API Resources com organização de namespace estruturada que espelha o padrão existente `Models/Central`, `Models/Tenant`, `Models/Shared` (anteriormente Universal).
 
 ---
 
@@ -171,7 +171,7 @@ app/Http/Resources/
 │       ├── InvoiceCollection.php
 │       └── InvoiceDetailResource.php
 │
-├── Shared/                        # Funciona em ambos os contextos
+├── Shared/                           # Funciona em ambos os contextos (anteriormente Universal)
 │   ├── RoleResource.php              # Listagem de role
 │   ├── RoleDetailResource.php        # Role com permissions/users
 │   ├── RoleEditResource.php          # Role para formulário de edição
@@ -181,7 +181,7 @@ app/Http/Resources/
 │   ├── PermissionGroupResource.php   # Permissions agrupadas por categoria
 │   └── PermissionCollection.php
 │
-└── Shared/                           # Resources compartilhados/utilitários
+└── Common/                           # Resources compartilhados/utilitários
     ├── PaginationResource.php        # Meta de paginação padronizada
     ├── FilterOptionsResource.php     # Opções de filtro para dropdown
     └── StatsResource.php             # Objeto genérico de estatísticas
@@ -227,7 +227,7 @@ app/Http/Resources/
 | `InvoiceResource` | - | Listagem de invoice |
 | `InvoiceDetailResource` | - | Invoice completo com line items |
 
-### Universal Resources (6 arquivos)
+### Shared Resources (6 arquivos)
 
 | Resource | Model | Propósito |
 |----------|-------|-----------|
@@ -273,11 +273,11 @@ app/Http/Resources/
 
 3. **Atualizar TeamService** para retornar models, não arrays
 
-### Fase 3: Universal & Billing Resources
+### Fase 3: Shared & Billing Resources
 
 **Objetivo**: Completar cobertura de resources
 
-1. **Criar Universal Resources**:
+1. **Criar Shared Resources**:
    - `RoleResource`, `RoleDetailResource`, `RoleEditResource`
    - `PermissionResource`, `PermissionGroupResource`
 
@@ -429,7 +429,7 @@ class TeamMemberResource extends BaseResource
 }
 ```
 
-### Exemplo Universal/RoleResource
+### Exemplo Shared/RoleResource
 
 ```php
 <?php
@@ -759,12 +759,12 @@ test('tenant index returns TenantResource collection', function () {
 - [ ] Atualizar `AuditLogController` para usar Resources
 - [ ] Escrever testes
 
-### Fase 3: Universal & Billing
-- [ ] Criar `Universal/RoleResource.php`
-- [ ] Criar `Universal/RoleDetailResource.php`
-- [ ] Criar `Universal/RoleEditResource.php`
-- [ ] Criar `Universal/PermissionResource.php`
-- [ ] Criar `Universal/PermissionGroupResource.php`
+### Fase 3: Shared & Billing
+- [ ] Criar `Shared/RoleResource.php`
+- [ ] Criar `Shared/RoleDetailResource.php`
+- [ ] Criar `Shared/RoleEditResource.php`
+- [ ] Criar `Shared/PermissionResource.php`
+- [ ] Criar `Shared/PermissionGroupResource.php`
 - [ ] Criar `Tenant/Billing/SubscriptionResource.php`
 - [ ] Criar `Tenant/Billing/InvoiceResource.php`
 - [ ] Atualizar `TenantRoleController`

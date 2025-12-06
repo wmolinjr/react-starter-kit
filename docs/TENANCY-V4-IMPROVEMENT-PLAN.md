@@ -16,7 +16,7 @@ Este documento detalha as melhorias do Stancl/Tenancy v4 que podemos implementar
 - [x] Early identification middleware - `InitializeTenancyByDomain` prepended
 - [x] Middleware priority - Tenancy antes de StartSession
 - [x] PreventAccessFromUnwantedDomains - Substituindo PreventAccessFromCentralDomains
-- [x] Universal routes - Rotas `/settings/*` funcionam em ambos contextos
+- [x] Shared routes - Rotas `/settings/*` funcionam em ambos contextos
 - [x] UserImpersonation - Feature habilitada
 - [x] TelescopeTags - Feature habilitada
 - [x] CrossDomainRedirect - Feature habilitada

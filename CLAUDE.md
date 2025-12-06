@@ -398,7 +398,7 @@ import { store } from '@/routes/register'
 **v4 Route Configuration**:
 - **Default Route Mode**: `RouteMode::CENTRAL`
 - **Early Identification**: Tenancy inicializado ANTES de StartSession
-- **Universal Routes**: `/settings/*` funcionam em ambos contextos
+- **Shared Routes**: `/settings/*` funcionam em ambos contextos
 
 **Tenant Creation Flow**:
 1. `Tenant::create()` fires `TenantCreated` event

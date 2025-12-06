@@ -4,8 +4,8 @@
 
 This plan provides a comprehensive analysis of the `/docs/` folder and recommends actions to organize, update, and improve documentation quality. The codebase has undergone significant architectural changes including:
 
-- **Model Namespace Restructuring**: Models now organized into `Central/`, `Tenant/`, and `Universal/` namespaces
-- **Services Namespace Restructuring**: Services now organized into `Central/`, `Tenant/`, and `Universal/` namespaces
+- **Model Namespace Restructuring**: Models now organized into `Central/`, `Tenant/`, and `Shared/` namespaces
+- **Services Namespace Restructuring**: Services now organized into `Central/`, `Tenant/`, and `Shared/` namespaces
 - **Controller Refactoring**: Business logic extracted to dedicated service classes with Form Requests
 - **Option C User Architecture**: Tenant-only users implemented (Central\User for admins, Tenant\User for tenant users)
 
@@ -49,7 +49,7 @@ app/Models/
   Central/   (9 files): Addon, AddonBundle, AddonPurchase, AddonSubscription,
                         Domain, Plan, Tenant, TenantInvitation, User
   Tenant/    (5 files): Activity, Media, Project, TenantTranslationOverride, User
-  Universal/ (2 files): Permission, Role
+  Shared/ (2 files): Permission, Role
 ```
 
 **Services Structure** (IMPLEMENTED):
@@ -87,7 +87,7 @@ app/Services/
 - May reference old patterns
 
 **Required Updates**:
-1. Update all model references to use new namespaces (Central/, Tenant/, Universal/)
+1. Update all model references to use new namespaces (Central/, Tenant/, Shared/)
 2. Update Services section to show Central/ and Tenant/ organization
 3. Add section on Controller patterns (thin controllers with Services)
 4. Update code examples to use current patterns
@@ -151,7 +151,7 @@ Document the Services layer architecture:
 
 #### `docs/MODELS.md`
 Document the Models layer architecture:
-1. Model Architecture Overview (Central/Tenant/Universal)
+1. Model Architecture Overview (Central/Tenant/Shared)
 2. Model List by Namespace
 3. Model Traits (HasUuids, CentralConnection, etc.)
 4. MorphMap configuration
@@ -161,7 +161,7 @@ Document the Models layer architecture:
 
 #### `docs/CONTROLLERS.md`
 Document controller patterns:
-1. Controller Namespace Structure (Central/Tenant/Universal)
+1. Controller Namespace Structure (Central/Tenant/Shared)
 2. Thin Controller Pattern
 3. Service injection patterns
 4. Form Request validation

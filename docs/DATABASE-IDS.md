@@ -84,7 +84,7 @@ $table->uuidMorphs('model'); // For MediaLibrary, Activity Log, etc.
 | `Media` | UUID | Spatie MediaLibrary |
 | `TenantTranslationOverride` | UUID | White-label translations |
 
-### Universal (`App\Models\Shared\`)
+### Shared (`App\Models\Shared\`)
 
 | Model | ID Type | Notes |
 |-------|---------|-------|
