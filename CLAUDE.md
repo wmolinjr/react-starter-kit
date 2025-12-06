@@ -229,11 +229,12 @@ Models are organized by database context:
 app/Models/
 ├── Central/           # Banco central (dados globais)
 │   ├── Addon.php, AddonBundle.php, AddonPurchase.php, AddonSubscription.php
-│   ├── Domain.php, Plan.php, Tenant.php, TenantInvitation.php
+│   ├── Domain.php, Plan.php, Tenant.php
 │   └── User.php       # Admins centrais (Super Admin, Central Admin)
 ├── Tenant/            # Banco do tenant (dados isolados)
 │   ├── Activity.php, Media.php, Project.php, TenantTranslationOverride.php
-│   └── User.php       # Usuarios do tenant (owner, admin, member)
+│   ├── User.php       # Usuarios do tenant (owner, admin, member)
+│   └── UserInvitation.php  # Team invitations (isolated per tenant)
 └── Shared/            # Funcionam em ambos contextos
     ├── Permission.php
     └── Role.php

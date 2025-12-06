@@ -10,7 +10,7 @@ use App\Http\Requests\Tenant\AcceptInvitationRequest;
 use App\Http\Requests\Tenant\InviteMemberRequest;
 use App\Http\Requests\Tenant\UpdateMemberRoleRequest;
 use App\Http\Resources\Tenant\TeamMemberResource;
-use App\Http\Resources\Tenant\TenantInvitationResource;
+use App\Http\Resources\Tenant\UserInvitationResource;
 use App\Models\Tenant\User;
 use App\Services\Tenant\TeamService;
 use Illuminate\Http\RedirectResponse;
@@ -23,10 +23,10 @@ use Inertia\Response;
 /**
  * TeamController
  *
- * OPTION C: TENANT-ONLY USERS
+ * MULTI-DATABASE TENANCY (Option C):
  * - Users exist ONLY in tenant databases
- * - No pivot table (tenant_user) - users are directly in tenant DB
- * - All user queries happen in tenant context (already initialized by middleware)
+ * - UserInvitation lives in tenant database (isolated per tenant)
+ * - All queries happen in tenant context (already initialized by middleware)
  */
 class TeamController extends Controller implements HasMiddleware
 {
@@ -56,7 +56,7 @@ class TeamController extends Controller implements HasMiddleware
 
         return Inertia::render('tenant/admin/team/index', [
             'members' => TeamMemberResource::collection($this->teamService->getTeamMembers()),
-            'pendingInvitations' => TenantInvitationResource::collection($this->teamService->getPendingInvitations($tenant)),
+            'pendingInvitations' => UserInvitationResource::collection($this->teamService->getPendingInvitations()),
             'teamStats' => $this->teamService->getTeamStats($tenant),
         ]);
     }
@@ -86,6 +86,9 @@ class TeamController extends Controller implements HasMiddleware
 
     /**
      * Accept invitation via token.
+     *
+     * Note: Tenancy is already initialized by InitializeTenancyByDomain middleware
+     * since the invitation URL contains the tenant domain.
      */
     public function acceptInvitation(AcceptInvitationRequest $request): RedirectResponse
     {
@@ -99,8 +102,7 @@ class TeamController extends Controller implements HasMiddleware
         try {
             $this->teamService->acceptInvitation(
                 user: $user,
-                token: $validated['token'],
-                tenantId: tenant('id')
+                token: $validated['token']
             );
 
             return redirect()

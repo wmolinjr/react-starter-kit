@@ -6,11 +6,15 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 
 /**
- * TenantInvitationResource
+ * UserInvitationResource
  *
  * Pending team invitation.
+ *
+ * MULTI-DATABASE TENANCY (Option C):
+ * - UserInvitation lives in tenant database (isolated per tenant)
+ * - invitedBy relationship to Tenant\User
  */
-class TenantInvitationResource extends BaseResource
+class UserInvitationResource extends BaseResource
 {
     /**
      * Transform the resource into an array.
@@ -29,6 +33,12 @@ class TenantInvitationResource extends BaseResource
             // Computed
             'is_expired' => $this->isExpired(),
             'expires_in_days' => $this->expires_at?->diffInDays(now()),
+
+            // Relationship
+            'invited_by' => $this->whenLoaded('invitedBy', fn () => [
+                'id' => $this->invitedBy->id,
+                'name' => $this->invitedBy->name,
+            ]),
         ];
     }
 }

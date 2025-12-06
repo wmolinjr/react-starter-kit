@@ -1,30 +1,27 @@
 <?php
 
-namespace App\Models\Central;
+namespace App\Models\Tenant;
 
-use App\Models\Tenant\User as TenantUser;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
- * TenantInvitation
+ * UserInvitation
  *
- * OPTION C: TENANT-ONLY USERS
- * - Stores email instead of user_id (users don't exist in central DB)
- * - User is created in tenant database when invitation is accepted
- * - invited_by_user_id references User in TENANT database (not central)
+ * MULTI-DATABASE TENANCY (Option C):
+ * - Lives in tenant database (isolated per tenant)
+ * - Proper FK to users table
+ * - Better LGPD compliance (emails isolated per tenant)
  */
-class TenantInvitation extends Model
+class UserInvitation extends Model
 {
-    use CentralConnection, HasFactory, HasUuids;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
-        'tenant_id',
-        'email', // Email of invited user (no user_id in central DB)
-        'invited_by_user_id', // User ID from TENANT database
+        'email',
+        'invited_by_user_id',
         'role',
         'invitation_token',
         'invited_at',
@@ -39,22 +36,11 @@ class TenantInvitation extends Model
     ];
 
     /**
-     * Tenant that the invitation is for
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
-    /**
      * Get the user who sent the invitation.
-     *
-     * OPTION C: invited_by_user_id is from TENANT database.
-     * This relationship only works when in tenant context.
      */
     public function invitedBy(): BelongsTo
     {
-        return $this->belongsTo(TenantUser::class, 'invited_by_user_id');
+        return $this->belongsTo(User::class, 'invited_by_user_id');
     }
 
     /**

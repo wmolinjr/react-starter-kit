@@ -5,8 +5,8 @@ namespace App\Services\Tenant;
 use App\Exceptions\Tenant\TeamAuthorizationException;
 use App\Mail\Tenant\TeamInvitation;
 use App\Models\Central\Tenant;
-use App\Models\Central\TenantInvitation;
 use App\Models\Tenant\User;
+use App\Models\Tenant\UserInvitation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -17,10 +17,10 @@ use Illuminate\Support\Str;
  *
  * Handles all business logic for team management in tenant context.
  *
- * OPTION C: TENANT-ONLY USERS
+ * MULTI-DATABASE TENANCY (Option C):
  * - Users exist ONLY in tenant databases
- * - No pivot table (tenant_user) - users are directly in tenant DB
- * - All user queries happen in tenant context (already initialized by middleware)
+ * - UserInvitation lives in tenant database (isolated per tenant)
+ * - All queries happen in tenant context (already initialized by middleware)
  */
 class TeamService
 {
@@ -41,16 +41,16 @@ class TeamService
     /**
      * Get pending invitations for the current tenant.
      *
-     * Returns TenantInvitation models for use with TenantInvitationResource.
+     * Returns UserInvitation models for use with UserInvitationResource.
      *
-     * @return Collection<int, TenantInvitation>
+     * @return Collection<int, UserInvitation>
      */
-    public function getPendingInvitations(Tenant $tenant): Collection
+    public function getPendingInvitations(): Collection
     {
-        return TenantInvitation::query()
-            ->where('tenant_id', $tenant->id)
-            ->whereNull('accepted_at')
-            ->where('expires_at', '>', now())
+        return UserInvitation::query()
+            ->with('invitedBy')
+            ->pending()
+            ->orderBy('invited_at', 'desc')
             ->get();
     }
 
@@ -77,7 +77,7 @@ class TeamService
         string $email,
         string $role,
         User $invitedBy
-    ): TenantInvitation {
+    ): UserInvitation {
         // Check user limit
         if ($tenant->hasReachedUserLimit()) {
             throw new \App\Exceptions\Tenant\TeamException(__('flash.team.user_limit_reached'));
@@ -89,11 +89,9 @@ class TeamService
         }
 
         // Check for pending invitation
-        $existingInvitation = TenantInvitation::query()
-            ->where('tenant_id', $tenant->id)
+        $existingInvitation = UserInvitation::query()
             ->where('email', $email)
-            ->whereNull('accepted_at')
-            ->where('expires_at', '>', now())
+            ->pending()
             ->exists();
 
         if ($existingInvitation) {
@@ -104,8 +102,7 @@ class TeamService
         $invitationToken = Str::random(64);
 
         // Create invitation record
-        $invitation = TenantInvitation::create([
-            'tenant_id' => $tenant->id,
+        $invitation = UserInvitation::create([
             'email' => $email,
             'invited_by_user_id' => $invitedBy->id,
             'role' => $role,
@@ -130,15 +127,10 @@ class TeamService
      *
      * @throws \App\Exceptions\Tenant\TeamException
      */
-    public function acceptInvitation(User $user, string $token, string $tenantId): void
+    public function acceptInvitation(User $user, string $token): void
     {
-        // Find pending invitation
-        $invitation = TenantInvitation::query()
-            ->where('tenant_id', $tenantId)
-            ->where('invitation_token', $token)
-            ->whereNull('accepted_at')
-            ->where('expires_at', '>', now())
-            ->first();
+        // Find pending invitation (already in tenant context)
+        $invitation = UserInvitation::findByToken($token);
 
         if (! $invitation) {
             throw new \App\Exceptions\Tenant\TeamException(__('flash.team.invite_invalid'));
@@ -238,7 +230,7 @@ class TeamService
      *
      * @throws \App\Exceptions\Tenant\TeamException
      */
-    public function resendInvitation(TenantInvitation $invitation, Tenant $tenant, User $invitedBy): void
+    public function resendInvitation(UserInvitation $invitation, Tenant $tenant, User $invitedBy): void
     {
         if ($invitation->isAccepted()) {
             throw new \App\Exceptions\Tenant\TeamException(__('flash.team.invite_already_accepted'));
@@ -261,7 +253,7 @@ class TeamService
     /**
      * Cancel a pending invitation.
      */
-    public function cancelInvitation(TenantInvitation $invitation): void
+    public function cancelInvitation(UserInvitation $invitation): void
     {
         $invitation->delete();
     }
