@@ -36,7 +36,7 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_CONNECTION', 'pgsql'), // Always use central database
+            'connection' => 'central', // Always use central database
             'table' => 'features',
         ],
 
@@ -53,5 +53,5 @@ return [
     |
     */
 
-    'scope' => \App\Models\Tenant::class,
+    'scope' => \App\Models\Central\Tenant::class,
 ];

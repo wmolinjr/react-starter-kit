@@ -56,14 +56,17 @@ class Project extends Model implements HasMedia
 
     /**
      * Register media collections (Spatie)
+     *
+     * Uses 'public' disk - FilesystemTenancyBootstrapper handles tenant isolation.
+     * @see https://v4.tenancyforlaravel.com/bootstrappers/filesystem
      */
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('attachments')
-            ->useDisk('tenant_uploads');
+            ->useDisk('public');
 
         $this->addMediaCollection('images')
-            ->useDisk('tenant_uploads')
+            ->useDisk('public')
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('thumb')
                     ->width(300)

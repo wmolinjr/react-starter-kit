@@ -61,7 +61,7 @@ class MediaLibraryQueueTenancyTest extends TenantTestCase
      */
     public function test_media_files_stored_in_tenant_isolated_paths(): void
     {
-        Storage::fake('tenant_uploads');
+        Storage::fake('public');
 
         $user = User::factory()->create();
         $project = Project::factory()->create(['user_id' => $user->id]);
@@ -132,7 +132,7 @@ class MediaLibraryQueueTenancyTest extends TenantTestCase
         config(['queue.default' => 'sync']);
         config(['media-library.queue_conversions_by_default' => true]);
 
-        Storage::fake('tenant_uploads');
+        Storage::fake('public');
 
         $user = User::factory()->create();
         $project = Project::factory()->create(['user_id' => $user->id]);
@@ -162,7 +162,7 @@ class MediaLibraryQueueTenancyTest extends TenantTestCase
      */
     public function test_media_is_accessible_within_tenant_context(): void
     {
-        Storage::fake('tenant_uploads');
+        Storage::fake('public');
 
         // Count existing media before creating new ones
         $initialCount = Media::count();

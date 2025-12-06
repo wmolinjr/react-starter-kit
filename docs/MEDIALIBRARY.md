@@ -108,16 +108,22 @@ return [
 
 ## Exemplo de Uso: Project com Imagens
 
-**app/Models/Project.php:52-64**:
+**app/Models/Tenant/Project.php:57-75**:
 
 ```php
+/**
+ * Register media collections (Spatie)
+ *
+ * Uses 'public' disk - FilesystemTenancyBootstrapper handles tenant isolation.
+ * @see https://v4.tenancyforlaravel.com/bootstrappers/filesystem
+ */
 public function registerMediaCollections(): void
 {
     $this->addMediaCollection('attachments')
-        ->useDisk('tenant_uploads');
+        ->useDisk('public');
 
     $this->addMediaCollection('images')
-        ->useDisk('tenant_uploads')
+        ->useDisk('public')
         ->registerMediaConversions(function () {
             $this->addMediaConversion('thumb')
                 ->width(300)
@@ -125,6 +131,8 @@ public function registerMediaCollections(): void
         });
 }
 ```
+
+> **IMPORTANTE**: Use o disk `public` ou `local`. O `FilesystemTenancyBootstrapper` automaticamente prefixa os paths com `tenants/{tenant_id}/` em runtime.
 
 **Upload e Conversão**:
 

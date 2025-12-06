@@ -59,7 +59,7 @@ return [
 
     'storage' => [
         'database' => [
-            'connection' => env('DB_CONNECTION', 'mysql'),
+            'connection' => 'central', // Always use central database for Telescope
             'chunk' => 1000,
         ],
     ],
