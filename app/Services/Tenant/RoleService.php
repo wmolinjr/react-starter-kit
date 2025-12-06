@@ -3,7 +3,7 @@
 namespace App\Services\Tenant;
 
 use App\Enums\TenantPermission;
-use App\Exceptions\RoleException;
+use App\Exceptions\Shared\RoleException;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
 use App\Models\Shared\Permission;

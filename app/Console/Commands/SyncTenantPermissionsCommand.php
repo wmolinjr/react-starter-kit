@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\SyncTenantPermissions;
+use App\Jobs\Central\SyncTenantPermissions;
 use App\Models\Central\Tenant;
 use App\Services\Central\PlanPermissionResolver;
 use Illuminate\Console\Command;

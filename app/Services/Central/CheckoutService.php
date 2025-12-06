@@ -2,7 +2,7 @@
 
 namespace App\Services\Central;
 
-use App\Exceptions\AddonException;
+use App\Exceptions\Central\AddonException;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\Tenant;

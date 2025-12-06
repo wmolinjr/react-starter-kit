@@ -219,7 +219,7 @@ app/Models/
 ├── Tenant/            # Banco do tenant (dados isolados)
 │   ├── Activity.php, Media.php, Project.php, TenantTranslationOverride.php
 │   └── User.php       # Usuarios do tenant (owner, admin, member)
-└── Shared/         # Funcionam em ambos contextos
+└── Shared/            # Funcionam em ambos contextos
     ├── Permission.php
     └── Role.php
 ```
@@ -248,6 +248,46 @@ app/Services/
 └── Tenant/            # Operam no banco do tenant
     ├── AuditLogService.php, BillingService.php, RoleService.php
     ├── TeamService.php, TenantSettingsService.php
+```
+
+### Additional Organized Folders
+
+Other app folders also follow the Central/Tenant/Shared pattern:
+
+```
+app/Exceptions/
+├── Central/           # PlanException, AddonException, AddonLimitExceededException
+├── Tenant/            # TeamException, TeamAuthorizationException, SettingsException
+└── Shared/            # RoleException
+
+app/Jobs/
+├── Central/           # SyncTenantPermissions, SeedTenantDatabase
+├── Tenant/            # .gitkeep
+└── Shared/            # .gitkeep
+
+app/Listeners/
+├── Central/           # UpdateTenantLimits, SyncPermissionsOnSubscriptionChange
+├── Tenant/            # .gitkeep
+└── Shared/            # .gitkeep
+
+app/Mail/
+├── Central/           # .gitkeep
+├── Tenant/            # TeamInvitation
+└── Shared/            # .gitkeep
+
+app/Http/Middleware/
+├── Central/           # .gitkeep
+├── Tenant/            # AllowAdminMode, VerifyTenantAccess, CheckPlan
+└── Shared/            # HandleInertiaRequests, AddSecurityHeaders, HandleAppearance, SetLocale
+
+app/Actions/Fortify/
+├── Tenant/            # CreateNewUser, ResetUserPassword
+└── Shared/            # PasswordValidationRules (trait)
+
+app/Policies/
+├── Central/           # .gitkeep
+├── Tenant/            # ProjectPolicy
+└── Shared/            # .gitkeep
 ```
 
 ### Controller Pattern (Thin Controllers)
@@ -291,7 +331,7 @@ app/Http/Resources/
 ├── BaseResource.php          # Base class with helpers (trans, formatIso, etc.)
 ├── Central/                  # TenantResource, PlanResource, DomainResource, etc.
 ├── Tenant/                   # UserResource, ProjectResource, ActivityResource, etc.
-└── Shared/                # RoleResource, PermissionResource (works in both contexts)
+└── Shared/                   # RoleResource, PermissionResource (works in both contexts)
 ```
 
 **Naming Conventions**:

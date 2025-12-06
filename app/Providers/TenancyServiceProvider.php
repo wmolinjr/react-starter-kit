@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\TenantConfigKey;
-use App\Jobs\SeedTenantDatabase;
+use App\Jobs\Central\SeedTenantDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;

@@ -2,8 +2,8 @@
 
 namespace App\Services\Tenant;
 
-use App\Exceptions\TeamAuthorizationException;
-use App\Mail\TeamInvitation;
+use App\Exceptions\Tenant\TeamAuthorizationException;
+use App\Mail\Tenant\TeamInvitation;
 use App\Models\Central\Tenant;
 use App\Models\Central\TenantInvitation;
 use App\Models\Tenant\User;

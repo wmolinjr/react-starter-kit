@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains;
-use App\Http\Middleware\VerifyTenantAccess;
+use App\Http\Middleware\Tenant\VerifyTenantAccess;
 use App\Models\Tenant\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;

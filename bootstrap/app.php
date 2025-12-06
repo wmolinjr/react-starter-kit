@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Middleware\AddSecurityHeaders;
-use App\Http\Middleware\HandleAppearance;
-use App\Http\Middleware\HandleInertiaRequests;
-use App\Http\Middleware\SetLocale;
-use App\Http\Middleware\VerifyTenantAccess;
+use App\Http\Middleware\Shared\AddSecurityHeaders;
+use App\Http\Middleware\Shared\HandleAppearance;
+use App\Http\Middleware\Shared\HandleInertiaRequests;
+use App\Http\Middleware\Shared\SetLocale;
+use App\Http\Middleware\Tenant\VerifyTenantAccess;
 use App\Models\Tenant\Project;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Application;
@@ -133,7 +133,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Plan middleware (unified feature and limit enforcement)
             // Usage: plan:feature,customRoles | plan:limit,users
-            'plan' => \App\Http\Middleware\CheckPlan::class,
+            'plan' => \App\Http\Middleware\Tenant\CheckPlan::class,
 
             // Spatie Permission middleware (for permission-based authorization)
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -144,7 +144,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'scope.sessions' => \Stancl\Tenancy\Middleware\ScopeSessions::class,
 
             // Admin Mode: Allow access when impersonating without specific user (Option C)
-            'admin.mode' => \App\Http\Middleware\AllowAdminMode::class,
+            'admin.mode' => \App\Http\Middleware\Tenant\AllowAdminMode::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

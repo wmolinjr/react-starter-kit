@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
-use App\Exceptions\RoleException;
+use App\Exceptions\Shared\RoleException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\StoreRoleRequest;
 use App\Http\Requests\Tenant\UpdateRoleRequest;

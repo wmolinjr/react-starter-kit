@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\CentralPermission;
-use App\Exceptions\RoleException;
+use App\Exceptions\Shared\RoleException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\StoreRoleRequest;
 use App\Http\Requests\Central\UpdateRoleRequest;

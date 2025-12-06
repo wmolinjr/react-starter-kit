@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Actions\Fortify\CreateNewUser;
-use App\Actions\Fortify\ResetUserPassword;
+use App\Actions\Fortify\Tenant\CreateNewUser;
+use App\Actions\Fortify\Tenant\ResetUserPassword;
 use App\Models\Tenant\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;

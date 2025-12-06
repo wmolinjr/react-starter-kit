@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Listeners\SyncPermissionsOnSubscriptionChange;
-use App\Listeners\UpdateTenantLimits;
+use App\Listeners\Central\SyncPermissionsOnSubscriptionChange;
+use App\Listeners\Central\UpdateTenantLimits;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Domain;

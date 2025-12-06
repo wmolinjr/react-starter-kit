@@ -202,7 +202,7 @@ class AddonBundleTest extends TenantTestCase
         $this->addonService->purchase($this->tenant, 'advanced_reports', 1, BillingPeriod::MONTHLY);
 
         // Try to purchase power_pack which includes advanced_reports
-        $this->expectException(\App\Exceptions\AddonException::class);
+        $this->expectException(\App\Exceptions\Central\AddonException::class);
         $this->expectExceptionMessage('already have');
 
         $this->addonService->purchaseBundle($this->tenant, 'power_pack', BillingPeriod::MONTHLY);

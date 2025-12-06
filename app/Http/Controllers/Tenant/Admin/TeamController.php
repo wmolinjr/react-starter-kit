@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
-use App\Exceptions\TeamAuthorizationException;
-use App\Exceptions\TeamException;
+use App\Exceptions\Tenant\TeamAuthorizationException;
+use App\Exceptions\Tenant\TeamException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\AcceptInvitationRequest;
 use App\Http\Requests\Tenant\InviteMemberRequest;

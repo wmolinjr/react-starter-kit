@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\SyncTenantPermissions;
+use App\Jobs\Central\SyncTenantPermissions;
 use App\Models\Shared\Permission;
 use App\Models\Central\Plan;
 use App\Models\Shared\Role;

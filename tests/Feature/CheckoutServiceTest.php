@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\AddonType;
-use App\Exceptions\AddonException;
+use App\Exceptions\Central\AddonException;
 use App\Models\Central\AddonPurchase;
 use App\Services\Central\CheckoutService;
 use PHPUnit\Framework\Attributes\Test;

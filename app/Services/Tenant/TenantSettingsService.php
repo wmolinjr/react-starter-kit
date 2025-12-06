@@ -3,7 +3,7 @@
 namespace App\Services\Tenant;
 
 use App\Enums\TenantConfigKey;
-use App\Exceptions\SettingsException;
+use App\Exceptions\Tenant\SettingsException;
 use App\Models\Central\Tenant;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\BadgePreset;
 use App\Enums\CentralPermission;
-use App\Exceptions\PlanException;
+use App\Exceptions\Central\PlanException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\StorePlanRequest;
 use App\Http\Requests\Central\UpdatePlanRequest;

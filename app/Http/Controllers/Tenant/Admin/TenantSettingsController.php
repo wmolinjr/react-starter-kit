@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
-use App\Exceptions\SettingsException;
+use App\Exceptions\Tenant\SettingsException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\AddDomainRequest;
 use App\Http\Requests\Tenant\UpdateBrandingRequest;
