@@ -47,15 +47,6 @@ return [
             'report' => false,
         ],
 
-        'tenant-media' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public/media'),
-            'url' => env('APP_URL').'/storage/media',
-            'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
-        ],
-
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -65,6 +56,29 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Tenant-isolated local storage
+        'tenant_uploads' => [
+            'driver' => 'local',
+            'root' => storage_path('app/tenants/'.(tenancy()->initialized ? tenant('id') : 'central')),
+            'url' => env('APP_URL').'/storage/tenants/'.(tenancy()->initialized ? tenant('id') : 'central'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // Tenant-isolated S3 storage
+        'tenant_s3' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'root' => 'tenants/'.(tenancy()->initialized ? tenant('id') : 'central'),
+            'visibility' => 'private',
             'throw' => false,
             'report' => false,
         ],

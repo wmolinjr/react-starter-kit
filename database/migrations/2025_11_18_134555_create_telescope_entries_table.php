@@ -8,9 +8,17 @@ return new class extends Migration
 {
     /**
      * Get the migration connection name.
+     *
+     * In testing environment, use the testing connection.
+     * This allows migrate:fresh --database=testing to work correctly.
      */
     public function getConnection(): ?string
     {
+        // Use testing connection in test environment
+        if (app()->environment('testing')) {
+            return config('database.default'); // 'testing' from phpunit.xml
+        }
+
         return config('telescope.storage.database.connection');
     }
 
@@ -20,6 +28,11 @@ return new class extends Migration
     public function up(): void
     {
         $schema = Schema::connection($this->getConnection());
+
+        // Skip if tables already exist (prevents errors when migrating across connections)
+        if ($schema->hasTable('telescope_entries')) {
+            return;
+        }
 
         $schema->create('telescope_entries', function (Blueprint $table) {
             $table->bigIncrements('sequence');

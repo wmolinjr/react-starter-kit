@@ -69,11 +69,33 @@ return [
     |
     | Here you may configure the path where users will get redirected during
     | authentication or password reset when the operations are successful
-    | and the user is authenticated. You are free to change this value.
+    | and the user is authenticated.
+    |
+    | STANCL/TENANCY V4:
+    | - Central context: Uses this path (/home) which does role-based routing
+    | - Tenant context: FortifyRouteBootstrapper overrides to tenant.admin.dashboard
+    |
+    | @see App\Providers\TenancyFortifyServiceProvider
+    | @see routes/central.php (central.fortify.home)
+    */
+
+    'home' => '/home',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fortify Redirects
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the redirect paths for various auth operations.
+    |
+    | STANCL/TENANCY V4:
+    | - FortifyRouteBootstrapper handles tenant-specific redirects automatically
     |
     */
 
-    'home' => '/dashboard',
+    'redirects' => [
+        'email-verification' => '/home',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +123,19 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    /*
+    |--------------------------------------------------------------------------
+    | STANCL/TENANCY V4:
+    | - 'universal' flag: makes Fortify routes work in both central and tenant contexts
+    | - InitializeTenancyByDomain: initializes tenancy when accessed from tenant domain
+    | - This enables FortifyRouteBootstrapper to redirect to tenant.admin.dashboard
+    |--------------------------------------------------------------------------
+    */
+    'middleware' => [
+        'web',
+        'universal',
+        \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+    ],
 
     /*
     |--------------------------------------------------------------------------

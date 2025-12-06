@@ -1,49 +1,32 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
+/**
+ * Central Migration: Users Table (DEPRECATED in Option C)
+ *
+ * OPTION C ARCHITECTURE:
+ * - Users exist ONLY in tenant databases (complete isolation)
+ * - Admin users are stored in the 'admins' table (separate migration)
+ * - password_reset_tokens and sessions are in tenant databases
+ *
+ * This migration is kept empty for compatibility with Laravel's
+ * expected migration structure but creates no tables.
+ *
+ * @see database/migrations/2025_12_05_000001_create_admins_table.php
+ * @see database/migrations/tenant/0001_01_01_000000_create_users_table.php
+ */
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
+        // Option C: No users table in central database
+        // Users exist only in tenant databases
+        // Admins use separate 'admins' table
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
+        // Nothing to drop
     }
 };

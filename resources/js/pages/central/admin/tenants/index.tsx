@@ -1,0 +1,221 @@
+import { Head, Link, router } from '@inertiajs/react';
+import CentralAdminLayout from '@/layouts/central-admin-layout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Trash2, Eye, Pencil, Search, Users, Globe, LogIn } from 'lucide-react';
+import { useState } from 'react';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import admin from '@/routes/central/admin';
+import { type BreadcrumbItem } from '@/types';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
+
+interface User {
+    id: string;
+    name: string;
+    email: string;
+}
+
+interface Tenant {
+    id: string;
+    name: string;
+    slug: string;
+    created_at: string;
+    users_count: number;
+    plan: { name: string } | null;
+    domains: { domain: string; is_primary: boolean }[];
+    users: User[];
+}
+
+interface Props {
+    tenants: {
+        data: Tenant[];
+        links: { url: string | null; label: string; active: boolean }[];
+        current_page: number;
+        last_page: number;
+    };
+    filters: { search?: string };
+    isImpersonating?: boolean;
+}
+
+export default function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
+    const { t } = useLaravelReactI18n();
+    const [search, setSearch] = useState(filters.search || '');
+    const [impersonating, setImpersonating] = useState<string | null>(null);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('breadcrumbs.tenants'), href: admin.tenants.index.url() },
+    ];
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(admin.tenants.index.url(), { search }, { preserveState: true });
+    };
+
+    const handleDelete = (tenantId: string) => {
+        if (confirm(t('common.confirm_delete'))) {
+            router.delete(admin.tenants.destroy.url(tenantId));
+        }
+    };
+
+    const handleImpersonate = (tenantId: string, userId?: string) => {
+        setImpersonating(tenantId);
+        const url = userId
+            ? admin.impersonate.start.user.url({ tenant: tenantId, user: userId })
+            : admin.impersonate.start.url(tenantId);
+        router.post(url, {}, { onFinish: () => setImpersonating(null) });
+    };
+
+    return (
+        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+            <Head title={t('admin.tenants.title')} />
+
+            <Page>
+                <PageHeader>
+                    <PageHeaderContent>
+                        <PageTitle>{t('admin.tenants.title')}</PageTitle>
+                        <PageDescription>{t('admin.tenants.description')}</PageDescription>
+                    </PageHeaderContent>
+                    <PageHeaderActions>
+                        {isImpersonating && (
+                            <Badge variant="destructive">{t('admin.tenants.currently_impersonating')}</Badge>
+                        )}
+                    </PageHeaderActions>
+                </PageHeader>
+
+                <PageContent>
+                    <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle>{t('admin.tenants.all_tenants')}</CardTitle>
+                            <form onSubmit={handleSearch} className="flex gap-2">
+                                <Input
+                                    placeholder={t('admin.tenants.search_placeholder')}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="w-64"
+                                />
+                                <Button type="submit" variant="outline" size="icon">
+                                    <Search className="h-4 w-4" />
+                                </Button>
+                            </form>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>{t('common.name')}</TableHead>
+                                    <TableHead>Domain</TableHead>
+                                    <TableHead>Plan</TableHead>
+                                    <TableHead>Users</TableHead>
+                                    <TableHead>{t('common.created')}</TableHead>
+                                    <TableHead>{t('common.actions')}</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {tenants.data.map((tenant) => (
+                                    <TableRow key={tenant.id}>
+                                        <TableCell className="font-medium">{tenant.name}</TableCell>
+                                        <TableCell>
+                                            {tenant.domains?.[0] && (
+                                                <div className="flex items-center gap-1">
+                                                    <Globe className="text-muted-foreground h-3 w-3" />
+                                                    <span className="text-sm">{tenant.domains[0].domain}</span>
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {tenant.plan ? (
+                                                <Badge variant="outline">{tenant.plan.name}</Badge>
+                                            ) : (
+                                                <Badge variant="secondary">{t('admin.tenants.no_plan')}</Badge>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-1">
+                                                <Users className="text-muted-foreground h-3 w-3" />
+                                                <span>{tenant.users_count}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {new Date(tenant.created_at).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-wrap gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleImpersonate(tenant.id)}
+                                                    disabled={impersonating === tenant.id}
+                                                >
+                                                    <LogIn className="mr-1 h-3 w-3" />
+                                                    {impersonating === tenant.id ? '...' : t('admin.tenants.impersonate')}
+                                                </Button>
+                                                {tenant.users?.slice(0, 2).map((user) => (
+                                                    <Button
+                                                        key={user.id}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleImpersonate(tenant.id, user.id)}
+                                                        disabled={impersonating === tenant.id}
+                                                        title={`${t('admin.tenants.impersonate')} ${user.name}`}
+                                                    >
+                                                        <LogIn className="mr-1 h-3 w-3" />
+                                                        {user.name.split(' ')[0]}
+                                                    </Button>
+                                                ))}
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={admin.tenants.show.url(tenant.id)}>
+                                                        <Eye className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={admin.tenants.edit.url(tenant.id)}>
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(tenant.id)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+
+                        {tenants.data.length === 0 && (
+                            <div className="py-12 text-center">
+                                <p className="text-muted-foreground">{t('admin.tenants.no_tenants')}</p>
+                            </div>
+                        )}
+
+                        {tenants.last_page > 1 && (
+                            <div className="mt-4 flex justify-center gap-2">
+                                {tenants.links.map((link, i) => (
+                                    <Button
+                                        key={i}
+                                        variant={link.active ? 'default' : 'outline'}
+                                        size="sm"
+                                        disabled={!link.url}
+                                        onClick={() => link.url && router.get(link.url)}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+                </PageContent>
+            </Page>
+        </CentralAdminLayout>
+    );
+}

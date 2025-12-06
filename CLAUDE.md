@@ -4,128 +4,111 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Laravel + React starter kit that combines Laravel 12 backend with React 19 frontend using Inertia.js. The stack includes:
-- **Backend**: Laravel 12, Laravel Fortify (authentication), Laravel Wayfinder
-- **Frontend**: React 19, TypeScript, Tailwind CSS 4, shadcn/ui components, Radix UI, Lucide icons
-- **Build Tools**: Vite 7, Laravel Vite plugin
-- **Other**: React Compiler enabled, SSR support available
+Laravel + React starter kit combining Laravel 12 backend with React 19 frontend using Inertia.js.
 
-## Development Commands
+**Stack:**
+- **Backend**: Laravel 12, Fortify (auth), Stancl Tenancy (multi-tenant), Spatie Permission
+- **Frontend**: React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Radix UI, Lucide icons
+- **Build**: Vite 7, React Compiler enabled, SSR support
+- **Infrastructure**: Laravel Sail (Docker), PostgreSQL 18, Redis
 
-**Nota**: Este projeto suporta desenvolvimento com Laravel Sail (Docker) ou localmente. Ver seção "Ambiente de Desenvolvimento" para comandos Sail completos.
+## Development Commands (Laravel Sail)
+
+**Este projeto usa Laravel Sail (Docker) para desenvolvimento. Todos os comandos devem usar `sail`.**
 
 ### Initial Setup
 
-**Com Sail (Recomendado)**:
 ```bash
-sail up -d               # Inicia containers Docker
+sail up -d               # Inicia containers (PostgreSQL, Redis, App)
 sail artisan migrate     # Roda migrations
 sail npm install         # Instala dependências frontend
 sail npm run build       # Build inicial
 ```
 
-**Sem Sail (Local)**:
-```bash
-composer setup
-# Runs: composer install, copies .env, generates key, runs migrations, npm install, npm run build
-```
-
 ### Development Server
 
-**Com Sail**:
 ```bash
-sail up -d              # Containers em background (PostgreSQL, Redis, App já rodando)
+sail up -d              # Containers em background
 sail npm run dev        # Vite dev server (porta 5173)
-```
-
-**Sem Sail**:
-```bash
-composer dev
-# Starts 4 concurrent processes:
-# - PHP dev server (php artisan serve)
-# - Queue worker (php artisan queue:listen)
-# - Log viewer (php artisan pail)
-# - Vite dev server (npm run dev)
-```
-
-### SSR Development
-```bash
-composer dev:ssr
-# Builds SSR bundle first, then runs dev server with Inertia SSR instead of Vite
-```
-
-### Frontend Commands
-```bash
-npm run dev          # Start Vite dev server
-npm run build        # Build for production
-npm run build:ssr    # Build with SSR support
-npm run lint         # Run ESLint with auto-fix
-npm run format       # Format code with Prettier
-npm run format:check # Check formatting without changes
-npm run types        # Type-check TypeScript without emitting files
 ```
 
 ### Backend Commands
 
-**Com Sail**:
 ```bash
 sail artisan test                      # Run PHPUnit tests
 sail artisan test --filter TestName   # Run specific test
 sail artisan migrate                   # Run migrations
 sail artisan tinker                    # Interactive shell
 sail shell                             # Bash shell no container
+sail logs -f                           # Seguir logs em tempo real
 ```
 
-**Sem Sail**:
+### Frontend Commands
+
 ```bash
-composer test              # Run PHPUnit tests
-php artisan test           # Run tests (alternative)
-php artisan test --filter TestName  # Run specific test
-vendor/bin/phpunit --testsuite Unit # Run unit tests only
-vendor/bin/phpunit --testsuite Feature # Run feature tests only
+sail npm run dev          # Start Vite dev server
+sail npm run build        # Build for production
+sail npm run build:ssr    # Build with SSR support
+sail npm run lint         # Run ESLint with auto-fix
+sail npm run format       # Format code with Prettier
+sail npm run types        # Type-check TypeScript
 ```
 
 ### Code Quality
+
 ```bash
 vendor/bin/pint        # Format PHP code with Laravel Pint
 vendor/bin/pint --test # Check formatting without changes
 ```
 
-## Ambiente de Desenvolvimento
+### Tenant Commands (Stancl/Tenancy v4)
 
-Este projeto suporta desenvolvimento com **Laravel Sail** (Docker) ou localmente com PHP nativo.
-
-### Laravel Sail (Docker - Recomendado)
-
-**Serviços Configurados:**
-- **App**: PHP 8.4 com Laravel
-- **PostgreSQL**: 18-alpine (porta 5432)
-- **Redis**: alpine (porta 6379)
-- **Volumes**: Persistência para banco e cache
-
-**Comandos Principais:**
 ```bash
-# Gerenciamento de containers
-sail up                 # Inicia todos os serviços
-sail up -d              # Inicia em background
-sail down               # Para todos os containers
-sail restart            # Reinicia containers
-sail ps                 # Status dos containers
+# Migrar todos os tenants
+sail artisan tenants:migrate
 
-# Desenvolvimento
-sail artisan migrate    # Rodar migrations
-sail artisan tinker     # PHP interactive shell
-sail npm run dev        # Vite dev server (porta 5173)
-sail npm run build      # Build para produção
-sail artisan test       # Rodar testes
-sail shell              # Acessa shell do container
+# Migrar em paralelo (4 processos) - v4 feature
+sail artisan tenants:migrate -p 4
 
-# Logs
-sail logs               # Ver logs de todos os serviços
-sail logs -f            # Seguir logs em tempo real
+# Migrar com skip de falhas
+sail artisan tenants:migrate -p 4 --skip-failing
+
+# Rollback em paralelo
+sail artisan tenants:rollback -p 4
+
+# Seed em paralelo
+sail artisan tenants:seed -p 4
+
+# Tinker no contexto de um tenant - v4 feature
+sail artisan tenant:tinker <tenant-id>
+
+# Listar tenants
+sail artisan tenants:list
+
+# Limpar pending tenants antigos
+sail artisan tenants:pending-clear --older-than-days=7
 ```
 
-**Configuração do Banco (.env com Sail):**
+### Permissions & Roles
+
+```bash
+# Sincronizar permissions (atualizar/criar)
+sail artisan permissions:sync
+
+# Limpar e recriar tudo
+sail artisan permissions:sync --fresh
+```
+
+### Sail Configuration
+
+**Serviços**:
+- **App**: PHP 8.4 com Laravel (porta 80)
+- **PostgreSQL**: 18-alpine (porta 5432)
+- **Redis**: alpine (porta 6379)
+- **Vite**: Dev server (porta 5173)
+- **Mailpit**: Email testing (SMTP 1025, Web UI http://localhost:8025)
+
+**Database (.env)**:
 ```env
 DB_CONNECTION=pgsql
 DB_HOST=pgsql          # Nome do serviço Docker
@@ -137,446 +120,599 @@ DB_PASSWORD=password
 REDIS_HOST=redis       # Nome do serviço Docker
 ```
 
-**Portas Expostas:**
-- App: `APP_PORT` (padrão: 80)
-- Vite: `VITE_PORT` (padrão: 5173)
-- PostgreSQL: `FORWARD_DB_PORT` (padrão: 5432)
-- Redis: `FORWARD_REDIS_PORT` (padrão: 6379)
-
-### Desenvolvimento Local (Sem Docker)
-
-Use os comandos `composer dev` conforme documentado acima. O projeto usa SQLite por padrão quando não está com Sail.
+**Nota para Produção**: Comandos sem Sail (php artisan, composer, npm) são usados apenas em servidores de produção sem Docker.
 
 ## Architecture
 
 ### Inertia Integration
 
-Inertia bridges Laravel and React, enabling classic server-side routing with React components as views.
+Inertia bridges Laravel and React, enabling server-side routing with React components as views.
 
 **Key Flow:**
-1. Routes defined in `routes/web.php` and `routes/settings.php`
-2. Controllers return `Inertia::render('page-name', $props)` instead of Blade views
-3. Inertia middleware (`HandleInertiaRequests.php`) shares global props to all pages
+1. Routes defined in `routes/web.php`, `routes/settings.php`, `routes/tenant.php`
+2. Controllers return `Inertia::render('page-name', $props)`
+3. Inertia middleware (`HandleInertiaRequests.php`) shares global props
 4. React pages in `resources/js/pages/` receive props and render
 
-**Shared Props** (available to all pages via `HandleInertiaRequests.php:38-49`):
+**Shared Props** (available to all pages):
 - `name`: App name from config
 - `quote`: Random inspiring quote
 - `auth.user`: Current authenticated user
 - `sidebarOpen`: Sidebar state from cookie
 
+### Vite & Asset Bundling
+
+**IMPORTANT**: Follow Inertia.js best practices for Vite configuration.
+
+**✅ CORRECT Configuration** (`resources/views/app.blade.php:43`):
+```blade
+@viteReactRefresh
+@vite(['resources/css/app.css', 'resources/js/app.tsx'])
+@inertiaHead
+```
+
+**❌ NEVER do this:**
+```blade
+{{-- DON'T: This breaks Vite manifest and Inertia's module resolution --}}
+@vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+```
+
+**Why?**
+- Vite only builds entry points defined in `vite.config.ts` (`app.tsx` and `ssr.tsx`)
+- Individual page components are NOT in the Vite manifest
+- Inertia handles dynamic page loading via `import.meta.glob('./pages/**/*.tsx')` in `app.tsx:16`
+- Attempting to preload individual pages causes `ViteException: Unable to locate file in Vite manifest`
+
+**How Inertia Loads Pages** (`resources/js/app.tsx:13-17`):
+```typescript
+resolve: (name) =>
+    resolvePageComponent(
+        `./pages/${name}.tsx`,
+        import.meta.glob('./pages/**/*.tsx'),
+    ),
+```
+
+**Vite Configuration** (`vite.config.ts:9-11`):
+```typescript
+laravel({
+    input: ['resources/css/app.css', 'resources/js/app.tsx'],
+    ssr: 'resources/js/ssr.tsx',
+    refresh: true,
+}),
+```
+
+**Multi-Tenant Considerations:**
+- Same Vite setup works for both Central and Tenant domains
+- Pages are resolved at runtime based on route
+- No need for domain-specific manifests or builds
+
 ### Frontend Structure
 
-**Pages** (`resources/js/pages/`): Inertia page components
-- Auto-resolved via glob pattern: `./pages/${name}.tsx`
-- Examples: `auth/login.tsx`, `dashboard.tsx`, `settings/profile.tsx`
-
-**Layouts** (`resources/js/layouts/`):
-- `app-layout.tsx`: Main authenticated app layout
-- `auth-layout.tsx`: Authentication pages layout
-- Nested layouts in subdirectories: `app/`, `auth/`, `settings/`
-
-**Components**:
-- `resources/js/components/`: Application-specific components
-- `resources/js/components/ui/`: shadcn/ui components (managed by shadcn CLI)
-- Import aliases configured in `components.json` and `tsconfig.json`
-
-**Hooks** (`resources/js/hooks/`):
-- `use-appearance.tsx`: Light/dark theme management
-- `use-mobile.tsx`, `use-mobile-navigation.ts`: Mobile responsiveness
-- `use-two-factor-auth.ts`: 2FA functionality
-- `use-clipboard.ts`, `use-initials.tsx`: Utilities
-
-**Entry Point** (`resources/js/app.tsx`):
-- Initializes Inertia app
-- Configures page resolution
-- Sets theme on load
+- **Pages**: `resources/js/pages/` - Inertia page components
+- **Layouts**: `resources/js/layouts/` - App layouts (app, auth, settings)
+- **Components**: `resources/js/components/` - App components
+- **UI Components**: `resources/js/components/ui/` - shadcn/ui (managed by CLI)
+- **Hooks**: `resources/js/hooks/` - Custom React hooks
+- **Entry Point**: `resources/js/app.tsx` - Initializes Inertia app
 
 ### Backend Structure
 
-**Authentication**: Laravel Fortify handles registration, login, password reset, email verification, and 2FA
-- Configuration in `FortifyServiceProvider.php`
-- All auth views return Inertia pages instead of Blade
-- Custom actions in `app/Actions/Fortify/`
+- **Authentication**: Laravel Fortify (registration, login, password reset, 2FA)
+- **Controllers**: `app/Http/Controllers/` - Thin controllers (Inertia responses only)
+- **Resources**: `app/Http/Resources/` - API Resources for data transformation
+- **Middleware**: HandleInertiaRequests, HandleAppearance, tenant middleware
+- **Routes**: web.php (public), settings.php (settings), tenant.php (tenant routes)
+- **Multi-Tenancy**: Multi-database tenancy (each tenant has dedicated database)
+- **Permissions**: Spatie Laravel Permission + Enums (`app/Enums/TenantPermission.php`, `CentralPermission.php`, `TenantRole.php`)
+- **Services**: `app/Services/` - Business logic (return Eloquent models, not arrays)
 
-**Controllers** (`app/Http/Controllers/`):
-- `Settings/`: Profile, password, 2FA controllers for settings pages
-- All return Inertia responses
+### Models Structure
 
-**Middleware**:
-- `HandleInertiaRequests`: Shares global props
-- `HandleAppearance`: Manages theme preference cookie
+Models are organized by database context:
 
-**Routes**:
-- `routes/web.php`: Public routes and dashboard
-- `routes/settings.php`: Settings pages (all auth-protected)
-- `routes/console.php`: Artisan commands
+```
+app/Models/
+├── Central/           # Banco central (dados globais)
+│   ├── Addon.php, AddonBundle.php, AddonPurchase.php, AddonSubscription.php
+│   ├── Domain.php, Plan.php, Tenant.php, TenantInvitation.php
+│   └── User.php       # Admins centrais (Super Admin, Central Admin)
+├── Tenant/            # Banco do tenant (dados isolados)
+│   ├── Activity.php, Media.php, Project.php, TenantTranslationOverride.php
+│   └── User.php       # Usuarios do tenant (owner, admin, member)
+└── Universal/         # Funcionam em ambos contextos
+    ├── Permission.php
+    └── Role.php
+```
+
+**MorphMap Configuration** (`AppServiceProvider.php`):
+```php
+Relation::enforceMorphMap([
+    'user' => \App\Models\Tenant\User::class,
+    'admin' => \App\Models\Central\User::class,
+    'tenant' => \App\Models\Central\Tenant::class,
+    'project' => \App\Models\Tenant\Project::class,
+]);
+```
+
+### Services Structure
+
+Business logic organized by context:
+
+```
+app/Services/
+├── Central/           # Operam no banco central
+│   ├── AddonService.php, CheckoutService.php, ImpersonationService.php
+│   ├── MeteredBillingService.php, PlanFeatureResolver.php
+│   ├── PlanPermissionResolver.php, PlanService.php, PlanSyncService.php
+│   ├── RoleService.php, StripeSyncService.php
+└── Tenant/            # Operam no banco do tenant
+    ├── AuditLogService.php, BillingService.php, RoleService.php
+    ├── TeamService.php, TenantSettingsService.php
+```
+
+### Controller Pattern (Thin Controllers)
+
+Controllers should only handle HTTP concerns. Business logic goes in Services.
+
+**Pattern**:
+```php
+class TeamController extends Controller
+{
+    public function __construct(
+        protected TeamService $teamService  // Inject service
+    ) {}
+
+    public function invite(InviteMemberRequest $request): RedirectResponse
+    {
+        // Form Request handles validation
+        $this->teamService->invite(
+            $request->validated()['email'],
+            $request->validated()['role']
+        );
+        return back()->with('success', __('flash.invitation.sent'));
+    }
+}
+```
+
+**Form Requests** (validation extracted from controllers):
+```
+app/Http/Requests/
+├── Central/           # StorePlanRequest, UpdatePlanRequest, StoreRoleRequest, UpdateRoleRequest
+└── Tenant/            # InviteMemberRequest, StoreProjectRequest, CheckoutRequest, etc.
+```
+
+### API Resources
+
+All Inertia responses use Laravel API Resources for consistent data transformation:
+
+**Structure**:
+```
+app/Http/Resources/
+├── BaseResource.php          # Base class with helpers (trans, formatIso, etc.)
+├── Central/                  # TenantResource, PlanResource, DomainResource, etc.
+├── Tenant/                   # UserResource, ProjectResource, ActivityResource, etc.
+└── Universal/                # RoleResource, PermissionResource (works in both contexts)
+```
+
+**Naming Conventions**:
+- `Resource` - Listing views (e.g., `ProjectResource`)
+- `DetailResource` - Show pages with relationships (e.g., `ProjectDetailResource`)
+- `EditResource` - Edit forms with field values (e.g., `ProjectEditResource`)
+- `SummaryResource` - Minimal info for dropdowns (e.g., `PlanSummaryResource`)
+
+**Usage**:
+```php
+// Controller uses Resources for transformation
+return Inertia::render('tenant/admin/projects/index', [
+    'projects' => ProjectResource::collection($projects),
+]);
+
+// Services return models, NOT arrays
+public function getTeamMembers(): Collection
+{
+    return User::with('roles')->orderBy('name')->get();
+}
+```
+
+**See**: [docs/API-RESOURCES.md](docs/API-RESOURCES.md) for complete guide.
 
 ### Type Safety
 
-**TypeScript Configuration**:
-- Path aliases: `@/` maps to `resources/js/`
-- Strict type checking enabled
-- Inertia page props are typed via `resources/js/types/index.d.ts`
+- **Path aliases**: `@/` maps to `resources/js/`
+- **Strict TypeScript**: Type checking enabled
+- **Inertia props**: Typed via `resources/js/types/index.d.ts`
+- **Laravel Wayfinder**: Type-safe route helpers for TypeScript
 
-**Laravel Wayfinder**: Generates type-safe route helpers for TypeScript from Laravel routes
+### Laravel Wayfinder
 
-## shadcn/ui Integration
+**Generate TypeScript routes with form support:**
+```bash
+sail artisan wayfinder:generate --with-form
+```
 
-This project uses shadcn/ui components configured with:
-- Style: "new-york"
-- Base color: neutral
-- CSS variables enabled
-- Import aliases for components, utils, hooks
-- Icon library: lucide-react
+**Usage with Inertia Form:**
+```tsx
+import { Form } from '@inertiajs/react'
+import { store } from '@/routes/register'
 
-Add new components: `npx shadcn@latest add <component-name>`
+// Standard pattern: use route.form() (returns { action, method })
+<Form {...store.form()}>
+  <input name="email" />
+  <button type="submit">Submit</button>
+</Form>
+```
 
-## Styling
+**Standard Pattern:** Always use `route.form()` instead of method-specific variants (`route.form.post()`, `route.form.delete()`, etc.). The `.form()` method automatically uses the default HTTP method for the route.
 
-- Tailwind CSS 4 with Vite plugin
-- CSS variables for theming (defined in `resources/css/app.css`)
-- Utility functions: `cn()` from `lib/utils` for conditional classes
-- `class-variance-authority` for component variants
-- Prettier plugin auto-sorts Tailwind classes
+**Important:** Always use `--with-form` flag when regenerating routes to maintain `.form()` method support.
 
-## SSR Support
+### Database IDs
 
-SSR entry point: `resources/js/ssr.tsx`
-Build SSR assets: `npm run build:ssr`
-Run SSR: `php artisan inertia:start-ssr` (after building)
+**Decision**: UUID for ALL models (consistency and security).
 
-## React Compiler
+**Why UUID everywhere**:
+- **Consistency**: One pattern for all models - no decisions needed
+- **Security**: No enumeration attacks, IDs safe to expose in URLs/logs
+- **Multi-database ready**: Globally unique, works across tenant databases
+- **MediaLibrary**: `uuidMorphs` works seamlessly with all models
+- **Laravel 11+**: Uses UUID v7 (ordered) for better index performance
 
-React Compiler (Babel plugin) is enabled in `vite.config.ts` for automatic optimizations.
+**Implementation**:
+- All models use `HasUuids` trait
+- All migrations use `$table->uuid('id')->primary()`
+- Foreign keys use `$table->foreignUuid()`
+- TypeScript types use `string` for all IDs
+
+**See**: [docs/DATABASE-IDS.md](docs/DATABASE-IDS.md) for complete architecture.
+
+## Multi-Tenancy & Security
+
+### Stancl/Tenancy v4
+
+**Version**: v4 (dev-master)
+**Strategy**: Multi-database tenancy (physical isolation for LGPD/HIPAA compliance)
+
+**Architecture (Option C: Tenant-Only Users)**:
+- **Central Database** (`laravel`): tenants, domains, admins, plans, subscriptions
+- **Tenant Databases** (`tenant_{id}`): users, projects, media, roles, permissions, activity_log
+
+**User Models**:
+- **Central\\User** (`app/Models/Central/User.php`): Central administrators with `is_super_admin` flag
+- **Tenant\\User** (`app/Models/Tenant/User.php`): Tenant users (owners, admins, members) - isolated per database
+
+**v4 Bootstrappers Ativos**:
+- ✅ **DatabaseTenancyBootstrapper**: Switches database connection per tenant
+- ✅ **CacheTenancyBootstrapper**: Cache prefixing por tenant
+- ✅ **FilesystemTenancyBootstrapper**: Storage paths isolados
+- ✅ **QueueTenancyBootstrapper**: Jobs mantêm contexto do tenant
+- ✅ **RedisTenancyBootstrapper**: Redis keys prefixadas por tenant
+- ✅ **DatabaseSessionBootstrapper**: Sessões em banco isoladas (v4)
+- ✅ **FortifyRouteBootstrapper**: Redirects tenant-aware para Fortify (v4)
+- ✅ **SpatiePermissionsBootstrapper**: Cache de permissions por tenant
+
+**v4 Features Ativas**:
+- ✅ **UserImpersonation**: Admin impersonation com tokens single-use
+- ✅ **TelescopeTags**: Tags automáticas no Telescope
+- ✅ **CrossDomainRedirect**: Redirects entre domínios central/tenant
+
+**v4 Route Configuration**:
+- **Default Route Mode**: `RouteMode::CENTRAL`
+- **Early Identification**: Tenancy inicializado ANTES de StartSession
+- **Universal Routes**: `/settings/*` funcionam em ambos contextos
+
+**Tenant Creation Flow**:
+1. `Tenant::create()` fires `TenantCreated` event
+2. `Jobs\CreateDatabase` creates `tenant_{id}` PostgreSQL database
+3. `Jobs\MigrateDatabase` runs tenant migrations
+4. `SeedTenantDatabase` seeds roles/permissions
+
+**Migrations Structure**:
+```
+database/migrations/          # Central database (default)
+database/migrations/tenant/   # Tenant databases
+```
+
+**See**:
+- [docs/MULTI-DATABASE-MIGRATION-PLAN.md](docs/MULTI-DATABASE-MIGRATION-PLAN.md) - Migration strategy
+- [docs/TENANCY-V4-IMPROVEMENT-PLAN.md](docs/TENANCY-V4-IMPROVEMENT-PLAN.md) - v4 improvement roadmap
+
+### Session Security
+
+**Critical Configuration** (`.env`):
+```env
+SESSION_DOMAIN=              # VAZIO = Isolamento por domínio (PRODUÇÃO)
+SESSION_SAME_SITE=lax        # Proteção CSRF + permite impersonation
+SESSION_SECURE_COOKIE=true   # HTTPS obrigatório (PRODUÇÃO)
+SESSION_DRIVER=redis         # Performance + escalabilidade
+```
+
+**Redis Multi-Database Strategy**:
+- DB 0: Sessions + Direct Redis (tenant-prefixed)
+- DB 1: Cache (tenant-tagged)
+- DB 2: Queue (NO tenant prefix - workers need global access)
+
+**See**: [docs/SESSION-SECURITY.md](docs/SESSION-SECURITY.md) for complete security guide.
+
+### User Impersonation & Session Configuration
+
+**⚠️ CRÍTICO**: Impersonation requer configuração correta de `SESSION_DOMAIN` e middleware de tenancy.
+
+#### 1. SESSION_DOMAIN DEVE ESTAR VAZIO
+
+**Problema**: `SESSION_DOMAIN=.localhost` compartilha cookies entre todos os subdomains
+- Cookies criados em `localhost` são acessíveis em `tenant1.localhost`
+- Session fixation e leakage entre tenants
+- Impersonation não funciona (sessões não isoladas)
+
+**Solução** (`.env:39`):
+```env
+SESSION_DOMAIN=    # VAZIO = isolamento por domínio exato
+```
+
+**Benefícios**:
+- ✅ Cookies isolados por domínio exato (`localhost` ≠ `tenant1.localhost`)
+- ✅ Segurança multi-tenant (sem session leakage)
+- ✅ Impersonation funciona corretamente
+- ✅ Válido para DEV e PROD
+
+#### 2. Early Middleware Initialization
+
+**Middleware** (`bootstrap/app.php:88-93`):
+```php
+$middleware->priority([
+    \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+]);
+$middleware->prepend(\Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class);
+```
+
+**Propósito**: Garante que tenancy seja inicializado ANTES do StartSession para Redis session prefixing correto.
+
+**$onFail Handler** (`TenancyServiceProvider::boot()`):
+```php
+Middleware\InitializeTenancyByDomain::$onFail = function ($exception, $request, $next) {
+    if (tenancy()->initialized) {
+        return $next($request);
+    }
+    return $next($request);
+};
+```
+
+**Reference**: [Tenancy v4 docs - Early Identification Middleware](https://v4.tenancyforlaravel.com/version-4)
+
+### MediaLibrary Integration
+
+**Spatie MediaLibrary** com isolamento multi-tenant completo:
+
+- ✅ Media model em `App\Models\Tenant\Media` (isolado por banco de dados)
+- ✅ TenantPathGenerator para paths isolados (`tenants/{id}/media/...`)
+- ✅ QueueTenancyBootstrapper para conversion jobs
+- ✅ Testes completos (MediaLibraryQueueTenancyTest)
+
+**See**: [docs/MEDIALIBRARY.md](docs/MEDIALIBRARY.md) for integration details.
+
+## Permissions & Roles
+
+**System**: Spatie Laravel Permission + PHP Enums (Single Source of Truth)
+
+**Architecture**:
+```
+app/Enums/
+├── TenantPermission.php    # 41 tenant permissions + descriptions
+├── CentralPermission.php   # 38 central permissions + descriptions
+```
+
+**Quick Reference**:
+```bash
+sail artisan permissions:sync    # Sync all permissions from enums
+```
+
+**Adding a New Permission**:
+1. Edit enum (`TenantPermission.php` or `CentralPermission.php`)
+2. Add case + description in `description()` method
+3. Run `sail artisan permissions:sync`
+
+**Nomenclatura**: `resource:action`
+- Tenant: `projects:view`, `team:invite`, `billing:manage`
+- Central: `tenants:view`, `plans:edit`, `system:logs`
+
+**Tenant Roles**:
+- `owner`: All permissions - Full access including billing
+- `admin`: 13 permissions - Team & projects (no billing/danger)
+- `member`: 6 permissions - Own projects only
+
+**See**: [docs/PERMISSIONS.md](docs/PERMISSIONS.md) for complete guide.
+
+## Plans System (Hybrid Architecture)
+
+**Architecture**: Database + Laravel Pennant + Spatie Permission
+
+**Quick Commands**:
+```bash
+# Seed plans (Starter, Professional, Enterprise)
+sail artisan db:seed --class=PlanSeeder
+
+# Run plan tests
+sail artisan test --filter=Plan
+```
+
+**Key Concepts**:
+- **Plans** (Database): Defines subscription tiers with features, limits, and permission mappings
+- **Pennant** (Feature Flags): Resolves features and limits at runtime
+- **Spatie Permission**: Maps plan features to granular user permissions
+- **Enums**: `PlanFeature` and `PlanLimit` for type-safe feature/limit references
+
+**Usage**:
+```php
+// Backend - Check features
+use Laravel\Pennant\Feature;
+if (Feature::for($tenant)->active('customRoles')) { }
+
+// Backend - Check limits
+if ($tenant->hasReachedLimit('users')) { }
+
+// Frontend - React hook
+const { hasFeature, hasReachedLimit } = usePlan();
+```
+
+**⚠️ DO NOT**:
+- Bypass `Feature::for()` by checking plan JSON directly
+- Modify `plan_enabled_permissions` manually (auto-generated)
+- Hardcode plan checks (use features instead)
+
+**See**: [docs/SYSTEM-ARCHITECTURE.md](docs/SYSTEM-ARCHITECTURE.md) for complete plans documentation.
 
 ## Testing
 
+```bash
+sail artisan test                      # Run all tests
+sail artisan test --filter TestName   # Run specific test
+sail artisan migrate:fresh --seed     # Reset database and seed test users
+```
+
+**Test Users** (created by seeders):
+
+| Type | Email | Password | Domain | Guard | Model |
+|------|-------|----------|--------|-------|-------|
+| Super Admin | `admin@setor3.app` | `password` | localhost/admin/login | `admin` | Central\\User |
+| Support Admin | `support@setor3.app` | `password` | localhost/admin/login | `admin` | Central\\User |
+| Tenant 1 Owner | `john@acme.com` | `password` | tenant1.localhost | `web` | Tenant\\User |
+| Tenant 2 Owner | `jane@startup.com` | `password` | tenant2.localhost | `web` | Tenant\\User |
+| Tenant 3 Owner | `mike@enterprise.com` | `password` | tenant3.localhost | `web` | Tenant\\User |
+
+**Authentication Guards (Option C)**:
+- `admin` guard: Central administrators (Central\\User) at `localhost/admin/login`
+- `web` guard: Tenant users (Tenant\\User) at `{tenant}.localhost/login`
+
+**See**: [docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md#usuários-de-teste-seeders) for detailed test scenarios.
+
 - PHPUnit 11 configured with `phpunit.xml`
 - Test suites: Unit (`tests/Unit`) and Feature (`tests/Feature`)
-- Test database: SQLite (`:memory:` or `testing` database)
-- Testing environment vars in `phpunit.xml` (cache=array, queue=sync, etc.)
-- **Telescope desabilitado durante testes** para evitar ruído nos dados de teste
+- Test database: PostgreSQL (via Sail)
+- Telescope desabilitado durante testes
+
+### Playwright E2E Tests
+
+**Purpose**: Test runtime session/cache isolation between tenants (requires real browser HTTP lifecycle).
+
+```bash
+# Run all E2E tests
+sail npm run test:e2e
+
+# Run with headed browser (visible)
+sail npm run test:e2e:headed
+
+# Run with Playwright UI
+sail npm run test:e2e:ui
+
+# Show HTML report
+sail npm run test:e2e:report
+```
+
+**Test Location**: `tests/Browser/`
+
+**Key Test**: `session-isolation.spec.ts`
+- Sessions not leaking between tenant domains
+- Independent sessions for each tenant
+- Logout isolation (one tenant doesn't affect another)
+- Cache isolation verification
+- Session cookie domain scoping
+
+**Prerequisites**:
+- Sail containers running (`sail up -d`)
+- Tenants seeded (`tenant1.localhost`, `tenant2.localhost`)
+- Hosts configured (`/etc/hosts` with `127.0.0.1 tenant1.localhost tenant2.localhost`)
+
+**Why Playwright for Session Tests?**
+PHPUnit cannot properly test runtime session isolation because switching tenants mid-process doesn't reinitialize session handlers. Browser tests exercise the full HTTP lifecycle including:
+1. `InitializeTenancyByDomain` middleware
+2. `RedisTenancyBootstrapper` (Redis key prefixing)
+3. `CacheTenancyBootstrapper` (session scoping)
+4. `StartSession` middleware
 
 ## MCP Tools (Model Context Protocol)
 
-Este projeto tem acesso a ferramentas MCP para debugging, testes e documentação. **Use estas ferramentas proativamente durante o desenvolvimento.**
+**⚠️ USE PROATIVAMENTE DURANTE O DESENVOLVIMENTO**
 
-### 1. Laravel Telescope MCP (Monitoramento Backend)
+### 1. Laravel Telescope MCP
 
-**Status**: Instalado e configurado (`laravel/telescope` + `lucianotonet/laravel-telescope-mcp`)
+**Uso Obrigatório**: Verificar **AUTOMATICAMENTE** após qualquer mudança no backend.
 
-**Acesso**:
-- Interface Web: `http://localhost/telescope` ou `http://127.0.0.1:8000/telescope`
-- MCP Endpoint: `http://127.0.0.1:8000/telescope-mcp`
+**Acesso**: http://localhost/telescope
 
-**⚠️ USO OBRIGATÓRIO**: Sempre verificar Telescope MCP **AUTOMATICAMENTE** após **QUALQUER** mudança no backend.
+**Verificar**:
+- ✅ Exceptions (stack traces)
+- ✅ Queries (N+1 problems, slow queries)
+- ✅ Requests (status codes, payloads)
+- ✅ Jobs (queue jobs, failures)
 
-**Quando Verificar**:
-- ✅ Após criar ou modificar Controllers
-- ✅ Após criar ou modificar Models (verificar queries N+1)
-- ✅ Após criar Jobs ou Events
-- ✅ Após modificar Migrations
-- ✅ Após testes falharem (verificar exceptions)
-- ✅ Após qualquer request Inertia
+### 2. Context7 MCP
 
-**Ferramentas Disponíveis** (19 no total):
+**Prioridade Máxima**: Consultar **ANTES** de implementar qualquer feature.
 
-| Ferramenta | Uso | O que Verificar |
-|------------|-----|-----------------|
-| **Requests** | HTTP requests | Status codes, tempo de resposta, payloads |
-| **Exceptions** | Erros da aplicação | Stack traces, erros não tratados |
-| **Queries** | Database queries | Queries lentas, N+1 problems, duplicatas |
-| **Logs** | Application logs | Erros, warnings, debug info |
-| **Jobs** | Queue jobs | Jobs falhados, retry attempts, payloads |
-| **Models** | Eloquent operations | Queries geradas, eventos disparados |
-| **Events** | Event dispatches | Listeners executados, ordem de eventos |
-| **Mail** | Emails enviados | Recipients, assunto, conteúdo |
-| **Cache** | Cache operations | Hits/misses, keys, TTL |
-| **Redis** | Redis commands | Operações, performance |
-| **HTTP Client** | Outgoing HTTP | APIs externas, responses, timeouts |
-| **Notifications** | Notificações | Canais, status, conteúdo |
-| **Commands** | Artisan commands | Execuções, status, output |
-| **Views** | View renders | Templates renderizados, dados passados |
-| **Dumps** | var_dump/dd() | Debug outputs, valores |
-| **Gates** | Authorization | Checks de permissão, results |
-| **Schedule** | Scheduled tasks | Cron jobs, execuções |
-| **Batches** | Batch operations | Jobs em batch, progresso |
-| **Prune** | Limpar dados antigos | Limpeza de entries |
-
-**Exemplo de Workflow**:
-```
-1. Criar ProfileController com método update()
-2. ✅ OBRIGATÓRIO: Verificar Telescope MCP
-   - Ferramenta: Requests (verificar request POST/PATCH)
-   - Ferramenta: Queries (verificar se não há N+1)
-   - Ferramenta: Exceptions (verificar se não há erros)
-3. Se encontrar problema:
-   - Analisar stack trace em Exceptions
-   - Verificar queries geradas em Queries
-   - Ver logs em Logs
-4. Corrigir e verificar novamente
-```
-
-**Queries N+1 - Exemplo**:
-```php
-// ❌ Problema N+1 detectado no Telescope
-User::all()->each(fn($user) => $user->posts);
-// Telescope mostrará: 1 query para users + N queries para posts
-
-// ✅ Solução verificada no Telescope
-User::with('posts')->get();
-// Telescope mostrará: 2 queries apenas (users + posts)
-```
-
-### 2. Context7 MCP (Documentação de Bibliotecas)
-
-**Status**: Disponível via MCP
-
-**⚠️ PRIORIDADE MÁXIMA**: **SEMPRE** consultar Context7 **ANTES** de implementar qualquer feature.
-
-**Quando Usar**:
-1. ✅ **Antes de implementar** features com Inertia, React, Laravel
-2. ✅ **Para buscar exemplos** de código corretos
-3. ✅ **Para verificar best practices** das bibliotecas
-4. ✅ **Quando encontrar erros** - buscar soluções primeiro no Context7
-5. ✅ **Antes de usar** novas bibliotecas ou APIs
-
-**Bibliotecas Principais**:
-- `/laravel/framework` - Laravel 12 documentation
-- `/inertiajs/inertia-laravel` - Inertia.js backend
-- `/inertiajs/inertia` - Inertia.js core
+**Bibliotecas**:
+- `/laravel/framework` - Laravel 12
+- `/inertiajs/inertia` - Inertia.js
 - `/facebook/react` - React 19
-- `/tailwindlabs/tailwindcss` - Tailwind CSS 4
-- `/radix-ui/primitives` - Radix UI components
-- `/shadcn/ui` - shadcn/ui components
+- `/shadcn/ui` - shadcn/ui
 
-**Como Usar**:
-```
-1. Identificar a biblioteca: "preciso usar Inertia Form"
-2. Resolver library ID: Context7.resolve-library-id("inertia")
-3. Buscar docs: Context7.get-library-docs("/inertiajs/inertia", topic="forms")
-4. Ler exemplos e best practices
-5. Implementar seguindo os padrões
-```
+### 3. Playwright MCP
 
-**Exemplo de Workflow**:
-```
-Tarefa: Criar formulário de login com Inertia
+**Uso**: Testar páginas Inertia, verificar console errors, capturar screenshots.
 
-1. ✅ Consultar Context7 PRIMEIRO
-   - resolve-library-id("inertia react")
-   - get-library-docs("/inertiajs/inertia", topic="forms")
-   - get-library-docs("/inertiajs/inertia", topic="validation")
+**Ferramentas**: browser_navigate, browser_console_messages, browser_fill_form, browser_snapshot
 
-2. Aprender o padrão correto:
-   - Form component com render props
-   - Wayfinder para routes type-safe
-   - Error handling automático
+**See**: [docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md) for complete workflow guide.
 
-3. Implementar seguindo documentação
+## Styling
 
-4. ✅ Verificar no Telescope que funcionou
+- **Tailwind CSS 4** with Vite plugin
+- **shadcn/ui**: Style "new-york", base color neutral
+- **CSS variables**: Theming support (resources/css/app.css)
+- **Add components**: `npx shadcn@latest add <component-name>`
+- **Prettier**: Auto-sorts Tailwind classes
+
+## SSR Support
+
+```bash
+sail npm run build:ssr          # Build with SSR
+sail artisan inertia:start-ssr  # Start SSR server
 ```
 
-**Quando Encontrar Erros**:
-```
-1. ✅ Context7: Buscar solução na documentação oficial
-   - Procurar por mensagens de erro similares
-   - Ver exemplos de código correto
+- SSR entry point: `resources/js/ssr.tsx`
+- React Compiler enabled for optimizations
 
-2. ✅ Telescope MCP: Ver detalhes do erro
-   - Stack trace completo
-   - Request/response data
+## Telescope Configuration
 
-3. Corrigir baseado nas informações
-4. Validar que funciona
-```
+**Files**:
+- Config: `config/telescope.php`
+- Provider: `app/Providers/TelescopeServiceProvider.php`
+- Migration: `database/migrations/2025_11_18_134555_create_telescope_entries_table.php`
 
-### 3. Playwright MCP (Testes Frontend)
-
-**Status**: Disponível via MCP (20+ ferramentas de browser)
-
-**Quando Usar**:
-1. ✅ **Após criar/modificar** páginas Inertia
-2. ✅ **Testar fluxos de formulários** end-to-end
-3. ✅ **Verificar erros de console** JavaScript
-4. ✅ **Capturar screenshots** para review visual
-5. ✅ **Validar navegação** entre páginas
-
-**Ferramentas Principais**:
-
-| Ferramenta | Uso |
-|------------|-----|
-| `browser_navigate` | Navegar para URLs |
-| `browser_snapshot` | Capturar estado da página (accessibility tree) |
-| `browser_click` | Clicar em elementos |
-| `browser_fill_form` | Preencher formulários |
-| `browser_type` | Digitar em inputs |
-| `browser_console_messages` | Ver erros/logs do console |
-| `browser_take_screenshot` | Capturar screenshot |
-| `browser_wait_for` | Esperar elementos/texto |
-| `browser_network_requests` | Ver requisições de rede |
-
-**Exemplo de Workflow - Testar Página de Perfil**:
-```
-1. Criar/modificar resources/js/pages/settings/profile.tsx
-
-2. ✅ Testar com Playwright:
-   a. browser_navigate("http://localhost/settings/profile")
-   b. browser_console_messages() - verificar erros JavaScript
-   c. browser_snapshot() - ver estrutura da página
-   d. browser_fill_form([
-        {name: "name", value: "Teste User"},
-        {name: "email", value: "test@example.com"}
-      ])
-   e. browser_click("button[type=submit]")
-   f. browser_wait_for(text: "Profile updated")
-   g. browser_network_requests() - verificar request Inertia
-
-3. ✅ Verificar no Telescope MCP:
-   - Requests: ver PATCH /settings/profile
-   - Queries: verificar update executado
-   - Exceptions: garantir sem erros
-
-4. Se houver erros:
-   - Console: browser_console_messages(onlyErrors: true)
-   - Network: browser_network_requests() - ver failed requests
-   - Telescope: Exceptions - ver backend errors
-```
-
-**Exemplo - Verificar Erros de Console**:
-```
-Sempre após modificar componentes React:
-
-1. browser_navigate("http://localhost/dashboard")
-2. browser_console_messages(onlyErrors: true)
-3. Se houver erros:
-   - Corrigir componentes
-   - Verificar imports
-   - Testar novamente
-```
-
-## MCP Workflow - Fluxo de Trabalho Obrigatório
-
-### Ao Criar/Modificar Backend (Controllers, Models, etc.)
-
-```
-1. ✅ Consultar Context7
-   - Buscar best practices Laravel/Inertia
-   - Ver exemplos de código correto
-   - Verificar API correta
-
-2. ✅ Implementar mudanças
-   - Seguir padrões da documentação
-   - Usar type hints e validações
-
-3. ✅ OBRIGATÓRIO: Verificar Telescope MCP
-   - Exceptions: garantir sem erros
-   - Queries: verificar performance (sem N+1)
-   - Requests: validar request/response
-   - Logs: verificar warnings
-
-4. ✅ Rodar testes
-   - sail artisan test (ou php artisan test)
-   - Se falhar: verificar Telescope Exceptions
-
-5. ✅ Validação final
-   - Todas as ferramentas Telescope em verde
-   - Testes passando
-   - Sem queries lentas
-```
-
-### Ao Criar/Modificar Frontend (Páginas, Componentes)
-
-```
-1. ✅ Consultar Context7
-   - Buscar best practices React/Inertia
-   - Ver exemplos de Form, usePage, Link
-   - Verificar hooks corretos
-
-2. ✅ Implementar componente/página
-   - Seguir padrões do INERTIA.md
-   - Usar TypeScript com tipos corretos
-   - Importar de @/routes (Wayfinder)
-
-3. ✅ OBRIGATÓRIO: Testar com Playwright MCP
-   - browser_navigate: acessar página
-   - browser_console_messages: verificar erros
-   - browser_snapshot: ver renderização
-   - browser_fill_form + click: testar formulários
-   - browser_take_screenshot: capturar visual
-
-4. ✅ Verificar Telescope MCP
-   - Requests: ver requests Inertia (JSON)
-   - Exceptions: garantir sem backend errors
-   - Queries: verificar dados carregados
-
-5. ✅ Validação final
-   - Console sem erros JavaScript
-   - Formulários funcionando
-   - Navegação correta
-   - Backend respondendo JSON (Inertia v2)
-```
-
-### Ao Encontrar Erros
-
-```
-1. ✅ Identificar origem
-   - Frontend? browser_console_messages
-   - Backend? Telescope Exceptions
-   - Ambos? Verificar os dois
-
-2. ✅ Context7: Buscar solução
-   - Procurar erro na documentação
-   - Ver exemplos corretos
-   - Verificar breaking changes
-
-3. ✅ Telescope MCP: Detalhes do erro
-   - Stack trace completo
-   - Request/response data
-   - Queries executadas
-
-4. ✅ Playwright MCP: Reproduzir erro
-   - browser_navigate para página
-   - Executar ações que causam erro
-   - Verificar console e network
-
-5. ✅ Corrigir e validar
-   - Implementar correção
-   - Testar novamente com Playwright
-   - Verificar Telescope sem erros
-   - Confirmar testes passando
-```
-
-### Checklist Antes de Considerar Tarefa Completa
-
-- [ ] Context7 consultado para best practices
-- [ ] Código implementado seguindo padrões
-- [ ] Telescope MCP verificado (sem exceptions, queries OK)
-- [ ] Playwright MCP testado (página funciona, sem console errors)
-- [ ] Testes automatizados passando
-- [ ] TypeScript sem erros (`npm run types`)
-- [ ] ESLint sem warnings (`npm run lint`)
-- [ ] Código formatado (`npm run format`)
-
-## Telescope - Acesso e Configuração
-
-**Arquivo de Configuração**: `config/telescope.php`
-**Service Provider**: `app/Providers/TelescopeServiceProvider.php`
-**Migration**: `database/migrations/2025_11_18_134555_create_telescope_entries_table.php`
-
-**Watchers Habilitados**: Todos (Cache, Command, Dump, Event, Exception, Gate, Job, Log, Mail, Model, Notification, Query, Redis, Request, Schedule, View)
-
-**Variáveis de Ambiente**:
+**Environment Variables**:
 ```env
-TELESCOPE_ENABLED=true          # Habilitar Telescope
-TELESCOPE_PATH=telescope        # Caminho de acesso
-TELESCOPE_MCP_ENABLED=true      # Habilitar MCP endpoint
+TELESCOPE_ENABLED=true
+TELESCOPE_PATH=telescope
+TELESCOPE_MCP_ENABLED=true
 TELESCOPE_MCP_PATH=telescope-mcp
 ```
 
-**Segurança**:
+**Security**:
 - Telescope só registra em ambiente `local`
 - Em produção, requer autenticação
 - Dados sensíveis filtrados (`_token`, cookies, CSRF headers)
+
+## Detailed Documentation
+
+For in-depth technical documentation, see:
+
+- **[docs/PERMISSIONS.md](docs/PERMISSIONS.md)** - Permissions system (enums, roles, usage)
+- **[docs/SYSTEM-ARCHITECTURE.md](docs/SYSTEM-ARCHITECTURE.md)** - Plans, features, limits, addons
+- **[docs/DATABASE-IDS.md](docs/DATABASE-IDS.md)** - UUID architecture decision
+- **[docs/STANCL-FEATURES.md](docs/STANCL-FEATURES.md)** - Multi-tenancy features
+- **[docs/SESSION-SECURITY.md](docs/SESSION-SECURITY.md)** - Session security and Redis
+- **[docs/MEDIALIBRARY.md](docs/MEDIALIBRARY.md)** - MediaLibrary integration
+- **[docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md)** - MCP tools workflow
+- **[docs/I18N.md](docs/I18N.md)** - Internationalization guide
+- **[docs/ADDONS.md](docs/ADDONS.md)** - Add-ons system
+- **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources for data transformation

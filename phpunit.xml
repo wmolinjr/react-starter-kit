@@ -22,13 +22,20 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_DATABASE" value="testing"/>
+        <!-- Use Redis for cache/session testing (Sail provides Redis) -->
+        <env name="CACHE_STORE" value="redis"/>
+        <env name="SESSION_DRIVER" value="redis"/>
+        <env name="REDIS_HOST" value="redis"/>
+        <env name="REDIS_CLIENT" value="phpredis"/>
+        <!-- Use PostgreSQL for testing (PHP 8.4 has issues with SQLite transactions) -->
+        <env name="DB_CONNECTION" value="testing"/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- Use database queue for async tests, sync for most tests -->
         <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="PENNANT_STORE" value="array"/>
+        <env name="TENANCY_DB_BOOTSTRAPPER" value="false"/>
     </php>
 </phpunit>

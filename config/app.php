@@ -43,6 +43,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Content Security Policy (CSP)
+    |--------------------------------------------------------------------------
+    |
+    | Enable or disable Content Security Policy headers. In development, you
+    | may want to disable CSP if you're having issues with Vite or browser
+    | extensions. Always keep enabled in production for security.
+    |
+    */
+
+    'csp_enabled' => env('CSP_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
@@ -53,19 +66,6 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Application Domain
-    |--------------------------------------------------------------------------
-    |
-    | This is the base domain for your application, used for subdomain-based
-    | multi-tenancy. For example, 'localhost' or 'myapp.com'.
-    | Tenants will be accessed via subdomains like 'cliente.localhost'
-    |
-    */
-
-    'domain' => env('APP_DOMAIN', 'localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -96,6 +96,42 @@ return [
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | List of locales supported by the application for translations.
+    | Used by Stripe sync services and other i18n features.
+    | Format: comma-separated list (e.g., "en,pt_BR,es")
+    |
+    */
+
+    'locales' => explode(',', env('APP_LOCALES', 'en,pt_BR')),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locale Labels
+    |--------------------------------------------------------------------------
+    |
+    | Human-readable labels for each supported locale.
+    | Used in UI components like TranslatableInput.
+    |
+    */
+
+    'locale_labels' => [
+        'en' => 'English',
+        'pt_BR' => 'Português',
+        'es' => 'Español',
+        'fr' => 'Français',
+        'de' => 'Deutsch',
+        'it' => 'Italiano',
+        'ja' => '日本語',
+        'zh_CN' => '简体中文',
+        'zh_TW' => '繁體中文',
+        'ko' => '한국어',
+    ],
 
     /*
     |--------------------------------------------------------------------------

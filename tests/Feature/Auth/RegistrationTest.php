@@ -2,12 +2,10 @@
 
 namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_registration_screen_can_be_rendered()
     {
@@ -26,6 +24,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        // Fortify redirects to /home, which then redirects based on role
+        $response->assertRedirect(route('central.fortify.home', absolute: false));
     }
 }

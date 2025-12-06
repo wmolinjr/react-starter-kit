@@ -1,0 +1,236 @@
+<?php
+
+namespace App\Models\Central;
+
+use App\Models\Universal\Permission;
+use App\Traits\HasTenantTranslations;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Stancl\Tenancy\Database\Concerns\CentralConnection;
+
+/**
+ * Plan Model
+ *
+ * Represents subscription plans with features and limits.
+ * Supports multi-language translations with tenant customization.
+ *
+ * @property string $id
+ * @property array $name
+ * @property string $slug
+ * @property array|null $description
+ * @property int $price
+ * @property string $currency
+ * @property string $billing_period
+ * @property array|null $features
+ * @property array|null $limits
+ * @property array|null $permission_map
+ * @property bool $is_active
+ * @property bool $is_featured
+ * @property int $sort_order
+ */
+class Plan extends Model
+{
+    use CentralConnection, HasFactory, HasUuids;
+    use HasTenantTranslations;
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory(): \Database\Factories\PlanFactory
+    {
+        return \Database\Factories\PlanFactory::new();
+    }
+
+    /**
+     * Fields that support translations (Spatie Translatable).
+     */
+    public array $translatable = [
+        'name',
+        'description',
+    ];
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'price',
+        'currency',
+        'billing_period',
+        'stripe_product_id',
+        'stripe_price_id',
+        'paddle_price_id',
+        'features',
+        'limits',
+        'permission_map',
+        'is_active',
+        'is_featured',
+        'badge',
+        'icon',
+        'icon_color',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'price' => 'integer',
+        'features' => 'array',
+        'limits' => 'array',
+        'permission_map' => 'array',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'sort_order' => 'integer',
+    ];
+
+    public function tenants(): HasMany
+    {
+        return $this->hasMany(Tenant::class);
+    }
+
+    /**
+     * Addons available for this plan
+     */
+    public function addons(): BelongsToMany
+    {
+        return $this->belongsToMany(Addon::class, 'addon_plan')
+            ->withPivot([
+                'price_override_monthly',
+                'price_override_yearly',
+                'price_override_one_time',
+                'discount_percent',
+                'included',
+                'active',
+            ])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get active addons available for this plan
+     */
+    public function availableAddons(): BelongsToMany
+    {
+        return $this->addons()->wherePivot('active', true);
+    }
+
+    /**
+     * Check if plan has a specific feature
+     */
+    public function hasFeature(string $feature): bool
+    {
+        return $this->features[$feature] ?? false;
+    }
+
+    /**
+     * Get limit for a resource (-1 = unlimited)
+     */
+    public function getLimit(string $resource): int
+    {
+        return $this->limits[$resource] ?? 0;
+    }
+
+    /**
+     * Check if limit is unlimited
+     */
+    public function isUnlimited(string $resource): bool
+    {
+        return $this->getLimit($resource) === -1;
+    }
+
+    /**
+     * ⭐ Get permissions that should be enabled for a feature
+     */
+    public function getPermissionsForFeature(string $feature): array
+    {
+        return $this->permission_map[$feature] ?? [];
+    }
+
+    /**
+     * ⭐ Get all permissions enabled by this plan
+     */
+    public function getAllEnabledPermissions(): array
+    {
+        $permissions = [];
+
+        foreach ($this->features ?? [] as $feature => $enabled) {
+            if ($enabled) {
+                $featurePermissions = $this->getPermissionsForFeature($feature);
+                $permissions = array_merge($permissions, $featurePermissions);
+            }
+        }
+
+        return array_unique($permissions);
+    }
+
+    /**
+     * ⭐ Expand wildcard permissions
+     * "tenant.roles:*" → all roles permissions
+     */
+    public function expandPermissions(array $permissions): array
+    {
+        $expanded = [];
+
+        foreach ($permissions as $permission) {
+            if (str_ends_with($permission, ':*')) {
+                // Wildcard: get all permissions for this category
+                $category = str_replace(':*', '', $permission);
+                $categoryPermissions = Permission::where('name', 'like', "{$category}:%")
+                    ->pluck('name')
+                    ->toArray();
+                $expanded = array_merge($expanded, $categoryPermissions);
+            } else {
+                $expanded[] = $permission;
+            }
+        }
+
+        return array_unique($expanded);
+    }
+
+    /**
+     * Get formatted price using configured currency
+     */
+    public function getFormattedPriceAttribute(): string
+    {
+        if ($this->price === 0) {
+            return 'Custom';
+        }
+
+        return format_stripe_price($this->price, $this->currency);
+    }
+
+    /**
+     * Scopes
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order');
+    }
+
+    /**
+     * Get plan data for API/frontend with translations.
+     */
+    public function toTranslatedArray(?int $tenantId = null): array
+    {
+        return [
+            'id' => $this->id,
+            'slug' => $this->slug,
+            'name' => $this->trans('name'),
+            'description' => $this->trans('description'),
+            'price' => $this->price,
+            'formatted_price' => $this->formatted_price,
+            'currency' => $this->currency,
+            'billing_period' => $this->billing_period,
+            'features' => $this->features,
+            'limits' => $this->limits,
+            'is_active' => $this->is_active,
+            'is_featured' => $this->is_featured,
+            'sort_order' => $this->sort_order,
+            'has_override' => $tenantId ? $this->hasTenantOverride('name', $tenantId) : false,
+        ];
+    }
+}

@@ -1,0 +1,211 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Providers;
+
+use App\Jobs\SeedTenantDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Stancl\JobPipeline\JobPipeline;
+use Stancl\Tenancy\Events;
+use Stancl\Tenancy\Jobs;
+use Stancl\Tenancy\Listeners;
+use Stancl\Tenancy\Middleware;
+
+/**
+ * TenancyServiceProvider
+ *
+ * MULTI-DATABASE TENANCY:
+ * - Each tenant gets a dedicated PostgreSQL database
+ * - DatabaseTenancyBootstrapper switches to tenant database on initialization
+ * - Tenant database is created, migrated, and seeded on tenant creation
+ *
+ * CONFIGURATION:
+ * - TENANCY_DB_BOOTSTRAPPER=true (default): Multi-database mode
+ * - TENANCY_DB_BOOTSTRAPPER=false: Single-database mode (for tests)
+ */
+class TenancyServiceProvider extends ServiceProvider
+{
+    public static string $controllerNamespace = '';
+
+    /**
+     * Check if multi-database tenancy is enabled.
+     */
+    protected function isMultiDatabaseEnabled(): bool
+    {
+        return (bool) env('TENANCY_DB_BOOTSTRAPPER', true);
+    }
+
+    public function events()
+    {
+        // Database jobs only run in multi-database mode
+        $tenantCreatedListeners = [];
+        $tenantDeletedListeners = [];
+
+        if ($this->isMultiDatabaseEnabled()) {
+            $tenantCreatedListeners = [
+                JobPipeline::make([
+                    Jobs\CreateDatabase::class,
+                    Jobs\MigrateDatabase::class,
+                    SeedTenantDatabase::class,
+                ])->send(function (Events\TenantCreated $event) {
+                    return $event->tenant;
+                })->shouldBeQueued(false), // Sync for MVP, make true for production
+            ];
+
+            $tenantDeletedListeners = [
+                JobPipeline::make([
+                    Jobs\DeleteDatabase::class,
+                ])->send(function (Events\TenantDeleted $event) {
+                    return $event->tenant;
+                })->shouldBeQueued(false),
+            ];
+        }
+
+        // Bootstrappers only run in multi-database mode
+        $tenancyInitializedListeners = $this->isMultiDatabaseEnabled()
+            ? [Listeners\BootstrapTenancy::class]
+            : [];
+
+        $tenancyEndedListeners = $this->isMultiDatabaseEnabled()
+            ? [Listeners\RevertToCentralContext::class]
+            : [];
+
+        return [
+            // Tenant events
+            Events\CreatingTenant::class => [],
+            Events\TenantCreated::class => $tenantCreatedListeners,
+            Events\SavingTenant::class => [],
+            Events\TenantSaved::class => [],
+            Events\UpdatingTenant::class => [],
+            Events\TenantUpdated::class => [],
+            Events\DeletingTenant::class => [],
+            Events\TenantDeleted::class => $tenantDeletedListeners,
+
+            // Domain events
+            Events\CreatingDomain::class => [],
+            Events\DomainCreated::class => [],
+            Events\SavingDomain::class => [],
+            Events\DomainSaved::class => [],
+            Events\UpdatingDomain::class => [],
+            Events\DomainUpdated::class => [],
+            Events\DeletingDomain::class => [],
+            Events\DomainDeleted::class => [],
+
+            // Database events
+            Events\DatabaseCreated::class => [],
+            Events\DatabaseMigrated::class => [],
+            Events\DatabaseSeeded::class => [],
+            Events\DatabaseRolledBack::class => [],
+            Events\DatabaseDeleted::class => [],
+
+            // Tenancy events
+            Events\InitializingTenancy::class => [],
+            Events\TenancyInitialized::class => $tenancyInitializedListeners,
+            Events\EndingTenancy::class => [],
+            Events\TenancyEnded::class => $tenancyEndedListeners,
+
+            Events\BootstrappingTenancy::class => [],
+            Events\TenancyBootstrapped::class => [
+                // Configure Spatie Permission cache key per tenant database
+                function (Events\TenancyBootstrapped $event) {
+                    $tenantKey = $event->tenancy->tenant->getTenantKey();
+                    $permissionRegistrar = app(\Spatie\Permission\PermissionRegistrar::class);
+                    $permissionRegistrar->cacheKey = 'spatie.permission.cache.tenant.' . $tenantKey;
+                },
+            ],
+            Events\RevertingToCentralContext::class => [],
+            Events\RevertedToCentralContext::class => [
+                // Reset Spatie Permission cache key when leaving tenant context
+                function (Events\RevertedToCentralContext $event) {
+                    $permissionRegistrar = app(\Spatie\Permission\PermissionRegistrar::class);
+                    $permissionRegistrar->cacheKey = 'spatie.permission.cache';
+                },
+            ],
+
+            // Resource syncing
+            Events\SyncedResourceSaved::class => [
+                Listeners\UpdateSyncedResource::class,
+            ],
+            Events\SyncedResourceChangedInForeignDatabase::class => [],
+        ];
+    }
+
+    public function register()
+    {
+        //
+    }
+
+    public function boot()
+    {
+        $this->bootEvents();
+        $this->mapRoutes();
+
+        $this->makeTenancyMiddlewareHighestPriority();
+
+        // Configure InitializeTenancyByDomain to handle failures gracefully
+        // This covers: central domains, already initialized tenancy, or unknown domains
+        Middleware\InitializeTenancyByDomain::$onFail = function ($exception, $request, $next) {
+            // If tenancy is already initialized (e.g., manually in tests), continue
+            if (tenancy()->initialized) {
+                return $next($request);
+            }
+
+            // For central domains or unknown domains, just continue without tenant context
+            return $next($request);
+        };
+
+        // Configure ScopeSessions to handle session hijacking attempts gracefully
+        // v4 feature: Prevents a session from one tenant being used on another tenant
+        Middleware\ScopeSessions::$onFail = function ($request) {
+            // Clear the compromised session
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // Redirect to login with error message
+            return redirect()->route('login')
+                ->with('error', __('Your session has expired. Please log in again.'));
+        };
+    }
+
+    protected function bootEvents()
+    {
+        foreach ($this->events() as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if ($listener instanceof JobPipeline) {
+                    $listener = $listener->toListener();
+                }
+
+                Event::listen($event, $listener);
+            }
+        }
+    }
+
+    protected function mapRoutes()
+    {
+        $this->app->booted(function () {
+            if (file_exists(base_path('routes/tenant.php'))) {
+                Route::namespace(static::$controllerNamespace)
+                    ->group(base_path('routes/tenant.php'));
+            }
+        });
+    }
+
+    protected function makeTenancyMiddlewareHighestPriority()
+    {
+        $tenancyMiddleware = [
+            Middleware\PreventAccessFromUnwantedDomains::class,
+            Middleware\InitializeTenancyByDomain::class,
+            Middleware\InitializeTenancyBySubdomain::class,
+            Middleware\InitializeTenancyByDomainOrSubdomain::class,
+            Middleware\InitializeTenancyByPath::class,
+            Middleware\InitializeTenancyByRequestData::class,
+        ];
+
+        foreach (array_reverse($tenancyMiddleware) as $middleware) {
+            $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
+        }
+    }
+}

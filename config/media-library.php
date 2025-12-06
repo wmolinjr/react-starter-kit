@@ -6,7 +6,7 @@ return [
      * The disk on which to store added files and derived images by default. Choose
      * one or more of the disks you've configured in config/filesystems.php.
      */
-    'disk_name' => env('MEDIA_DISK', 'tenant-media'),
+    'disk_name' => env('MEDIA_DISK', 'public'),
 
     /*
      * The maximum file size of an item in bytes.
@@ -39,7 +39,7 @@ return [
     /*
      * The fully qualified class name of the media model.
      */
-    'media_model' => App\Models\Media::class,
+    'media_model' => App\Models\Tenant\Media::class,
 
     /*
      * The fully qualified class name of the media observer.
@@ -81,7 +81,7 @@ return [
     /*
      * The class that contains the strategy for determining a media file's path.
      */
-    'path_generator' => App\Support\MediaLibrary\TenantPathGenerator::class,
+    'path_generator' => App\Support\TenantPathGenerator::class,
 
     /*
      * The class that contains the strategy for determining how to remove files.
@@ -98,10 +98,15 @@ return [
     ],
 
     /*
-     * When urls to files get generated, this class will be called. Use the default
-     * if your files are stored locally above the site root or on s3.
+     * When urls to files get generated, this class will be called.
+     *
+     * MULTI-DATABASE TENANCY:
+     * Uses TenantAwareUrlGenerator to generate URLs via asset() helper,
+     * ensuring correct URLs across different tenant domains.
+     *
+     * @see https://v4.tenancyforlaravel.com/integrations/spatie
      */
-    'url_generator' => Spatie\MediaLibrary\Support\UrlGenerator\DefaultUrlGenerator::class,
+    'url_generator' => App\Support\TenantAwareUrlGenerator::class,
 
     /*
      * Moves media on updating to keep path consistent. Enable it only with a custom

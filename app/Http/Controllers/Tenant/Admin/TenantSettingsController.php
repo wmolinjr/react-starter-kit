@@ -1,0 +1,220 @@
+<?php
+
+namespace App\Http\Controllers\Tenant\Admin;
+
+use App\Enums\TenantPermission;
+use App\Exceptions\SettingsException;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Tenant\AddDomainRequest;
+use App\Http\Requests\Tenant\UpdateBrandingRequest;
+use App\Services\Tenant\TenantSettingsService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class TenantSettingsController extends Controller implements HasMiddleware
+{
+    public function __construct(
+        protected TenantSettingsService $settingsService
+    ) {}
+
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            // View permissions
+            new Middleware('permission:'.TenantPermission::SETTINGS_VIEW->value, only: ['index', 'branding', 'domains', 'language']),
+            new Middleware('permission:'.TenantPermission::API_TOKENS_VIEW->value, only: ['apiTokens']),
+            new Middleware('permission:'.TenantPermission::SETTINGS_DANGER->value, only: ['danger']),
+
+            // Edit permissions
+            new Middleware('permission:'.TenantPermission::SETTINGS_EDIT->value, only: ['updateBranding', 'addDomain', 'removeDomain', 'updateFeatures', 'updateNotifications', 'updateLanguage']),
+            new Middleware('permission:'.TenantPermission::SETTINGS_DANGER->value, only: ['destroy']),
+        ];
+    }
+
+    /**
+     * Display tenant settings page.
+     */
+    public function index(): Response
+    {
+        $tenant = tenant();
+
+        return Inertia::render('tenant/admin/settings/index', [
+            'settings' => $this->settingsService->getAllSettings($tenant),
+            'domains' => $tenant->domains,
+        ]);
+    }
+
+    /**
+     * Display branding settings page.
+     */
+    public function branding(): Response
+    {
+        return Inertia::render('tenant/admin/settings/branding', [
+            'branding' => $this->settingsService->getBrandingSettings(tenant()),
+        ]);
+    }
+
+    /**
+     * Update branding settings.
+     */
+    public function updateBranding(UpdateBrandingRequest $request): RedirectResponse
+    {
+        $this->settingsService->updateBranding(tenant(), $request->validated());
+
+        return back()->with('success', __('flash.settings.branding_updated'));
+    }
+
+    /**
+     * Display domains management page.
+     */
+    public function domains(): Response
+    {
+        $config = $this->settingsService->getDomainsConfig(tenant());
+
+        return Inertia::render('tenant/admin/settings/domains', [
+            'domains' => $config['domains'],
+            'hasCustomDomainFeature' => $config['hasCustomDomainFeature'],
+        ]);
+    }
+
+    /**
+     * Add custom domain to tenant.
+     */
+    public function addDomain(AddDomainRequest $request): RedirectResponse
+    {
+        try {
+            $this->settingsService->addDomain(tenant(), $request->validated()['domain']);
+
+            return back()->with('success', __('flash.settings.domain_added'));
+        } catch (SettingsException $e) {
+            throw ValidationException::withMessages([
+                'domain' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Remove custom domain from tenant.
+     */
+    public function removeDomain(Request $request, $domainId): RedirectResponse
+    {
+        try {
+            $this->settingsService->removeDomain(tenant(), $domainId);
+
+            return back()->with('success', __('flash.settings.domain_removed'));
+        } catch (SettingsException $e) {
+            throw ValidationException::withMessages([
+                'domain' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Update tenant features.
+     */
+    public function updateFeatures(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'api_enabled' => 'boolean',
+            'two_factor_required' => 'boolean',
+        ]);
+
+        $this->settingsService->updateFeatures(tenant(), $request->only([
+            'api_enabled',
+            'two_factor_required',
+        ]));
+
+        return back()->with('success', __('flash.settings.features_updated'));
+    }
+
+    /**
+     * Update notification settings.
+     */
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email_digest' => 'in:never,daily,weekly,monthly',
+            'slack_webhook' => 'nullable|url',
+        ]);
+
+        $this->settingsService->updateNotifications(tenant(), $request->only([
+            'email_digest',
+            'slack_webhook',
+        ]));
+
+        return back()->with('success', __('flash.settings.notifications_updated'));
+    }
+
+    /**
+     * Display API tokens management page.
+     */
+    public function apiTokens(): Response
+    {
+        $user = auth()->user();
+
+        return Inertia::render('tenant/admin/settings/api-tokens', [
+            'tokens' => $user->tokens->map(fn ($token) => [
+                'id' => $token->id,
+                'name' => $token->name,
+                'abilities' => $token->abilities,
+                'last_used_at' => $token->last_used_at,
+                'created_at' => $token->created_at,
+            ]),
+        ]);
+    }
+
+    /**
+     * Display language settings page.
+     */
+    public function language(): Response
+    {
+        return Inertia::render('tenant/admin/settings/language', $this->settingsService->getLanguageSettings(tenant()));
+    }
+
+    /**
+     * Update language settings.
+     */
+    public function updateLanguage(Request $request): RedirectResponse
+    {
+        $availableLocales = config('app.locales');
+
+        $request->validate([
+            'language' => ['required', 'string', 'in:'.implode(',', $availableLocales)],
+        ]);
+
+        try {
+            $this->settingsService->updateLanguage(tenant(), $request->language);
+
+            return back()->with('success', __('tenant.settings.language_updated'));
+        } catch (SettingsException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Display danger zone page.
+     */
+    public function danger(): Response
+    {
+        return Inertia::render('tenant/admin/settings/danger');
+    }
+
+    /**
+     * Delete the tenant permanently.
+     */
+    public function destroy(): RedirectResponse
+    {
+        $this->settingsService->deleteTenant(tenant());
+
+        return redirect()->to(config('app.url'))
+            ->with('success', __('flash.tenant.organization_deleted'));
+    }
+}

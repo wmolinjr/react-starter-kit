@@ -1,0 +1,391 @@
+<?php
+
+namespace App\Enums;
+
+/**
+ * Plan Feature Enum
+ *
+ * Single source of truth for all plan features.
+ * Contains all metadata (name, description, permissions, etc.)
+ *
+ * Usage:
+ * - PlanFeature::values() - Get all feature keys as array
+ * - PlanFeature::CUSTOM_ROLES->value - Get feature key string
+ * - PlanFeature::CUSTOM_ROLES->name() - Get translatable name
+ * - PlanFeature::toFrontendArray() - Get data for frontend
+ * - PlanFeature::keyed() - Get keyed array for lookups
+ */
+enum PlanFeature: string
+{
+    case BASE = 'base';
+    case PROJECTS = 'projects';
+    case CUSTOM_ROLES = 'customRoles';
+    case API_ACCESS = 'apiAccess';
+    case ADVANCED_REPORTS = 'advancedReports';
+    case SSO = 'sso';
+    case WHITE_LABEL = 'whiteLabel';
+    case AUDIT_LOG = 'auditLog';
+    case PRIORITY_SUPPORT = 'prioritySupport';
+    case MULTI_LANGUAGE = 'multiLanguage';
+
+    /**
+     * Get translatable name.
+     *
+     * @return array<string, string>
+     */
+    public function name(): array
+    {
+        return match ($this) {
+            self::BASE => ['en' => 'Base Features', 'pt_BR' => 'Recursos Base'],
+            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
+            self::CUSTOM_ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Roles Personalizados'],
+            self::API_ACCESS => ['en' => 'API Access', 'pt_BR' => 'Acesso à API'],
+            self::ADVANCED_REPORTS => ['en' => 'Advanced Reports', 'pt_BR' => 'Relatórios Avançados'],
+            self::SSO => ['en' => 'Single Sign-On (SSO)', 'pt_BR' => 'Single Sign-On (SSO)'],
+            self::WHITE_LABEL => ['en' => 'White Label', 'pt_BR' => 'White Label'],
+            self::AUDIT_LOG => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria'],
+            self::PRIORITY_SUPPORT => ['en' => 'Priority Support', 'pt_BR' => 'Suporte Prioritário'],
+            self::MULTI_LANGUAGE => ['en' => 'Multi-Language', 'pt_BR' => 'Multi-Idioma'],
+        };
+    }
+
+    /**
+     * Get translatable description.
+     *
+     * @return array<string, string>
+     */
+    public function description(): array
+    {
+        return match ($this) {
+            self::BASE => [
+                'en' => 'Core team and settings management features',
+                'pt_BR' => 'Recursos básicos de gerenciamento de equipe e configurações',
+            ],
+            self::PROJECTS => [
+                'en' => 'Create and manage projects with your team',
+                'pt_BR' => 'Crie e gerencie projetos com sua equipe',
+            ],
+            self::CUSTOM_ROLES => [
+                'en' => 'Create and manage custom roles with granular permissions',
+                'pt_BR' => 'Crie e gerencie roles personalizados com permissões granulares',
+            ],
+            self::API_ACCESS => [
+                'en' => 'Generate API tokens for external integrations',
+                'pt_BR' => 'Gere tokens de API para integrações externas',
+            ],
+            self::ADVANCED_REPORTS => [
+                'en' => 'Access advanced analytics and custom report builder',
+                'pt_BR' => 'Acesse análises avançadas e construtor de relatórios personalizados',
+            ],
+            self::SSO => [
+                'en' => 'Enable SAML/OIDC authentication for enterprise security',
+                'pt_BR' => 'Habilite autenticação SAML/OIDC para segurança empresarial',
+            ],
+            self::WHITE_LABEL => [
+                'en' => 'Customize branding, colors, and remove platform branding',
+                'pt_BR' => 'Personalize marca, cores e remova a marca da plataforma',
+            ],
+            self::AUDIT_LOG => [
+                'en' => 'Track all user actions and system events',
+                'pt_BR' => 'Rastreie todas as ações de usuários e eventos do sistema',
+            ],
+            self::PRIORITY_SUPPORT => [
+                'en' => '24/7 priority support with dedicated account manager',
+                'pt_BR' => 'Suporte prioritário 24/7 com gerente de conta dedicado',
+            ],
+            self::MULTI_LANGUAGE => [
+                'en' => 'Enable multiple language support for your users',
+                'pt_BR' => 'Habilite suporte a múltiplos idiomas para seus usuários',
+            ],
+        };
+    }
+
+    /**
+     * Get feature category key.
+     */
+    public function category(): string
+    {
+        return match ($this) {
+            self::BASE => 'other',
+            self::PROJECTS => 'modules',
+            self::CUSTOM_ROLES, self::SSO, self::AUDIT_LOG => 'security',
+            self::API_ACCESS => 'integration',
+            self::ADVANCED_REPORTS => 'analytics',
+            self::WHITE_LABEL, self::MULTI_LANGUAGE => 'customization',
+            self::PRIORITY_SUPPORT => 'support',
+        };
+    }
+
+    /**
+     * Get category label (translated).
+     */
+    public static function categoryLabel(string $category): array
+    {
+        return match ($category) {
+            'modules' => ['en' => 'Modules', 'pt_BR' => 'Módulos'],
+            'security' => ['en' => 'Security', 'pt_BR' => 'Segurança'],
+            'integration' => ['en' => 'Integration', 'pt_BR' => 'Integração'],
+            'analytics' => ['en' => 'Analytics', 'pt_BR' => 'Análises'],
+            'customization' => ['en' => 'Customization', 'pt_BR' => 'Personalização'],
+            'support' => ['en' => 'Support', 'pt_BR' => 'Suporte'],
+            'collaboration' => ['en' => 'Collaboration', 'pt_BR' => 'Colaboração'],
+            'other' => ['en' => 'Other', 'pt_BR' => 'Outros'],
+            default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)],
+        };
+    }
+
+    /**
+     * Get translated category label.
+     */
+    public static function categoryTrans(string $category, ?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $labels = self::categoryLabel($category);
+        return $labels[$locale] ?? $labels['en'];
+    }
+
+    /**
+     * Get all unique categories with labels.
+     */
+    public static function categories(): array
+    {
+        $categories = [];
+        foreach (self::cases() as $feature) {
+            $cat = $feature->category();
+            if (!isset($categories[$cat])) {
+                $categories[$cat] = [
+                    'value' => $cat,
+                    'label' => self::categoryTrans($cat),
+                ];
+            }
+        }
+        return array_values($categories);
+    }
+
+    /**
+     * Get Lucide icon name.
+     */
+    public function icon(): string
+    {
+        return match ($this) {
+            self::BASE => 'Settings',
+            self::PROJECTS => 'Folder',
+            self::CUSTOM_ROLES => 'Shield',
+            self::API_ACCESS => 'Key',
+            self::ADVANCED_REPORTS => 'BarChart3',
+            self::SSO => 'KeyRound',
+            self::WHITE_LABEL => 'Palette',
+            self::AUDIT_LOG => 'FileText',
+            self::PRIORITY_SUPPORT => 'Headphones',
+            self::MULTI_LANGUAGE => 'Globe',
+        };
+    }
+
+    /**
+     * Get permissions enabled by this feature.
+     *
+     * @return string[]
+     */
+    public function permissions(): array
+    {
+        return match ($this) {
+            self::BASE => [
+                TenantPermission::TEAM_VIEW->value,
+                TenantPermission::TEAM_INVITE->value,
+                TenantPermission::TEAM_REMOVE->value,
+                TenantPermission::TEAM_MANAGE_ROLES->value,
+                TenantPermission::TEAM_ACTIVITY->value,
+                TenantPermission::SETTINGS_VIEW->value,
+                TenantPermission::SETTINGS_EDIT->value,
+                TenantPermission::SETTINGS_DANGER->value,
+                TenantPermission::BILLING_VIEW->value,
+                TenantPermission::BILLING_MANAGE->value,
+                TenantPermission::BILLING_INVOICES->value,
+            ],
+            self::PROJECTS => [
+                TenantPermission::PROJECTS_VIEW->value,
+                TenantPermission::PROJECTS_CREATE->value,
+                TenantPermission::PROJECTS_EDIT->value,
+                TenantPermission::PROJECTS_EDIT_OWN->value,
+                TenantPermission::PROJECTS_DELETE->value,
+                TenantPermission::PROJECTS_UPLOAD->value,
+                TenantPermission::PROJECTS_DOWNLOAD->value,
+                TenantPermission::PROJECTS_ARCHIVE->value,
+            ],
+            self::CUSTOM_ROLES => [
+                TenantPermission::ROLES_VIEW->value,
+                TenantPermission::ROLES_CREATE->value,
+                TenantPermission::ROLES_EDIT->value,
+                TenantPermission::ROLES_DELETE->value,
+            ],
+            self::API_ACCESS => [
+                TenantPermission::API_TOKENS_VIEW->value,
+                TenantPermission::API_TOKENS_CREATE->value,
+                TenantPermission::API_TOKENS_DELETE->value,
+            ],
+            self::ADVANCED_REPORTS => [
+                TenantPermission::REPORTS_VIEW->value,
+                TenantPermission::REPORTS_EXPORT->value,
+                TenantPermission::REPORTS_SCHEDULE->value,
+                TenantPermission::REPORTS_CUSTOMIZE->value,
+            ],
+            self::SSO => [
+                TenantPermission::SSO_CONFIGURE->value,
+                TenantPermission::SSO_MANAGE->value,
+                TenantPermission::SSO_TEST_CONNECTION->value,
+            ],
+            self::WHITE_LABEL => [
+                TenantPermission::BRANDING_VIEW->value,
+                TenantPermission::BRANDING_EDIT->value,
+                TenantPermission::BRANDING_PREVIEW->value,
+                TenantPermission::BRANDING_PUBLISH->value,
+            ],
+            self::AUDIT_LOG => [
+                TenantPermission::AUDIT_VIEW->value,
+                TenantPermission::AUDIT_EXPORT->value,
+            ],
+            self::PRIORITY_SUPPORT => [],
+            self::MULTI_LANGUAGE => [
+                TenantPermission::LOCALES_VIEW->value,
+                TenantPermission::LOCALES_MANAGE->value,
+            ],
+        };
+    }
+
+    /**
+     * Whether this feature can be customized by tenants.
+     */
+    public function isCustomizable(): bool
+    {
+        return match ($this) {
+            self::BASE, self::SSO, self::WHITE_LABEL => false,
+            default => true,
+        };
+    }
+
+    /**
+     * Sort order for display.
+     */
+    public function sortOrder(): int
+    {
+        return match ($this) {
+            self::BASE => -1,
+            self::PROJECTS => 0,
+            self::CUSTOM_ROLES => 1,
+            self::API_ACCESS => 2,
+            self::ADVANCED_REPORTS => 3,
+            self::SSO => 4,
+            self::WHITE_LABEL => 5,
+            self::AUDIT_LOG => 6,
+            self::PRIORITY_SUPPORT => 7,
+            self::MULTI_LANGUAGE => 8,
+        };
+    }
+
+    /**
+     * Get all feature keys as array.
+     *
+     * @return string[]
+     */
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+
+    /**
+     * Get features that should be shared with frontend.
+     * Excludes 'base' which is always true.
+     *
+     * @return string[]
+     */
+    public static function frontendFeatures(): array
+    {
+        return array_filter(
+            self::values(),
+            fn ($feature) => $feature !== 'base'
+        );
+    }
+
+    /**
+     * Check if a feature key exists.
+     */
+    public static function exists(string $key): bool
+    {
+        return self::tryFrom($key) !== null;
+    }
+
+    /**
+     * Get translated name for current locale.
+     */
+    public function translatedName(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $names = $this->name();
+
+        return $names[$locale] ?? $names['en'] ?? $this->value;
+    }
+
+    /**
+     * Get translated description for current locale.
+     */
+    public function translatedDescription(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $descriptions = $this->description();
+
+        return $descriptions[$locale] ?? $descriptions['en'] ?? '';
+    }
+
+    /**
+     * Convert single feature to frontend format.
+     *
+     * @return array<string, mixed>
+     */
+    public function toFrontend(?string $locale = null): array
+    {
+        return [
+            'key' => $this->value,
+            'name' => $this->translatedName($locale),
+            'description' => $this->translatedDescription($locale),
+            'category' => $this->category(),
+            'icon' => $this->icon(),
+            'permissions' => $this->permissions(),
+            'is_customizable' => $this->isCustomizable(),
+        ];
+    }
+
+    /**
+     * Convert all features to frontend array format.
+     * Sorted by sortOrder.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function toFrontendArray(?string $locale = null): array
+    {
+        $features = array_map(
+            fn (self $f) => $f->toFrontend($locale) + ['sort_order' => $f->sortOrder()],
+            self::cases()
+        );
+
+        usort($features, fn ($a, $b) => $a['sort_order'] <=> $b['sort_order']);
+
+        return array_map(function ($f) {
+            unset($f['sort_order']);
+
+            return $f;
+        }, $features);
+    }
+
+    /**
+     * Get all features as a keyed collection (by feature key).
+     *
+     * @return array<string, self>
+     */
+    public static function keyed(): array
+    {
+        return array_combine(
+            array_column(self::cases(), 'value'),
+            self::cases()
+        );
+    }
+}

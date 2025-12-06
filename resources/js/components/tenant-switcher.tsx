@@ -1,3 +1,6 @@
+import { Building2, Check, ChevronsUpDown } from 'lucide-react';
+import { useTenant } from '@/hooks/use-tenant';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,117 +9,68 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
-} from '@/components/ui/sidebar';
-import { useIsMobile } from '@/hooks/use-mobile';
-import tenants from '@/routes/tenants';
-import { type SharedData } from '@/types';
-import { router, usePage } from '@inertiajs/react';
-import { Building2, Check, ChevronsUpDown, Plus, Settings } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function TenantSwitcher() {
-    const { tenant, tenants: tenantsList } = usePage<SharedData>().props;
-    const { state } = useSidebar();
-    const isMobile = useIsMobile();
+    const { tenant, tenants, hasTenant } = useTenant();
 
-    const handleSwitch = (slug: string) => {
-        // Navigate to tenant subdomain
-        // EnsureTenantAccess middleware will automatically update current_tenant_id
-        const protocol = window.location.protocol;
-        const domain = window.location.hostname.split('.').slice(-1)[0]; // Get base domain (localhost or production domain)
-        const tenantUrl = `${protocol}//${slug}.${domain}`;
-
-        window.location.href = tenantUrl;
-    };
-
-    if (!tenantsList || tenantsList.length === 0) {
+    if (!hasTenant) {
         return null;
     }
 
+    const handleTenantSwitch = (slug: string) => {
+        // Redirect to the tenant's domain
+        const protocol = window.location.protocol;
+        const port = window.location.port ? `:${window.location.port}` : '';
+        const baseDomain = window.location.hostname.split('.').slice(-2).join('.');
+
+        // Build the new URL: protocol://slug.basedomain:port/dashboard
+        const newUrl = `${protocol}//${slug}.${baseDomain}${port}/dashboard`;
+
+        // Use full page reload to reinitialize tenant context
+        // eslint-disable-next-line react-hooks/immutability
+        window.location.href = newUrl;
+    };
+
     return (
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton
-                            size="lg"
-                            className="group data-[state=open]:bg-sidebar-accent"
-                        >
-                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                <Building2 className="size-4" />
-                            </div>
-                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">
-                                    {tenant ? tenant.name : 'No Workspace'}
-                                </span>
-                                <span className="truncate text-xs text-muted-foreground">
-                                    {tenant ? tenant.slug : 'Select a workspace'}
-                                </span>
-                            </div>
-                            <ChevronsUpDown className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                        align="start"
-                        side={
-                            isMobile
-                                ? 'bottom'
-                                : state === 'collapsed'
-                                  ? 'right'
-                                  : 'bottom'
-                        }
-                        sideOffset={4}
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                >
+                    <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 shrink-0 opacity-50" />
+                        <span className="truncate">{tenant?.name || 'Select Tenant'}</span>
+                    </div>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[240px]" align="start">
+                <DropdownMenuLabel>Switch Tenant</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {tenants.map((t) => (
+                    <DropdownMenuItem
+                        key={t.id}
+                        onSelect={() => {
+                            if (!t.is_current) {
+                                handleTenantSwitch(t.slug);
+                            }
+                        }}
+                        className={cn(
+                            'flex items-center justify-between cursor-pointer',
+                            t.is_current && 'bg-accent'
+                        )}
                     >
-                        <DropdownMenuLabel className="text-xs text-muted-foreground">
-                            Workspaces
-                        </DropdownMenuLabel>
-                        {tenantsList.map((t) => (
-                            <DropdownMenuItem
-                                key={t.id}
-                                onClick={() => handleSwitch(t.slug)}
-                                className="gap-2 p-2"
-                            >
-                                <div className="flex size-6 items-center justify-center rounded-sm border">
-                                    <Building2 className="size-4 shrink-0" />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="font-medium">{t.name}</div>
-                                    <div className="text-xs text-muted-foreground">{t.slug}</div>
-                                </div>
-                                {tenant?.id === t.id && <Check className="size-4 ml-auto" />}
-                            </DropdownMenuItem>
-                        ))}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <a
-                                href={tenants.index().url}
-                                className="gap-2 p-2"
-                            >
-                                <div className="flex size-6 items-center justify-center rounded-sm border border-dashed">
-                                    <Settings className="size-4" />
-                                </div>
-                                Manage Workspaces
-                            </a>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <a
-                                href={tenants.create().url}
-                                className="gap-2 p-2"
-                            >
-                                <div className="flex size-6 items-center justify-center rounded-sm border border-dashed">
-                                    <Plus className="size-4" />
-                                </div>
-                                Create Workspace
-                            </a>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
+                        <div className="flex flex-col">
+                            <span className="font-medium">{t.name}</span>
+                            <span className="text-xs text-muted-foreground">{t.role}</span>
+                        </div>
+                        {t.is_current && <Check className="h-4 w-4" />}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

@@ -1,0 +1,178 @@
+import { Head, router } from '@inertiajs/react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Page,
+    PageHeader,
+    PageHeaderContent,
+    PageHeaderActions,
+    PageTitle,
+    PageDescription,
+    PageContent,
+} from '@/components/page';
+import CentralAdminLayout from '@/layouts/central-admin-layout';
+import admin from '@/routes/central/admin';
+import { CheckCircle, RefreshCw, XCircle } from 'lucide-react';
+import { AddonForm } from './components/addon-form';
+import { type BreadcrumbItem } from '@/types';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { type BadgePreset } from '@/components/badge-selector';
+import { Translations } from '@/components/translatable-input';
+
+interface Addon {
+    id: string;
+    slug: string;
+    name: Translations;
+    name_display: string;
+    description: Translations | null;
+    type: string;
+    category: string;
+    active: boolean;
+    sort_order: number;
+    limit_key: string | null;
+    unit_value: number | null;
+    unit_label: Translations | null;
+    min_quantity: number;
+    max_quantity: number | null;
+    stackable: boolean;
+    price_monthly: number | null;
+    price_yearly: number | null;
+    price_one_time: number | null;
+    validity_months: number | null;
+    stripe_product_id: string | null;
+    stripe_price_monthly_id: string | null;
+    stripe_price_yearly_id: string | null;
+    stripe_price_one_time_id: string | null;
+    icon: string;
+    icon_color: string | null;
+    badge: string | null;
+    is_synced: boolean;
+    plan_ids: string[];
+    features: Record<string, boolean>;
+}
+
+interface FeatureDefinition {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    category: string | null;
+    icon: string | null;
+}
+
+interface LimitDefinition {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    unit: string | null;
+    unit_label: string | null;
+    default_value: number;
+    allows_unlimited: boolean;
+    icon: string | null;
+}
+
+interface CategoryOption {
+    value: string;
+    label: string;
+}
+
+interface Props {
+    addon: Addon;
+    types: { value: string; label: string }[];
+    plans: { id: string; name: string; slug: string }[];
+    featureDefinitions: FeatureDefinition[];
+    limitDefinitions: LimitDefinition[];
+    categories: CategoryOption[];
+    badgePresets: BadgePreset[];
+}
+
+export default function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+    const { t } = useLaravelReactI18n();
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('breadcrumbs.addon_catalog'), href: admin.catalog.index.url() },
+        { title: addon.name_display, href: admin.catalog.edit.url(addon.id) },
+    ];
+
+    const handleSync = () => {
+        router.post(`/admin/catalog/${addon.id}/sync`);
+    };
+
+    return (
+        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+            <Head title={`${t('admin.catalog.edit_addon')}: ${addon.name_display}`} />
+
+            <Page>
+                <PageHeader>
+                    <PageHeaderContent>
+                        <PageTitle>{t('admin.catalog.edit_addon')}</PageTitle>
+                        <PageDescription>{addon.slug}</PageDescription>
+                    </PageHeaderContent>
+                    <PageHeaderActions>
+                        <Button variant="outline" onClick={handleSync}>
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            {t('admin.catalog.sync_with_stripe')}
+                        </Button>
+                    </PageHeaderActions>
+                </PageHeader>
+
+                <PageContent>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('admin.catalog.stripe_integration')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-4">
+                                {addon.is_synced ? (
+                                    <Badge variant="default" className="bg-green-600">
+                                        <CheckCircle className="mr-1 h-3 w-3" />
+                                        {t('admin.catalog.synced')}
+                                    </Badge>
+                                ) : (
+                                    <Badge variant="secondary">
+                                        <XCircle className="mr-1 h-3 w-3" />
+                                        {t('admin.catalog.not_synced')}
+                                    </Badge>
+                                )}
+                                {addon.stripe_product_id && (
+                                    <span className="text-sm text-muted-foreground">
+                                        {t('admin.catalog.product')}: {addon.stripe_product_id}
+                                    </span>
+                                )}
+                            </div>
+                            {addon.stripe_price_monthly_id && (
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                    {t('admin.catalog.monthly_price')}: {addon.stripe_price_monthly_id}
+                                </p>
+                            )}
+                            {addon.stripe_price_yearly_id && (
+                                <p className="text-sm text-muted-foreground">
+                                    {t('admin.catalog.yearly_price')}: {addon.stripe_price_yearly_id}
+                                </p>
+                            )}
+                            {addon.stripe_price_one_time_id && (
+                                <p className="text-sm text-muted-foreground">
+                                    {t('admin.catalog.one_time_price')}: {addon.stripe_price_one_time_id}
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <AddonForm
+                        addon={addon}
+                        types={types}
+                        plans={plans}
+                        featureDefinitions={featureDefinitions}
+                        limitDefinitions={limitDefinitions}
+                        categories={categories}
+                        badgePresets={badgePresets}
+                        isEdit
+                    />
+                </PageContent>
+            </Page>
+        </CentralAdminLayout>
+    );
+}
