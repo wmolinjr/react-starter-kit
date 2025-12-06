@@ -92,11 +92,26 @@ sail artisan tenants:pending-clear --older-than-days=7
 ### Permissions & Roles
 
 ```bash
-# Sincronizar permissions (atualizar/criar)
+# Sincronizar permissions dos enums para o banco
 sail artisan permissions:sync
 
 # Limpar e recriar tudo
 sail artisan permissions:sync --fresh
+
+# Sincronizar permissions de um tenant específico
+sail artisan tenant:sync-permissions <tenant-id>
+
+# Sincronizar permissions de todos os tenants
+sail artisan tenant:sync-permissions --all
+
+# Só atualizar cache (não modifica banco do tenant)
+sail artisan tenant:sync-permissions --all --cache-only
+
+# Cleanup após downgrade (remove permissions não autorizadas)
+sail artisan tenant:sync-permissions --all --cleanup
+
+# Dry run (mostra o que seria alterado)
+sail artisan tenant:sync-permissions --all --dry-run
 ```
 
 ### Sail Configuration

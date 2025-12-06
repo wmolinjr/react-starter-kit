@@ -67,9 +67,8 @@ app/
 │   └── Billing/AddonWebhookController.php  # Stripe webhooks
 ├── Console/Commands/
 │   ├── SyncAddons.php         # addons:sync
-│   ├── MigrateOverridesToAddons.php # addons:migrate-overrides
 │   └── ReportMeteredUsage.php # billing:report-usage
-└── Exceptions/
+└── Exceptions/Central/
     ├── AddonException.php
     └── AddonLimitExceededException.php
 
@@ -301,9 +300,6 @@ sail artisan addons:sync
 
 # Sincronizar tenant específico
 sail artisan addons:sync --tenant=1
-
-# Migrar overrides existentes para addons
-sail artisan addons:migrate-overrides
 
 # Reportar uso metered para Stripe
 sail artisan billing:report-usage
