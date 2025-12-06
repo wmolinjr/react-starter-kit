@@ -7,5 +7,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - './.docker/php/conf.d/xdebug.ini:/etc/php/8.4/cli/conf.d/99-xdebug.ini'   
+      - './.docker/php/conf.d/xdebug.ini:/etc/php/8.4/cli/conf.d/99-xdebug.ini'
       - './.docker/php/conf.d/xdebug.ini:/etc/php/8.4/fpm/conf.d/99-xdebug.ini'
+
+  pgsql:
+    command: postgres -c max_connections=300

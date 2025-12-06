@@ -118,10 +118,14 @@ sail artisan tenant:sync-permissions --all --dry-run
 
 **Serviços**:
 - **App**: PHP 8.4 com Laravel (porta 80)
-- **PostgreSQL**: 18-alpine (porta 5432)
+- **PostgreSQL**: 18-alpine (porta 5432, max_connections=300)
 - **Redis**: alpine (porta 6379)
 - **Vite**: Dev server (porta 5173)
 - **Mailpit**: Email testing (SMTP 1025, Web UI http://localhost:8025)
+
+**Docker Overrides** (`docker-compose.override.yml`):
+- Xdebug configurado para debug remoto
+- PostgreSQL max_connections=300 (para testes paralelos)
 
 **Database (.env)**:
 ```env
@@ -620,10 +624,24 @@ const { hasFeature, hasReachedLimit } = usePlan();
 ## Testing
 
 ```bash
-sail artisan test                      # Run all tests
-sail artisan test --filter TestName   # Run specific test
-sail artisan migrate:fresh --seed     # Reset database and seed test users
+sail artisan test                           # Run all tests
+sail artisan test --filter TestName        # Run specific test
+sail artisan test --parallel               # Run tests in parallel (faster)
+sail artisan test --parallel --processes=20  # Run with 20 parallel processes (optimal)
+sail artisan migrate:fresh --seed          # Reset database and seed test users
 ```
+
+**Parallel Testing**: Tests run in parallel using ParaTest, creating isolated databases per process (`testing_1`, `testing_tenant_1`, etc.).
+
+| Processes | Time | Speedup |
+|-----------|------|---------|
+| 1 (sequential) | ~163s | - |
+| 8 | ~30s | 82% faster |
+| 16 | ~21s | 87% faster |
+| **20** | **~17s** | **90% faster** |
+| 32+ | ~18-21s | diminishing returns |
+
+**Recommended**: Use `--processes=20` for optimal performance (requires 300 PostgreSQL connections configured in `docker-compose.override.yml`).
 
 **Test Users** (created by seeders):
 

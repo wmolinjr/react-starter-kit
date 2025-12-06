@@ -61,6 +61,11 @@ return [
         | - 'testing': Central database (Central\User, tenants, plans, etc.)
         | - 'testing_tenant': Tenant database (Tenant\User, projects, etc.)
         |
+        | PARALLEL TESTING SUPPORT:
+        | When running `php artisan test --parallel`, Laravel sets TEST_TOKEN
+        | to a unique value per process (1, 2, 3, etc.). This creates isolated
+        | databases per process: testing_1, testing_tenant_1, etc.
+        |
         | This avoids PHP 8.4 SQLite transaction issues and properly tests
         | multi-database isolation.
         |
@@ -70,7 +75,7 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
-            'database' => 'testing',
+            'database' => 'testing'.(env('TEST_TOKEN') ? '_'.env('TEST_TOKEN') : ''),
             'username' => env('DB_USERNAME', 'sail'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
@@ -85,7 +90,7 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
-            'database' => 'testing_tenant',
+            'database' => 'testing_tenant'.(env('TEST_TOKEN') ? '_'.env('TEST_TOKEN') : ''),
             'username' => env('DB_USERNAME', 'sail'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),

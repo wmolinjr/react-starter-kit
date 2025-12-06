@@ -38,12 +38,20 @@ class Tenant extends Model implements TenantWithDatabase
      *
      * In tests with TENANCY_TESTING_DATABASE, all tenants use the same
      * testing_tenant database instead of dynamic tenant_{id} databases.
+     *
+     * PARALLEL TESTING SUPPORT:
+     * When TEST_TOKEN is set, uses testing_tenant_{token} for isolation.
      */
     protected static function booted(): void
     {
         static::creating(function (Tenant $tenant) {
             // In tests, use fixed testing database for all tenants
             if ($testingDb = env('TENANCY_TESTING_DATABASE')) {
+                // Support parallel testing: append TEST_TOKEN to database name
+                $testToken = env('TEST_TOKEN');
+                if ($testToken) {
+                    $testingDb = "testing_tenant_{$testToken}";
+                }
                 $tenant->setInternal('db_name', $testingDb);
             }
         });

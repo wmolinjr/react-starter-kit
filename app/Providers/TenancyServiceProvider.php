@@ -234,7 +234,12 @@ class TenancyServiceProvider extends ServiceProvider
      * This allows running multi-database tests without creating databases
      * dynamically for each test tenant.
      *
+     * PARALLEL TESTING SUPPORT:
+     * When TEST_TOKEN is set (parallel testing), uses testing_tenant_{token}
+     * to isolate each test process.
+     *
      * @see https://v4.tenancyforlaravel.com/customizing-databases
+     * @see https://laravel.com/docs/12.x/testing#running-tests-in-parallel
      */
     protected function configureTestingDatabase(): void
     {
@@ -242,6 +247,12 @@ class TenancyServiceProvider extends ServiceProvider
 
         if (! $testingDb) {
             return;
+        }
+
+        // Support parallel testing: append TEST_TOKEN to database name
+        $testToken = env('TEST_TOKEN');
+        if ($testToken) {
+            $testingDb = "testing_tenant_{$testToken}";
         }
 
         // Configure template_tenant_connection to use testing_tenant
