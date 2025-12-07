@@ -1,12 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-import AppearanceTabs from '@/components/appearance-tabs';
-import HeadingSmall from '@/components/heading-small';
-import { LanguageSelector } from '@/components/language-selector';
+import AppearanceTabs from '@/components/shared/settings/appearance-tabs';
+import HeadingSmall from '@/components/shared/typography/heading-small';
+import { LanguageSelector } from '@/components/shared/settings/language-selector';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
@@ -26,7 +26,7 @@ export default function Appearance() {
     ];
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.preferences.page_title')} />
 
             <CentralUserSettingsLayout>
@@ -57,6 +57,6 @@ export default function Appearance() {
                     <AppearanceTabs />
                 </div>
             </CentralUserSettingsLayout>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

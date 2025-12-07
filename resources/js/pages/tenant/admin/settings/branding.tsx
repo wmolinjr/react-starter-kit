@@ -10,12 +10,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowLeft, Palette, Upload } from 'lucide-react';
 import { FormEvent, useRef } from 'react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 interface Branding {
@@ -60,7 +60,7 @@ export default function BrandingSettings({ tenant: tenantData, branding }: Props
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Branding" />
 
             <Page>
@@ -255,6 +255,6 @@ export default function BrandingSettings({ tenant: tenantData, branding }: Props
                 </form>
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

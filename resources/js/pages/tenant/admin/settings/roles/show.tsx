@@ -2,10 +2,10 @@ import admin from '@/routes/tenant/admin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Trash2, Users, Shield, ArrowLeft } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import {
     Table,
@@ -81,7 +81,7 @@ export default function ShowRole({ role }: Props) {
     );
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={role.display_name} />
 
             <Page>
@@ -222,6 +222,6 @@ export default function ShowRole({ role }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

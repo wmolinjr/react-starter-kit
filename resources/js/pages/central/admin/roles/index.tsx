@@ -1,10 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Users, Shield, Eye } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -113,7 +113,7 @@ export default function RolesIndex({ centralRoles }: Props) {
     );
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.roles.title')} />
 
             <Page>
@@ -157,6 +157,6 @@ export default function RolesIndex({ centralRoles }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

@@ -9,15 +9,15 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
-import { DynamicIcon } from '@/components/dynamic-icon';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+} from '@/components/shared/layout/page';
+import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { create, destroy, sync, syncAll } from '@/routes/central/admin/plans';
 import { Head, Link, router } from '@inertiajs/react';
 import { Check, Pencil, Plus, RefreshCw, Trash2, Users, X } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
-import { type BadgePreset } from '@/components/badge-selector';
+import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn } from '@/lib/utils';
 
@@ -75,7 +75,7 @@ export default function PlansIndex({ plans, badgePresets }: Props) {
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.plans.title')} />
 
             <Page>
@@ -236,6 +236,6 @@ export default function PlansIndex({ plans, badgePresets }: Props) {
                 )}
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

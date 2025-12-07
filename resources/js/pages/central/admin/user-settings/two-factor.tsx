@@ -1,10 +1,10 @@
-import CentralTwoFactorSetupModal from '@/components/central-two-factor-setup-modal';
-import HeadingSmall from '@/components/heading-small';
-import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
+import CentralTwoFactorSetupModal from '@/components/central/dialogs/two-factor-setup-modal';
+import HeadingSmall from '@/components/shared/typography/heading-small';
+import TwoFactorRecoveryCodes from '@/components/shared/auth/two-factor-recovery-codes';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import { useTwoFactorAuth } from '@/hooks/shared/use-two-factor-auth';
+import AdminLayout from '@/layouts/central/admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
@@ -50,7 +50,7 @@ export default function TwoFactor({
     ];
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.two_factor.title')} />
             <CentralUserSettingsLayout>
                 <div className="space-y-6">
@@ -136,6 +136,6 @@ export default function TwoFactor({
                     />
                 </div>
             </CentralUserSettingsLayout>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

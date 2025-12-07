@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { TranslatableInput, Translations } from '@/components/translatable-input';
-import { useLocales } from '@/hooks/use-locales';
+import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
+import { useLocales } from '@/hooks/shared/use-locales';
 
 interface Permission {
     id: string;

@@ -1,12 +1,12 @@
 import { Head, router } from '@inertiajs/react';
 import type { FormDataConvertible } from '@inertiajs/core';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { PlanForm, type PlanData } from './components/plan-form';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem, type EnumOption } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import type { BadgePreset } from '@/components/badge-selector';
+import type { BadgePreset } from '@/components/central/forms/badge-selector';
 
 interface Addon {
     id: string;
@@ -63,7 +63,7 @@ export default function EditPlan({ plan, addons, featureDefinitions, limitDefini
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('admin.plans.edit_plan')}: ${plan.name_display}`} />
 
             <Page>
@@ -86,6 +86,6 @@ export default function EditPlan({ plan, addons, featureDefinitions, limitDefini
                     />
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

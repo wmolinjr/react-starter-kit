@@ -6,7 +6,7 @@ import {
   TriangleAlertIcon,
 } from 'lucide-react';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
-import { useAppearance } from '@/hooks/use-appearance';
+import { useAppearance } from '@/hooks/shared/use-appearance';
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { appearance } = useAppearance();

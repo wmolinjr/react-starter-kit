@@ -2,11 +2,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, KeyRound, Shield, User, Users } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useState } from 'react';
@@ -85,7 +85,7 @@ export default function ImpersonateTenant({ tenant, users }: Props) {
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('impersonation.impersonate_tenant')}: ${tenant.name}`} />
 
             <Page>
@@ -206,6 +206,6 @@ export default function ImpersonateTenant({ tenant, users }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

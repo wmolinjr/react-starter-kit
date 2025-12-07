@@ -1,8 +1,8 @@
-import TextLink from '@/components/text-link';
+import TextLink from '@/components/shared/typography/text-link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import { logout } from '@/routes/central/admin/auth';
 import { send } from '@/routes/central/admin/auth/verification';
 import { Form, Head } from '@inertiajs/react';
@@ -13,7 +13,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <CentralAdminLayout>
+        <AdminLayout>
             <Head title={t('Email verification')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -54,6 +54,6 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </CardContent>
                 </Card>
             </div>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

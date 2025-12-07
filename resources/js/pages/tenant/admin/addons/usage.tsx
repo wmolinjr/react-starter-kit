@@ -1,11 +1,11 @@
 import admin from '@/routes/tenant/admin';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UsageMeter } from '@/components/addons/usage-meter';
-import { useAddons } from '@/hooks/use-addons';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { UsageMeter } from '@/components/tenant/addons/usage-meter';
+import { useAddons } from '@/hooks/tenant/use-addons';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 export default function AddonsUsage() {
@@ -21,7 +21,7 @@ export default function AddonsUsage() {
     const meteredAddons = active.filter((addon) => addon.is_metered);
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.addons.usage')} />
 
             <Page>
@@ -61,6 +61,6 @@ export default function AddonsUsage() {
                     )}
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

@@ -1,5 +1,5 @@
-import HeadingSmall from '@/components/heading-small';
-import InputError from '@/components/input-error';
+import HeadingSmall from '@/components/shared/typography/heading-small';
+import InputError from '@/components/shared/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

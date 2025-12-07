@@ -1,10 +1,10 @@
-import HeadingSmall from '@/components/heading-small';
-import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
-import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
+import HeadingSmall from '@/components/shared/typography/heading-small';
+import TwoFactorRecoveryCodes from '@/components/shared/auth/two-factor-recovery-codes';
+import TwoFactorSetupModal from '@/components/tenant/dialogs/two-factor-setup-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import { useTwoFactorAuth } from '@/hooks/shared/use-two-factor-auth';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import TenantUserSettingsLayout from '@/layouts/tenant/user-settings-layout';
 import userSettings from '@/routes/tenant/admin/user-settings';
 import { type BreadcrumbItem } from '@/types';
@@ -48,7 +48,7 @@ export default function TwoFactor({
     ];
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.two_factor.title')} />
             <TenantUserSettingsLayout>
                 <div className="space-y-6">
@@ -135,6 +135,6 @@ export default function TwoFactor({
                     />
                 </div>
             </TenantUserSettingsLayout>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

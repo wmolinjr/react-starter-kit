@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
@@ -16,7 +16,7 @@ export default function AddonsSuccess({ addon_name, quantity, amount }: Props) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <TenantAdminLayout>
+        <AdminLayout>
             <Head title={t('tenant.addons.purchase_successful')} />
 
             <div className="flex items-center justify-center py-12">
@@ -53,6 +53,6 @@ export default function AddonsSuccess({ addon_name, quantity, amount }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

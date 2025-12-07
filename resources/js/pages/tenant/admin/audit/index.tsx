@@ -14,7 +14,7 @@ import {
     ChevronDown,
 } from 'lucide-react';
 
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +44,7 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
+} from '@/components/shared/layout/page';
 import {
     Pagination,
     PaginationContent,
@@ -278,7 +278,7 @@ export default function AuditLogIndex({
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.audit.page_title')} />
 
             <Page>
@@ -664,6 +664,6 @@ export default function AuditLogIndex({
                     )}
                 </DialogContent>
             </Dialog>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

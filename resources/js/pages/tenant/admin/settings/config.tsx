@@ -16,12 +16,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowLeft, Building2, Check, Clock, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 interface Props {
@@ -104,7 +104,7 @@ export default function ConfigSettings({
     }, [availableTimezones, timezoneSearch]);
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.config.title')} />
 
             <Page>
@@ -358,6 +358,6 @@ export default function ConfigSettings({
                     </form>
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

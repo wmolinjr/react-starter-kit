@@ -1,17 +1,17 @@
 import admin from '@/routes/tenant/admin';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
-import { useAddons } from '@/hooks/use-addons';
-import { usePurchase } from '@/hooks/use-purchase';
-import { AddonCard } from '@/components/addons/addon-card';
-import { ActiveAddonCard } from '@/components/addons/active-addon-card';
-import { PurchaseModal } from '@/components/addons/purchase-modal';
+import AdminLayout from '@/layouts/tenant/admin-layout';
+import { useAddons } from '@/hooks/tenant/use-addons';
+import { usePurchase } from '@/hooks/tenant/use-purchase';
+import { AddonCard } from '@/components/tenant/addons/addon-card';
+import { ActiveAddonCard } from '@/components/tenant/addons/active-addon-card';
+import { PurchaseModal } from '@/components/tenant/addons/purchase-modal';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import type { AddonCatalogItem } from '@/types/addons';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 export default function AddonsIndex() {
@@ -44,7 +44,7 @@ export default function AddonsIndex() {
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Add-ons" />
 
             <Page>
@@ -109,6 +109,6 @@ export default function AddonsIndex() {
                 onConfirm={handleModalConfirm}
                 isPurchasing={isPurchasing}
             />
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

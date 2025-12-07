@@ -2,10 +2,10 @@ import admin from '@/routes/tenant/admin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Users, Shield, Eye, Info } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -68,7 +68,7 @@ export default function RolesIndex({ roles, planInfo }: Props) {
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('roles.title')} />
 
             <Page>
@@ -230,6 +230,6 @@ export default function RolesIndex({ roles, planInfo }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

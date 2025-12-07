@@ -7,11 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { TranslatableInput, Translations } from '@/components/translatable-input';
-import { useLocales } from '@/hooks/use-locales';
-import { BadgeSelector, BadgePreset } from '@/components/badge-selector';
-import { IconSelector } from '@/components/icon-selector';
-import { ColorSelector } from '@/components/color-selector';
+import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
+import { useLocales } from '@/hooks/shared/use-locales';
+import { BadgeSelector, BadgePreset } from '@/components/central/forms/badge-selector';
+import { IconSelector } from '@/components/central/forms/icon-selector';
+import { ColorSelector } from '@/components/central/forms/color-selector';
 import { Plus, Trash2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 

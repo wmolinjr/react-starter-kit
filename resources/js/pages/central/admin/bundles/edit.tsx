@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { BundleForm } from './components/bundle-form';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
@@ -87,7 +87,7 @@ export default function BundleEdit({ bundle, addons, plans, badgePresets }: Prop
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('admin.bundles.edit_bundle')} - ${bundle.name_display}`} />
 
             <Page>
@@ -108,6 +108,6 @@ export default function BundleEdit({ bundle, addons, plans, badgePresets }: Prop
                     />
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

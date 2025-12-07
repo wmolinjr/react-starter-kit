@@ -1,9 +1,9 @@
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Button } from '@/components/ui/button';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import {
   Card,
@@ -106,7 +106,7 @@ export default function ProjectShow({ project }: ProjectShowProps) {
   };
 
   return (
-    <TenantAdminLayout breadcrumbs={breadcrumbs}>
+    <AdminLayout breadcrumbs={breadcrumbs}>
       <Head title={project.name} />
 
       <Page>
@@ -291,6 +291,6 @@ export default function ProjectShow({ project }: ProjectShowProps) {
         </Card>
         </PageContent>
       </Page>
-    </TenantAdminLayout>
+    </AdminLayout>
   );
 }

@@ -20,12 +20,12 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 interface Props {
@@ -54,7 +54,7 @@ export default function DangerSettings({ tenant: tenantData }: Props) {
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.settings.danger_zone')} />
 
             <Page>
@@ -174,6 +174,6 @@ export default function DangerSettings({ tenant: tenantData }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

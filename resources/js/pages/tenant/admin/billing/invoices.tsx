@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { FileText, Download, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,7 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
+} from '@/components/shared/layout/page';
 import {
     Dialog,
     DialogContent,
@@ -121,7 +121,7 @@ export default function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.invoices.page_title')} />
 
             <Page>
@@ -266,6 +266,6 @@ export default function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                     )}
                 </DialogContent>
             </Dialog>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

@@ -1,8 +1,8 @@
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
-import { AppSidebar } from '@/components/sidebar/app-sidebar';
-import { AppSidebarHeader } from '@/components/sidebar/app-sidebar-header';
-import { ImpersonationBanner } from '@/components/impersonation-banner';
+import { AppContent } from '@/components/shared/layout/app-content';
+import { AppShell } from '@/components/shared/layout/app-shell';
+import { AppSidebar } from '@/components/tenant/navigation/app-sidebar';
+import { AppSidebarHeader } from '@/components/shared/navigation/sidebar-header';
+import { ImpersonationBanner } from '@/components/tenant/feedback/impersonation-banner';
 import { type BreadcrumbItem } from '@/types';
 import { type PropsWithChildren } from 'react';
 

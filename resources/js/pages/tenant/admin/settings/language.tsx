@@ -15,12 +15,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowLeft, Check, Languages } from 'lucide-react';
 import { FormEvent } from 'react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 interface Props {
@@ -54,7 +54,7 @@ export default function LanguageSettings({
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.settings.language')} />
 
             <Page>
@@ -162,6 +162,6 @@ export default function LanguageSettings({
                     </form>
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

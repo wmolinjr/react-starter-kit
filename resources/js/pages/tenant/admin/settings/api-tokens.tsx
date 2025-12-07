@@ -28,13 +28,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import apiTokens from '@/routes/tenant/api/tokens';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowLeft, Copy, Key, Plus, Trash2 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 interface Token {
@@ -88,7 +88,7 @@ export default function ApiTokensSettings({ tokens, newToken }: Props) {
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="API Tokens" />
 
             <Page>
@@ -290,6 +290,6 @@ export default function ApiTokensSettings({ tokens, newToken }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

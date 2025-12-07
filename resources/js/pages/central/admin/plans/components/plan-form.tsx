@@ -7,12 +7,12 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { TranslatableInput, Translations } from '@/components/translatable-input';
-import { useLocales } from '@/hooks/use-locales';
-import { BadgeSelector, BadgePreset } from '@/components/badge-selector';
-import { IconSelector } from '@/components/icon-selector';
-import { ColorSelector } from '@/components/color-selector';
-import { DynamicIcon } from '@/components/dynamic-icon';
+import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
+import { useLocales } from '@/hooks/shared/use-locales';
+import { BadgeSelector, BadgePreset } from '@/components/central/forms/badge-selector';
+import { IconSelector } from '@/components/central/forms/icon-selector';
+import { ColorSelector } from '@/components/central/forms/color-selector';
+import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
 import { formatPrice } from '@/lib/utils';
 import type { EnumOption } from '@/types';
 

@@ -10,15 +10,15 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+} from '@/components/shared/layout/page';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { AddonForm } from './components/addon-form';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { type BadgePreset } from '@/components/badge-selector';
-import { Translations } from '@/components/translatable-input';
+import { type BadgePreset } from '@/components/central/forms/badge-selector';
+import { Translations } from '@/components/central/forms/translatable-input';
 
 interface Addon {
     id: string;
@@ -102,7 +102,7 @@ export default function CatalogEdit({ addon, types, plans, featureDefinitions, l
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('admin.catalog.edit_addon')}: ${addon.name_display}`} />
 
             <Page>
@@ -173,6 +173,6 @@ export default function CatalogEdit({ addon, types, plans, featureDefinitions, l
                     />
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

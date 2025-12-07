@@ -12,8 +12,8 @@
  */
 
 import { Button } from '@/components/ui/button';
-import { usePermissions, useCan } from '@/hooks/use-permissions';
-import { Can } from '@/components/can';
+import { usePermissions, useCan } from '@/hooks/shared/use-permissions';
+import { Can } from '@/components/shared/auth/can';
 
 export function ProjectsExample() {
     const { has } = usePermissions();

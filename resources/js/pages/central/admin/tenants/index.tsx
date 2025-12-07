@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, Pencil, Search, Users, Globe, LogIn } from 'lucide-react';
 import { useState } from 'react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -71,7 +71,7 @@ export default function TenantsIndex({ tenants, filters, isImpersonating }: Prop
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.tenants.title')} />
 
             <Page>
@@ -217,6 +217,6 @@ export default function TenantsIndex({ tenants, filters, isImpersonating }: Prop
                 </Card>
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

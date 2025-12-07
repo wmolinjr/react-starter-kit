@@ -1,11 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTenant } from '@/hooks/use-tenant';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import { useTenant } from '@/hooks/tenant/use-tenant';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { BarChart3, CreditCard, FolderOpen, TrendingUp, Users } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
 export default function TenantDashboard() {
@@ -17,7 +17,7 @@ export default function TenantDashboard() {
     ];
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
             <Page>
@@ -149,6 +149,6 @@ export default function TenantDashboard() {
                     </Card>
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

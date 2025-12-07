@@ -1,10 +1,10 @@
-import InputError from '@/components/input-error';
+import InputError from '@/components/shared/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { type BreadcrumbItem } from '@/types';
 import { store } from '@/routes/tenant/auth/confirm-password';
 import { Form, Head } from '@inertiajs/react';
@@ -22,7 +22,7 @@ export default function ConfirmPassword() {
     ];
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('auth.confirm_password.page_title')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -67,6 +67,6 @@ export default function ConfirmPassword() {
                     </CardContent>
                 </Card>
             </div>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

@@ -1,15 +1,15 @@
-import InputError from '@/components/input-error';
+import InputError from '@/components/shared/feedback/input-error';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useRef } from 'react';
 
-import HeadingSmall from '@/components/heading-small';
+import HeadingSmall from '@/components/shared/typography/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import settings from '@/routes/central/admin/settings';
 
@@ -30,7 +30,7 @@ export default function Password() {
     ];
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.password.page_title')} />
 
             <CentralUserSettingsLayout>
@@ -146,6 +146,6 @@ export default function Password() {
                     </Form>
                 </div>
             </CentralUserSettingsLayout>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

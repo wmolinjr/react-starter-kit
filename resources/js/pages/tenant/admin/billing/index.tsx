@@ -1,9 +1,9 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import {
   Card,
@@ -115,7 +115,7 @@ export default function BillingIndex() {
   const currentPlanKey = getCurrentPlan();
 
   return (
-    <TenantAdminLayout breadcrumbs={breadcrumbs}>
+    <AdminLayout breadcrumbs={breadcrumbs}>
       <Head title={t('tenant.billing.title')} />
 
       <Page>
@@ -281,6 +281,6 @@ export default function BillingIndex() {
         )}
         </PageContent>
       </Page>
-    </TenantAdminLayout>
+    </AdminLayout>
   );
 }

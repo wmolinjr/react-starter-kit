@@ -1,8 +1,8 @@
 import admin from '@/routes/tenant/admin';
 import { Head, router } from '@inertiajs/react';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import { RoleForm } from './components/role-form';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
@@ -46,7 +46,7 @@ export default function EditRole({ role, permissions }: Props) {
     };
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('roles.edit_title')} ${role.display_name}`} />
 
             <Page>
@@ -72,6 +72,6 @@ export default function EditRole({ role, permissions }: Props) {
                     />
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

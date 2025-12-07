@@ -5,9 +5,9 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { LaravelReactI18nProvider } from 'laravel-react-i18n';
 import { StrictMode, type ComponentType, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
+import { initializeTheme } from './hooks/shared/use-appearance';
 import { Toaster } from './components/ui/sonner';
-import { FlashMessages } from './components/flash-messages';
+import { FlashMessages } from './components/shared/feedback/flash-messages';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

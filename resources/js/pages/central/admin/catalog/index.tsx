@@ -9,15 +9,15 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
-import { DynamicIcon } from '@/components/dynamic-icon';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+} from '@/components/shared/layout/page';
+import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { create, destroy, sync, syncAll } from '@/routes/central/admin/catalog';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
-import { type BadgePreset } from '@/components/badge-selector';
+import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn, formatPrice } from '@/lib/utils';
 
@@ -74,7 +74,7 @@ export default function CatalogIndex({ addons, badgePresets }: Props) {
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.catalog.title')} />
 
             <Page>
@@ -209,6 +209,6 @@ export default function CatalogIndex({ addons, badgePresets }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

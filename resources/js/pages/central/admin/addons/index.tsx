@@ -1,9 +1,9 @@
 import { Head } from '@inertiajs/react';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import {
     Table,
     TableBody,
@@ -54,7 +54,7 @@ export default function AdminAddonsIndex({ addons, stats }: Props) {
     ];
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.addons.title')} />
 
             <Page>
@@ -136,6 +136,6 @@ export default function AdminAddonsIndex({ addons, stats }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

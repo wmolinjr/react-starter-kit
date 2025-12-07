@@ -1,5 +1,5 @@
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import InputError from '@/components/shared/feedback/input-error';
+import TextLink from '@/components/shared/typography/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';

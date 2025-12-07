@@ -5,7 +5,7 @@ import { Activity, User, Filter, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +35,7 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
+} from '@/components/shared/layout/page';
 import {
     Pagination,
     PaginationContent,
@@ -183,7 +183,7 @@ export default function TeamActivity({
     const hasActiveFilters = Object.values(filters).some((v) => v !== null);
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('tenant.activity.page_title')} />
 
             <Page>
@@ -447,6 +447,6 @@ export default function TeamActivity({
                     )}
                 </PageContent>
             </Page>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

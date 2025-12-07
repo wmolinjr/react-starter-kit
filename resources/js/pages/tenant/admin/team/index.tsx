@@ -4,7 +4,7 @@ import type { PageProps } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield } from 'lucide-react';
 
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,9 +25,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { InviteMemberDialog } from '@/components/invite-member-dialog';
-import { Can } from '@/components/can';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { InviteMemberDialog } from '@/components/tenant/dialogs/invite-member-dialog';
+import { Can } from '@/components/shared/auth/can';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 
 interface Member {
   id: string;
@@ -98,7 +98,7 @@ export default function TeamIndex({ members, teamStats }: Props) {
   };
 
   return (
-    <TenantAdminLayout breadcrumbs={breadcrumbs}>
+    <AdminLayout breadcrumbs={breadcrumbs}>
       <Head title={t('tenant.team.page_title')} />
 
       <Page>
@@ -220,6 +220,6 @@ export default function TeamIndex({ members, teamStats }: Props) {
         onOpenChange={setInviteDialogOpen}
         maxUsersReached={teamStats.max_users !== null && teamStats.current_users >= teamStats.max_users}
       />
-    </TenantAdminLayout>
+    </AdminLayout>
   );
 }

@@ -1,12 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-import AppearanceTabs from '@/components/appearance-tabs';
-import HeadingSmall from '@/components/heading-small';
-import { LanguageSelector } from '@/components/language-selector';
+import AppearanceTabs from '@/components/shared/settings/appearance-tabs';
+import HeadingSmall from '@/components/shared/typography/heading-small';
+import { LanguageSelector } from '@/components/shared/settings/language-selector';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import TenantUserSettingsLayout from '@/layouts/tenant/user-settings-layout';
 import userSettings from '@/routes/tenant/admin/user-settings';
 import { type BreadcrumbItem } from '@/types';
@@ -26,7 +26,7 @@ export default function Appearance() {
     ];
 
     return (
-        <TenantAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.preferences.page_title')} />
 
             <TenantUserSettingsLayout>
@@ -57,6 +57,6 @@ export default function Appearance() {
                     <AppearanceTabs />
                 </div>
             </TenantUserSettingsLayout>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

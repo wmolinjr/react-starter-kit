@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { AddonForm } from './components/addon-form';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { type BadgePreset } from '@/components/badge-selector';
+import { type BadgePreset } from '@/components/central/forms/badge-selector';
 
 interface FeatureDefinition {
     id: string;
@@ -52,7 +52,7 @@ export default function CatalogCreate({ types, plans, featureDefinitions, limitD
     ];
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.catalog.create_addon')} />
 
             <Page>
@@ -74,6 +74,6 @@ export default function CatalogCreate({ types, plans, featureDefinitions, limitD
                     />
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

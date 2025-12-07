@@ -6,8 +6,8 @@ import {
     PageTitle,
     PageDescription,
     PageContent,
-} from '@/components/page';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+} from '@/components/shared/layout/page';
+import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -33,7 +33,7 @@ export default function AdminDashboard({ stats }: Props) {
     ];
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.dashboard.title')} />
 
             <Page>
@@ -145,6 +145,6 @@ export default function AdminDashboard({ stats }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }

@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { TranslatableInput, Translations } from '@/components/translatable-input';
-import { useLocales } from '@/hooks/use-locales';
+import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
+import { useLocales } from '@/hooks/shared/use-locales';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { DynamicIcon } from '@/components/dynamic-icon';
-import { BadgeSelector, BadgePreset } from '@/components/badge-selector';
-import { IconSelector } from '@/components/icon-selector';
-import { ColorSelector } from '@/components/color-selector';
+import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
+import { BadgeSelector, BadgePreset } from '@/components/central/forms/badge-selector';
+import { IconSelector } from '@/components/central/forms/icon-selector';
+import { ColorSelector } from '@/components/central/forms/color-selector';
 import { TrendingUp, Sparkles, Activity, CreditCard, Info } from 'lucide-react';
 
 // Feature definition from backend

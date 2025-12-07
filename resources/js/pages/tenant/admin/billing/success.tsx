@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import TenantAdminLayout from '@/layouts/tenant-admin-layout';
+import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -21,7 +21,7 @@ export default function BillingSuccess({ plan, message }: Props) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <TenantAdminLayout>
+        <AdminLayout>
             <Head title={t('tenant.billing.payment_confirmed')} />
 
             <div className="flex items-center justify-center min-h-[60vh]">
@@ -59,6 +59,6 @@ export default function BillingSuccess({ plan, message }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </TenantAdminLayout>
+        </AdminLayout>
     );
 }

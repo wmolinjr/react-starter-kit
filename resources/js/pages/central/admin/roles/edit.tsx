@@ -1,12 +1,12 @@
 import { Head, router } from '@inertiajs/react';
 import type { FormDataConvertible } from '@inertiajs/core';
-import CentralAdminLayout from '@/layouts/central-admin-layout';
+import AdminLayout from '@/layouts/central/admin-layout';
 import { RoleForm } from './components/role-form';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Translations } from '@/components/translatable-input';
+import { Translations } from '@/components/central/forms/translatable-input';
 
 interface Permission {
     id: string;
@@ -48,7 +48,7 @@ export default function EditRole({ role, permissions }: Props) {
     };
 
     return (
-        <CentralAdminLayout breadcrumbs={breadcrumbs}>
+        <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t('admin.roles.edit_role')}: ${role.display_name_display}`} />
 
             <Page>
@@ -74,6 +74,6 @@ export default function EditRole({ role, permissions }: Props) {
                     />
                 </PageContent>
             </Page>
-        </CentralAdminLayout>
+        </AdminLayout>
     );
 }
