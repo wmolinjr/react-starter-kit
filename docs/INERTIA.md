@@ -59,7 +59,7 @@ const submit = (e) => {
 import { Form } from '@inertiajs/react';
 import { store } from '@/routes/login';
 
-<Form {...store.form()} resetOnSuccess={['password']}>
+<Form {...store()} resetOnSuccess={['password']}>
     {({ processing, errors }) => (
         <>
             <Input name="email" />
@@ -89,7 +89,7 @@ O Form component é a maneira preferida de lidar com formulários no Inertia v2.
 import { Form } from '@inertiajs/react';
 import { store } from '@/routes/profile';
 
-<Form {...store.form()}>
+<Form {...store()}>
     {({ processing, errors, recentlySuccessful }) => (
         <div>
             <Input name="name" required />

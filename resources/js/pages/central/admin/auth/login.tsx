@@ -33,7 +33,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
             </div>
 
             <Form
-                {...store.form()}
+                {...store()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >

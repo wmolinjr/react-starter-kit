@@ -41,7 +41,7 @@ export default function Password() {
                     />
 
                     <Form
-                        {...settings.password.update.form()}
+                        {...settings.password.update()}
                         options={{
                             preserveScroll: true,
                         }}

@@ -57,7 +57,7 @@ export default function Profile({
                     />
 
                     <Form
-                        {...userSettings.profile.update.form()}
+                        {...userSettings.profile.update()}
                         options={{
                             preserveScroll: true,
                         }}
