@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Tenant;
-use App\Http\Controllers\Controller;
 
 use App\Enums\TenantPermission;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 
 class ApiTokenController extends Controller implements HasMiddleware
 {
@@ -39,7 +39,7 @@ class ApiTokenController extends Controller implements HasMiddleware
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return inertia('settings/api-tokens', [
+        return Inertia::render('settings/api-tokens', [
             'tokens' => $tokens->map(fn ($token) => [
                 'id' => $token->id,
                 'name' => $token->name,
@@ -73,10 +73,8 @@ class ApiTokenController extends Controller implements HasMiddleware
             ->update(['tenant_id' => tenant('id')]);
 
         return back()->with([
-            'flash' => [
-                'token' => $token->plainTextToken,
-                'message' => 'API token created successfully. Make sure to copy it now - you won\'t be able to see it again!',
-            ],
+            'token' => $token->plainTextToken,
+            'success' => __('flash.token.created'),
         ]);
     }
 
@@ -99,7 +97,7 @@ class ApiTokenController extends Controller implements HasMiddleware
             'abilities' => $request->abilities,
         ])->save();
 
-        return back()->with('success', 'Token abilities updated successfully.');
+        return back()->with('success', __('flash.token.updated'));
     }
 
     /**
@@ -114,6 +112,6 @@ class ApiTokenController extends Controller implements HasMiddleware
 
         $token->delete();
 
-        return back()->with('success', 'API token deleted successfully.');
+        return back()->with('success', __('flash.token.deleted'));
     }
 }

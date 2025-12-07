@@ -948,8 +948,10 @@
   "flash.settings.domain_removed": "Domain removed successfully!",
   "flash.settings.features_updated": "Feature settings updated!",
   "flash.settings.notifications_updated": "Notification settings updated!",
+  "flash.settings.language_updated": "Language settings updated successfully!",
   "flash.settings.config_updated": "Configuration settings updated successfully!",
 
+  "flash.token.created": "API token created successfully. Make sure to copy it now - you won't be able to see it again!",
   "flash.token.updated": "Token abilities updated successfully.",
   "flash.token.deleted": "API token deleted successfully.",
 

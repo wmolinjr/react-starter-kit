@@ -193,7 +193,7 @@ class TenantSettingsController extends Controller implements HasMiddleware
         try {
             $this->settingsService->updateLanguage(tenant(), $request->language);
 
-            return back()->with('success', __('tenant.settings.language_updated'));
+            return back()->with('success', __('flash.settings.language_updated'));
         } catch (SettingsException $e) {
             return back()->with('error', $e->getMessage());
         }

@@ -168,7 +168,7 @@ class AuditLogService
     {
         if (! empty($filters['user_id'])) {
             $query->where('causer_id', $filters['user_id'])
-                ->where('causer_type', 'App\\Models\\User');
+                ->where('causer_type', 'user');
         }
 
         if (! empty($filters['event'])) {

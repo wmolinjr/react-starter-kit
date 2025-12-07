@@ -1197,8 +1197,10 @@
   "flash.settings.domain_removed": "Domínio removido com sucesso!",
   "flash.settings.features_updated": "Configurações de recursos atualizadas!",
   "flash.settings.notifications_updated": "Configurações de notificações atualizadas!",
+  "flash.settings.language_updated": "Configurações de idioma atualizadas com sucesso!",
   "flash.settings.config_updated": "Configurações do sistema atualizadas com sucesso!",
 
+  "flash.token.created": "Token de API criado com sucesso. Copie-o agora - você não poderá vê-lo novamente!",
   "flash.token.updated": "Permissões do token atualizadas com sucesso.",
   "flash.token.deleted": "Token de API excluído com sucesso.",
 

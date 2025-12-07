@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Tenant\ActivityResource;
 use App\Models\Tenant\Activity;
+use App\Models\Tenant\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -31,8 +33,6 @@ class TeamActivityController extends Controller implements HasMiddleware
      */
     public function index(Request $request)
     {
-        $tenant = tenant();
-
         // Get filter parameters
         $filters = [
             'user_id' => $request->input('user_id'),
@@ -51,7 +51,7 @@ class TeamActivityController extends Controller implements HasMiddleware
         // Apply filters
         if ($filters['user_id']) {
             $query->where('causer_id', $filters['user_id'])
-                ->where('causer_type', 'App\\Models\\User');
+                ->where('causer_type', 'user');
         }
 
         if ($filters['event']) {
@@ -70,29 +70,14 @@ class TeamActivityController extends Controller implements HasMiddleware
             $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
-        // Paginate results
-        $activities = $query->paginate(20)->through(function ($activity) {
-            return [
-                'id' => $activity->id,
-                'description' => $activity->description,
-                'event' => $activity->event,
-                'subject_type' => $activity->subject_type ? class_basename($activity->subject_type) : null,
-                'subject_id' => $activity->subject_id,
-                'subject_name' => $this->getSubjectName($activity),
-                'causer' => $activity->causer ? [
-                    'id' => $activity->causer->id,
-                    'name' => $activity->causer->name,
-                    'email' => $activity->causer->email,
-                ] : null,
-                'properties' => $activity->properties?->toArray(),
-                'created_at' => $activity->created_at->toISOString(),
-                'created_at_human' => $activity->created_at->diffForHumans(),
-            ];
-        });
+        // Paginate results using ActivityResource for consistent transformation
+        $activities = ActivityResource::collection($query->paginate(20));
 
         // Get team members for filter dropdown
-        $teamMembers = $tenant->users()
-            ->select('users.id', 'users.name', 'users.email')
+        // Multi-database: query User model directly (already in tenant context)
+        $teamMembers = User::query()
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
             ->get()
             ->map(fn ($user) => [
                 'id' => $user->id,
@@ -124,33 +109,6 @@ class TeamActivityController extends Controller implements HasMiddleware
             'eventTypes' => $eventTypes,
             'subjectTypes' => $subjectTypes,
             'filters' => $filters,
-            // NOTE: Don't override 'tenant' - use shared props from HandleInertiaRequests
-            // which includes plan, features, limits, etc. needed for sidebar navigation
         ]);
-    }
-
-    /**
-     * Get a human-readable name for the activity subject.
-     */
-    protected function getSubjectName(Activity $activity): ?string
-    {
-        if (! $activity->subject) {
-            return null;
-        }
-
-        // Try common name attributes
-        if (isset($activity->subject->name)) {
-            return $activity->subject->name;
-        }
-
-        if (isset($activity->subject->title)) {
-            return $activity->subject->title;
-        }
-
-        if (isset($activity->subject->email)) {
-            return $activity->subject->email;
-        }
-
-        return "#{$activity->subject_id}";
     }
 }
