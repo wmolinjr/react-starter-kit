@@ -13,8 +13,6 @@ use App\Http\Controllers\Central\Admin\TenantManagementController;
 use App\Http\Controllers\Central\Admin\UserManagementController;
 use App\Http\Controllers\Central\Auth\AdminLoginController;
 use App\Http\Controllers\Central\Auth\AdminLogoutController;
-use App\Http\Controllers\Central\Panel\DashboardController as PanelDashboardController;
-use App\Http\Controllers\Central\Panel\TenantAccessController;
 use App\Http\Controllers\Shared\Settings\PasswordController;
 use App\Http\Controllers\Shared\Settings\ProfileController;
 use App\Http\Controllers\Shared\Settings\TwoFactorAuthenticationController;
@@ -81,34 +79,10 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
             ->middleware('web')
             ->name('sanctum.csrf-cookie');
 
-        // Fortify home redirect (role-based routing after auth)
-        // - Users with central roles → Admin Dashboard
-        // - Regular users → User Panel (manage tenants)
+        // Fortify home redirect - always go to admin dashboard
         Route::get('/home', function () {
-            $user = auth()->user();
-
-            if ($user && $user->roles()->exists()) {
-                return redirect()->route('central.admin.dashboard');
-            }
-
-            return redirect()->route('central.panel.dashboard');
-        })->middleware('auth')->name('fortify.home');
-
-        /*
-        |----------------------------------------------------------------------
-        | Panel Routes (central.panel.*)
-        |----------------------------------------------------------------------
-        */
-
-        Route::middleware(['auth', 'verified'])
-            ->prefix('painel')
-            ->name('panel.')
-            ->group(function () {
-                Route::get('/', PanelDashboardController::class)->name('dashboard');
-
-                // Seamless login: redirect user to their tenant (generates token)
-                Route::get('/access/{tenant}', [TenantAccessController::class, 'redirect'])->name('access');
-            });
+            return redirect()->route('central.admin.dashboard');
+        })->middleware('auth:central')->name('fortify.home');
 
         /*
         |----------------------------------------------------------------------

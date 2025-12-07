@@ -1,5 +1,4 @@
 import admin from '@/routes/central/admin';
-import central from '@/routes/central';
 import { type NavItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -7,13 +6,11 @@ import {
     Building2,
     CreditCard,
     Folder,
-    LayoutGrid,
     Package,
     PackageOpen,
     Settings,
     Shield,
     ShieldCheck,
-    User,
     Users,
 } from 'lucide-react';
 
@@ -92,27 +89,3 @@ export function useCentralAdminNavItems(): NavItem[] {
     ];
 }
 
-/**
- * Central Panel navigation items (user account in central domain)
- */
-export function useCentralPanelNavItems(): NavItem[] {
-    const { t } = useLaravelReactI18n();
-
-    return [
-        {
-            title: t('sidebar.dashboard'),
-            href: central.panel.dashboard.url(),
-            icon: LayoutGrid,
-        },
-        {
-            title: t('sidebar.profile'),
-            href: admin.settings.profile.edit.url(),
-            icon: User,
-        },
-        {
-            title: t('sidebar.settings'),
-            href: admin.settings.appearance.edit.url(),
-            icon: Settings,
-        },
-    ];
-}
