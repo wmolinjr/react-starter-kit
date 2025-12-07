@@ -141,9 +141,6 @@ return [
 
         // Spatie Permission: Limpa cache ao trocar de tenant
         App\Bootstrappers\SpatiePermissionsBootstrapper::class,
-
-        // FortifyRouteBootstrapper for tenant-aware Fortify redirects (v4 feature)
-        Bootstrappers\Integrations\FortifyRouteBootstrapper::class,
     ],
 
     /**

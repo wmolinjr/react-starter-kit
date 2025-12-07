@@ -18,15 +18,15 @@ class TwoFactorChallengeTest extends TestCase
         $this->initializeTenant();
     }
 
-    public function test_two_factor_challenge_redirects_to_login_when_not_authenticated(): void
+    public function test_two_factor_challenge_redirects_to_login_when_no_session(): void
     {
         if (! Features::canManageTwoFactorAuthentication()) {
             $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
-        $response = $this->get(route('two-factor.login'));
+        $response = $this->get($this->tenantUrl('/two-factor-challenge'));
 
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('tenant.auth.login'));
     }
 
     public function test_two_factor_challenge_can_be_rendered(): void
@@ -34,11 +34,6 @@ class TwoFactorChallengeTest extends TestCase
         if (! Features::canManageTwoFactorAuthentication()) {
             $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
-
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-        ]);
 
         $user = User::factory()->create();
 
@@ -48,12 +43,13 @@ class TwoFactorChallengeTest extends TestCase
             'two_factor_confirmed_at' => now(),
         ])->save();
 
-        $this->post(route('login'), [
+        // Login first to set session
+        $this->post($this->tenantUrl('/login'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->get(route('two-factor.login'))
+        $this->get($this->tenantUrl('/two-factor-challenge'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('tenant/auth/two-factor-challenge')

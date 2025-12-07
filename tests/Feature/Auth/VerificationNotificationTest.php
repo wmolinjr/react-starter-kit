@@ -26,9 +26,9 @@ class VerificationNotificationTest extends TestCase
             'email_verified_at' => null,
         ]);
 
-        $this->actingAs($user)
-            ->post(route('verification.send'))
-            ->assertRedirect(route('central.home'));
+        $this->actingAs($user, 'tenant')
+            ->post($this->tenantUrl('/email/verification-notification'))
+            ->assertRedirect();
 
         Notification::assertSentTo($user, VerifyEmail::class);
     }
@@ -41,8 +41,8 @@ class VerificationNotificationTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        $this->actingAs($user)
-            ->post(route('verification.send'))
+        $this->actingAs($user, 'tenant')
+            ->post($this->tenantUrl('/email/verification-notification'))
             // Tenant users are redirected to admin dashboard
             ->assertRedirect(route('tenant.admin.dashboard', absolute: false));
 

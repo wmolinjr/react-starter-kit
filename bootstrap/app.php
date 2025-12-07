@@ -78,12 +78,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         // Configure redirect for unauthenticated users
-        // Admin guard redirects to /admin/login, others to /login
+        // Central admin redirects to /admin/login, tenant users to /login
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->routeIs('central.admin.*')) {
                 return route('central.admin.auth.login');
             }
-            return route('login');
+            // Tenant users redirect to tenant login
+            return route('tenant.auth.login');
         });
 
         // Configure redirect for authenticated users (trying to access login pages)
@@ -142,6 +143,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Central Admin password confirmation (separate from Fortify's password.confirm)
             'central.password.confirm' => \App\Http\Middleware\Central\RequireCentralPassword::class,
+
+            // Tenant password confirmation (custom middleware replacing Fortify's password.confirm)
+            'tenant.password.confirm' => \App\Http\Middleware\Tenant\RequireTenantPassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

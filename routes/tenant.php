@@ -2,11 +2,17 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Tenant\Auth\ConfirmPasswordController;
+use App\Http\Controllers\Tenant\Auth\ForgotPasswordController;
+use App\Http\Controllers\Tenant\Auth\LoginController;
+use App\Http\Controllers\Tenant\Auth\LogoutController;
+use App\Http\Controllers\Tenant\Auth\RegisterController;
+use App\Http\Controllers\Tenant\Auth\ResetPasswordController;
+use App\Http\Controllers\Tenant\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
 use App\Http\Controllers\Tenant\Settings\TwoFactorAuthenticationController;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
-use Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains;
 use App\Http\Middleware\Tenant\VerifyTenantAccess;
 use App\Models\Tenant\User;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Stancl\Tenancy\Database\Models\ImpersonationToken;
 use Stancl\Tenancy\Features\UserImpersonation;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains;
 
 /*
 |--------------------------------------------------------------------------
@@ -174,6 +182,53 @@ Route::middleware([
     // Redirect root to dashboard
     Route::get('/', function () {
         return redirect()->route('tenant.admin.dashboard');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | Tenant Authentication Routes (tenant.auth.*)
+    |----------------------------------------------------------------------
+    */
+
+    // Guest routes (login, register, password reset, 2FA challenge)
+    Route::middleware('guest:tenant')->name('auth.')->group(function () {
+        // Login
+        Route::get('/login', [LoginController::class, 'create'])->name('login');
+        Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+
+        // Registration (if enabled via Features::registration())
+        Route::get('/register', [RegisterController::class, 'create'])->name('register');
+        Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+
+        // Forgot Password
+        Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
+        Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email');
+
+        // Reset Password
+        Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
+        Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('password.update');
+
+        // Two-Factor Challenge (during login)
+        Route::get('/two-factor-challenge', [TwoFactorChallengeController::class, 'create'])->name('two-factor.challenge');
+        Route::post('/two-factor-challenge', [TwoFactorChallengeController::class, 'store'])->name('two-factor.challenge.store');
+    });
+
+    // Authenticated routes (logout, password confirmation, email verification)
+    Route::middleware('auth:tenant')->name('auth.')->group(function () {
+        Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
+
+        // Password confirmation
+        Route::get('/confirm-password', [ConfirmPasswordController::class, 'show'])->name('confirm-password');
+        Route::post('/confirm-password', [ConfirmPasswordController::class, 'store'])->name('confirm-password.store');
+
+        // Email Verification
+        Route::get('/email/verify', [VerifyEmailController::class, 'notice'])->name('verification.notice');
+        Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
+            ->middleware(['signed', 'throttle:6,1'])
+            ->name('verification.verify');
+        Route::post('/email/verification-notification', [VerifyEmailController::class, 'send'])
+            ->middleware('throttle:6,1')
+            ->name('verification.send');
     });
 
     /*

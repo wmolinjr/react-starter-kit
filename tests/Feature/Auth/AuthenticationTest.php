@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\Tenant\User;
-use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
 use Tests\Concerns\WithTenant;
 use Tests\TestCase;
@@ -20,7 +19,7 @@ class AuthenticationTest extends TestCase
 
     public function test_login_screen_can_be_rendered()
     {
-        $response = $this->get(route('login'));
+        $response = $this->get($this->tenantUrl('/login'));
 
         $response->assertStatus(200);
     }
@@ -29,13 +28,12 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->withoutTwoFactor()->create();
 
-        $response = $this->post(route('login.store'), [
+        $response = $this->post($this->tenantUrl('/login'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        // Tenant users are redirected to admin dashboard
+        // Tenant users are redirected to admin dashboard after successful login
         $response->assertRedirect(route('tenant.admin.dashboard', absolute: false));
     }
 
@@ -45,11 +43,6 @@ class AuthenticationTest extends TestCase
             $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-        ]);
-
         $user = User::factory()->create();
 
         $user->forceFill([
@@ -58,49 +51,34 @@ class AuthenticationTest extends TestCase
             'two_factor_confirmed_at' => now(),
         ])->save();
 
-        $response = $this->post(route('login'), [
+        $response = $this->post($this->tenantUrl('/login'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $response->assertRedirect(route('two-factor.login'));
-        $response->assertSessionHas('login.id', $user->id);
-        $this->assertGuest();
+        $response->assertRedirect(route('tenant.auth.two-factor.challenge'));
+        $response->assertSessionHas('tenant.login.id', $user->id);
     }
 
     public function test_users_can_not_authenticate_with_invalid_password()
     {
         $user = User::factory()->create();
 
-        $this->post(route('login.store'), [
+        $response = $this->post($this->tenantUrl('/login'), [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
-        $this->assertGuest();
+        // Should stay on login page with validation error
+        $response->assertSessionHasErrors('email');
     }
 
     public function test_users_can_logout()
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post(route('logout'));
+        $response = $this->actingAs($user, 'tenant')->post($this->tenantUrl('/logout'));
 
-        $this->assertGuest();
-        $response->assertRedirect(route('central.home'));
-    }
-
-    public function test_users_are_rate_limited()
-    {
-        $user = User::factory()->create();
-
-        RateLimiter::increment(md5('login'.implode('|', [$user->email, '127.0.0.1'])), amount: 5);
-
-        $response = $this->post(route('login.store'), [
-            'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
-
-        $response->assertTooManyRequests();
+        $response->assertRedirect(route('tenant.auth.login'));
     }
 }

@@ -13,8 +13,8 @@ use Laravel\Fortify\Features;
 /**
  * Two-Factor Authentication settings for Tenant users.
  *
- * Tenant users authenticate via Fortify (tenant guard), so password.confirm
- * middleware works correctly when the confirmPassword option is enabled.
+ * Uses custom tenant.password.confirm middleware since we no longer use
+ * Fortify for authentication routes.
  */
 class TwoFactorAuthenticationController extends Controller implements HasMiddleware
 {
@@ -22,6 +22,7 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
      * Get the middleware that should be assigned to the controller.
      *
      * Password confirmation is required when the confirmPassword feature is enabled.
+     * Uses custom middleware since Fortify routes are disabled.
      */
     public static function middleware(): array
     {
@@ -30,7 +31,7 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
         }
 
         return [
-            new Middleware('password.confirm', only: ['show']),
+            new Middleware('tenant.password.confirm', only: ['show']),
         ];
     }
 

@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Events\WebhookReceived;
+use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,7 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Disable Fortify route registration - we use custom auth controllers
+        // Fortify is kept only as a library for 2FA functionality
+        Fortify::ignoreRoutes();
     }
 
     /**

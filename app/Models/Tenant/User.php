@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenant;
 
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\URL;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
@@ -208,5 +210,27 @@ class User extends Authenticatable implements MustVerifyEmail
 
         // Final fallback to app default
         return config('app.locale', 'en');
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * Custom implementation to use tenant-specific route.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        // Configure the verification URL to use tenant route
+        VerifyEmail::createUrlUsing(function ($notifiable) {
+            return URL::temporarySignedRoute(
+                'tenant.auth.verification.verify',
+                now()->addMinutes(config('auth.verification.expire', 60)),
+                [
+                    'id' => $notifiable->getKey(),
+                    'hash' => sha1($notifiable->getEmailForVerification()),
+                ]
+            );
+        });
+
+        $this->notify(new VerifyEmail);
     }
 }

@@ -85,11 +85,6 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
             ->middleware('web')
             ->name('sanctum.csrf-cookie');
 
-        // Fortify home redirect - always go to admin dashboard
-        Route::get('/home', function () {
-            return redirect()->route('central.admin.dashboard');
-        })->middleware('auth:central')->name('fortify.home');
-
         /*
         |----------------------------------------------------------------------
         | Admin Authentication Routes (central.admin.auth.*)
