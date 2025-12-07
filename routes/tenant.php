@@ -13,6 +13,7 @@ use App\Http\Controllers\Tenant\Auth\VerifyEmailController;
 use App\Http\Controllers\Tenant\Settings\PasswordController;
 use App\Http\Controllers\Tenant\Settings\ProfileController;
 use App\Http\Controllers\Tenant\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\Tenant\Settings\TwoFactorController;
 use App\Http\Middleware\Tenant\VerifyTenantAccess;
 use App\Models\Tenant\User;
 use Illuminate\Support\Facades\Auth;
@@ -383,6 +384,18 @@ Route::middleware([
 
                     Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])
                         ->name('two-factor.show');
+
+                    // Two-Factor Authentication API routes
+                    // All 2FA actions require password confirmation
+                    Route::middleware('password.confirm')->prefix('two-factor')->name('two-factor.')->group(function () {
+                        Route::post('enable', [TwoFactorController::class, 'enable'])->name('enable');
+                        Route::post('confirm', [TwoFactorController::class, 'confirm'])->name('confirm');
+                        Route::delete('disable', [TwoFactorController::class, 'disable'])->name('disable');
+                        Route::get('qr-code', [TwoFactorController::class, 'qrCode'])->name('qr-code');
+                        Route::get('secret-key', [TwoFactorController::class, 'secretKey'])->name('secret-key');
+                        Route::get('recovery-codes', [TwoFactorController::class, 'recoveryCodes'])->name('recovery-codes');
+                        Route::post('recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('recovery-codes.store');
+                    });
                 });
         });
 

@@ -1,6 +1,6 @@
 import { usePage } from '@inertiajs/react';
-import { logout as fortifyLogout } from '@/routes';
-import { logout as adminLogout } from '@/routes/central/admin/auth';
+import tenantAuth from '@/routes/tenant/auth';
+import centralAuth from '@/routes/central/admin/auth';
 import type { PageProps } from '@/types';
 
 /**
@@ -8,7 +8,7 @@ import type { PageProps } from '@/types';
  *
  * DUAL GUARD SYSTEM:
  * - 'central' guard: Uses /admin/logout (AdminLogoutController)
- * - 'tenant' guard: Uses /logout (Fortify AuthenticatedSessionController)
+ * - 'tenant' guard: Uses /logout (LogoutController)
  *
  * This ensures central admins and tenant users use their respective logout routes.
  */
@@ -16,5 +16,5 @@ export function useLogout() {
     const { auth } = usePage<PageProps>().props;
 
     // Return appropriate logout route based on guard
-    return auth.guard === 'central' ? adminLogout : fortifyLogout;
+    return auth.guard === 'central' ? centralAuth.logout : tenantAuth.logout;
 }

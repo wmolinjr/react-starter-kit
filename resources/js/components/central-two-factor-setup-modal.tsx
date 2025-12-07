@@ -13,7 +13,7 @@ import {
     InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { useClipboard } from '@/hooks/use-clipboard';
-import { OTP_MAX_LENGTH } from '@/hooks/use-central-two-factor-auth';
+import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/central/admin/settings/two-factor';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';

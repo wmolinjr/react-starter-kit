@@ -1,15 +1,102 @@
 # Fortify Removal and Custom Tenant Authentication Implementation Plan
 
+> **STATUS: ✅ CONCLUÍDO** (Dezembro 2024)
+>
+> Este plano foi completamente implementado. Laravel Fortify foi removido como provedor de rotas
+> e agora é utilizado apenas como biblioteca para funcionalidade 2FA.
+
+## Summary of Changes
+
+### What Was Done
+
+1. **Created 8 Custom Tenant Auth Controllers** in `app/Http/Controllers/Tenant/Auth/`:
+   - `LoginController.php` - Login form and authentication
+   - `LogoutController.php` - Logout handling
+   - `RegisterController.php` - Registration form and user creation
+   - `ForgotPasswordController.php` - Password reset request
+   - `ResetPasswordController.php` - Password reset form and processing
+   - `VerifyEmailController.php` - Email verification handling
+   - `TwoFactorChallengeController.php` - 2FA challenge during login
+   - `ConfirmPasswordController.php` - Password confirmation for sensitive actions
+
+2. **Added Authentication Routes** in `routes/tenant.php`:
+   - All routes prefixed with `tenant.auth.*`
+   - Guest routes: login, register, password reset, 2FA challenge
+   - Authenticated routes: logout, password confirmation, email verification
+
+3. **Created Custom Password Confirmation Middleware**:
+   - `RequireTenantPassword` middleware (`app/Http/Middleware/Tenant/RequireTenantPassword.php`)
+   - Registered as `tenant.password.confirm` alias
+
+4. **Removed Fortify Components**:
+   - Removed `FortifyServiceProvider.php`
+   - Removed `TenancyFortifyServiceProvider.php`
+   - Removed `RedirectFortifyOnCentral.php` middleware
+   - Removed `FortifyRouteBootstrapper` from tenancy config
+   - Removed `app/Actions/Fortify/Tenant/` directory
+
+5. **Updated Fortify Configuration**:
+   - `config/fortify.php` now only configures 2FA features
+   - Added `Fortify::ignoreRoutes()` in AppServiceProvider to disable Fortify routes
+   - Features enabled: registration, resetPasswords, emailVerification, twoFactorAuthentication
+
+6. **Updated Tests**:
+   - All auth tests updated to use `tenant.auth.*` routes
+   - Tests use `$this->tenantUrl()` helper for cross-domain testing
+
+7. **Regenerated Wayfinder Routes**:
+   - TypeScript route helpers updated for new route names
+
+### Current Architecture
+
+```
+app/Http/Controllers/
+├── Central/Auth/           # Central admin authentication (unchanged)
+│   ├── AdminLoginController.php
+│   ├── AdminLogoutController.php
+│   ├── ForgotPasswordController.php
+│   ├── ResetPasswordController.php
+│   ├── TwoFactorChallengeController.php
+│   └── ConfirmPasswordController.php
+└── Tenant/Auth/            # NEW: Tenant user authentication
+    ├── LoginController.php
+    ├── LogoutController.php
+    ├── RegisterController.php
+    ├── ForgotPasswordController.php
+    ├── ResetPasswordController.php
+    ├── TwoFactorChallengeController.php
+    ├── ConfirmPasswordController.php
+    └── VerifyEmailController.php
+```
+
+### Fortify Usage (Library Only)
+
+Fortify is kept as a dependency ONLY for 2FA functionality:
+- `TwoFactorAuthenticatable` trait on User models
+- `TwoFactorAuthenticationProvider` for TOTP verification
+- `Features::twoFactorAuthentication()` for feature flag checks
+- Actions: `EnableTwoFactorAuthentication`, `DisableTwoFactorAuthentication`, etc.
+
+**Routes are completely disabled** via `Fortify::ignoreRoutes()`.
+
+---
+
+## Original Plan (Historical Reference)
+
+The sections below document the original implementation plan for reference.
+
+---
+
 ## Overview
 
 Este documento detalha o plano para remover o Laravel Fortify do projeto e substituir por controllers custom para autenticação do Tenant, seguindo a mesma arquitetura já implementada para Central Admin.
 
-**Estado Atual:**
+**Estado Anterior:**
 - **Central Admin**: Usa controllers custom (`AdminLoginController`, `ForgotPasswordController`, `ResetPasswordController`, `VerifyEmailController`, `TwoFactorChallengeController`, `ConfirmPasswordController`)
-- **Tenant**: Usa Laravel Fortify v1.30 com guard `tenant`
+- **Tenant**: Usava Laravel Fortify v1.30 com guard `tenant`
 
-**Estado Final:**
-- **Central Admin**: Sem mudanças (controllers custom)
+**Estado Atual:**
+- **Central Admin**: Controllers custom (sem mudanças)
 - **Tenant**: Controllers custom seguindo o mesmo padrão do Central Admin
 
 ## Motivação

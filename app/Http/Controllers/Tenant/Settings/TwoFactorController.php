@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Central\Settings;
+namespace App\Http\Controllers\Tenant\Settings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -13,16 +13,14 @@ use Laravel\Fortify\Actions\GenerateNewRecoveryCodes;
 use Laravel\Fortify\Fortify;
 
 /**
- * Two-Factor Authentication API for Central administrators.
- *
- * Central admins don't use Fortify routes (which use tenant guard),
- * so we provide custom routes that use the same Fortify Actions.
+ * Two-Factor Authentication API for Tenant users.
  *
  * Routes:
  * - POST   /admin/settings/two-factor/enable     - Enable 2FA (generates secret + recovery codes)
  * - POST   /admin/settings/two-factor/confirm    - Confirm 2FA with TOTP code
  * - DELETE /admin/settings/two-factor/disable    - Disable 2FA
  * - GET    /admin/settings/two-factor/qr-code    - Get QR code SVG
+ * - GET    /admin/settings/two-factor/secret-key - Get secret key for manual entry
  * - GET    /admin/settings/two-factor/recovery-codes - Get recovery codes
  * - POST   /admin/settings/two-factor/recovery-codes - Regenerate recovery codes
  */
@@ -71,6 +69,22 @@ class TwoFactorController extends Controller
         return response()->json([
             'svg' => $request->user()->twoFactorQrCodeSvg(),
             'url' => $request->user()->twoFactorQrCodeUrl(),
+        ]);
+    }
+
+    /**
+     * Get the secret key for manual entry in authenticator apps.
+     */
+    public function secretKey(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (is_null($user->two_factor_secret)) {
+            return response()->json([]);
+        }
+
+        return response()->json([
+            'secretKey' => Fortify::currentEncrypter()->decrypt($user->two_factor_secret),
         ]);
     }
 

@@ -70,7 +70,7 @@ class TwoFactorAuthenticationTest extends TestCase
             ->post(route('central.admin.settings.two-factor.enable'));
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'two-factor-authentication-enabled');
+        $response->assertSessionHas('success');
 
         $this->admin->refresh();
         $this->assertNotNull($this->admin->two_factor_secret);
@@ -102,7 +102,7 @@ class TwoFactorAuthenticationTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'two-factor-authentication-confirmed');
+        $response->assertSessionHas('success');
 
         $this->admin->refresh();
         $this->assertNotNull($this->admin->two_factor_confirmed_at);
@@ -127,7 +127,7 @@ class TwoFactorAuthenticationTest extends TestCase
             ->delete(route('central.admin.settings.two-factor.disable'));
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'two-factor-authentication-disabled');
+        $response->assertSessionHas('success');
 
         $this->admin->refresh();
         $this->assertNull($this->admin->two_factor_secret);
@@ -209,7 +209,7 @@ class TwoFactorAuthenticationTest extends TestCase
             ->post(route('central.admin.settings.two-factor.recovery-codes.store'));
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'recovery-codes-generated');
+        $response->assertSessionHas('success');
 
         $this->admin->refresh();
         $newCodes = json_decode(decrypt($this->admin->two_factor_recovery_codes), true);

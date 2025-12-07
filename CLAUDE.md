@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Laravel + React starter kit combining Laravel 12 backend with React 19 frontend using Inertia.js.
 
 **Stack:**
-- **Backend**: Laravel 12, Fortify (auth), Stancl Tenancy (multi-tenant), Spatie Permission
+- **Backend**: Laravel 12, Custom Auth Controllers, Stancl Tenancy (multi-tenant), Spatie Permission
 - **Frontend**: React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Radix UI, Lucide icons
 - **Build**: Vite 7, React Compiler enabled, SSR support
 - **Infrastructure**: Laravel Sail (Docker), PostgreSQL 18, Redis
@@ -216,7 +216,7 @@ laravel({
 
 ### Backend Structure
 
-- **Authentication**: Laravel Fortify (registration, login, password reset, 2FA)
+- **Authentication**: Custom Auth Controllers (Fortify used only as 2FA library)
 - **Controllers**: `app/Http/Controllers/` - Thin controllers (Inertia responses only)
 - **Resources**: `app/Http/Resources/` - API Resources for data transformation
 - **Middleware**: HandleInertiaRequests, HandleAppearance, tenant middleware
@@ -224,6 +224,50 @@ laravel({
 - **Multi-Tenancy**: Multi-database tenancy (each tenant has dedicated database)
 - **Permissions**: Spatie Laravel Permission + Enums (`app/Enums/TenantPermission.php`, `CentralPermission.php`, `TenantRole.php`)
 - **Services**: `app/Services/` - Business logic (return Eloquent models, not arrays)
+
+### Authentication Architecture
+
+**Custom Auth Controllers** (não usa rotas do Fortify):
+
+```
+app/Http/Controllers/
+├── Central/Auth/           # Central admin authentication
+│   ├── AdminLoginController.php
+│   ├── AdminLogoutController.php
+│   ├── ForgotPasswordController.php
+│   ├── ResetPasswordController.php
+│   ├── TwoFactorChallengeController.php
+│   └── ConfirmPasswordController.php
+└── Tenant/Auth/            # Tenant user authentication
+    ├── LoginController.php
+    ├── LogoutController.php
+    ├── RegisterController.php
+    ├── ForgotPasswordController.php
+    ├── ResetPasswordController.php
+    ├── TwoFactorChallengeController.php
+    ├── ConfirmPasswordController.php
+    └── VerifyEmailController.php
+```
+
+**Authentication Routes**:
+- **Central**: `central.admin.auth.*` (login, logout, password reset, 2FA)
+- **Tenant**: `tenant.auth.*` (login, logout, register, password reset, 2FA, email verification)
+
+**Guards**:
+- `central`: Central administrators (Central\\User)
+- `tenant`: Tenant users (Tenant\\User)
+
+**Password Confirmation Middleware**:
+- `central.password.confirm`: For central admin routes
+- `tenant.password.confirm`: For tenant user routes
+
+**Fortify Usage** (library only, no routes):
+- `TwoFactorAuthenticatable` trait on User models
+- `TwoFactorAuthenticationProvider` for code verification
+- `Features::twoFactorAuthentication()` for feature flag checks
+- Routes disabled via `Fortify::ignoreRoutes()` in AppServiceProvider
+
+**See**: [docs/FORTIFY-REMOVAL-PLAN.md](docs/FORTIFY-REMOVAL-PLAN.md) for migration details.
 
 ### Models Structure
 
@@ -296,13 +340,9 @@ app/Mail/
 └── Shared/            # .gitkeep
 
 app/Http/Middleware/
-├── Central/           # .gitkeep
-├── Tenant/            # AllowAdminMode, VerifyTenantAccess, CheckPlan
+├── Central/           # RequireCentralPassword
+├── Tenant/            # AllowAdminMode, VerifyTenantAccess, CheckPlan, RequireTenantPassword
 └── Shared/            # HandleInertiaRequests, AddSecurityHeaders, HandleAppearance, SetLocale
-
-app/Actions/Fortify/
-├── Tenant/            # CreateNewUser, ResetUserPassword
-└── Shared/            # PasswordValidationRules (trait)
 
 app/Policies/
 ├── Central/           # .gitkeep
@@ -446,7 +486,6 @@ import { store } from '@/routes/register'
 - ✅ **FilesystemTenancyBootstrapper**: Storage paths isolados
 - ✅ **QueueTenancyBootstrapper**: Jobs mantêm contexto do tenant
 - ✅ **RedisTenancyBootstrapper**: Redis keys prefixadas por tenant (sessions included)
-- ✅ **FortifyRouteBootstrapper**: Redirects tenant-aware para Fortify (v4)
 - ✅ **SpatiePermissionsBootstrapper**: Cache de permissions por tenant
 
 **v4 Features Ativas**:
@@ -789,3 +828,4 @@ For in-depth technical documentation, see:
 - **[docs/I18N.md](docs/I18N.md)** - Internationalization guide
 - **[docs/ADDONS.md](docs/ADDONS.md)** - Add-ons system
 - **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources for data transformation
+- **[docs/FORTIFY-REMOVAL-PLAN.md](docs/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation

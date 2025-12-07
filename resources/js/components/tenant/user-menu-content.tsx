@@ -7,7 +7,7 @@ import {
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import userSettings from '@/routes/tenant/admin/user-settings';
-import { logout } from '@/routes';
+import { logout } from '@/routes/tenant/auth';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';

@@ -3,10 +3,9 @@ import HeadingSmall from '@/components/heading-small';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useCentralTwoFactorAuth } from '@/hooks/use-central-two-factor-auth';
+import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import CentralAdminLayout from '@/layouts/central-admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
-import { disable, enable } from '@/routes/central/admin/settings/two-factor';
 import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
@@ -35,7 +34,8 @@ export default function TwoFactor({
         recoveryCodesList,
         fetchRecoveryCodes,
         errors,
-    } = useCentralTwoFactorAuth();
+        routes,
+    } = useTwoFactorAuth({ context: 'central' });
     const [showSetupModal, setShowSetupModal] = useState<boolean>(setupPending);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -69,10 +69,11 @@ export default function TwoFactor({
                                 recoveryCodesList={recoveryCodesList}
                                 fetchRecoveryCodes={fetchRecoveryCodes}
                                 errors={errors}
+                                regenerateRecoveryCodes={routes.regenerateRecoveryCodes}
                             />
 
                             <div className="relative inline">
-                                <Form {...disable.form()}>
+                                <Form {...routes.disable.form()}>
                                     {({ processing }) => (
                                         <Button
                                             variant="destructive"
@@ -102,7 +103,7 @@ export default function TwoFactor({
                                     </Button>
                                 ) : (
                                     <Form
-                                        {...enable.form()}
+                                        {...routes.enable.form()}
                                         onSuccess={() =>
                                             setShowSetupModal(true)
                                         }

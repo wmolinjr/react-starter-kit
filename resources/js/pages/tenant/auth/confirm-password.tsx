@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import TenantAdminLayout from '@/layouts/tenant-admin-layout';
 import { type BreadcrumbItem } from '@/types';
-import { store } from '@/routes/password/confirm';
+import { store } from '@/routes/tenant/auth/confirm-password';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldCheck } from 'lucide-react';
@@ -37,7 +37,7 @@ export default function ConfirmPassword() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Form {...store.form()} resetOnSuccess={['password']}>
+                        <Form {...store()} resetOnSuccess={['password']}>
                             {({ processing, errors }) => (
                                 <div className="space-y-6">
                                     <div className="grid gap-2">

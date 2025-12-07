@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import TenantAdminLayout from '@/layouts/tenant-admin-layout';
 import TenantUserSettingsLayout from '@/layouts/tenant/user-settings-layout';
-import { disable, enable } from '@/routes/two-factor';
 import userSettings from '@/routes/tenant/admin/user-settings';
 import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
@@ -33,6 +32,7 @@ export default function TwoFactor({
         recoveryCodesList,
         fetchRecoveryCodes,
         errors,
+        routes,
     } = useTwoFactorAuth();
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
@@ -67,10 +67,11 @@ export default function TwoFactor({
                                 recoveryCodesList={recoveryCodesList}
                                 fetchRecoveryCodes={fetchRecoveryCodes}
                                 errors={errors}
+                                regenerateRecoveryCodes={routes.regenerateRecoveryCodes}
                             />
 
                             <div className="relative inline">
-                                <Form {...disable.form()}>
+                                <Form {...routes.disable.form()}>
                                     {({ processing }) => (
                                         <Button
                                             variant="destructive"
@@ -100,7 +101,7 @@ export default function TwoFactor({
                                     </Button>
                                 ) : (
                                     <Form
-                                        {...enable.form()}
+                                        {...routes.enable.form()}
                                         onSuccess={() =>
                                             setShowSetupModal(true)
                                         }
@@ -130,6 +131,7 @@ export default function TwoFactor({
                         clearSetupData={clearSetupData}
                         fetchSetupData={fetchSetupData}
                         errors={errors}
+                        confirmRoute={routes.confirm}
                     />
                 </div>
             </TenantUserSettingsLayout>

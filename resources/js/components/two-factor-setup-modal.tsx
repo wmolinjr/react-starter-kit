@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/input-otp';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import { confirm } from '@/routes/two-factor';
+import type { confirm } from '@/routes/tenant/admin/user-settings/two-factor';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, ScanLine } from 'lucide-react';
@@ -132,9 +132,11 @@ function TwoFactorSetupStep({
 function TwoFactorVerificationStep({
     onClose,
     onBack,
+    confirmRoute,
 }: {
     onClose: () => void;
     onBack: () => void;
+    confirmRoute: typeof confirm;
 }) {
     const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
@@ -147,7 +149,7 @@ function TwoFactorVerificationStep({
 
     return (
         <Form
-            {...confirm.form()}
+            {...confirmRoute.form()}
             onSuccess={() => onClose()}
             resetOnError
             resetOnSuccess
@@ -229,6 +231,7 @@ interface TwoFactorSetupModalProps {
     clearSetupData: () => void;
     fetchSetupData: () => Promise<void>;
     errors: string[];
+    confirmRoute: typeof confirm;
 }
 
 export default function TwoFactorSetupModal({
@@ -241,6 +244,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
+    confirmRoute,
 }: TwoFactorSetupModalProps) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
@@ -321,6 +325,7 @@ export default function TwoFactorSetupModal({
                         <TwoFactorVerificationStep
                             onClose={onClose}
                             onBack={() => setShowVerificationStep(false)}
+                            confirmRoute={confirmRoute}
                         />
                     ) : (
                         <TwoFactorSetupStep

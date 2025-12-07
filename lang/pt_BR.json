@@ -1168,6 +1168,13 @@
 
   "flash.user.deleted": "Usuário excluído com sucesso.",
 
+  "flash.password.updated": "Senha atualizada com sucesso.",
+
+  "flash.two_factor.enabled": "Autenticação de dois fatores ativada.",
+  "flash.two_factor.confirmed": "Autenticação de dois fatores confirmada.",
+  "flash.two_factor.disabled": "Autenticação de dois fatores desativada.",
+  "flash.two_factor.recovery_codes_regenerated": "Códigos de recuperação regenerados com sucesso.",
+
   "flash.impersonation.stopped": "Impersonação encerrada com sucesso.",
 
   "flash.project.created": "Projeto criado com sucesso!",
