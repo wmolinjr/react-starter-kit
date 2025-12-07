@@ -13,9 +13,15 @@ use App\Http\Controllers\Central\Admin\TenantManagementController;
 use App\Http\Controllers\Central\Admin\UserManagementController;
 use App\Http\Controllers\Central\Auth\AdminLoginController;
 use App\Http\Controllers\Central\Auth\AdminLogoutController;
+use App\Http\Controllers\Central\Auth\ConfirmPasswordController;
+use App\Http\Controllers\Central\Auth\ForgotPasswordController;
+use App\Http\Controllers\Central\Auth\ResetPasswordController;
+use App\Http\Controllers\Central\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Central\Auth\VerifyEmailController;
 use App\Http\Controllers\Central\Settings\PasswordController;
 use App\Http\Controllers\Central\Settings\ProfileController;
 use App\Http\Controllers\Central\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\Central\Settings\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -96,15 +102,41 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         |
         */
 
-        // Guest routes (admin login)
+        // Guest routes (admin login, password reset, 2FA challenge)
         Route::middleware('guest:central')->prefix('admin')->name('admin.auth.')->group(function () {
+            // Login
             Route::get('/login', [AdminLoginController::class, 'create'])->name('login');
             Route::post('/login', [AdminLoginController::class, 'store'])->name('login.store');
+
+            // Forgot Password
+            Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
+            Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email');
+
+            // Reset Password
+            Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
+            Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('password.update');
+
+            // Two-Factor Challenge (during login)
+            Route::get('/two-factor-challenge', [TwoFactorChallengeController::class, 'create'])->name('two-factor.challenge');
+            Route::post('/two-factor-challenge', [TwoFactorChallengeController::class, 'store'])->name('two-factor.challenge.store');
         });
 
-        // Authenticated routes (admin logout)
+        // Authenticated routes (admin logout, password confirmation, email verification)
         Route::middleware('auth:central')->prefix('admin')->name('admin.auth.')->group(function () {
             Route::post('/logout', [AdminLogoutController::class, 'destroy'])->name('logout');
+
+            // Password confirmation (separate from Fortify's password.confirm for tenant users)
+            Route::get('/confirm-password', [ConfirmPasswordController::class, 'show'])->name('confirm-password');
+            Route::post('/confirm-password', [ConfirmPasswordController::class, 'store'])->name('confirm-password.store');
+
+            // Email Verification
+            Route::get('/email/verify', [VerifyEmailController::class, 'notice'])->name('verification.notice');
+            Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
+                ->middleware(['signed', 'throttle:6,1'])
+                ->name('verification.verify');
+            Route::post('/email/verification-notification', [VerifyEmailController::class, 'send'])
+                ->middleware('throttle:6,1')
+                ->name('verification.send');
         });
 
         /*
@@ -241,7 +273,19 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                             return Inertia::render('central/admin/user-settings/appearance');
                         })->name('appearance.edit');
 
+                        // Two-Factor Authentication routes
+                        // Show page doesn't require password confirmation
                         Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])->name('two-factor.show');
+
+                        // All 2FA actions require password confirmation (same as Fortify for tenant users)
+                        Route::middleware('central.password.confirm')->group(function () {
+                            Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
+                            Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+                            Route::delete('two-factor/disable', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+                            Route::get('two-factor/qr-code', [TwoFactorController::class, 'qrCode'])->name('two-factor.qr-code');
+                            Route::get('two-factor/recovery-codes', [TwoFactorController::class, 'recoveryCodes'])->name('two-factor.recovery-codes');
+                            Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.recovery-codes.store');
+                        });
                     });
             });
     });

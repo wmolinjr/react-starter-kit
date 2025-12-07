@@ -1,19 +1,23 @@
 import InputError from '@/components/input-error';
+import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import { store } from '@/routes/central/admin/auth/login';
+import { request } from '@/routes/central/admin/auth/password';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Shield } from 'lucide-react';
 
 interface AdminLoginProps {
     status?: string;
+    canResetPassword?: boolean;
 }
 
-export default function AdminLogin({ status }: AdminLoginProps) {
+export default function AdminLogin({ status, canResetPassword = true }: AdminLoginProps) {
     const { t } = useLaravelReactI18n();
 
     return (
@@ -29,8 +33,7 @@ export default function AdminLogin({ status }: AdminLoginProps) {
             </div>
 
             <Form
-                action="/admin/login"
-                method="post"
+                {...store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
@@ -55,9 +58,20 @@ export default function AdminLogin({ status }: AdminLoginProps) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">
-                                    {t('Password')}
-                                </Label>
+                                <div className="flex items-center">
+                                    <Label htmlFor="password">
+                                        {t('Password')}
+                                    </Label>
+                                    {canResetPassword && (
+                                        <TextLink
+                                            href={request()}
+                                            className="ml-auto text-sm"
+                                            tabIndex={5}
+                                        >
+                                            {t('Forgot your password?')}
+                                        </TextLink>
+                                    )}
+                                </div>
                                 <Input
                                     id="password"
                                     type="password"

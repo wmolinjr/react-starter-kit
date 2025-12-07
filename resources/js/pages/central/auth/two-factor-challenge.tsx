@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/input-otp';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import AuthLayout from '@/layouts/auth-layout';
-import { store } from '@/routes/two-factor/login';
+import { store } from '@/routes/central/admin/auth/two-factor/challenge';
 import { Form, Head } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useLaravelReactI18n } from 'laravel-react-i18n';

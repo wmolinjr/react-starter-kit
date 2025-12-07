@@ -1,12 +1,12 @@
+import CentralTwoFactorSetupModal from '@/components/central-two-factor-setup-modal';
 import HeadingSmall from '@/components/heading-small';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
-import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
+import { useCentralTwoFactorAuth } from '@/hooks/use-central-two-factor-auth';
 import CentralAdminLayout from '@/layouts/central-admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
-import { disable, enable } from '@/routes/two-factor';
+import { disable, enable } from '@/routes/central/admin/settings/two-factor';
 import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
@@ -17,11 +17,13 @@ import { useState } from 'react';
 interface TwoFactorProps {
     requiresConfirmation?: boolean;
     twoFactorEnabled?: boolean;
+    setupPending?: boolean;
 }
 
 export default function TwoFactor({
     requiresConfirmation = false,
     twoFactorEnabled = false,
+    setupPending = false,
 }: TwoFactorProps) {
     const { t } = useLaravelReactI18n();
     const {
@@ -33,8 +35,8 @@ export default function TwoFactor({
         recoveryCodesList,
         fetchRecoveryCodes,
         errors,
-    } = useTwoFactorAuth();
-    const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
+    } = useCentralTwoFactorAuth();
+    const [showSetupModal, setShowSetupModal] = useState<boolean>(setupPending);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -120,7 +122,7 @@ export default function TwoFactor({
                         </div>
                     )}
 
-                    <TwoFactorSetupModal
+                    <CentralTwoFactorSetupModal
                         isOpen={showSetupModal}
                         onClose={() => setShowSetupModal(false)}
                         requiresConfirmation={requiresConfirmation}

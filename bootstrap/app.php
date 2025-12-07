@@ -139,6 +139,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Admin Mode: Allow access when impersonating without specific user (Option C)
             'admin.mode' => \App\Http\Middleware\Tenant\AllowAdminMode::class,
+
+            // Central Admin password confirmation (separate from Fortify's password.confirm)
+            'central.password.confirm' => \App\Http\Middleware\Central\RequireCentralPassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

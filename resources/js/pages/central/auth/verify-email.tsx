@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Spinner } from '@/components/ui/spinner';
 import CentralAdminLayout from '@/layouts/central-admin-layout';
 import { logout } from '@/routes/central/admin/auth';
-import { send } from '@/routes/verification';
+import { send } from '@/routes/central/admin/auth/verification';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Mail } from 'lucide-react';

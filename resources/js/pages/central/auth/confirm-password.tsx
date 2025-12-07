@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import CentralAdminLayout from '@/layouts/central-admin-layout';
 import { type BreadcrumbItem } from '@/types';
-import { store } from '@/routes/password/confirm';
+import { store } from '@/routes/central/admin/auth/confirm-password';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldCheck } from 'lucide-react';
@@ -17,7 +17,7 @@ export default function ConfirmPassword() {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: t('auth.confirm_password.breadcrumb'),
-            href: '/user/confirm-password',
+            href: '/admin/confirm-password',
         },
     ];
 
