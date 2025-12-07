@@ -85,6 +85,11 @@ export function useCentralAdminNavItems(): NavItem[] {
             href: admin.roles.index.url(),
             icon: Shield,
         },
+        {
+            title: t('sidebar.settings'),
+            href: shared.settings.profile.edit.url(),
+            icon: Settings,
+        },
     ];
 }
 

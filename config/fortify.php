@@ -129,12 +129,14 @@ return [
     | - 'universal' flag: makes Fortify routes work in both central and tenant contexts
     | - InitializeTenancyByDomain: initializes tenancy when accessed from tenant domain
     | - This enables FortifyRouteBootstrapper to redirect to tenant.admin.dashboard
+    | - RedirectFortifyOnCentral: redirects /login to /admin/login on central domains
     |--------------------------------------------------------------------------
     */
     'middleware' => [
         'web',
         'universal',
         \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        \App\Http\Middleware\Central\RedirectFortifyOnCentral::class,
     ],
 
     /*

@@ -13,43 +13,31 @@ use Inertia\Inertia;
 /**
  * Central admin dashboard controller.
  *
- * TENANT-ONLY ARCHITECTURE (Option C):
- * This controller supports both authentication methods during migration:
- * - 'central' guard: New Admin model (central database)
- * - 'tenant' guard: Legacy User model with Super Admin role (deprecated)
- *
- * After full migration, only 'central' guard will be supported.
+ * ARCHITECTURE (Option C - Tenant-Only Users):
+ * - Central admins authenticate via 'central' guard (Central\User model)
+ * - Only admins with proper permissions can access this controller
  */
 class DashboardController extends Controller
 {
     /**
      * Admin dashboard with platform stats.
      *
-     * Access control:
-     * - If using 'central' guard: must be a super admin (Admin model)
-     * - If using 'tenant' guard: must have 'Super Admin' role (legacy, deprecated)
+     * Requires authenticated central user with at least one role.
+     * Users without roles cannot access the admin area.
      */
     public function dashboard()
     {
-        // Check if authenticated via central guard (new architecture)
-        if (Auth::guard('central')->check()) {
-            $admin = Auth::guard('central')->user();
-            if (! $admin instanceof CentralUser || ! $admin->isSuperAdmin()) {
-                abort(403, 'Only super administrators can access this area.');
-            }
-        }
-        // Legacy: Check if authenticated via tenant guard with Super Admin role
-        elseif (Auth::guard('tenant')->check()) {
-            $user = Auth::guard('tenant')->user();
-            if (! $user->hasRole('Super Admin')) {
-                abort(403, 'Only super administrators can access this area.');
-            }
-        } else {
+        $admin = Auth::guard('central')->user();
+
+        if (! $admin instanceof CentralUser) {
             abort(403, 'Authentication required.');
         }
 
-        // Option C: Users only exist in tenant databases
-        // Count admins from central DB instead
+        // Require at least one role to access admin area
+        if ($admin->roles()->count() === 0) {
+            abort(403, 'Access denied. No admin role assigned.');
+        }
+
         $stats = [
             'total_tenants' => Tenant::count(),
             'total_admins' => CentralUser::count(),

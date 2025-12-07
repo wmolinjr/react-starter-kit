@@ -51,6 +51,21 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
             ]);
         })->name('home');
 
+        /*
+        |----------------------------------------------------------------------
+        | Fortify Route Redirects (Central Domain)
+        |----------------------------------------------------------------------
+        |
+        | NOTE: Fortify routes (/login, /register) on central domain are now
+        | handled by RedirectFortifyOnCentral middleware in config/fortify.php.
+        |
+        | The middleware intercepts these routes and redirects to admin login
+        | since there are no tenant users in central database.
+        |
+        | @see App\Http\Middleware\Central\RedirectFortifyOnCentral
+        |
+        */
+
         /**
          * Sanctum CSRF Cookie Route for Central Context.
          *
@@ -133,16 +148,11 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                 // Dashboard com lista de tenants
                 Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-                // Impersonation
-                // TENANT-ONLY ARCHITECTURE (Option C): New routes for advanced impersonation
-                Route::prefix('impersonate')->name('impersonate.')->group(function () {
-                    // Legacy routes (kept for backward compatibility)
-                    Route::post('/tenant/{tenant}', [ImpersonationController::class, 'start'])->name('start');
-                    Route::post('/tenant/{tenant}/user/{user}', [ImpersonationController::class, 'start'])->name('start.user');
-                    Route::post('/stop', [ImpersonationController::class, 'stop'])->name('stop');
-                });
+                // Impersonation - TENANT-ONLY ARCHITECTURE (Option C)
+                // Stop impersonation route (shared)
+                Route::post('/impersonate/stop', [ImpersonationController::class, 'stop'])->name('impersonate.stop');
 
-                // Advanced Impersonation Routes (Option C)
+                // Impersonation Routes
                 Route::prefix('tenants/{tenant}/impersonate')->name('tenants.impersonate.')->group(function () {
                     // User selection page - lists users from tenant database
                     Route::get('/', [ImpersonationController::class, 'index'])->name('index');

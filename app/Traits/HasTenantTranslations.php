@@ -104,9 +104,6 @@ trait HasTenantTranslations
             return null;
         }
 
-        // Get tenant key for cache key (even though not filtering by it)
-        $tenantKey = tenancy()->initialized ? tenant('id') : 'none';
-
         // When cache doesn't support tagging, skip caching entirely
         if (! $this->cacheSupportsTagging()) {
             return TenantTranslationOverride::where([
@@ -116,9 +113,10 @@ trait HasTenantTranslations
             ])->first();
         }
 
-        $cacheKey = "trans_override:{$tenantKey}:".static::class.":{$this->id}:{$field}";
+        // Cache key includes model info - tenant isolation is handled by RedisTenancyBootstrapper
+        $cacheKey = "trans_override:".static::class.":{$this->id}:{$field}";
 
-        return Cache::tags(['tenant_translations', "tenant:{$tenantKey}"])
+        return Cache::tags(['tenant_translations'])
             ->remember($cacheKey, 3600, function () use ($field) {
                 return TenantTranslationOverride::where([
                     'translatable_type' => static::class,
@@ -315,13 +313,13 @@ trait HasTenantTranslations
 
     /**
      * Clear tenant translation cache.
+     *
+     * Tenant isolation is handled by RedisTenancyBootstrapper - no need for tenant-specific tags.
      */
     protected function clearTenantTranslationCache(): void
     {
-        $tenantKey = tenancy()->initialized ? tenant('id') : 'none';
-
         if ($this->cacheSupportsTagging()) {
-            Cache::tags(["tenant:{$tenantKey}", 'tenant_translations'])->flush();
+            Cache::tags(['tenant_translations'])->flush();
         } else {
             // Without tags, we can't selectively clear - clear the entire cache
             // In production, use Redis which supports tagging

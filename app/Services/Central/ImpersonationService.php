@@ -4,27 +4,12 @@ namespace App\Services\Central;
 
 use App\Models\Central\Tenant;
 use App\Models\Central\User as CentralUser;
-use App\Models\Tenant\User as TenantUser;
+use App\Models\Tenant\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Stancl\Tenancy\Database\Models\ImpersonationToken;
 use Stancl\Tenancy\Features\UserImpersonation;
 
-/**
- * ImpersonationService
- *
- * Handles all business logic for admin impersonation of tenant users.
- *
- * STANCL/TENANCY V4:
- * - Uses native tenancy()->impersonate() to create tokens
- * - Uses native UserImpersonation::stopImpersonating() to end session
- *
- * TENANT-ONLY ARCHITECTURE (Option C):
- * - Supports two impersonation scenarios:
- *   1. Admin Mode: Admin enters tenant without logging in as a user (user_id = null)
- *   2. As User: Admin impersonates a specific tenant user
- * - Users exist ONLY in tenant databases, queried via tenancy()->run()
- */
 class ImpersonationService
 {
     /**
@@ -35,11 +20,11 @@ class ImpersonationService
     public function getTenantUsers(Tenant $tenant): Collection
     {
         return tenancy()->run($tenant, function () {
-            return TenantUser::select('id', 'name', 'email', 'created_at')
+            return User::select('id', 'name', 'email', 'created_at')
                 ->with('roles:id,name')
                 ->orderBy('name')
                 ->get()
-                ->map(fn (TenantUser $user) => [
+                ->map(fn (User $user) => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
@@ -83,7 +68,7 @@ class ImpersonationService
     ): ImpersonationToken {
         // Verify user exists in tenant database
         $userExists = tenancy()->run($tenant, function () use ($userId) {
-            return TenantUser::where('id', $userId)->exists();
+            return User::where('id', $userId)->exists();
         });
 
         if (! $userExists) {
@@ -95,43 +80,19 @@ class ImpersonationService
     }
 
     /**
-     * Get the authenticated admin user.
-     *
-     * Supports both new 'central' guard and legacy 'tenant' guard with Super Admin role.
+     * Get the authenticated central admin user.
      */
-    public function getAuthenticatedAdmin(): CentralUser|TenantUser|null
+    public function getAuthenticatedAdmin(): ?CentralUser
     {
-        // Try central guard first (new architecture)
-        $admin = auth('central')->user();
-        if ($admin) {
-            return $admin;
-        }
-
-        // Fallback to web guard (legacy)
-        $user = auth()->user();
-        if ($user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) {
-            return $user;
-        }
-
-        return null;
+        return auth('central')->user();
     }
 
     /**
      * Check if admin can access the tenant.
      */
-    public function canAccessTenant($admin, Tenant $tenant): bool
+    public function canAccessTenant(CentralUser $admin, Tenant $tenant): bool
     {
-        // New Admin model has canAccessTenant() method
-        if (method_exists($admin, 'canAccessTenant')) {
-            return $admin->canAccessTenant($tenant);
-        }
-
-        // Legacy: User with Super Admin role
-        if (method_exists($admin, 'hasRole')) {
-            return $admin->hasRole('Super Admin');
-        }
-
-        return false;
+        return $admin->canAccessTenant($tenant);
     }
 
     /**

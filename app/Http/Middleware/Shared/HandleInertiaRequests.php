@@ -42,7 +42,10 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        $user = $request->user();
+        // Check central guard first, then default guard
+        // This fixes the issue where central admins have null auth.user
+        // because $request->user() uses the default 'tenant' guard
+        $user = auth('central')->user() ?? $request->user();
 
         return [
             ...parent::share($request),
@@ -94,6 +97,7 @@ class HandleInertiaRequests extends Middleware
                 'tenant' => null,
                 'permissions' => [],
                 'role' => null,
+                'guard' => null,
             ];
         }
 
@@ -107,6 +111,7 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                 'role' => $user->getRoleName(),
                 'isSuperAdmin' => $user->isSuperAdmin(),
+                'guard' => 'central', // Indicate which guard is active
             ];
         }
 
@@ -124,6 +129,8 @@ class HandleInertiaRequests extends Middleware
 
             // Role info: para UI apenas (badges, display, etc) - NÃO usar para autorização
             'role' => $this->getRoleData($user),
+
+            'guard' => 'tenant', // Indicate which guard is active
         ];
     }
 

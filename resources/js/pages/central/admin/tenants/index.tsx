@@ -63,9 +63,10 @@ export default function TenantsIndex({ tenants, filters, isImpersonating }: Prop
 
     const handleImpersonate = (tenantId: string, userId?: string) => {
         setImpersonating(tenantId);
+        // Use new impersonation routes (Option C architecture)
         const url = userId
-            ? admin.impersonate.start.user.url({ tenant: tenantId, user: userId })
-            : admin.impersonate.start.url(tenantId);
+            ? admin.tenants.impersonate.asUser.url({ tenant: tenantId, userId })
+            : admin.tenants.impersonate.adminMode.url(tenantId);
         router.post(url, {}, { onFinish: () => setImpersonating(null) });
     };
 

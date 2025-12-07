@@ -35,9 +35,17 @@ export interface TenantInfo {
  * - Users exist ONLY in tenant databases (complete isolation)
  * - A user belongs to exactly one tenant (the database they're in)
  * - No tenants list - just current tenant info
+ *
+ * DUAL GUARD SYSTEM:
+ * - 'central' guard: Central admins (Central\User) - isSuperAdmin available
+ * - 'tenant' guard: Tenant users (Tenant\User)
  */
 export interface ExtendedAuth extends Auth<User> {
     tenant: TenantInfo | null;
+    /** Only present for central users (guard === 'central') */
+    isSuperAdmin?: boolean;
+    /** Which authentication guard is active */
+    guard: 'central' | 'tenant' | null;
 }
 
 export interface TenantSubscription {

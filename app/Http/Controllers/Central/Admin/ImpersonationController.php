@@ -37,7 +37,7 @@ class ImpersonationController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('can:'.CentralPermission::TENANTS_IMPERSONATE->value, only: ['index', 'adminMode', 'asUser', 'start']),
+            new Middleware('can:'.CentralPermission::TENANTS_IMPERSONATE->value, only: ['index', 'adminMode', 'asUser']),
         ];
     }
 
@@ -102,38 +102,6 @@ class ImpersonationController extends Controller implements HasMiddleware
 
         try {
             $token = $this->impersonationService->createUserImpersonationToken($tenant, $userId);
-            $url = $this->impersonationService->buildImpersonationUrl($tenant, $token);
-
-            return Inertia::location($url);
-        } catch (\InvalidArgumentException $e) {
-            abort(404, $e->getMessage());
-        }
-    }
-
-    /**
-     * Legacy method: Start impersonation of tenant user via token.
-     *
-     * @deprecated Use asUser() or adminMode() instead
-     */
-    public function start(Tenant $tenant, ?User $user = null): RedirectResponse|Response
-    {
-        // If no user specified, redirect to user selection page
-        if (! $user) {
-            return redirect()->route('central.admin.tenants.impersonate.index', $tenant);
-        }
-
-        // Legacy: Validate user belongs to tenant via pivot table
-        // This path is kept for backward compatibility during migration
-        if (method_exists($user, 'tenants') && ! $user->tenants()->where('tenant_id', $tenant->id)->exists()) {
-            abort(403, 'User does not belong to this tenant.');
-        }
-
-        try {
-            $token = $this->impersonationService->createUserImpersonationToken(
-                $tenant,
-                (string) $user->id,
-                '/admin'
-            );
             $url = $this->impersonationService->buildImpersonationUrl($tenant, $token);
 
             return Inertia::location($url);
