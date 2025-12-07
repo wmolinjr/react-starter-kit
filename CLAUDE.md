@@ -148,7 +148,7 @@ REDIS_HOST=redis       # Nome do serviço Docker
 Inertia bridges Laravel and React, enabling server-side routing with React components as views.
 
 **Key Flow:**
-1. Routes defined in `routes/web.php`, `routes/settings.php`, `routes/tenant.php`
+1. Routes defined in `routes/central.php` (central admin + panel), `routes/tenant.php` (tenant routes)
 2. Controllers return `Inertia::render('page-name', $props)`
 3. Inertia middleware (`HandleInertiaRequests.php`) shares global props
 4. React pages in `resources/js/pages/` receive props and render
@@ -220,7 +220,7 @@ laravel({
 - **Controllers**: `app/Http/Controllers/` - Thin controllers (Inertia responses only)
 - **Resources**: `app/Http/Resources/` - API Resources for data transformation
 - **Middleware**: HandleInertiaRequests, HandleAppearance, tenant middleware
-- **Routes**: web.php (public), settings.php (settings), tenant.php (tenant routes)
+- **Routes**: central.php (central admin + panel), tenant.php (tenant routes), webhooks.php (Stripe)
 - **Multi-Tenancy**: Multi-database tenancy (each tenant has dedicated database)
 - **Permissions**: Spatie Laravel Permission + Enums (`app/Enums/TenantPermission.php`, `CentralPermission.php`, `TenantRole.php`)
 - **Services**: `app/Services/` - Business logic (return Eloquent models, not arrays)

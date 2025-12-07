@@ -16,7 +16,11 @@ class PasswordController extends Controller
      */
     public function edit(): Response
     {
-        return Inertia::render('shared/settings/password');
+        $page = tenancy()->initialized
+            ? 'tenant/admin/user-settings/password'
+            : 'central/admin/user-settings/password';
+
+        return Inertia::render($page);
     }
 
     /**

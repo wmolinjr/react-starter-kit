@@ -11,7 +11,8 @@ class PasswordUpdateTest extends TenantTestCase
     public function test_password_update_page_is_displayed()
     {
         $response = $this
-            ->get(route('shared.settings.password.edit'));
+            ->actingAs($this->user, 'tenant')
+            ->get($this->tenantRoute('tenant.admin.user-settings.password.edit'));
 
         $response->assertStatus(200);
     }
@@ -19,8 +20,9 @@ class PasswordUpdateTest extends TenantTestCase
     public function test_password_can_be_updated()
     {
         $response = $this
-            ->from(route('shared.settings.password.edit'))
-            ->put(route('shared.settings.password.update'), [
+            ->actingAs($this->user, 'tenant')
+            ->from($this->tenantRoute('tenant.admin.user-settings.password.edit'))
+            ->put($this->tenantRoute('tenant.admin.user-settings.password.update'), [
                 'current_password' => 'password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -28,7 +30,7 @@ class PasswordUpdateTest extends TenantTestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('shared.settings.password.edit'));
+            ->assertRedirect($this->tenantRoute('tenant.admin.user-settings.password.edit'));
 
         $this->assertTrue(Hash::check('new-password', $this->user->refresh()->password));
     }
@@ -36,8 +38,9 @@ class PasswordUpdateTest extends TenantTestCase
     public function test_correct_password_must_be_provided_to_update_password()
     {
         $response = $this
-            ->from(route('shared.settings.password.edit'))
-            ->put(route('shared.settings.password.update'), [
+            ->actingAs($this->user, 'tenant')
+            ->from($this->tenantRoute('tenant.admin.user-settings.password.edit'))
+            ->put($this->tenantRoute('tenant.admin.user-settings.password.update'), [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -45,6 +48,6 @@ class PasswordUpdateTest extends TenantTestCase
 
         $response
             ->assertSessionHasErrors('current_password')
-            ->assertRedirect(route('shared.settings.password.edit'));
+            ->assertRedirect($this->tenantRoute('tenant.admin.user-settings.password.edit'));
     }
 }

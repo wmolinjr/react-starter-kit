@@ -15,6 +15,9 @@ use App\Http\Controllers\Central\Auth\AdminLoginController;
 use App\Http\Controllers\Central\Auth\AdminLogoutController;
 use App\Http\Controllers\Central\Panel\DashboardController as PanelDashboardController;
 use App\Http\Controllers\Central\Panel\TenantAccessController;
+use App\Http\Controllers\Shared\Settings\PasswordController;
+use App\Http\Controllers\Shared\Settings\ProfileController;
+use App\Http\Controllers\Shared\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -234,6 +237,38 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::put('/{tenant}', [TenantManagementController::class, 'update'])->name('update');
                     Route::delete('/{tenant}', [TenantManagementController::class, 'destroy'])->name('destroy');
                 });
+
+                /*
+                |------------------------------------------------------------------
+                | Admin User Settings Routes (central.admin.settings.*)
+                |------------------------------------------------------------------
+                |
+                | Personal settings for central admin users (profile, password, etc.)
+                | Uses shared controllers that work with auth()->user().
+                |
+                */
+
+                Route::prefix('settings')
+                    ->name('settings.')
+                    ->group(function () {
+                        Route::redirect('/', '/admin/settings/profile');
+
+                        Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+                        Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+                        Route::patch('profile/locale', [ProfileController::class, 'updateLocale'])->name('profile.locale');
+                        Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+                        Route::get('password', [PasswordController::class, 'edit'])->name('password.edit');
+                        Route::put('password', [PasswordController::class, 'update'])
+                            ->middleware('throttle:6,1')
+                            ->name('password.update');
+
+                        Route::get('appearance', function () {
+                            return Inertia::render('central/admin/user-settings/appearance');
+                        })->name('appearance.edit');
+
+                        Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])->name('two-factor.show');
+                    });
             });
     });
 }

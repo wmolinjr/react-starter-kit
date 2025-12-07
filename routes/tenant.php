@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Shared\Settings\PasswordController;
+use App\Http\Controllers\Shared\Settings\ProfileController;
+use App\Http\Controllers\Shared\Settings\TwoFactorAuthenticationController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains;
 use App\Http\Middleware\Tenant\VerifyTenantAccess;
@@ -290,6 +293,42 @@ Route::middleware([
                     Route::delete('/delete', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'destroy'])->name('destroy');
                 });
             });
+
+            /*
+            |------------------------------------------------------------------
+            | User Settings Routes (tenant.admin.user-settings.*)
+            |------------------------------------------------------------------
+            |
+            | Personal settings for tenant users (profile, password, etc.)
+            | Uses shared controllers that work with auth()->user().
+            |
+            | NOTE: Uses 'user-settings' prefix to avoid conflict with
+            | tenant organization settings (tenant.admin.settings.*).
+            |
+            */
+
+            Route::prefix('settings')
+                ->name('user-settings.')
+                ->group(function () {
+                    Route::redirect('/', '/admin/settings/profile');
+
+                    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+                    Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+                    Route::patch('profile/locale', [ProfileController::class, 'updateLocale'])->name('profile.locale');
+                    Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+                    Route::get('password', [PasswordController::class, 'edit'])->name('password.edit');
+                    Route::put('password', [PasswordController::class, 'update'])
+                        ->middleware('throttle:6,1')
+                        ->name('password.update');
+
+                    Route::get('appearance', function () {
+                        return Inertia::render('tenant/admin/user-settings/appearance');
+                    })->name('appearance.edit');
+
+                    Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])
+                        ->name('two-factor.show');
+                });
         });
 
     /*

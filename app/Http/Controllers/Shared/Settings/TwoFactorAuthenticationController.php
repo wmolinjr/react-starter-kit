@@ -29,7 +29,11 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
     {
         $request->ensureStateIsValid();
 
-        return Inertia::render('shared/settings/two-factor', [
+        $page = tenancy()->initialized
+            ? 'tenant/admin/user-settings/two-factor'
+            : 'central/admin/user-settings/two-factor';
+
+        return Inertia::render($page, [
             'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);

@@ -1,7 +1,7 @@
 import admin from '@/routes/tenant/admin';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { TenantNavUser } from '@/components/tenant/nav-user';
 import {
     useTenantAdminNavItems,
     useTenantFooterNavItems,
@@ -43,7 +43,7 @@ export function TenantAdminSidebar() {
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+                <TenantNavUser />
             </SidebarFooter>
         </Sidebar>
     );

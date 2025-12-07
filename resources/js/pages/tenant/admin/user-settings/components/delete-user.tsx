@@ -1,4 +1,3 @@
-import ProfileController from '@/actions/App/Http/Controllers/Shared/Settings/ProfileController';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Form } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useRef } from 'react';
+
+import userSettings from '@/routes/tenant/admin/user-settings';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -53,7 +54,7 @@ export default function DeleteUser() {
                         </DialogDescription>
 
                         <Form
-                            {...ProfileController.destroy.form()}
+                            {...userSettings.profile.destroy.form()}
                             options={{
                                 preserveScroll: true,
                             }}

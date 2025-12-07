@@ -1,4 +1,4 @@
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * Session Isolation Test Suite for Multi-Tenant Application
@@ -27,7 +27,7 @@ const TENANT2_URL = 'http://tenant2.localhost';
 // Home paths for each context (see App\Http\Responses\LoginResponse)
 // Uses named routes: 'dashboard' for tenant, 'central.panel.dashboard' for central
 const TENANT_HOME = '/admin/dashboard';
-const CENTRAL_HOME = '/painel';
+// const CENTRAL_HOME = '/painel'; // Reserved for future central domain tests
 
 const TENANT1_USER = {
     email: 'john@acme.com',
@@ -67,8 +67,9 @@ async function loginToTenant(
 
 /**
  * Helper: Check if user is logged in
+ * @reserved Reserved for future use in more complex test scenarios
  */
-async function isLoggedIn(page: Page): Promise<boolean> {
+async function _isLoggedIn(page: Page): Promise<boolean> {
     // Check for common logged-in indicators
     // This might need adjustment based on your app's structure
     const logoutButton = await page.locator('button:has-text("Log out"), a:has-text("Log out")').count();
@@ -79,8 +80,9 @@ async function isLoggedIn(page: Page): Promise<boolean> {
 
 /**
  * Helper: Get current user info from page
+ * @reserved Reserved for future use in more complex test scenarios
  */
-async function getCurrentUserEmail(page: Page): Promise<string | null> {
+async function _getCurrentUserEmail(page: Page): Promise<string | null> {
     // Try to find user email in the page
     const userEmailElement = await page.locator('[data-test="user-email"]').first();
     if (await userEmailElement.count() > 0) {
@@ -88,6 +90,9 @@ async function getCurrentUserEmail(page: Page): Promise<string | null> {
     }
     return null;
 }
+
+// Export reserved helpers to satisfy ESLint (they're intentionally unused in current tests)
+export { _isLoggedIn, _getCurrentUserEmail };
 
 test.describe('Session Isolation Between Tenants', () => {
     test.describe.configure({ mode: 'serial' });

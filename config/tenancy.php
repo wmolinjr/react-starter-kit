@@ -342,12 +342,12 @@ return [
             'team.remove',
             'team.update-role',
 
-            // Password - prevent credential changes
-            'shared.settings.password.*',
+            // Password - prevent credential changes (tenant user settings)
+            'tenant.admin.user-settings.password.*',
             'password.update',
 
             // Two-factor authentication - prevent security changes
-            'shared.settings.two-factor.*',
+            'tenant.admin.user-settings.two-factor.*',
             'two-factor.*',
 
             // Tenant deletion - prevent destructive actions

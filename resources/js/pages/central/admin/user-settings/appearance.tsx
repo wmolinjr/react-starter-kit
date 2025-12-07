@@ -6,36 +6,30 @@ import HeadingSmall from '@/components/heading-small';
 import { LanguageSelector } from '@/components/language-selector';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import CentralAdminLayout from '@/layouts/central-admin-layout';
+import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
+import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
-
-import SettingsLayout from '@/layouts/settings/layout';
-import SharedLayout from '@/layouts/shared-layout';
-import { edit as editPreferences } from '@/routes/shared/settings/appearance';
-import { edit as editProfile } from '@/routes/shared/settings/profile';
-
-function useBreadcrumbs(): BreadcrumbItem[] {
-    const { t } = useLaravelReactI18n();
-    return [
-        {
-            title: t('settings.title'),
-            href: editProfile().url,
-        },
-        {
-            title: t('settings.nav.preferences'),
-            href: editPreferences().url,
-        },
-    ];
-}
 
 export default function Appearance() {
     const { t } = useLaravelReactI18n();
-    const breadcrumbs = useBreadcrumbs();
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.title'),
+            href: settings.profile.edit().url,
+        },
+        {
+            title: t('settings.nav.preferences'),
+            href: settings.appearance.edit().url,
+        },
+    ];
 
     return (
-        <SharedLayout breadcrumbs={breadcrumbs}>
+        <CentralAdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.preferences.page_title')} />
 
-            <SettingsLayout>
+            <CentralUserSettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
                         title={t('settings.language.title')}
@@ -62,7 +56,7 @@ export default function Appearance() {
                     />
                     <AppearanceTabs />
                 </div>
-            </SettingsLayout>
-        </SharedLayout>
+            </CentralUserSettingsLayout>
+        </CentralAdminLayout>
     );
 }

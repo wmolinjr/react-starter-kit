@@ -59,9 +59,6 @@ return Application::configure(basePath: dirname(__DIR__))
             // Central routes (admin + panel + auth) - managed by domain scoping
             require base_path('routes/central.php');
 
-            // Shared routes (work in both central and tenant contexts)
-            require base_path('routes/shared.php');
-
             // Webhook routes (Stripe, etc.) - no CSRF, no auth
             Route::middleware('api')->group(base_path('routes/webhooks.php'));
 
@@ -122,9 +119,6 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
-
-        // Note: The 'universal' middleware group is registered by Stancl\Tenancy\TenancyServiceProvider
-        // It's just a flag - the actual logic is in InitializeTenancyByDomain middleware
 
         // Middleware aliases
         $middleware->alias([

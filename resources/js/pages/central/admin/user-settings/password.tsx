@@ -1,7 +1,4 @@
-import PasswordController from '@/actions/App/Http/Controllers/Shared/Settings/PasswordController';
 import InputError from '@/components/input-error';
-import SettingsLayout from '@/layouts/settings/layout';
-import SharedLayout from '@/layouts/shared-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
@@ -12,34 +9,31 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/shared/settings/password';
-import { edit as editProfile } from '@/routes/shared/settings/profile';
-
-function useBreadcrumbs(): BreadcrumbItem[] {
-    const { t } = useLaravelReactI18n();
-    return [
-        {
-            title: t('settings.title'),
-            href: editProfile().url,
-        },
-        {
-            title: t('settings.nav.password'),
-            href: edit().url,
-        },
-    ];
-}
+import CentralAdminLayout from '@/layouts/central-admin-layout';
+import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
+import settings from '@/routes/central/admin/settings';
 
 export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
-    const breadcrumbs = useBreadcrumbs();
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.title'),
+            href: settings.profile.edit().url,
+        },
+        {
+            title: t('settings.nav.password'),
+            href: settings.password.edit().url,
+        },
+    ];
 
     return (
-        <SharedLayout breadcrumbs={breadcrumbs}>
+        <CentralAdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.password.page_title')} />
 
-            <SettingsLayout>
+            <CentralUserSettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
                         title={t('settings.password.title')}
@@ -47,7 +41,7 @@ export default function Password() {
                     />
 
                     <Form
-                        {...PasswordController.update.form()}
+                        {...settings.password.update.form()}
                         options={{
                             preserveScroll: true,
                         }}
@@ -151,7 +145,7 @@ export default function Password() {
                         )}
                     </Form>
                 </div>
-            </SettingsLayout>
-        </SharedLayout>
+            </CentralUserSettingsLayout>
+        </CentralAdminLayout>
     );
 }

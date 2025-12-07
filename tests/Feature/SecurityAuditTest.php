@@ -177,8 +177,8 @@ class SecurityAuditTest extends TestCase
         $response = $this->get($tenantUrl('admin/billing'));
         $response->assertRedirect();
 
-        // Try to access profile settings without auth (universal route works on any domain)
-        $response = $this->get($this->centralUrl('settings/password'));
+        // Try to access profile settings without auth
+        $response = $this->get($this->centralUrl('admin/settings/password'));
         $response->assertRedirect();
     }
 

@@ -18,7 +18,11 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('shared/settings/profile', [
+        $page = tenancy()->initialized
+            ? 'tenant/admin/user-settings/profile'
+            : 'central/admin/user-settings/profile';
+
+        return Inertia::render($page, [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
@@ -37,7 +41,12 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return to_route('shared.settings.profile.edit');
+        // Redirect based on context (central or tenant)
+        $route = tenancy()->initialized
+            ? 'tenant.admin.user-settings.profile.edit'
+            : 'central.admin.settings.profile.edit';
+
+        return to_route($route);
     }
 
     /**

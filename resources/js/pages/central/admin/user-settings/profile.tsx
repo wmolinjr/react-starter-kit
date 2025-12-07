@@ -1,34 +1,20 @@
-import ProfileController from '@/actions/App/Http/Controllers/Shared/Settings/ProfileController';
 import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import SettingsLayout from '@/layouts/settings/layout';
-import SharedLayout from '@/layouts/shared-layout';
-import { edit } from '@/routes/shared/settings/profile';
+import CentralAdminLayout from '@/layouts/central-admin-layout';
+import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
+import settings from '@/routes/central/admin/settings';
 
-function useBreadcrumbs(): BreadcrumbItem[] {
-    const { t } = useLaravelReactI18n();
-    return [
-        {
-            title: t('settings.title'),
-            href: edit().url,
-        },
-        {
-            title: t('settings.nav.profile'),
-            href: edit().url,
-        },
-    ];
-}
+import DeleteUser from './components/delete-user';
 
 export default function Profile({
     mustVerifyEmail,
@@ -39,7 +25,17 @@ export default function Profile({
 }) {
     const { auth } = usePage<SharedData>().props;
     const { t } = useLaravelReactI18n();
-    const breadcrumbs = useBreadcrumbs();
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.title'),
+            href: settings.profile.edit().url,
+        },
+        {
+            title: t('settings.nav.profile'),
+            href: settings.profile.edit().url,
+        },
+    ];
 
     // Profile page requires authentication
     if (!auth.user) {
@@ -50,10 +46,10 @@ export default function Profile({
     const user = auth.user;
 
     return (
-        <SharedLayout breadcrumbs={breadcrumbs}>
+        <CentralAdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.profile.page_title')} />
 
-            <SettingsLayout>
+            <CentralUserSettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
                         title={t('settings.profile.title')}
@@ -61,7 +57,7 @@ export default function Profile({
                     />
 
                     <Form
-                        {...ProfileController.update.form()}
+                        {...settings.profile.update.form()}
                         options={{
                             preserveScroll: true,
                         }}
@@ -159,7 +155,7 @@ export default function Profile({
                 <Separator />
 
                 <DeleteUser />
-            </SettingsLayout>
-        </SharedLayout>
+            </CentralUserSettingsLayout>
+        </CentralAdminLayout>
     );
 }

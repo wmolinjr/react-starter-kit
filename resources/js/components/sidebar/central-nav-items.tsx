@@ -1,6 +1,5 @@
 import admin from '@/routes/central/admin';
 import central from '@/routes/central';
-import shared from '@/routes/shared';
 import { type NavItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -87,7 +86,7 @@ export function useCentralAdminNavItems(): NavItem[] {
         },
         {
             title: t('sidebar.settings'),
-            href: shared.settings.profile.edit.url(),
+            href: admin.settings.profile.edit.url(),
             icon: Settings,
         },
     ];
@@ -107,12 +106,12 @@ export function useCentralPanelNavItems(): NavItem[] {
         },
         {
             title: t('sidebar.profile'),
-            href: shared.settings.profile.edit.url(),
+            href: admin.settings.profile.edit.url(),
             icon: User,
         },
         {
             title: t('sidebar.settings'),
-            href: shared.settings.appearance.edit.url(),
+            href: admin.settings.appearance.edit.url(),
             icon: Settings,
         },
     ];

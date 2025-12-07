@@ -27,10 +27,11 @@ class TwoFactorAuthenticationTest extends TenantTestCase
             'two_factor_confirmed_at' => null,
         ])->save();
 
-        $this->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('shared.settings.two-factor.show'))
+        $this->actingAs($this->user, 'tenant')
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->get($this->tenantRoute('tenant.admin.user-settings.two-factor.show'))
             ->assertInertia(fn (Assert $page) => $page
-                ->component('shared/settings/two-factor')
+                ->component('tenant/admin/user-settings/two-factor')
                 ->where('twoFactorEnabled', false)
             );
     }
@@ -46,7 +47,9 @@ class TwoFactorAuthenticationTest extends TenantTestCase
             'confirmPassword' => true,
         ]);
 
-        $response = $this->get(route('shared.settings.two-factor.show'));
+        $response = $this
+            ->actingAs($this->user, 'tenant')
+            ->get($this->tenantRoute('tenant.admin.user-settings.two-factor.show'));
 
         $response->assertRedirect(route('password.confirm'));
     }
@@ -62,10 +65,11 @@ class TwoFactorAuthenticationTest extends TenantTestCase
             'confirmPassword' => false,
         ]);
 
-        $this->get(route('shared.settings.two-factor.show'))
+        $this->actingAs($this->user, 'tenant')
+            ->get($this->tenantRoute('tenant.admin.user-settings.two-factor.show'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('shared/settings/two-factor')
+                ->component('tenant/admin/user-settings/two-factor')
             );
     }
 
@@ -77,8 +81,9 @@ class TwoFactorAuthenticationTest extends TenantTestCase
 
         config(['fortify.features' => []]);
 
-        $this->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('shared.settings.two-factor.show'))
+        $this->actingAs($this->user, 'tenant')
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->get($this->tenantRoute('tenant.admin.user-settings.two-factor.show'))
             ->assertForbidden();
     }
 }

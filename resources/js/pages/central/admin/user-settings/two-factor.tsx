@@ -4,11 +4,10 @@ import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
-import SettingsLayout from '@/layouts/settings/layout';
-import SharedLayout from '@/layouts/shared-layout';
+import CentralAdminLayout from '@/layouts/central-admin-layout';
+import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import { disable, enable } from '@/routes/two-factor';
-import { edit as editProfile } from '@/routes/shared/settings/profile';
-import { show } from '@/routes/shared/settings/two-factor';
+import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -20,26 +19,11 @@ interface TwoFactorProps {
     twoFactorEnabled?: boolean;
 }
 
-function useBreadcrumbs(): BreadcrumbItem[] {
-    const { t } = useLaravelReactI18n();
-    return [
-        {
-            title: t('settings.title'),
-            href: editProfile().url,
-        },
-        {
-            title: t('settings.nav.two_factor'),
-            href: show.url(),
-        },
-    ];
-}
-
 export default function TwoFactor({
     requiresConfirmation = false,
     twoFactorEnabled = false,
 }: TwoFactorProps) {
     const { t } = useLaravelReactI18n();
-    const breadcrumbs = useBreadcrumbs();
     const {
         qrCodeSvg,
         hasSetupData,
@@ -52,10 +36,21 @@ export default function TwoFactor({
     } = useTwoFactorAuth();
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('settings.title'),
+            href: settings.profile.edit().url,
+        },
+        {
+            title: t('settings.nav.two_factor'),
+            href: settings.twoFactor.show().url,
+        },
+    ];
+
     return (
-        <SharedLayout breadcrumbs={breadcrumbs}>
+        <CentralAdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.two_factor.title')} />
-            <SettingsLayout>
+            <CentralUserSettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
                         title={t('settings.two_factor.title')}
@@ -137,7 +132,7 @@ export default function TwoFactor({
                         errors={errors}
                     />
                 </div>
-            </SettingsLayout>
-        </SharedLayout>
+            </CentralUserSettingsLayout>
+        </CentralAdminLayout>
     );
 }

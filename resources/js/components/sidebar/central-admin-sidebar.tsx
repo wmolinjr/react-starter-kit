@@ -1,6 +1,6 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { CentralNavUser } from '@/components/central/nav-user';
 import {
     useCentralAdminNavItems,
     useFooterNavItems,
@@ -65,7 +65,7 @@ export function CentralAdminSidebar() {
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+                <CentralNavUser />
             </SidebarFooter>
         </Sidebar>
     );

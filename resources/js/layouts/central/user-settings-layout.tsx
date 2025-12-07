@@ -2,14 +2,12 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/shared/settings/appearance';
-import { edit } from '@/routes/shared/settings/profile';
-import { show } from '@/routes/shared/settings/two-factor';
-import { edit as editPassword } from '@/routes/shared/settings/password';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type PropsWithChildren } from 'react';
+
+import settings from '@/routes/central/admin/settings';
 
 function useSettingsNavItems(): NavItem[] {
     const { t } = useLaravelReactI18n();
@@ -17,28 +15,28 @@ function useSettingsNavItems(): NavItem[] {
     return [
         {
             title: t('settings.nav.profile'),
-            href: edit(),
+            href: settings.profile.edit(),
             icon: null,
         },
         {
             title: t('settings.nav.password'),
-            href: editPassword(),
+            href: settings.password.edit(),
             icon: null,
         },
         {
             title: t('settings.nav.two_factor'),
-            href: show(),
+            href: settings.twoFactor.show(),
             icon: null,
         },
         {
             title: t('settings.nav.preferences'),
-            href: editAppearance(),
+            href: settings.appearance.edit(),
             icon: null,
         },
     ];
 }
 
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function CentralUserSettingsLayout({ children }: PropsWithChildren) {
     const { t } = useLaravelReactI18n();
     const sidebarNavItems = useSettingsNavItems();
 
