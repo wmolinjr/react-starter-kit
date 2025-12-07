@@ -26,7 +26,7 @@ class PasswordConfirmationTest extends TestCase
         $response->assertStatus(200);
 
         $response->assertInertia(fn (Assert $page) => $page
-            ->component('shared/auth/confirm-password')
+            ->component('tenant/auth/confirm-password')
         );
     }
 

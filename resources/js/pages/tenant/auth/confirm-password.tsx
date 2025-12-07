@@ -4,29 +4,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import SharedLayout from '@/layouts/shared-layout';
+import TenantAdminLayout from '@/layouts/tenant-admin-layout';
 import { type BreadcrumbItem } from '@/types';
 import { store } from '@/routes/password/confirm';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldCheck } from 'lucide-react';
 
-function useBreadcrumbs(): BreadcrumbItem[] {
+export default function ConfirmPassword() {
     const { t } = useLaravelReactI18n();
-    return [
+
+    const breadcrumbs: BreadcrumbItem[] = [
         {
             title: t('auth.confirm_password.breadcrumb'),
             href: '/user/confirm-password',
         },
     ];
-}
-
-export default function ConfirmPassword() {
-    const { t } = useLaravelReactI18n();
-    const breadcrumbs = useBreadcrumbs();
 
     return (
-        <SharedLayout breadcrumbs={breadcrumbs}>
+        <TenantAdminLayout breadcrumbs={breadcrumbs}>
             <Head title={t('auth.confirm_password.page_title')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -71,6 +67,6 @@ export default function ConfirmPassword() {
                     </CardContent>
                 </Card>
             </div>
-        </SharedLayout>
+        </TenantAdminLayout>
     );
 }

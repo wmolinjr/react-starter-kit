@@ -79,33 +79,81 @@ class FortifyServiceProvider extends ServiceProvider
 
     /**
      * Configure Fortify views.
+     *
+     * All views are context-aware using tenancy()->initialized to determine
+     * whether to render tenant or central pages.
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn (Request $request) => Inertia::render('shared/auth/login', [
-            'canResetPassword' => Features::enabled(Features::resetPasswords()),
-            'canRegister' => Features::enabled(Features::registration()),
-            'status' => $request->session()->get('status'),
-        ]));
+        Fortify::loginView(function (Request $request) {
+            $page = tenancy()->initialized
+                ? 'tenant/auth/login'
+                : 'central/auth/login';
 
-        Fortify::resetPasswordView(fn (Request $request) => Inertia::render('shared/auth/reset-password', [
-            'email' => $request->email,
-            'token' => $request->route('token'),
-        ]));
+            $props = [
+                'canResetPassword' => Features::enabled(Features::resetPasswords()),
+                'status' => $request->session()->get('status'),
+            ];
 
-        Fortify::requestPasswordResetLinkView(fn (Request $request) => Inertia::render('shared/auth/forgot-password', [
-            'status' => $request->session()->get('status'),
-        ]));
+            // Only tenant context supports registration
+            if (tenancy()->initialized) {
+                $props['canRegister'] = Features::enabled(Features::registration());
+            }
 
-        Fortify::verifyEmailView(fn (Request $request) => Inertia::render('shared/auth/verify-email', [
-            'status' => $request->session()->get('status'),
-        ]));
+            return Inertia::render($page, $props);
+        });
 
-        Fortify::registerView(fn () => Inertia::render('shared/auth/register'));
+        Fortify::resetPasswordView(function (Request $request) {
+            $page = tenancy()->initialized
+                ? 'tenant/auth/reset-password'
+                : 'central/auth/reset-password';
 
-        Fortify::twoFactorChallengeView(fn () => Inertia::render('shared/auth/two-factor-challenge'));
+            return Inertia::render($page, [
+                'email' => $request->email,
+                'token' => $request->route('token'),
+            ]);
+        });
 
-        Fortify::confirmPasswordView(fn () => Inertia::render('shared/auth/confirm-password'));
+        Fortify::requestPasswordResetLinkView(function (Request $request) {
+            $page = tenancy()->initialized
+                ? 'tenant/auth/forgot-password'
+                : 'central/auth/forgot-password';
+
+            return Inertia::render($page, [
+                'status' => $request->session()->get('status'),
+            ]);
+        });
+
+        Fortify::verifyEmailView(function (Request $request) {
+            $page = tenancy()->initialized
+                ? 'tenant/auth/verify-email'
+                : 'central/auth/verify-email';
+
+            return Inertia::render($page, [
+                'status' => $request->session()->get('status'),
+            ]);
+        });
+
+        Fortify::registerView(function () {
+            // Registration is only available in tenant context
+            return Inertia::render('tenant/auth/register');
+        });
+
+        Fortify::twoFactorChallengeView(function () {
+            $page = tenancy()->initialized
+                ? 'tenant/auth/two-factor-challenge'
+                : 'central/auth/two-factor-challenge';
+
+            return Inertia::render($page);
+        });
+
+        Fortify::confirmPasswordView(function () {
+            $page = tenancy()->initialized
+                ? 'tenant/auth/confirm-password'
+                : 'central/auth/confirm-password';
+
+            return Inertia::render($page);
+        });
     }
 
     /**
