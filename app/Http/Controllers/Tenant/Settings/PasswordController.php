@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Shared\Settings;
+namespace App\Http\Controllers\Tenant\Settings;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -16,11 +16,7 @@ class PasswordController extends Controller
      */
     public function edit(): Response
     {
-        $page = tenancy()->initialized
-            ? 'tenant/admin/user-settings/password'
-            : 'central/admin/user-settings/password';
-
-        return Inertia::render($page);
+        return Inertia::render('tenant/admin/user-settings/password');
     }
 
     /**

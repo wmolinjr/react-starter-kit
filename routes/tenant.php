@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Shared\Settings\PasswordController;
-use App\Http\Controllers\Shared\Settings\ProfileController;
-use App\Http\Controllers\Shared\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\Tenant\Settings\PasswordController;
+use App\Http\Controllers\Tenant\Settings\ProfileController;
+use App\Http\Controllers\Tenant\Settings\TwoFactorAuthenticationController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromUnwantedDomains;
 use App\Http\Middleware\Tenant\VerifyTenantAccess;

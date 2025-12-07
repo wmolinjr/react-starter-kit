@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Shared\Settings;
+namespace App\Http\Controllers\Tenant\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Shared\Settings\TwoFactorAuthenticationRequest;
@@ -10,16 +10,28 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
 
+/**
+ * Two-Factor Authentication settings for Tenant users.
+ *
+ * Tenant users authenticate via Fortify (tenant guard), so password.confirm
+ * middleware works correctly when the confirmPassword option is enabled.
+ */
 class TwoFactorAuthenticationController extends Controller implements HasMiddleware
 {
     /**
      * Get the middleware that should be assigned to the controller.
+     *
+     * Password confirmation is required when the confirmPassword feature is enabled.
      */
     public static function middleware(): array
     {
-        return Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
-            ? [new Middleware('password.confirm', only: ['show'])]
-            : [];
+        if (! Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')) {
+            return [];
+        }
+
+        return [
+            new Middleware('password.confirm', only: ['show']),
+        ];
     }
 
     /**
@@ -29,11 +41,7 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
     {
         $request->ensureStateIsValid();
 
-        $page = tenancy()->initialized
-            ? 'tenant/admin/user-settings/two-factor'
-            : 'central/admin/user-settings/two-factor';
-
-        return Inertia::render($page, [
+        return Inertia::render('tenant/admin/user-settings/two-factor', [
             'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);

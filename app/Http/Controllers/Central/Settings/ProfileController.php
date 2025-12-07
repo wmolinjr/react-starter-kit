@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Shared\Settings;
+namespace App\Http\Controllers\Central\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Shared\Settings\ProfileUpdateRequest;
@@ -18,11 +18,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        $page = tenancy()->initialized
-            ? 'tenant/admin/user-settings/profile'
-            : 'central/admin/user-settings/profile';
-
-        return Inertia::render($page, [
+        return Inertia::render('central/admin/user-settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
@@ -41,12 +37,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        // Redirect based on context (central or tenant)
-        $route = tenancy()->initialized
-            ? 'tenant.admin.user-settings.profile.edit'
-            : 'central.admin.settings.profile.edit';
-
-        return to_route($route);
+        return to_route('central.admin.settings.profile.edit');
     }
 
     /**
@@ -57,15 +48,14 @@ class ProfileController extends Controller
         $availableLocales = config('app.locales', ['en']);
 
         $validated = $request->validate([
-            'locale' => ['required', 'string', 'in:' . implode(',', $availableLocales)],
+            'locale' => ['required', 'string', 'in:'.implode(',', $availableLocales)],
         ]);
 
         $request->user()->update([
             'locale' => $validated['locale'],
         ]);
 
-        // Set a cookie for the locale as well (helps with page refresh before next request)
-        $cookie = cookie('locale', $validated['locale'], 60 * 24 * 365); // 1 year
+        $cookie = cookie('locale', $validated['locale'], 60 * 24 * 365);
 
         return back()
             ->with('success', __('settings.language.updated'))
