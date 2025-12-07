@@ -31,11 +31,12 @@
 use App\Http\Controllers\Shared\Settings\PasswordController;
 use App\Http\Controllers\Shared\Settings\ProfileController;
 use App\Http\Controllers\Shared\Settings\TwoFactorAuthenticationController;
+use App\Http\Middleware\Shared\AuthenticateUniversal;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware(['web', InitializeTenancyByDomain::class, 'universal', 'auth'])
+Route::middleware(['web', InitializeTenancyByDomain::class, 'universal', AuthenticateUniversal::class])
     ->prefix('settings')
     ->name('shared.settings.')
     ->group(function () {
