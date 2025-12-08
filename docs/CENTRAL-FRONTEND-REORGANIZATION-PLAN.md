@@ -35,12 +35,12 @@ O projeto usa **Tenant-Only Architecture (Option C)** com dois guards:
 
 | Route | Controller | Guard | Domínio |
 |-------|------------|-------|---------|
-| `/admin/login` | `AdminLoginController` | `central` | localhost |
-| `/login` | Fortify | `tenant` | *.localhost |
+| `/admin/login` | `AdminLoginController` | `central` | app.test |
+| `/login` | Fortify | `tenant` | *.test |
 
 **Problema Identificado:**
 - Fortify routes (`/login`) funcionam no domínio central mas usam guard `tenant`
-- Quando admin tenta `/login` em `localhost`, autentica contra tabela vazia de tenant users
+- Quando admin tenta `/login` em `app.test`, autentica contra tabela vazia de tenant users
 - Causa confusão sobre qual rota usar
 
 **Arquivos:**
@@ -337,7 +337,7 @@ sail artisan wayfinder:generate --with-form
 
 1. [x] Add `/login` redirect to `/admin/login` in `routes/central.php`
 2. [x] Add `/register` redirect
-3. [x] Test: Navigate to `localhost/login`, verify redirect
+3. [x] Test: Navigate to `app.test/login`, verify redirect
 
 ### Step 4: Simplify Navigation (Medium Priority) - COMPLETED
 
@@ -386,7 +386,7 @@ sail artisan wayfinder:generate --with-form
   - [ ] Sidebar navigation is clean
   - [ ] `/login` redirects to `/admin/login`
 - [ ] Test tenant auth still works:
-  - [ ] Tenant login at `tenant1.localhost/login`
+  - [ ] Tenant login at `tenant1.test/login`
   - [ ] Tenant user menu works
   - [ ] Tenant logout works
 - [ ] Test impersonation flow

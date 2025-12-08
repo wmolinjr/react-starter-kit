@@ -7,6 +7,17 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: 'localhost',
+        },
+        cors: {
+            origin: true, // Allow all origins in development
+        },
+    },
     resolve: {
         alias: {
             react: path.resolve('./node_modules/react'),

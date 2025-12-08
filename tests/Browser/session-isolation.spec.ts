@@ -13,16 +13,16 @@ import { test, expect, type Page } from '@playwright/test';
  * 4. StartSession middleware
  *
  * Test Users (from seeders):
- * - Tenant 1: john@acme.com / password / tenant1.localhost
- * - Tenant 2: jane@startup.com / password / tenant2.localhost
+ * - Tenant 1: john@acme.com / password / tenant1.test
+ * - Tenant 2: jane@startup.com / password / tenant2.test
  *
  * @see tests/Feature/RedisSessionScopingTest.php for configuration tests
  * @see https://v4.tenancyforlaravel.com/session-scoping
  */
 
 // Test configuration - Sail serves on port 80
-const TENANT1_URL = 'http://tenant1.localhost';
-const TENANT2_URL = 'http://tenant2.localhost';
+const TENANT1_URL = 'http://tenant1.test';
+const TENANT2_URL = 'http://tenant2.test';
 
 // Home paths for each context (see App\Http\Responses\LoginResponse)
 // Uses named routes: 'dashboard' for tenant, 'central.panel.dashboard' for central

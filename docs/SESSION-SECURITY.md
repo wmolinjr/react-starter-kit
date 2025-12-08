@@ -12,12 +12,14 @@ SESSION_SAME_SITE=lax        # Proteção CSRF + permite impersonation
 SESSION_SECURE_COOKIE=true   # HTTPS obrigatório
 ```
 
-### Para DESENVOLVIMENTO (opcional)
+### Para DESENVOLVIMENTO (recomendado)
 
 ```env
-SESSION_DOMAIN=.localhost    # Facilita testes locais
+SESSION_DOMAIN=              # VAZIO = Isolamento por domínio (igual produção)
 SESSION_SAME_SITE=lax
 ```
+
+> **Nota**: Usamos domínios `.test` em desenvolvimento (`app.test`, `tenant1.test`, etc.) que funcionam melhor que `.localhost` no Windows e WSL.
 
 ## Implicações de Segurança
 

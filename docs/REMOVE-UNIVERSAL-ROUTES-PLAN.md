@@ -276,7 +276,7 @@ Remove references to `routes/shared.php` and update route structure documentatio
 
 ### Manual Testing - Tenant Context
 
-- [ ] Login as tenant user (john@acme.com at tenant1.localhost)
+- [ ] Login as tenant user (john@acme.com at tenant1.test)
 - [ ] Navigate to `/admin/settings/profile` - Page loads correctly
 - [ ] Update profile name - Form submits and redirects correctly
 - [ ] Navigate to `/admin/settings/password` - Page loads correctly
@@ -286,7 +286,7 @@ Remove references to `routes/shared.php` and update route structure documentatio
 
 ### Manual Testing - Central Admin Context
 
-- [ ] Login as central admin (admin@setor3.app at localhost/admin/login)
+- [ ] Login as central admin (admin@setor3.app at app.test/admin/login)
 - [ ] Navigate to `/admin/settings/profile` - Page loads correctly
 - [ ] Update profile name - Form submits and redirects correctly
 - [ ] Navigate to `/admin/settings/password` - Page loads correctly

@@ -14,13 +14,13 @@ sail artisan migrate:fresh --seed
 | Tipo | Nome | Email | Senha | Domain | Role | Permissions |
 |------|------|-------|-------|--------|------|-------------|
 | **Super Admin** | Super Admin | `admin@setor3.app` | `password` | Global | Super Admin | Todas (bypass) |
-| **Tenant 1 Owner** | John Doe | `john@acme.com` | `password` | tenant1.localhost | owner | 22 permissions |
-| **Tenant 2 Owner** | Jane Smith | `jane@startup.com` | `password` | tenant2.localhost | owner | 22 permissions |
+| **Tenant 1 Owner** | John Doe | `john@acme.com` | `password` | tenant1.test | owner | 22 permissions |
+| **Tenant 2 Owner** | Jane Smith | `jane@startup.com` | `password` | tenant2.test | owner | 22 permissions |
 
 ### Detalhes dos Tenants
 
 **Tenant 1 - Acme Corporation**:
-- **Domain**: `http://tenant1.localhost`
+- **Domain**: `http://tenant1.test`
 - **Owner**: John Doe (john@acme.com)
 - **Settings**:
   - Primary color: `#3b82f6` (blue)
@@ -28,7 +28,7 @@ sail artisan migrate:fresh --seed
   - Max projects: 100
 
 **Tenant 2 - Startup Inc**:
-- **Domain**: `http://tenant2.localhost`
+- **Domain**: `http://tenant2.test`
 - **Owner**: Jane Smith (jane@startup.com)
 - **Settings**:
   - Primary color: `#10b981` (green)
@@ -39,8 +39,8 @@ sail artisan migrate:fresh --seed
 
 **Testar como Super Admin**:
 ```javascript
-// Login como super admin (sem tenant - acesso global)
-browser_navigate("http://localhost/login")
+// Login como super admin (acesso central)
+browser_navigate("http://app.test/admin/login")
 browser_fill_form([
   {name: "email", value: "admin@setor3.app"},
   {name: "password", value: "password"}
@@ -52,7 +52,7 @@ browser_click("button[type=submit]")
 **Testar como Tenant Owner**:
 ```javascript
 // Login no Tenant 1
-browser_navigate("http://tenant1.localhost/login")
+browser_navigate("http://tenant1.test/login")
 browser_fill_form([
   {name: "email", value: "john@acme.com"},
   {name: "password", value: "password"}
@@ -64,25 +64,25 @@ browser_click("button[type=submit]")
 **Testar Isolamento de Tenants**:
 ```javascript
 // 1. Login no Tenant 1
-browser_navigate("http://tenant1.localhost/login")
+browser_navigate("http://tenant1.test/login")
 // Login com john@acme.com
 
 // 2. Criar projeto no Tenant 1
-browser_navigate("http://tenant1.localhost/projects/create")
+browser_navigate("http://tenant1.test/projects/create")
 // ... criar projeto
 
 // 3. Tentar acessar do Tenant 2 (deve falhar)
-browser_navigate("http://tenant2.localhost/login")
+browser_navigate("http://tenant2.test/login")
 // Login com jane@startup.com
 
-browser_navigate("http://tenant2.localhost/projects")
+browser_navigate("http://tenant2.test/projects")
 // Não deve ver projetos do Tenant 1 (isolamento garantido)
 ```
 
 **Testar Permissions**:
 ```javascript
 // Owner tem acesso a billing
-browser_navigate("http://tenant1.localhost/settings/billing")
+browser_navigate("http://tenant1.test/settings/billing")
 browser_console_messages(onlyErrors: true)
 // Deve carregar sem erros (owner tem billing:view)
 
@@ -95,7 +95,7 @@ browser_console_messages(onlyErrors: true)
 **Status**: Instalado e configurado (`laravel/telescope` + `lucianotonet/laravel-telescope-mcp`)
 
 **Acesso**:
-- Interface Web: `http://localhost/telescope`
+- Interface Web: `http://app.test/telescope`
 - MCP Endpoint: `http://127.0.0.1:8000/telescope-mcp`
 
 **⚠️ USO OBRIGATÓRIO**: Sempre verificar Telescope MCP **AUTOMATICAMENTE** após **QUALQUER** mudança no backend.
@@ -246,7 +246,7 @@ Tarefa: Criar formulário de login com Inertia
 1. Criar/modificar resources/js/pages/settings/profile.tsx
 
 2. ✅ Testar com Playwright:
-   a. browser_navigate("http://localhost/settings/profile")
+   a. browser_navigate("http://tenant1.test/settings/profile")
    b. browser_console_messages() - verificar erros JavaScript
    c. browser_snapshot() - ver estrutura da página
    d. browser_fill_form([

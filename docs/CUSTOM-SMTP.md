@@ -337,7 +337,7 @@ $tenant->plan->update(['features->custom_smtp' => true]);
 MAIL_LOG_CHANNEL=stack
 
 // Verificar via Telescope
-// http://localhost/telescope/mail
+// http://app.test/telescope/mail
 ```
 
 ## Referências

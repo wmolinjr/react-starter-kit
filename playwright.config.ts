@@ -22,7 +22,7 @@ export default defineConfig({
     use: {
         // Base URL for tenant1 (primary test domain)
         // Sail serves on port 80
-        baseURL: 'http://tenant1.localhost',
+        baseURL: 'http://tenant1.test',
 
         // Collect trace when retrying the failed test
         trace: 'on-first-retry',

@@ -537,8 +537,8 @@ SESSION_DRIVER=redis         # Performance + escalabilidade
 
 #### 1. SESSION_DOMAIN DEVE ESTAR VAZIO
 
-**Problema**: `SESSION_DOMAIN=.localhost` compartilha cookies entre todos os subdomains
-- Cookies criados em `localhost` são acessíveis em `tenant1.localhost`
+**Problema**: `SESSION_DOMAIN=.test` compartilha cookies entre todos os subdomains
+- Cookies criados em `app.test` são acessíveis em `tenant1.test`
 - Session fixation e leakage entre tenants
 - Impersonation não funciona (sessões não isoladas)
 
@@ -548,7 +548,7 @@ SESSION_DOMAIN=    # VAZIO = isolamento por domínio exato
 ```
 
 **Benefícios**:
-- ✅ Cookies isolados por domínio exato (`localhost` ≠ `tenant1.localhost`)
+- ✅ Cookies isolados por domínio exato (`app.test` ≠ `tenant1.test`)
 - ✅ Segurança multi-tenant (sem session leakage)
 - ✅ Impersonation funciona corretamente
 - ✅ Válido para DEV e PROD
@@ -686,15 +686,15 @@ sail artisan migrate:fresh --seed          # Reset database and seed test users
 
 | Type | Email | Password | Domain | Guard | Model |
 |------|-------|----------|--------|-------|-------|
-| Super Admin | `admin@setor3.app` | `password` | localhost/admin/login | `central` | Central\\User |
-| Support Admin | `support@setor3.app` | `password` | localhost/admin/login | `central` | Central\\User |
-| Tenant 1 Owner | `john@acme.com` | `password` | tenant1.localhost | `tenant` | Tenant\\User |
-| Tenant 2 Owner | `jane@startup.com` | `password` | tenant2.localhost | `tenant` | Tenant\\User |
-| Tenant 3 Owner | `mike@enterprise.com` | `password` | tenant3.localhost | `tenant` | Tenant\\User |
+| Super Admin | `admin@setor3.app` | `password` | app.test/admin/login | `central` | Central\\User |
+| Support Admin | `support@setor3.app` | `password` | app.test/admin/login | `central` | Central\\User |
+| Tenant 1 Owner | `john@acme.com` | `password` | tenant1.test | `tenant` | Tenant\\User |
+| Tenant 2 Owner | `jane@startup.com` | `password` | tenant2.test | `tenant` | Tenant\\User |
+| Tenant 3 Owner | `mike@enterprise.com` | `password` | tenant3.test | `tenant` | Tenant\\User |
 
 **Authentication Guards (Option C)**:
-- `central` guard: Central administrators (Central\\User) at `localhost/admin/login`
-- `tenant` guard: Tenant users (Tenant\\User) at `{tenant}.localhost/login`
+- `central` guard: Central administrators (Central\\User) at `app.test/admin/login`
+- `tenant` guard: Tenant users (Tenant\\User) at `{tenant}.test/login`
 
 **See**: [docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md#usuários-de-teste-seeders) for detailed test scenarios.
 
@@ -732,8 +732,8 @@ sail npm run test:e2e:report
 
 **Prerequisites**:
 - Sail containers running (`sail up -d`)
-- Tenants seeded (`tenant1.localhost`, `tenant2.localhost`)
-- Hosts configured (`/etc/hosts` with `127.0.0.1 tenant1.localhost tenant2.localhost`)
+- Tenants seeded (`tenant1.test`, `tenant2.test`)
+- Hosts configured (`/etc/hosts` with `127.0.0.1 app.test tenant1.test tenant2.test`)
 
 **Why Playwright for Session Tests?**
 PHPUnit cannot properly test runtime session isolation because switching tenants mid-process doesn't reinitialize session handlers. Browser tests exercise the full HTTP lifecycle including:

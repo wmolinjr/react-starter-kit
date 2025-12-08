@@ -39,7 +39,7 @@ class TenantSeeder extends Seeder
         $this->createTenant(
             name: 'Acme Corporation',
             slug: 'acme',
-            domain: 'tenant1.localhost',
+            domain: 'tenant1.test',
             ownerName: 'John Doe',
             ownerEmail: 'john@acme.com',
             plan: $professionalPlan,
@@ -61,7 +61,7 @@ class TenantSeeder extends Seeder
         $this->createTenant(
             name: 'Startup Inc',
             slug: 'startup',
-            domain: 'tenant2.localhost',
+            domain: 'tenant2.test',
             ownerName: 'Jane Smith',
             ownerEmail: 'jane@startup.com',
             plan: $starterPlan,
@@ -81,7 +81,7 @@ class TenantSeeder extends Seeder
         $this->createTenant(
             name: 'Enterprise Corp',
             slug: 'enterprise',
-            domain: 'tenant3.localhost',
+            domain: 'tenant3.test',
             ownerName: 'Mike Johnson',
             ownerEmail: 'mike@enterprise.com',
             plan: $enterprisePlan,
@@ -101,9 +101,9 @@ class TenantSeeder extends Seeder
 
         $this->command->info('');
         $this->command->info('Tenants created successfully!');
-        $this->command->info('  - tenant1.localhost (john@acme.com / password) - Professional Plan [pt_BR, BRL, America/Sao_Paulo]');
-        $this->command->info('  - tenant2.localhost (jane@startup.com / password) - Starter Plan [en, USD, America/New_York]');
-        $this->command->info('  - tenant3.localhost (mike@enterprise.com / password) - Enterprise Plan [es, EUR, Europe/Madrid]');
+        $this->command->info('  - tenant1.test (john@acme.com / password) - Professional Plan [pt_BR, BRL, America/Sao_Paulo]');
+        $this->command->info('  - tenant2.test (jane@startup.com / password) - Starter Plan [en, USD, America/New_York]');
+        $this->command->info('  - tenant3.test (mike@enterprise.com / password) - Enterprise Plan [es, EUR, Europe/Madrid]');
     }
 
     /**

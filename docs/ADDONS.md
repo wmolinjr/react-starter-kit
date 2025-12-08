@@ -263,7 +263,7 @@ brew install stripe/stripe-cli/stripe  # macOS
 stripe login
 
 # Iniciar listener
-stripe listen --forward-to localhost/stripe/webhook
+stripe listen --forward-to app.test/stripe/webhook
 
 # Copie o webhook signing secret para .env
 ```
@@ -606,7 +606,7 @@ sail artisan test --filter=CheckoutServiceTest
 
 ```bash
 # Iniciar Stripe CLI
-stripe listen --forward-to localhost/stripe/webhook
+stripe listen --forward-to app.test/stripe/webhook
 
 # Em outro terminal, rodar testes
 npm run test:e2e
