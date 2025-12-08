@@ -52,6 +52,10 @@ class TenancyServiceProvider extends ServiceProvider
         $tenantDeletedListeners = [];
 
         if ($this->shouldCreateDynamicDatabases()) {
+            // Queue tenant jobs in production for better UX (non-blocking tenant creation)
+            // Sync in local/testing for easier debugging
+            $shouldQueue = env('TENANCY_QUEUE_JOBS', ! app()->environment('local', 'testing'));
+
             $tenantCreatedListeners = [
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
@@ -59,7 +63,7 @@ class TenancyServiceProvider extends ServiceProvider
                     SeedTenantDatabase::class,
                 ])->send(function (Events\TenantCreated $event) {
                     return $event->tenant;
-                })->shouldBeQueued(false), // Sync for MVP, make true for production
+                })->shouldBeQueued($shouldQueue, 'default'), // Tenant operations queue
             ];
 
             $tenantDeletedListeners = [
@@ -67,7 +71,7 @@ class TenancyServiceProvider extends ServiceProvider
                     Jobs\DeleteDatabase::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
-                })->shouldBeQueued(false),
+                })->shouldBeQueued($shouldQueue, 'default'),
             ];
         }
 
