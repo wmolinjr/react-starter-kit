@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/central/admin/auth/login';
 import { request } from '@/routes/central/admin/auth/password';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface LoginProps {
@@ -18,6 +18,7 @@ interface LoginProps {
 
 export default function Login({ status, canResetPassword }: LoginProps) {
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <AuthLayout
@@ -48,7 +49,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     autoComplete="email"
                                     placeholder="email@example.com"
                                 />
-                                <InputError message={errors.email} />
+                                <InputError message={errors.email || pageErrors?.email} />
                             </div>
 
                             <div className="grid gap-2">
@@ -75,7 +76,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     autoComplete="current-password"
                                     placeholder={t('Password')}
                                 />
-                                <InputError message={errors.password} />
+                                <InputError message={errors.password || pageErrors?.password} />
                             </div>
 
                             <div className="flex items-center space-x-3">

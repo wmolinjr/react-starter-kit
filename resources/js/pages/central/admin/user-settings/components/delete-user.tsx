@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Form } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useRef } from 'react';
 
@@ -21,6 +21,7 @@ import settings from '@/routes/central/admin/settings';
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <div className="space-y-6">
@@ -81,7 +82,7 @@ export default function DeleteUser() {
                                             autoComplete="current-password"
                                         />
 
-                                        <InputError message={errors.password} />
+                                        <InputError message={errors.password || pageErrors?.password} />
                                     </div>
 
                                     <DialogFooter className="gap-2">

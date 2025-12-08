@@ -9,13 +9,14 @@ import {
 import { OTP_MAX_LENGTH } from '@/hooks/shared/use-two-factor-auth';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/tenant/admin/auth/two-factor/challenge';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useMemo, useState } from 'react';
 
 export default function TwoFactorChallenge() {
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
 
@@ -71,7 +72,7 @@ export default function TwoFactorChallenge() {
                                         required
                                     />
                                     <InputError
-                                        message={errors.recovery_code}
+                                        message={errors.recovery_code || pageErrors?.recovery_code}
                                     />
                                 </>
                             ) : (
@@ -98,7 +99,7 @@ export default function TwoFactorChallenge() {
                                             </InputOTPGroup>
                                         </InputOTP>
                                     </div>
-                                    <InputError message={errors.code} />
+                                    <InputError message={errors.code || pageErrors?.code} />
                                 </div>
                             )}
 

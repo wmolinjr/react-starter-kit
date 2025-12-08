@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { update } from '@/routes/central/admin/auth/password';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface ResetPasswordProps {
@@ -15,6 +15,7 @@ interface ResetPasswordProps {
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <AuthLayout
@@ -42,7 +43,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 readOnly
                             />
                             <InputError
-                                message={errors.email}
+                                message={errors.email || pageErrors?.email}
                                 className="mt-2"
                             />
                         </div>
@@ -58,7 +59,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 autoFocus
                                 placeholder={t('Password')}
                             />
-                            <InputError message={errors.password} />
+                            <InputError message={errors.password || pageErrors?.password} />
                         </div>
 
                         <div className="grid gap-2">
@@ -74,7 +75,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 placeholder={t('Confirm password')}
                             />
                             <InputError
-                                message={errors.password_confirmation}
+                                message={errors.password_confirmation || pageErrors?.password_confirmation}
                                 className="mt-2"
                             />
                         </div>

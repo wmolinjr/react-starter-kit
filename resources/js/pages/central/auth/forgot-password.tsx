@@ -6,12 +6,13 @@ import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { login } from '@/routes/central/admin/auth';
 import { email } from '@/routes/central/admin/auth/password';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { LoaderCircle } from 'lucide-react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <AuthLayout
@@ -43,7 +44,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     placeholder="email@example.com"
                                 />
 
-                                <InputError message={errors.email} />
+                                <InputError message={errors.email || pageErrors?.email} />
                             </div>
 
                             <div className="my-6 flex items-center justify-start">

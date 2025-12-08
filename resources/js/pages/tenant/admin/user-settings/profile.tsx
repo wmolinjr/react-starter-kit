@@ -5,6 +5,8 @@ import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 import HeadingSmall from '@/components/shared/typography/heading-small';
+
+type PageErrors = Record<string, string>;
 import InputError from '@/components/shared/feedback/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,7 +28,7 @@ function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, errors: pageErrors } = usePage<SharedData & { errors?: PageErrors }>().props;
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -85,7 +87,7 @@ function Profile({
 
                                     <InputError
                                         className="mt-2"
-                                        message={errors.name}
+                                        message={errors.name || pageErrors?.name}
                                     />
                                 </div>
 
@@ -105,7 +107,7 @@ function Profile({
 
                                     <InputError
                                         className="mt-2"
-                                        message={errors.email}
+                                        message={errors.email || pageErrors?.email}
                                     />
                                 </div>
 

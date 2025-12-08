@@ -3,7 +3,7 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { Transition } from '@headlessui/react';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useRef } from 'react';
 
@@ -19,6 +19,7 @@ function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -84,7 +85,7 @@ function Password() {
                                     />
 
                                     <InputError
-                                        message={errors.current_password}
+                                        message={errors.current_password || pageErrors?.current_password}
                                     />
                                 </div>
 
@@ -103,7 +104,7 @@ function Password() {
                                         placeholder={t('settings.password.new')}
                                     />
 
-                                    <InputError message={errors.password} />
+                                    <InputError message={errors.password || pageErrors?.password} />
                                 </div>
 
                                 <div className="grid gap-2">
@@ -121,7 +122,7 @@ function Password() {
                                     />
 
                                     <InputError
-                                        message={errors.password_confirmation}
+                                        message={errors.password_confirmation || pageErrors?.password_confirmation}
                                     />
                                 </div>
 
