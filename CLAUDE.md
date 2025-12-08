@@ -589,6 +589,31 @@ Middleware\InitializeTenancyByDomain::$onFail = function ($exception, $request, 
 
 **See**: [docs/MEDIALIBRARY.md](docs/MEDIALIBRARY.md) for integration details.
 
+### User Sync Federation
+
+**Sistema de sincronização de usuários entre tenants** para empresas multi-filial:
+
+- ✅ Usuários compartilhados entre múltiplos tenants
+- ✅ 3 estratégias de sync: `master_wins`, `last_write_wins`, `manual_review`
+- ✅ Dados sincronizados: nome, email, senha, locale, 2FA
+- ✅ Roles/permissions permanecem locais por tenant
+- ✅ Auto-create de usuários no primeiro login
+- ✅ Interface para resolução manual de conflitos
+
+**Quick Reference**:
+```bash
+# Rotas Central Admin
+sail artisan route:list --name=central.admin.federation
+
+# Rotas Tenant Admin
+sail artisan route:list --name=tenant.admin.settings.federation
+
+# Testes
+sail artisan test --filter=Federation
+```
+
+**See**: [docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md) for complete guide.
+
 ## Permissions & Roles
 
 **System**: Spatie Laravel Permission + PHP Enums (Single Source of Truth)
@@ -829,3 +854,4 @@ For in-depth technical documentation, see:
 - **[docs/ADDONS.md](docs/ADDONS.md)** - Add-ons system
 - **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources for data transformation
 - **[docs/FORTIFY-REMOVAL-PLAN.md](docs/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
+- **[docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md)** - User sync across tenants (multi-branch companies)

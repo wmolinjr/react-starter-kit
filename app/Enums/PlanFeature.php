@@ -27,6 +27,7 @@ enum PlanFeature: string
     case AUDIT_LOG = 'auditLog';
     case PRIORITY_SUPPORT = 'prioritySupport';
     case MULTI_LANGUAGE = 'multiLanguage';
+    case FEDERATION = 'federation';
 
     /**
      * Get translatable name.
@@ -46,6 +47,7 @@ enum PlanFeature: string
             self::AUDIT_LOG => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria'],
             self::PRIORITY_SUPPORT => ['en' => 'Priority Support', 'pt_BR' => 'Suporte Prioritário'],
             self::MULTI_LANGUAGE => ['en' => 'Multi-Language', 'pt_BR' => 'Multi-Idioma'],
+            self::FEDERATION => ['en' => 'User Federation', 'pt_BR' => 'Federação de Usuários'],
         };
     }
 
@@ -97,6 +99,10 @@ enum PlanFeature: string
                 'en' => 'Enable multiple language support for your users',
                 'pt_BR' => 'Habilite suporte a múltiplos idiomas para seus usuários',
             ],
+            self::FEDERATION => [
+                'en' => 'Sync users across multiple tenants in a federation group',
+                'pt_BR' => 'Sincronize usuários entre múltiplos tenants em um grupo de federação',
+            ],
         };
     }
 
@@ -108,7 +114,7 @@ enum PlanFeature: string
         return match ($this) {
             self::BASE => 'other',
             self::PROJECTS => 'modules',
-            self::CUSTOM_ROLES, self::SSO, self::AUDIT_LOG => 'security',
+            self::CUSTOM_ROLES, self::SSO, self::AUDIT_LOG, self::FEDERATION => 'security',
             self::API_ACCESS => 'integration',
             self::ADVANCED_REPORTS => 'analytics',
             self::WHITE_LABEL, self::MULTI_LANGUAGE => 'customization',
@@ -178,6 +184,7 @@ enum PlanFeature: string
             self::AUDIT_LOG => 'FileText',
             self::PRIORITY_SUPPORT => 'Headphones',
             self::MULTI_LANGUAGE => 'Globe',
+            self::FEDERATION => 'Network',
         };
     }
 
@@ -249,6 +256,12 @@ enum PlanFeature: string
                 TenantPermission::LOCALES_VIEW->value,
                 TenantPermission::LOCALES_MANAGE->value,
             ],
+            self::FEDERATION => [
+                TenantPermission::FEDERATION_VIEW->value,
+                TenantPermission::FEDERATION_MANAGE->value,
+                TenantPermission::FEDERATION_INVITE->value,
+                TenantPermission::FEDERATION_LEAVE->value,
+            ],
         };
     }
 
@@ -279,6 +292,7 @@ enum PlanFeature: string
             self::AUDIT_LOG => 6,
             self::PRIORITY_SUPPORT => 7,
             self::MULTI_LANGUAGE => 8,
+            self::FEDERATION => 9,
         };
     }
 

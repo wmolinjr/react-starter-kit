@@ -170,6 +170,7 @@ class PlanSeeder extends Seeder
                 PlanFeature::AUDIT_LOG,         // ⭐ Enterprise
                 PlanFeature::PRIORITY_SUPPORT,  // ⭐ Enterprise
                 PlanFeature::MULTI_LANGUAGE,
+                PlanFeature::FEDERATION,        // ⭐ Enterprise
             ]),
             'limits' => $this->limits([
                 'users' => -1, // unlimited

@@ -992,11 +992,88 @@ sail artisan test --filter=Tenant
 
 ---
 
-## 16. Boas Praticas
+## 16. User Sync Federation
+
+O sistema de **User Sync Federation** permite sincronizar usuarios entre multiplos tenants. Ideal para empresas multi-filial onde funcionarios precisam acessar sistemas diferentes com as mesmas credenciais.
+
+### Conceito
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         FEDERATION GROUP                                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌──────────────────┐                                                   │
+│  │  FederatedUser   │  ◄── Fonte da Verdade (Central DB)                │
+│  │  john@acme.com   │                                                   │
+│  └────────┬─────────┘                                                   │
+│           │                                                             │
+│     ┌─────┼─────┬─────────────┐                                         │
+│     │     │     │             │                                         │
+│     v     v     v             v                                         │
+│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐                                   │
+│  │User  │ │User  │ │User  │ │User  │                                   │
+│  │T1    │ │T2    │ │T3    │ │T4    │  ◄── Usuarios Locais              │
+│  │MASTER│ │      │ │      │ │      │      (Tenant DBs)                  │
+│  └──────┘ └──────┘ └──────┘ └──────┘                                   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Sync Strategies
+
+| Strategy | Descricao | Uso Ideal |
+|----------|-----------|-----------|
+| `master_wins` | Apenas master tenant pode alterar dados | Matriz → Filiais |
+| `last_write_wins` | Qualquer tenant pode alterar | Tenants com igual autonomia |
+| `manual_review` | Conflitos vao para revisao | Dados criticos |
+
+### Dados Sincronizados vs Locais
+
+**Sincronizados:**
+- name, email, password, locale
+- 2FA (secret, recovery codes, confirmed_at)
+
+**Sempre Locais:**
+- Roles e Permissions
+- Dados especificos do tenant
+
+### Models (Central DB)
+
+| Model | Descricao |
+|-------|-----------|
+| `FederationGroup` | Grupo de tenants que sincronizam |
+| `FederationGroupTenant` | Membership de tenant no grupo |
+| `FederatedUser` | Registro central do usuario |
+| `FederatedUserLink` | Link entre central e tenant user |
+| `FederationConflict` | Conflitos para manual_review |
+
+### Uso Basico
+
+```php
+// No Tenant\User (via HasFederation trait)
+$user->isFederated();        // Verifica se e federado
+$user->getFederatedUser();   // Obtem FederatedUser central
+$user->isMasterUser();       // Verifica se e o master
+
+// Federar usuario local
+$tenantService = app(\App\Services\Tenant\FederationService::class);
+$tenantService->federateUser($user);
+
+// Sync de senha (automatico via Observer)
+$tenantService->syncPasswordToFederation($user, $hashedPassword);
+```
+
+**See**: [docs/USER-SYNC-FEDERATION.md](./USER-SYNC-FEDERATION.md) for complete documentation.
+
+---
+
+## 17. Boas Praticas
 
 1. **Nunca acesse `plan->features` diretamente** - Use `tenant->hasFeature()`
 2. **Nunca modifique `plan_enabled_permissions` manualmente** - E auto-gerado
 3. **Use Feature::for($tenant)** para feature flags do Pennant
 4. **Sempre verifique limites antes de criar recursos**
 5. **Use observers para manter caches sincronizados**
-6. **Nao hardcode verificacoes de plano** - Use features como abstracaoY
+6. **Nao hardcode verificacoes de plano** - Use features como abstracao
+7. **Para federation: roles sao sempre locais** - Nao sincronize permissoes entre tenants

@@ -10,6 +10,7 @@ import {
     Folder,
     FolderOpen,
     LayoutGrid,
+    Network,
     Package,
     Settings,
     Users,
@@ -151,6 +152,14 @@ export function useTenantAdminNavItems(): NavItem[] {
             settingsItems.push({
                 title: t('sidebar.roles'),
                 href: admin.settings.roles.index.url(),
+            });
+        }
+
+        // Federation (Enterprise feature)
+        if (has('federation:view') && hasFeature('federation')) {
+            settingsItems.push({
+                title: t('sidebar.federation'),
+                href: admin.settings.federation.index.url(),
             });
         }
 
