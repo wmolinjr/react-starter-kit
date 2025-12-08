@@ -63,7 +63,14 @@ vendor/bin/pint --test # Check formatting without changes
 
 ### Complete Development Environment
 
-Para uma experiência igual à produção, execute os seguintes serviços em terminais separados:
+**Script Automatizado (Recomendado):**
+```bash
+./bin/dev-start.sh            # Básico: Containers + Vite + Queue Worker
+./bin/dev-start.sh --horizon  # Com Horizon (dashboard de filas)
+./bin/dev-start.sh --full     # Completo: Horizon + Scheduler + Stripe
+```
+
+**Ou terminais separados:**
 
 **Terminal 1 - Containers Docker:**
 ```bash
@@ -75,11 +82,14 @@ sail up -d                    # PostgreSQL, Redis, Mailpit
 sail npm run dev              # Hot reload para frontend
 ```
 
-**Terminal 3 - Queue Worker:**
+**Terminal 3 - Queue Worker (escolha uma opção):**
 ```bash
+# Opção A: Laravel Horizon (recomendado - com dashboard)
+sail artisan horizon
+# Dashboard: http://app.test/horizon
+
+# Opção B: queue:work simples
 sail artisan queue:work redis --queue=high,default,federation,media --tries=3 --timeout=300
-# Filas: high (emails), default (tenant ops), federation (user sync), media (images)
-# Veja docs/QUEUES.md para configuração de produção com Supervisor
 ```
 
 **Terminal 4 - Scheduler (opcional para testes de agendamentos):**

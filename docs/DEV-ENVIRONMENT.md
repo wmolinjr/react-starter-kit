@@ -85,13 +85,16 @@ O script `bin/dev-start.sh` inicia todos os serviços na ordem correta:
 # Básico: Containers + Vite + Queue Worker
 ./bin/dev-start.sh
 
+# Com Laravel Horizon (dashboard de filas)
+./bin/dev-start.sh --horizon
+
 # Com Scheduler
 ./bin/dev-start.sh --with-scheduler
 
 # Com Stripe Webhooks
 ./bin/dev-start.sh --with-stripe
 
-# Completo: Todos os serviços
+# Completo: Todos os serviços (inclui Horizon)
 ./bin/dev-start.sh --full
 ```
 
@@ -100,7 +103,7 @@ O script `bin/dev-start.sh` inicia todos os serviços na ordem correta:
 2. Aguarda PostgreSQL estar pronto (health check)
 3. Aguarda Redis estar pronto (health check)
 4. Inicia Vite dev server
-5. Inicia Queue Worker
+5. Inicia Queue Worker (ou Horizon com `--horizon`/`--full`)
 6. (Opcional) Inicia Scheduler
 7. (Opcional) Inicia Stripe webhook listener
 
@@ -151,6 +154,7 @@ stripe listen --forward-to http://app.test/stripe/webhook
 | **Tenant 3** | http://tenant3.test | Terceiro tenant de teste |
 | **Mailpit** | http://localhost:8025 | Interface de emails de teste |
 | **Telescope** | http://app.test/telescope | Debug e monitoring |
+| **Horizon** | http://app.test/horizon | Dashboard de filas (Horizon) |
 | **Vite** | http://localhost:5173 | Dev server (HMR) |
 
 ## Usuários de Teste
@@ -325,7 +329,31 @@ sail artisan queue:retry <job-id>
 sail artisan queue:retry all
 ```
 
-**Produção:** Veja [QUEUES.md](QUEUES.md) para configuração do Supervisor com workers dedicados.
+### Laravel Horizon
+
+Para um dashboard visual completo de filas, use o Laravel Horizon:
+
+```bash
+# Iniciar Horizon (substitui queue:work)
+sail artisan horizon
+
+# Via script automatizado
+./bin/dev-start.sh --horizon
+
+# Ou modo completo
+./bin/dev-start.sh --full
+```
+
+**Dashboard**: http://app.test/horizon
+
+**Features do Horizon:**
+- Dashboard em tempo real
+- Métricas de throughput e tempo de execução
+- Visualização de jobs falhos com stack traces
+- Tags automáticas por tenant
+- Retry de jobs via interface
+
+**Produção:** Veja [QUEUES.md](QUEUES.md) para configuração do Supervisor com Horizon.
 
 ## Agendamentos (Scheduler)
 

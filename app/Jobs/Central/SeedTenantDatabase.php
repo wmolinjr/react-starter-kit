@@ -114,6 +114,18 @@ class SeedTenantDatabase implements ShouldQueue
     }
 
     /**
+     * Get the tags that should be assigned to the job.
+     * Required for Laravel Horizon tenant job filtering.
+     */
+    public function tags(): array
+    {
+        return [
+            'tenant:' . $this->tenant->id,
+            'seed-database',
+        ];
+    }
+
+    /**
      * Create owner user in tenant database.
      *
      * OPTION C (TENANT-ONLY USERS):

@@ -208,24 +208,87 @@ Acesse http://app.test/telescope/jobs para:
 - Monitorar tempo de execução
 - Identificar gargalos
 
-## Horizon (Opcional)
+## Laravel Horizon (Recomendado)
 
-Para aplicações maiores, considere usar [Laravel Horizon](https://laravel.com/docs/horizon) que oferece:
+O projeto já vem com Laravel Horizon configurado para gerenciamento visual de filas.
 
+### Dashboard
+
+Acesse http://app.test/horizon para:
 - Dashboard em tempo real
-- Métricas e estatísticas
-- Configuração via código
-- Balanceamento automático de workers
+- Métricas de throughput e tempo de execução
+- Visualização de jobs falhos com stack traces
+- Tags automáticas por tenant
+- Retry de jobs via interface
+
+### Desenvolvimento
 
 ```bash
-# Instalar
-composer require laravel/horizon
+# Iniciar Horizon (substitui queue:work)
+sail artisan horizon
 
-# Publicar assets
-php artisan horizon:install
+# Via script automatizado
+./bin/dev-start.sh --horizon
 
-# Executar
-php artisan horizon
+# Modo completo (todos os serviços)
+./bin/dev-start.sh --full
+```
+
+### Produção com Supervisor
+
+Crie o arquivo `/etc/supervisor/conf.d/horizon.conf`:
+
+```ini
+[program:horizon]
+process_name=%(program_name)s
+command=php /var/www/html/artisan horizon
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/html/storage/logs/horizon.log
+stopwaitsecs=3600
+```
+
+```bash
+# Recarregar e iniciar
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start horizon
+```
+
+### Configuração
+
+O Horizon está configurado em `config/horizon.php` com 4 supervisors:
+
+| Supervisor | Fila | Processos | Timeout | Memória |
+|------------|------|-----------|---------|---------|
+| supervisor-high | high | 1-3 (prod: 2-5) | 60s | 128MB |
+| supervisor-default | default | 1-3 (prod: 2-5) | 300s | 128MB |
+| supervisor-federation | federation | 1-2 (prod: 1-3) | 600s | 256MB |
+| supervisor-media | media | 1-2 (prod: 1-3) | 900s | 512MB |
+
+### Acesso em Produção
+
+Em produção, o Horizon só é acessível por super admins (`is_super_admin = true`).
+
+### Comandos Úteis
+
+```bash
+# Pausar processamento
+sail artisan horizon:pause
+
+# Continuar processamento
+sail artisan horizon:continue
+
+# Terminar Horizon graciosamente
+sail artisan horizon:terminate
+
+# Ver status
+sail artisan horizon:status
+
+# Limpar jobs antigos
+sail artisan horizon:clear
 ```
 
 ## Boas Práticas
