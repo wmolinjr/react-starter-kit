@@ -43,7 +43,7 @@ class AllowAdminMode
 
         // Normal authentication required
         if (! $request->user()) {
-            return redirect()->route('tenant.auth.login');
+            return redirect()->route('tenant.admin.auth.login');
         }
 
         return $next($request);

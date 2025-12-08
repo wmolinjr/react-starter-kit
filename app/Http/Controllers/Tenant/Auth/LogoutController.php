@@ -28,6 +28,6 @@ class LogoutController extends Controller
         $request->session()->regenerateToken();
 
         // Redirect to tenant login
-        return redirect()->route('tenant.auth.login');
+        return redirect()->route('tenant.admin.auth.login');
     }
 }

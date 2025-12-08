@@ -78,13 +78,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         // Configure redirect for unauthenticated users
-        // Central admin redirects to /admin/login, tenant users to /login
+        // Both central and tenant use /admin/login for consistency
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->routeIs('central.admin.*')) {
                 return route('central.admin.auth.login');
             }
             // Tenant users redirect to tenant login
-            return route('tenant.auth.login');
+            return route('tenant.admin.auth.login');
         });
 
         // Configure redirect for authenticated users (trying to access login pages)

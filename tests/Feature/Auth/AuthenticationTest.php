@@ -19,7 +19,7 @@ class AuthenticationTest extends TestCase
 
     public function test_login_screen_can_be_rendered()
     {
-        $response = $this->get($this->tenantUrl('/login'));
+        $response = $this->get($this->tenantRoute('tenant.admin.auth.login'));
 
         $response->assertStatus(200);
     }
@@ -28,7 +28,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->withoutTwoFactor()->create();
 
-        $response = $this->post($this->tenantUrl('/login'), [
+        $response = $this->post($this->tenantRoute('tenant.admin.auth.login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
@@ -51,12 +51,12 @@ class AuthenticationTest extends TestCase
             'two_factor_confirmed_at' => now(),
         ])->save();
 
-        $response = $this->post($this->tenantUrl('/login'), [
+        $response = $this->post($this->tenantRoute('tenant.admin.auth.login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $response->assertRedirect(route('tenant.auth.two-factor.challenge'));
+        $response->assertRedirect(route('tenant.admin.auth.two-factor.challenge'));
         $response->assertSessionHas('tenant.login.id', $user->id);
     }
 
@@ -64,7 +64,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->post($this->tenantUrl('/login'), [
+        $response = $this->post($this->tenantRoute('tenant.admin.auth.login.store'), [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
@@ -77,8 +77,8 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'tenant')->post($this->tenantUrl('/logout'));
+        $response = $this->actingAs($user, 'tenant')->post($this->tenantRoute('tenant.admin.auth.logout'));
 
-        $response->assertRedirect(route('tenant.auth.login'));
+        $response->assertRedirect(route('tenant.admin.auth.login'));
     }
 }

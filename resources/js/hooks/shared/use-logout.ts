@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import tenantAuth from '@/routes/tenant/auth';
+import tenantAuth from '@/routes/tenant/admin/auth';
 import centralAuth from '@/routes/central/admin/auth';
 import type { PageProps } from '@/types';
 

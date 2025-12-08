@@ -69,6 +69,26 @@ trait WithTenant
     }
 
     /**
+     * Generate a tenant URL from a route name.
+     *
+     * Use the full route name including prefixes:
+     * - 'tenant.admin.auth.login'
+     * - 'tenant.admin.auth.register'
+     *
+     * @param string $name Full route name (e.g., 'tenant.admin.auth.login')
+     * @param array $parameters Route parameters
+     * @return string Full URL with tenant domain
+     */
+    protected function tenantRoute(string $name, array $parameters = []): string
+    {
+        // Get the path from the route
+        $url = route($name, $parameters);
+        $path = parse_url($url, PHP_URL_PATH);
+
+        return $this->tenantUrl($path);
+    }
+
+    /**
      * Sync permissions and roles for current tenant in tests.
      */
     protected function syncTenantPermissions(): void

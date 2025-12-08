@@ -27,7 +27,7 @@ class VerificationNotificationTest extends TestCase
         ]);
 
         $this->actingAs($user, 'tenant')
-            ->post($this->tenantUrl('/email/verification-notification'))
+            ->post($this->tenantRoute('tenant.admin.auth.verification.send'))
             ->assertRedirect();
 
         Notification::assertSentTo($user, VerifyEmail::class);
@@ -42,7 +42,7 @@ class VerificationNotificationTest extends TestCase
         ]);
 
         $this->actingAs($user, 'tenant')
-            ->post($this->tenantUrl('/email/verification-notification'))
+            ->post($this->tenantRoute('tenant.admin.auth.verification.send'))
             // Tenant users are redirected to admin dashboard
             ->assertRedirect(route('tenant.admin.dashboard', absolute: false));
 

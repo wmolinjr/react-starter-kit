@@ -42,7 +42,7 @@ class RequireTenantPassword
             }
 
             return $this->responseFactory->redirectGuest(
-                $this->urlGenerator->route('tenant.auth.confirm-password')
+                $this->urlGenerator->route('tenant.admin.auth.confirm-password')
             );
         }
 

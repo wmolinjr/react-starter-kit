@@ -30,7 +30,7 @@ class TwoFactorChallengeController extends Controller
     public function create(Request $request): Response|RedirectResponse
     {
         if (! $request->session()->has('tenant.login.id')) {
-            return redirect()->route('tenant.auth.login');
+            return redirect()->route('tenant.admin.auth.login');
         }
 
         return Inertia::render('tenant/auth/two-factor-challenge');
@@ -44,13 +44,13 @@ class TwoFactorChallengeController extends Controller
         $userId = $request->session()->get('tenant.login.id');
 
         if (! $userId) {
-            return redirect()->route('tenant.auth.login');
+            return redirect()->route('tenant.admin.auth.login');
         }
 
         $user = User::find($userId);
 
         if (! $user) {
-            return redirect()->route('tenant.auth.login');
+            return redirect()->route('tenant.admin.auth.login');
         }
 
         // Validate either code or recovery_code

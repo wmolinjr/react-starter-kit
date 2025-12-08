@@ -24,9 +24,9 @@ class TwoFactorChallengeTest extends TestCase
             $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
-        $response = $this->get($this->tenantUrl('/two-factor-challenge'));
+        $response = $this->get($this->tenantRoute('tenant.admin.auth.two-factor.challenge'));
 
-        $response->assertRedirect(route('tenant.auth.login'));
+        $response->assertRedirect(route('tenant.admin.auth.login'));
     }
 
     public function test_two_factor_challenge_can_be_rendered(): void
@@ -44,12 +44,12 @@ class TwoFactorChallengeTest extends TestCase
         ])->save();
 
         // Login first to set session
-        $this->post($this->tenantUrl('/login'), [
+        $this->post($this->tenantRoute('tenant.admin.auth.login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->get($this->tenantUrl('/two-factor-challenge'))
+        $this->get($this->tenantRoute('tenant.admin.auth.two-factor.challenge'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('tenant/auth/two-factor-challenge')

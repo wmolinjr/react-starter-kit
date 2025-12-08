@@ -17,14 +17,14 @@ class RegistrationTest extends TestCase
 
     public function test_registration_screen_can_be_rendered()
     {
-        $response = $this->get($this->tenantUrl('/register'));
+        $response = $this->get($this->tenantRoute('tenant.admin.auth.register'));
 
         $response->assertStatus(200);
     }
 
     public function test_new_users_can_register()
     {
-        $response = $this->post($this->tenantUrl('/register'), [
+        $response = $this->post($this->tenantRoute('tenant.admin.auth.register.store'), [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',

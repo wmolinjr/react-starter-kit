@@ -42,7 +42,7 @@ class VerifyEmailController extends Controller
         $user = User::findOrFail($id);
 
         if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
-            return redirect()->route('tenant.auth.verification.notice')
+            return redirect()->route('tenant.admin.auth.verification.notice')
                 ->withErrors(['email' => __('The verification link is invalid.')]);
         }
 

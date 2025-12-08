@@ -222,7 +222,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // Configure the verification URL to use tenant route
         VerifyEmail::createUrlUsing(function ($notifiable) {
             return URL::temporarySignedRoute(
-                'tenant.auth.verification.verify',
+                'tenant.admin.auth.verification.verify',
                 now()->addMinutes(config('auth.verification.expire', 60)),
                 [
                     'id' => $notifiable->getKey(),

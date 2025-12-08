@@ -51,7 +51,7 @@ class TwoFactorAuthenticationTest extends TenantTestCase
             ->actingAs($this->user, 'tenant')
             ->get($this->tenantRoute('tenant.admin.user-settings.two-factor.show'));
 
-        $response->assertRedirect($this->tenantUrl('/confirm-password'));
+        $response->assertRedirect($this->tenantRoute('tenant.admin.auth.confirm-password'));
     }
 
     public function test_two_factor_settings_page_does_not_requires_password_confirmation_when_disabled()

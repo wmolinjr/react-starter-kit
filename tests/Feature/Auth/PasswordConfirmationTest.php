@@ -21,7 +21,7 @@ class PasswordConfirmationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'tenant')->get($this->tenantUrl('/confirm-password'));
+        $response = $this->actingAs($user, 'tenant')->get($this->tenantRoute('tenant.admin.auth.confirm-password'));
 
         $response->assertStatus(200);
 
@@ -32,7 +32,7 @@ class PasswordConfirmationTest extends TestCase
 
     public function test_password_confirmation_requires_authentication()
     {
-        $response = $this->get($this->tenantUrl('/confirm-password'));
+        $response = $this->get($this->tenantRoute('tenant.admin.auth.confirm-password'));
 
         // Should redirect to login (might include intended URL)
         $response->assertRedirect();
@@ -43,7 +43,7 @@ class PasswordConfirmationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'tenant')->post($this->tenantUrl('/confirm-password'), [
+        $response = $this->actingAs($user, 'tenant')->post($this->tenantRoute('tenant.admin.auth.confirm-password.store'), [
             'password' => 'password',
         ]);
 
@@ -55,7 +55,7 @@ class PasswordConfirmationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'tenant')->post($this->tenantUrl('/confirm-password'), [
+        $response = $this->actingAs($user, 'tenant')->post($this->tenantRoute('tenant.admin.auth.confirm-password.store'), [
             'password' => 'wrong-password',
         ]);
 

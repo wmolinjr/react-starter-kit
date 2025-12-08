@@ -22,7 +22,7 @@ class EmailVerificationTest extends TestCase
     {
         $user = User::factory()->unverified()->create();
 
-        $response = $this->actingAs($user, 'tenant')->get($this->tenantUrl('/email/verify'));
+        $response = $this->actingAs($user, 'tenant')->get($this->tenantRoute('tenant.admin.auth.verification.notice'));
 
         $response->assertStatus(200);
     }
@@ -37,7 +37,7 @@ class EmailVerificationTest extends TestCase
         $hash = sha1($user->email);
         $response = $this->actingAs($user, 'tenant')
             ->withoutMiddleware(\Illuminate\Routing\Middleware\ValidateSignature::class)
-            ->get($this->tenantUrl("/email/verify/{$user->id}/{$hash}"));
+            ->get($this->tenantRoute('tenant.admin.auth.verification.verify', ['id' => $user->id, 'hash' => $hash]));
 
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
@@ -51,7 +51,7 @@ class EmailVerificationTest extends TestCase
 
         $response = $this->actingAs($user, 'tenant')
             ->withoutMiddleware(\Illuminate\Routing\Middleware\ValidateSignature::class)
-            ->get($this->tenantUrl("/email/verify/{$user->id}/invalid-hash"));
+            ->get($this->tenantRoute('tenant.admin.auth.verification.verify', ['id' => $user->id, 'hash' => 'invalid-hash']));
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
@@ -69,7 +69,7 @@ class EmailVerificationTest extends TestCase
         // Should return 404 for non-existent user
         $this->actingAs($user, 'tenant')
             ->withoutMiddleware(\Illuminate\Routing\Middleware\ValidateSignature::class)
-            ->get($this->tenantUrl("/email/verify/{$nonExistentId}/{$hash}"))
+            ->get($this->tenantRoute('tenant.admin.auth.verification.verify', ['id' => $nonExistentId, 'hash' => $hash]))
             ->assertNotFound();
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
@@ -81,7 +81,7 @@ class EmailVerificationTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        $response = $this->actingAs($user, 'tenant')->get($this->tenantUrl('/email/verify'));
+        $response = $this->actingAs($user, 'tenant')->get($this->tenantRoute('tenant.admin.auth.verification.notice'));
 
         // Tenant users are redirected to admin dashboard
         $response->assertRedirect(route('tenant.admin.dashboard', absolute: false));
@@ -98,7 +98,7 @@ class EmailVerificationTest extends TestCase
         $hash = sha1($user->email);
         $this->actingAs($user, 'tenant')
             ->withoutMiddleware(\Illuminate\Routing\Middleware\ValidateSignature::class)
-            ->get($this->tenantUrl("/email/verify/{$user->id}/{$hash}"))
+            ->get($this->tenantRoute('tenant.admin.auth.verification.verify', ['id' => $user->id, 'hash' => $hash]))
             ->assertRedirect(route('tenant.admin.dashboard', absolute: false).'?verified=1');
 
         $this->assertTrue($user->fresh()->hasVerifiedEmail());

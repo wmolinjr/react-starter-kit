@@ -28,7 +28,7 @@ class RegisterController extends Controller
     {
         // Check if registration is enabled
         if (! Features::enabled(Features::registration())) {
-            return redirect()->route('tenant.auth.login');
+            return redirect()->route('tenant.admin.auth.login');
         }
 
         return Inertia::render('tenant/auth/register');
@@ -41,7 +41,7 @@ class RegisterController extends Controller
     {
         // Check if registration is enabled
         if (! Features::enabled(Features::registration())) {
-            return redirect()->route('tenant.auth.login');
+            return redirect()->route('tenant.admin.auth.login');
         }
 
         $request->validate([

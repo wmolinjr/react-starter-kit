@@ -187,12 +187,18 @@ Route::middleware([
 
     /*
     |----------------------------------------------------------------------
-    | Tenant Authentication Routes (tenant.auth.*)
+    | Tenant Authentication Routes (tenant.admin.auth.*)
     |----------------------------------------------------------------------
+    |
+    | All auth routes use /admin prefix to match central domain structure.
+    | This provides consistent URLs across both domains:
+    | - Central: localhost/admin/login
+    | - Tenant:  tenant.localhost/admin/login
+    |
     */
 
     // Guest routes (login, register, password reset, 2FA challenge)
-    Route::middleware('guest:tenant')->name('auth.')->group(function () {
+    Route::middleware('guest:tenant')->prefix('admin')->name('admin.auth.')->group(function () {
         // Login
         Route::get('/login', [LoginController::class, 'create'])->name('login');
         Route::post('/login', [LoginController::class, 'store'])->name('login.store');
@@ -215,7 +221,7 @@ Route::middleware([
     });
 
     // Authenticated routes (logout, password confirmation, email verification)
-    Route::middleware('auth:tenant')->name('auth.')->group(function () {
+    Route::middleware('auth:tenant')->prefix('admin')->name('admin.auth.')->group(function () {
         Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
 
         // Password confirmation

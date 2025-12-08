@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { type BreadcrumbItem } from '@/types';
-import { store } from '@/routes/tenant/auth/confirm-password';
+import { store } from '@/routes/tenant/admin/auth/confirm-password';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldCheck } from 'lucide-react';

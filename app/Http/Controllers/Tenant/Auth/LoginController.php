@@ -61,7 +61,7 @@ class LoginController extends Controller
             $request->session()->put('tenant.login.id', $user->id);
             $request->session()->put('tenant.login.remember', $request->boolean('remember'));
 
-            return redirect()->route('tenant.auth.two-factor.challenge');
+            return redirect()->route('tenant.admin.auth.two-factor.challenge');
         }
 
         // Login with tenant guard (no 2FA)
