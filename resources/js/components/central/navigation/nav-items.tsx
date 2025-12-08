@@ -2,30 +2,29 @@ import admin from '@/routes/central/admin';
 import { type NavItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
-    BookOpen,
     Building2,
-    Folder,
+    Gauge,
     Shield,
     ShieldCheck,
     Store,
+    Telescope,
 } from 'lucide-react';
 
 /**
  * Footer navigation items (shared across central sidebars)
+ * Links to development/monitoring tools (only accessible by super admins)
  */
 export function useFooterNavItems(): NavItem[] {
-    const { t } = useLaravelReactI18n();
-
     return [
         {
-            title: t('sidebar.repository'),
-            href: 'https://github.com/laravel/react-starter-kit',
-            icon: Folder,
+            title: 'Telescope',
+            href: '/telescope',
+            icon: Telescope,
         },
         {
-            title: t('sidebar.documentation'),
-            href: 'https://laravel.com/docs/starter-kits#react',
-            icon: BookOpen,
+            title: 'Horizon',
+            href: '/horizon',
+            icon: Gauge,
         },
     ];
 }
