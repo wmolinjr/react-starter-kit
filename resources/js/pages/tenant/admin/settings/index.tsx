@@ -15,6 +15,7 @@ import {
     Globe,
     Key,
     Languages,
+    Network,
     Palette,
     Settings,
     Settings2,
@@ -24,7 +25,12 @@ import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageCo
 import { type BreadcrumbItem } from '@/types';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { usePermissions } from '@/hooks/shared/use-permissions';
+import { usePlan } from '@/hooks/tenant/use-plan';
 import { type ReactElement } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import type { Permission } from '@/types/permissions';
+import type { PlanFeatures } from '@/types';
 
 interface Domain {
     id: string;
@@ -44,8 +50,21 @@ interface Props {
     domains: Domain[];
 }
 
+interface SettingsLink {
+    title: string;
+    description: string;
+    href: string;
+    icon: LucideIcon;
+    badge?: string;
+    variant?: 'destructive';
+    permission?: Permission;
+    feature?: keyof PlanFeatures;
+}
+
 function SettingsIndex({ tenant: tenantData, domains }: Props) {
     const { t } = useLaravelReactI18n();
+    const { has } = usePermissions();
+    const { hasFeature } = usePlan();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -54,12 +73,15 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
 
     useSetBreadcrumbs(breadcrumbs);
 
-    const settingsLinks = [
+    const allSettingsLinks: SettingsLink[] = [
         {
-            title: 'Branding',
+            title: t('tenant.settings.branding'),
             description: t('tenant.settings.branding_description'),
             href: admin.settings.branding.url(),
             icon: Palette,
+            permission: 'branding:view',
+            feature: 'whiteLabel',
+            badge: 'Enterprise',
         },
         {
             title: t('tenant.settings.domains'),
@@ -67,40 +89,70 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
             href: admin.settings.domains.url(),
             icon: Globe,
             badge: t('tenant.settings.domains_count', { count: domains.length }),
+            permission: 'settings:edit',
         },
         {
             title: t('tenant.settings.language'),
             description: t('tenant.settings.language_description'),
             href: admin.settings.language.url(),
             icon: Languages,
+            permission: 'locales:view',
+            feature: 'multiLanguage',
         },
         {
             title: t('tenant.config.title'),
             description: t('tenant.config.description', { name: tenantData.name }),
             href: admin.settings.config.url(),
             icon: Settings2,
+            permission: 'settings:edit',
         },
         {
-            title: 'API Tokens',
+            title: t('tenant.settings.api_tokens'),
             description: t('tenant.settings.api_tokens_description'),
             href: admin.settings.apiTokens.url(),
             icon: Key,
+            permission: 'apiTokens:view',
         },
         {
-            title: 'Custom Roles',
+            title: t('tenant.settings.custom_roles'),
             description: t('tenant.settings.custom_roles_description'),
             href: admin.settings.roles.index.url(),
             icon: Shield,
             badge: 'Pro+',
+            permission: 'roles:view',
+            feature: 'customRoles',
+        },
+        {
+            title: t('tenant.settings.federation'),
+            description: t('tenant.settings.federation_description'),
+            href: admin.settings.federation.index.url(),
+            icon: Network,
+            badge: 'Enterprise',
+            permission: 'federation:view',
+            feature: 'federation',
         },
         {
             title: t('tenant.settings.danger_zone'),
             description: t('tenant.settings.danger_zone_description'),
             href: admin.settings.danger.url(),
             icon: AlertTriangle,
-            variant: 'destructive' as const,
+            variant: 'destructive',
+            permission: 'settings:danger',
         },
     ];
+
+    // Filter links based on permissions and features
+    const settingsLinks = allSettingsLinks.filter((link) => {
+        // Check permission if specified
+        if (link.permission && !has(link.permission)) {
+            return false;
+        }
+        // Check feature if specified
+        if (link.feature && !hasFeature(link.feature)) {
+            return false;
+        }
+        return true;
+    });
 
     return (
         <>

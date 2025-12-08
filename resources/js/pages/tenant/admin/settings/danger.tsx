@@ -21,9 +21,9 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import AdminLayout from '@/layouts/tenant/admin-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-react';
+import { AlertTriangle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
@@ -65,21 +65,12 @@ function DangerSettings({ tenant: tenantData }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" asChild>
-                                <Link href={admin.settings.index.url()}>
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <div>
-                                <PageTitle icon={AlertTriangle} className="text-red-600 dark:text-red-400">
-                                    {t('tenant.settings.danger_zone')}
-                                </PageTitle>
-                                <PageDescription>
-                                    {t('tenant.settings.danger_zone_page_description', { name: tenantData.name })}
-                                </PageDescription>
-                            </div>
-                        </div>
+                        <PageTitle icon={AlertTriangle} className="text-red-600 dark:text-red-400">
+                            {t('tenant.settings.danger_zone')}
+                        </PageTitle>
+                        <PageDescription>
+                            {t('tenant.settings.danger_zone_page_description', { name: tenantData.name })}
+                        </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

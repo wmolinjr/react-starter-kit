@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowLeft, Palette, Upload } from 'lucide-react';
+import { Palette, Upload } from 'lucide-react';
 import { FormEvent, useRef } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
@@ -71,19 +71,10 @@ function BrandingSettings({ tenant: tenantData, branding }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" asChild>
-                                <Link href={admin.settings.index.url()}>
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <div>
-                                <PageTitle icon={Palette}>Branding</PageTitle>
-                                <PageDescription>
-                                    {t('tenant.settings.branding_page_description', { name: tenantData.name })}
-                                </PageDescription>
-                            </div>
-                        </div>
+                        <PageTitle icon={Palette}>{t('tenant.settings.branding')}</PageTitle>
+                        <PageDescription>
+                            {t('tenant.settings.branding_page_description', { name: tenantData.name })}
+                        </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

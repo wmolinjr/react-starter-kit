@@ -30,9 +30,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import apiTokens from '@/routes/tenant/api/tokens';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowLeft, Copy, Key, Plus, Trash2 } from 'lucide-react';
+import { Copy, Key, Plus, Trash2 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
@@ -99,19 +99,10 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" asChild>
-                                <Link href={admin.settings.index.url()}>
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <div>
-                                <PageTitle icon={Key}>API Tokens</PageTitle>
-                                <PageDescription>
-                                    {t('tenant.settings.api_tokens_description')}
-                                </PageDescription>
-                            </div>
-                        </div>
+                        <PageTitle icon={Key}>{t('tenant.settings.api_tokens')}</PageTitle>
+                        <PageDescription>
+                            {t('tenant.settings.api_tokens_description')}
+                        </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

@@ -19,7 +19,7 @@ import {
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowLeft, Building2, Check, Clock, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
+import { Building2, Check, Clock, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
@@ -115,19 +115,10 @@ function ConfigSettings({
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" asChild>
-                                <Link href={admin.settings.index.url()}>
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <div>
-                                <PageTitle icon={Settings2}>{t('tenant.config.title')}</PageTitle>
-                                <PageDescription>
-                                    {t('tenant.config.description', { name: tenantData.name })}
-                                </PageDescription>
-                            </div>
-                        </div>
+                        <PageTitle icon={Settings2}>{t('tenant.config.title')}</PageTitle>
+                        <PageDescription>
+                            {t('tenant.config.description', { name: tenantData.name })}
+                        </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
