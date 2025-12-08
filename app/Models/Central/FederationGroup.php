@@ -52,6 +52,15 @@ class FederationGroup extends Model
     public const STRATEGY_MANUAL_REVIEW = 'manual_review';
 
     /**
+     * All available sync strategies (for UI dropdowns).
+     */
+    public const SYNC_STRATEGIES = [
+        self::STRATEGY_MASTER_WINS => 'Master tenant data always wins',
+        self::STRATEGY_LAST_WRITE_WINS => 'Most recent change wins',
+        self::STRATEGY_MANUAL_REVIEW => 'Require manual review for conflicts',
+    ];
+
+    /**
      * Default synced fields.
      */
     public const DEFAULT_SYNC_FIELDS = [

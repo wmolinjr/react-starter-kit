@@ -115,8 +115,17 @@ class FederationGroupController extends Controller implements HasMiddleware
             'federatedUsers.links.tenant',
         ]);
 
+        // Get tenants that can be added to this group
+        $availableTenants = Tenant::query()
+            ->whereDoesntHave('federationGroups', function ($query) {
+                $query->whereNull('federation_group_tenants.left_at');
+            })
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('central/admin/federation/show', [
             'group' => new FederationGroupDetailResource($group),
+            'availableTenants' => TenantSummaryResource::collection($availableTenants),
             'stats' => $this->federationService->getGroupStats($group),
         ]);
     }
@@ -128,17 +137,26 @@ class FederationGroupController extends Controller implements HasMiddleware
     {
         $group->load(['masterTenant', 'tenants']);
 
-        // Get tenants that can be added to this group
-        $availableTenants = Tenant::query()
-            ->whereDoesntHave('federationGroups', function ($query) {
-                $query->whereNull('federation_group_tenants.left_at');
+        // For editing, we need tenants that are either:
+        // 1. Already in this group (for master tenant selection)
+        // 2. Available (not in any group)
+        $groupTenantIds = $group->tenants->pluck('id')->toArray();
+
+        $tenants = Tenant::query()
+            ->where(function ($query) use ($groupTenantIds) {
+                // Tenants in this group
+                $query->whereIn('id', $groupTenantIds)
+                    // OR tenants not in any group
+                    ->orWhereDoesntHave('federationGroups', function ($q) {
+                        $q->whereNull('federation_group_tenants.left_at');
+                    });
             })
             ->orderBy('name')
             ->get();
 
         return Inertia::render('central/admin/federation/edit', [
             'group' => new FederationGroupDetailResource($group),
-            'availableTenants' => TenantSummaryResource::collection($availableTenants),
+            'tenants' => TenantSummaryResource::collection($tenants),
             'syncStrategies' => FederationGroup::SYNC_STRATEGIES,
             'defaultSyncFields' => FederationGroup::DEFAULT_SYNC_FIELDS,
         ]);

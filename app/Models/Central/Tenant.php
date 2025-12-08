@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Cashier\Billable;
 use Laravel\Pennant\Concerns\HasFeatures;
@@ -162,6 +163,16 @@ class Tenant extends Model implements TenantWithDatabase
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
+    }
+
+    /**
+     * Federation groups this tenant belongs to.
+     */
+    public function federationGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(FederationGroup::class, 'federation_group_tenants')
+            ->withPivot(['id', 'sync_enabled', 'joined_at', 'left_at', 'settings'])
+            ->withTimestamps();
     }
 
     /**

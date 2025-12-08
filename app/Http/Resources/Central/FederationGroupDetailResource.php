@@ -24,6 +24,7 @@ class FederationGroupDetailResource extends BaseResource
             'name' => $this->name,
             'description' => $this->description,
             'sync_strategy' => $this->sync_strategy,
+            'master_tenant_id' => $this->master_tenant_id,
             'settings' => $this->settings ?? [],
             'is_active' => $this->is_active,
             'created_at' => $this->formatIso($this->created_at),

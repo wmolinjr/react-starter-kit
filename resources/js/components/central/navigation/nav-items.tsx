@@ -6,6 +6,7 @@ import {
     Building2,
     CreditCard,
     Folder,
+    Network,
     Package,
     PackageOpen,
     Settings,
@@ -55,6 +56,11 @@ export function useCentralAdminNavItems(): NavItem[] {
             title: t('sidebar.tenants'),
             href: admin.tenants.index.url(),
             icon: Building2,
+        },
+        {
+            title: t('sidebar.federation'),
+            href: admin.federation.index.url(),
+            icon: Network,
         },
         {
             title: t('sidebar.active_addons'),
