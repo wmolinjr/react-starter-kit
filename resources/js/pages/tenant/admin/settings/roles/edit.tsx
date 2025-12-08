@@ -5,6 +5,7 @@ import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { Shield } from 'lucide-react';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -57,7 +58,7 @@ function EditRole({ role, permissions }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('roles.edit_title')}</PageTitle>
+                        <PageTitle icon={Shield}>{t('roles.edit_title')}</PageTitle>
                         <PageDescription>{t('roles.edit_description', { name: role.display_name })}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>

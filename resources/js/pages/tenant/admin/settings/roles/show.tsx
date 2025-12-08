@@ -93,7 +93,7 @@ function ShowRole({ role }: Props) {
                 <PageHeader>
                     <PageHeaderContent>
                         <div className="flex items-center gap-3">
-                            <PageTitle>{role.display_name}</PageTitle>
+                            <PageTitle icon={Shield}>{role.display_name}</PageTitle>
                             {role.is_protected && (
                                 <Badge variant="secondary">{t('common.protected')}</Badge>
                             )}

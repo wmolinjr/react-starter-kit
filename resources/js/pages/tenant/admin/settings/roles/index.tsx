@@ -50,6 +50,8 @@ function RolesIndex({ roles, planInfo }: Props) {
     const { t } = useLaravelReactI18n();
     const breadcrumbs = useBreadcrumbs();
 
+    useSetBreadcrumbs(breadcrumbs);
+
     // Format custom roles limit display
     const formatLimit = (limit: number) => {
         if (limit === -1) return t('common.unlimited');
@@ -77,7 +79,7 @@ function RolesIndex({ roles, planInfo }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('roles.title')}</PageTitle>
+                        <PageTitle icon={Shield}>{t('tenant.settings.custom_roles')}</PageTitle>
                         <PageDescription>
                             {t('roles.description')}
                         </PageDescription>

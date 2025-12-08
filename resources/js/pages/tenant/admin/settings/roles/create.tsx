@@ -5,6 +5,7 @@ import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { Shield } from 'lucide-react';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -38,6 +39,8 @@ function CreateRole({ permissions }: Props) {
     const { t } = useLaravelReactI18n();
     const breadcrumbs = useBreadcrumbs();
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof RoleForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.post(admin.settings.roles.store.url(), data);
     };
@@ -49,7 +52,7 @@ function CreateRole({ permissions }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('roles.create_title')}</PageTitle>
+                        <PageTitle icon={Shield}>{t('roles.create_title')}</PageTitle>
                         <PageDescription>
                             {t('roles.create_description')}
                         </PageDescription>

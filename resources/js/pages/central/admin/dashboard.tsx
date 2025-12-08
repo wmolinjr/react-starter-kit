@@ -12,7 +12,7 @@ import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Building2, CreditCard, Package, Shield } from 'lucide-react';
+import { Building2, CreditCard, Layers, Network, Package, Shield, Users } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type ReactElement } from 'react';
 
@@ -105,47 +105,84 @@ function AdminDashboard({ stats }: Props) {
                     </Card>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('admin.dashboard.quick_actions')}</CardTitle>
-                            <CardDescription>{t('admin.dashboard.quick_actions_description')}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="grid gap-2">
-                            <Link
-                                href={admin.tenants.index.url()}
-                                className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
-                            >
-                                <Building2 className="h-5 w-5" />
-                                <div>
-                                    <p className="font-medium">{t('admin.dashboard.manage_tenants')}</p>
-                                    <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_tenants_description')}</p>
-                                </div>
-                            </Link>
-                            <Link
-                                href={admin.plans.index.url()}
-                                className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
-                            >
-                                <CreditCard className="h-5 w-5" />
-                                <div>
-                                    <p className="font-medium">{t('admin.dashboard.plan_catalog')}</p>
-                                    <p className="text-muted-foreground text-xs">{t('admin.dashboard.plan_catalog_description')}</p>
-                                </div>
-                            </Link>
-                            <Link
-                                href={admin.catalog.index.url()}
-                                className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
-                            >
-                                <Package className="h-5 w-5" />
-                                <div>
-                                    <p className="font-medium">{t('admin.dashboard.addon_catalog')}</p>
-                                    <p className="text-muted-foreground text-xs">{t('admin.dashboard.addon_catalog_description')}</p>
-                                </div>
-                            </Link>
-                        </CardContent>
-                    </Card>
-
-                    </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('admin.dashboard.quick_actions')}</CardTitle>
+                        <CardDescription>{t('admin.dashboard.quick_actions_description')}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-2 md:grid-cols-2">
+                        <Link
+                            href={admin.tenants.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
+                        >
+                            <Building2 className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.manage_tenants')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_tenants_description')}</p>
+                            </div>
+                        </Link>
+                        <Link
+                            href={admin.users.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
+                        >
+                            <Users className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.manage_users')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_users_description')}</p>
+                            </div>
+                        </Link>
+                        <Link
+                            href={admin.plans.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
+                        >
+                            <CreditCard className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.plan_catalog')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.plan_catalog_description')}</p>
+                            </div>
+                        </Link>
+                        <Link
+                            href={admin.catalog.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
+                        >
+                            <Package className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.addon_catalog')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.addon_catalog_description')}</p>
+                            </div>
+                        </Link>
+                        <Link
+                            href={admin.bundles.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
+                        >
+                            <Layers className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.bundle_catalog')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.bundle_catalog_description')}</p>
+                            </div>
+                        </Link>
+                        <Link
+                            href={admin.roles.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3"
+                        >
+                            <Shield className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.manage_roles')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_roles_description')}</p>
+                            </div>
+                        </Link>
+                        <Link
+                            href={admin.federation.index.url()}
+                            className="hover:bg-muted flex items-center gap-2 rounded-lg border p-3 md:col-span-2"
+                        >
+                            <Network className="h-5 w-5" />
+                            <div>
+                                <p className="font-medium">{t('admin.dashboard.federation_groups')}</p>
+                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.federation_groups_description')}</p>
+                            </div>
+                        </Link>
+                    </CardContent>
+                </Card>
                 </PageContent>
             </Page>
         </>
