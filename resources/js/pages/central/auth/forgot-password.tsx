@@ -12,7 +12,7 @@ import { LoaderCircle } from 'lucide-react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <AuthLayout
@@ -29,7 +29,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
             <div className="space-y-6">
                 <Form {...email()}>
-                    {({ processing, errors }) => (
+                    {({ processing }) => (
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
@@ -44,7 +44,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     placeholder="email@example.com"
                                 />
 
-                                <InputError message={errors.email || pageErrors?.email} />
+                                <InputError message={errors?.email} />
                             </div>
 
                             <div className="my-6 flex items-center justify-start">

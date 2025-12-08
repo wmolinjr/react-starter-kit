@@ -15,12 +15,12 @@ import { type ReactElement } from 'react';
 
 function ConfirmPassword() {
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: t('auth.confirm_password.breadcrumb'),
-            href: '/user/confirm-password',
+            href: store().url,
         },
     ];
 
@@ -43,7 +43,7 @@ function ConfirmPassword() {
                     </CardHeader>
                     <CardContent>
                         <Form {...store()} resetOnSuccess={['password']}>
-                            {({ processing, errors }) => (
+                            {({ processing }) => (
                                 <div className="space-y-6">
                                     <div className="grid gap-2">
                                         <Label htmlFor="password">{t('common.password')}</Label>
@@ -55,7 +55,7 @@ function ConfirmPassword() {
                                             autoComplete="current-password"
                                             autoFocus
                                         />
-                                        <InputError message={errors.password || pageErrors?.password} />
+                                        <InputError message={errors?.password} />
                                     </div>
 
                                     <Button

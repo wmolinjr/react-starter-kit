@@ -28,7 +28,7 @@ function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth, errors: pageErrors } = usePage<SharedData & { errors?: PageErrors }>().props;
+    const { auth, errors } = usePage<SharedData & { errors?: PageErrors }>().props;
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -70,7 +70,7 @@ function Profile({
                         }}
                         className="space-y-6"
                     >
-                        {({ processing, recentlySuccessful, errors }) => (
+                        {({ processing, recentlySuccessful }) => (
                             <>
                                 <div className="grid gap-2">
                                     <Label htmlFor="name">{t('common.name')}</Label>
@@ -87,7 +87,7 @@ function Profile({
 
                                     <InputError
                                         className="mt-2"
-                                        message={errors.name || pageErrors?.name}
+                                        message={errors?.name}
                                     />
                                 </div>
 
@@ -107,7 +107,7 @@ function Profile({
 
                                     <InputError
                                         className="mt-2"
-                                        message={errors.email || pageErrors?.email}
+                                        message={errors?.email}
                                     />
                                 </div>
 

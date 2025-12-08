@@ -15,7 +15,7 @@ interface ResetPasswordProps {
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <AuthLayout
@@ -29,7 +29,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                 transform={(data) => ({ ...data, token, email })}
                 resetOnSuccess={['password', 'password_confirmation']}
             >
-                {({ processing, errors }) => (
+                {({ processing }) => (
                     <div className="grid gap-6">
                         <div className="grid gap-2">
                             <Label htmlFor="email">{t('Email')}</Label>
@@ -43,7 +43,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 readOnly
                             />
                             <InputError
-                                message={errors.email || pageErrors?.email}
+                                message={errors?.email}
                                 className="mt-2"
                             />
                         </div>
@@ -59,7 +59,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 autoFocus
                                 placeholder={t('Password')}
                             />
-                            <InputError message={errors.password || pageErrors?.password} />
+                            <InputError message={errors?.password} />
                         </div>
 
                         <div className="grid gap-2">
@@ -75,7 +75,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 placeholder={t('Confirm password')}
                             />
                             <InputError
-                                message={errors.password_confirmation || pageErrors?.password_confirmation}
+                                message={errors?.password_confirmation}
                                 className="mt-2"
                             />
                         </div>

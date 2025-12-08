@@ -20,7 +20,7 @@ function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -68,7 +68,7 @@ function Password() {
                         }}
                         className="space-y-6"
                     >
-                        {({ errors, processing, recentlySuccessful }) => (
+                        {({ processing, recentlySuccessful }) => (
                             <>
                                 <div className="grid gap-2">
                                     <Label htmlFor="current_password">
@@ -86,7 +86,7 @@ function Password() {
                                     />
 
                                     <InputError
-                                        message={errors.current_password || pageErrors?.current_password}
+                                        message={errors?.current_password}
                                     />
                                 </div>
 
@@ -105,7 +105,7 @@ function Password() {
                                         placeholder={t('settings.password.new')}
                                     />
 
-                                    <InputError message={errors.password || pageErrors?.password} />
+                                    <InputError message={errors?.password} />
                                 </div>
 
                                 <div className="grid gap-2">
@@ -123,7 +123,7 @@ function Password() {
                                     />
 
                                     <InputError
-                                        message={errors.password_confirmation || pageErrors?.password_confirmation}
+                                        message={errors?.password_confirmation}
                                     />
                                 </div>
 

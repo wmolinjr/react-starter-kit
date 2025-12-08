@@ -16,7 +16,7 @@ import { useMemo, useState } from 'react';
 
 export default function TwoFactorChallenge() {
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
 
@@ -60,7 +60,7 @@ export default function TwoFactorChallenge() {
                     resetOnError
                     resetOnSuccess={!showRecoveryInput}
                 >
-                    {({ errors, processing, clearErrors }) => (
+                    {({ processing, clearErrors }) => (
                         <>
                             {showRecoveryInput ? (
                                 <>
@@ -72,7 +72,7 @@ export default function TwoFactorChallenge() {
                                         required
                                     />
                                     <InputError
-                                        message={errors.recovery_code || pageErrors?.recovery_code}
+                                        message={errors?.recovery_code}
                                     />
                                 </>
                             ) : (
@@ -99,7 +99,7 @@ export default function TwoFactorChallenge() {
                                             </InputOTPGroup>
                                         </InputOTP>
                                     </div>
-                                    <InputError message={errors.code || pageErrors?.code} />
+                                    <InputError message={errors?.code} />
                                 </div>
                             )}
 

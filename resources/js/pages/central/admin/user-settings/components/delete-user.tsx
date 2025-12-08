@@ -21,7 +21,7 @@ import settings from '@/routes/central/admin/settings';
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <div className="space-y-6">
@@ -63,7 +63,7 @@ export default function DeleteUser() {
                             resetOnSuccess
                             className="space-y-6"
                         >
-                            {({ resetAndClearErrors, processing, errors }) => (
+                            {({ resetAndClearErrors, processing }) => (
                                 <>
                                     <div className="grid gap-2">
                                         <Label
@@ -82,7 +82,7 @@ export default function DeleteUser() {
                                             autoComplete="current-password"
                                         />
 
-                                        <InputError message={errors.password || pageErrors?.password} />
+                                        <InputError message={errors?.password} />
                                     </div>
 
                                     <DialogFooter className="gap-2">

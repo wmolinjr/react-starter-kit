@@ -159,7 +159,7 @@ function AuditLogIndex({
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('tenant.audit.title'), href: '/audit' },
+        { title: t('tenant.audit.title'), href: admin.audit.index().url },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

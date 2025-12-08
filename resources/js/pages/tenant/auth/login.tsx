@@ -24,7 +24,7 @@ export default function Login({
     canRegister,
 }: LoginProps) {
     const { t } = useLaravelReactI18n();
-    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
+    const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
         <AuthLayout
@@ -38,7 +38,7 @@ export default function Login({
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
-                {({ processing, errors }) => (
+                {({ processing }) => (
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
@@ -55,7 +55,7 @@ export default function Login({
                                     autoComplete="email"
                                     placeholder="email@example.com"
                                 />
-                                <InputError message={errors.email || pageErrors?.email} />
+                                <InputError message={errors?.email} />
                             </div>
 
                             <div className="grid gap-2">
@@ -82,7 +82,7 @@ export default function Login({
                                     autoComplete="current-password"
                                     placeholder={t('Password')}
                                 />
-                                <InputError message={errors.password || pageErrors?.password} />
+                                <InputError message={errors?.password} />
                             </div>
 
                             <div className="flex items-center space-x-3">
