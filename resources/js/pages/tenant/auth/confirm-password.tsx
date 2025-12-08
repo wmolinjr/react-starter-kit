@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { type BreadcrumbItem } from '@/types';
 import { store } from '@/routes/tenant/admin/auth/confirm-password';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldCheck } from 'lucide-react';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -15,6 +15,7 @@ import { type ReactElement } from 'react';
 
 function ConfirmPassword() {
     const { t } = useLaravelReactI18n();
+    const { errors: pageErrors } = usePage().props as { errors?: Record<string, string> };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -54,7 +55,7 @@ function ConfirmPassword() {
                                             autoComplete="current-password"
                                             autoFocus
                                         />
-                                        <InputError message={errors.password} />
+                                        <InputError message={errors.password || pageErrors?.password} />
                                     </div>
 
                                     <Button
