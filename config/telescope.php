@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'domain' => env('TELESCOPE_DOMAIN'),
+    'domain' => env('TELESCOPE_DOMAIN', env('APP_DOMAIN', 'app.test')),
 
     /*
     |--------------------------------------------------------------------------

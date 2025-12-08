@@ -109,19 +109,19 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      * This gate determines who can access Telescope in non-local environments.
      *
      * SECURITY: Only super admins can access Telescope in production.
-     * In local environment, all authenticated users can access.
+     * In local environment, access is allowed for development.
      */
     protected function gate(): void
     {
-        Gate::define('viewTelescope', function ($user) {
-            // In local environment, allow all authenticated users
+        Gate::define('viewTelescope', function ($user = null) {
+            // In local environment, allow access for development
             if (app()->environment('local')) {
                 return true;
             }
 
-            // In production, only super admins can access
-            // Multi-database tenancy: Super Admin role is in central database
-            return $user->hasRole('Super Admin');
+            // In production, only Central\User with super-admin role can access
+            return $user instanceof \App\Models\Central\User
+                && $user->isSuperAdmin();
         });
     }
 }

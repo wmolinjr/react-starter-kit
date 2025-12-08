@@ -35,8 +35,8 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
                 return true;
             }
 
-            // In production, require super admin
-            return $user instanceof User && $user->is_super_admin;
+            // In production, only Central\User with super-admin role can access
+            return $user instanceof User && $user->isSuperAdmin();
         });
     }
 }
