@@ -36,7 +36,7 @@ class TwoFactorController extends Controller
     {
         $enable($request->user(), $request->boolean('force', false));
 
-        return back()->with('success', __('flash.two_factor.enabled'));
+        return back()->with('status', Fortify::TWO_FACTOR_AUTHENTICATION_ENABLED);
     }
 
     /**
@@ -46,7 +46,7 @@ class TwoFactorController extends Controller
     {
         $confirm($request->user(), $request->input('code'));
 
-        return back()->with('success', __('flash.two_factor.confirmed'));
+        return back()->with('status', Fortify::TWO_FACTOR_AUTHENTICATION_CONFIRMED);
     }
 
     /**
@@ -56,7 +56,7 @@ class TwoFactorController extends Controller
     {
         $disable($request->user());
 
-        return back()->with('success', __('flash.two_factor.disabled'));
+        return back()->with('status', Fortify::TWO_FACTOR_AUTHENTICATION_DISABLED);
     }
 
     /**
@@ -97,6 +97,6 @@ class TwoFactorController extends Controller
     {
         $generate($request->user());
 
-        return back()->with('success', __('flash.two_factor.recovery_codes_regenerated'));
+        return back()->with('status', Fortify::RECOVERY_CODES_GENERATED);
     }
 }

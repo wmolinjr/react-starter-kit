@@ -160,12 +160,14 @@ class CheckoutServiceTest extends TenantTestCase
     #[Test]
     public function subscription_accepts_valid_monthly_billing(): void
     {
-        // This will fail at Stripe API call since we don't have valid keys in tests,
-        // but we can verify the validation passes
+        // Test that monthly billing validation passes (no validation exception thrown)
+        // The method may succeed with Stripe mock or fail at Stripe API level
         try {
-            $this->service->createSubscriptionCheckout($this->tenant, 'storage_50gb', 'monthly', 1);
+            $result = $this->service->createSubscriptionCheckout($this->tenant, 'storage_50gb', 'monthly', 1);
+            // If it succeeds, it should return session data
+            $this->assertIsArray($result);
         } catch (AddonException $e) {
-            // Expected: Stripe API error, not validation error
+            // If it fails, it should be a Stripe API error, not a validation error
             $this->assertStringContainsString('checkout session', $e->getMessage());
         }
     }
@@ -173,10 +175,13 @@ class CheckoutServiceTest extends TenantTestCase
     #[Test]
     public function subscription_accepts_valid_yearly_billing(): void
     {
+        // Test that yearly billing validation passes (no validation exception thrown)
         try {
-            $this->service->createSubscriptionCheckout($this->tenant, 'storage_50gb', 'yearly', 2);
+            $result = $this->service->createSubscriptionCheckout($this->tenant, 'storage_50gb', 'yearly', 2);
+            // If it succeeds, it should return session data
+            $this->assertIsArray($result);
         } catch (AddonException $e) {
-            // Expected: Stripe API error, not validation error
+            // If it fails, it should be a Stripe API error, not a validation error
             $this->assertStringContainsString('checkout session', $e->getMessage());
         }
     }
