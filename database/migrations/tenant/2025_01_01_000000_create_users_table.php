@@ -42,6 +42,10 @@ return new class extends Migration
             $table->text('two_factor_recovery_codes')->nullable();
             $table->timestamp('two_factor_confirmed_at')->nullable();
 
+            // Federation sync (optional - links to central federated_users table)
+            // If set, this user is part of a federation group and syncs with other tenants
+            $table->uuid('federated_user_id')->nullable()->index();
+
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

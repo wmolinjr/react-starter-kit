@@ -75,6 +75,12 @@ enum TenantPermission: string
     case LOCALES_VIEW = 'locales:view';
     case LOCALES_MANAGE = 'locales:manage';
 
+    // Federation (4 permissions) - Owner only
+    case FEDERATION_VIEW = 'federation:view';
+    case FEDERATION_MANAGE = 'federation:manage';
+    case FEDERATION_INVITE = 'federation:invite';
+    case FEDERATION_LEAVE = 'federation:leave';
+
     /**
      * Get the description for this permission.
      *
@@ -145,6 +151,12 @@ enum TenantPermission: string
             // Multi-Language
             self::LOCALES_VIEW => ['en' => 'View language settings', 'pt_BR' => 'Visualizar configurações de idioma'],
             self::LOCALES_MANAGE => ['en' => 'Manage language settings', 'pt_BR' => 'Gerenciar configurações de idioma'],
+
+            // Federation
+            self::FEDERATION_VIEW => ['en' => 'View federation settings', 'pt_BR' => 'Visualizar configurações de federação'],
+            self::FEDERATION_MANAGE => ['en' => 'Manage federation settings', 'pt_BR' => 'Gerenciar configurações de federação'],
+            self::FEDERATION_INVITE => ['en' => 'Invite tenants to federation', 'pt_BR' => 'Convidar tenants para federação'],
+            self::FEDERATION_LEAVE => ['en' => 'Leave federation group', 'pt_BR' => 'Sair do grupo de federação'],
         };
     }
 
@@ -186,6 +198,7 @@ enum TenantPermission: string
             'branding' => ['en' => 'Branding', 'pt_BR' => 'Marca'],
             'audit' => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria'],
             'locales' => ['en' => 'Languages', 'pt_BR' => 'Idiomas'],
+            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
             default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)],
         };
     }

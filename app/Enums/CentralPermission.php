@@ -58,6 +58,13 @@ enum CentralPermission: string
     case SYSTEM_EDIT = 'system:edit';
     case SYSTEM_LOGS = 'system:logs';
 
+    // Federation Management (5 permissions)
+    case FEDERATION_VIEW = 'federation:view';
+    case FEDERATION_CREATE = 'federation:create';
+    case FEDERATION_EDIT = 'federation:edit';
+    case FEDERATION_DELETE = 'federation:delete';
+    case FEDERATION_MANAGE_CONFLICTS = 'federation:manageConflicts';
+
     /**
      * Get the description for this permission.
      *
@@ -109,6 +116,13 @@ enum CentralPermission: string
             self::SYSTEM_VIEW => ['en' => 'View system settings', 'pt_BR' => 'Visualizar configurações do sistema'],
             self::SYSTEM_EDIT => ['en' => 'Edit system settings', 'pt_BR' => 'Editar configurações do sistema'],
             self::SYSTEM_LOGS => ['en' => 'View system logs', 'pt_BR' => 'Visualizar logs do sistema'],
+
+            // Federation
+            self::FEDERATION_VIEW => ['en' => 'View federation groups', 'pt_BR' => 'Visualizar grupos de federação'],
+            self::FEDERATION_CREATE => ['en' => 'Create federation groups', 'pt_BR' => 'Criar grupos de federação'],
+            self::FEDERATION_EDIT => ['en' => 'Edit federation groups', 'pt_BR' => 'Editar grupos de federação'],
+            self::FEDERATION_DELETE => ['en' => 'Delete federation groups', 'pt_BR' => 'Excluir grupos de federação'],
+            self::FEDERATION_MANAGE_CONFLICTS => ['en' => 'Manage federation conflicts', 'pt_BR' => 'Gerenciar conflitos de federação'],
         };
     }
 
@@ -146,6 +160,7 @@ enum CentralPermission: string
             'addons' => ['en' => 'Tenant Addons', 'pt_BR' => 'Add-ons de Tenants'],
             'roles' => ['en' => 'Central Roles', 'pt_BR' => 'Papéis Centrais'],
             'system' => ['en' => 'System', 'pt_BR' => 'Sistema'],
+            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
             default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)],
         };
     }

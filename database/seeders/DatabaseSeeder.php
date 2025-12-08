@@ -64,5 +64,10 @@ class DatabaseSeeder extends Seeder
         // Seed tenants (triggers automatic database creation, migration, seeding)
         // Owner users are created in TENANT databases by SeedTenantDatabase job
         $this->call([TenantSeeder::class]);
+        $this->command->newLine();
+
+        // Seed federation groups and federated users
+        $this->command->info('Seeding federation data...');
+        $this->call([FederationSeeder::class]);
     }
 }

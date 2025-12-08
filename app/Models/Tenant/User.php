@@ -17,6 +17,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Tenant\Traits\HasFederation;
 
 /**
  * User - Tenant users stored in tenant database.
@@ -39,6 +40,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $department
  * @property string|null $employee_id
  * @property array|null $custom_settings
+ * @property string|null $federated_user_id Federation link (null = local user only)
  * @property \Carbon\Carbon|null $email_verified_at
  * @property \Carbon\Carbon|null $two_factor_confirmed_at
  * @property \Carbon\Carbon|null $deleted_at
@@ -48,6 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use CausesActivity;
     use HasApiTokens;
     use HasFactory;
+    use HasFederation;
     use HasRoles;
     use HasUuids;
     use LogsActivity;
