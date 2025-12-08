@@ -1,5 +1,5 @@
 import { type BreadcrumbItem } from '@/types';
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
 
 interface BreadcrumbContextType {
     breadcrumbs: BreadcrumbItem[];
@@ -19,8 +19,14 @@ export function BreadcrumbProvider({ children }: { children: ReactNode }) {
         setBreadcrumbsState(items);
     }, []);
 
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo(
+        () => ({ breadcrumbs, setBreadcrumbs }),
+        [breadcrumbs, setBreadcrumbs]
+    );
+
     return (
-        <BreadcrumbContext.Provider value={{ breadcrumbs, setBreadcrumbs }}>
+        <BreadcrumbContext.Provider value={contextValue}>
             {children}
         </BreadcrumbContext.Provider>
     );
@@ -56,5 +62,6 @@ export function useSetBreadcrumbs(items: BreadcrumbItem[]) {
         if (context) {
             context.setBreadcrumbs(JSON.parse(serialized));
         }
-    }, [context, serialized]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- setBreadcrumbs is stable (useCallback)
+    }, [serialized]);
 }

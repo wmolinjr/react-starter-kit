@@ -19,12 +19,10 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     AlertTriangle,
-    ArrowLeft,
     Check,
     Clock,
     GitCompare,
     Mail,
-    Network,
     User,
     X,
 } from 'lucide-react';
@@ -170,13 +168,6 @@ function FederationConflicts({ group, conflicts }: Props) {
 
             <Page>
                 <PageHeader>
-                    <PageHeaderActions>
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={admin.federation.show.url(group.id)}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                     <PageHeaderContent>
                         <PageTitle icon={AlertTriangle}>{t('admin.federation.conflicts')}</PageTitle>
                         <PageDescription>

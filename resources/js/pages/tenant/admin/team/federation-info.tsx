@@ -15,7 +15,6 @@ import admin from '@/routes/tenant/admin';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
-    ArrowLeft,
     Calendar,
     Crown,
     Link as LinkIcon,
@@ -120,14 +119,6 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                             {t('tenant.federation.user_info_description')}
                         </PageDescription>
                     </PageHeaderContent>
-                    <PageHeaderActions>
-                        <Button variant="outline" asChild>
-                            <Link href={admin.team.index.url()}>
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                {t('common.back')}
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                 </PageHeader>
 
                 <PageContent>

@@ -1,11 +1,10 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Mail, Shield } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { Head } from '@inertiajs/react';
+import { Calendar, Mail, Shield } from 'lucide-react';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -43,13 +42,6 @@ function UserShow({ user }: Props) {
 
             <Page>
                 <PageHeader>
-                    <PageHeaderActions>
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={admin.users.index.url()}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                     <PageHeaderContent>
                         <PageTitle>{user.name}</PageTitle>
                         <PageDescription>{user.email}</PageDescription>

@@ -11,7 +11,6 @@ import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import {
     AlertTriangle,
-    ArrowLeft,
     Building2,
     Clock,
     Crown,
@@ -137,13 +136,6 @@ function FederationShow({ group, availableTenants }: Props) {
 
             <Page>
                 <PageHeader>
-                    <PageHeaderActions>
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={admin.federation.index.url()}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                     <PageHeaderContent>
                         <PageTitle icon={Network}>
                             {group.name}

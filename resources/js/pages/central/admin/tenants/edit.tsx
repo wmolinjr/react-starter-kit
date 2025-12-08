@@ -7,7 +7,6 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -48,13 +47,6 @@ function TenantEdit({ tenant, plans }: Props) {
 
             <Page>
                 <PageHeader>
-                    <PageHeaderActions>
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={admin.tenants.index.url()}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                     <PageHeaderContent>
                         <PageTitle>{t('admin.tenants.edit_tenant')}</PageTitle>
                         <PageDescription>{tenant.name}</PageDescription>

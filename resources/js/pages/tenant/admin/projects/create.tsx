@@ -20,7 +20,7 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowLeft, FolderPlus } from 'lucide-react';
+import { FolderPlus } from 'lucide-react';
 import { FormEvent, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
@@ -55,19 +55,10 @@ function ProjectCreate() {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" asChild>
-                                <Link href={admin.projects.index.url()}>
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <div>
-                                <PageTitle icon={FolderPlus}>{t('tenant.projects.new_project')}</PageTitle>
-                                <PageDescription>
-                                    {t('tenant.projects.new_project_description')}
-                                </PageDescription>
-                            </div>
-                        </div>
+                        <PageTitle icon={FolderPlus}>{t('tenant.projects.new_project')}</PageTitle>
+                        <PageDescription>
+                            {t('tenant.projects.new_project_description')}
+                        </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

@@ -5,7 +5,7 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CreditCard, Globe, Package, Users } from 'lucide-react';
+import { CreditCard, Globe, Package, Users } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -40,13 +40,6 @@ function TenantShow({ tenant }: Props) {
 
             <Page>
                 <PageHeader>
-                    <PageHeaderActions>
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={admin.tenants.index.url()}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                     <PageHeaderContent>
                         <PageTitle>{tenant.name}</PageTitle>
                         <PageDescription>ID: {tenant.id}</PageDescription>

@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Upload, Download, Trash2, Image as ImageIcon, Paperclip } from 'lucide-react';
+import { Upload, Download, Trash2, Image as ImageIcon, Paperclip } from 'lucide-react';
 import { FormEvent, useRef, useState, type ReactElement } from 'react';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
@@ -115,19 +115,10 @@ function ProjectShow({ project }: ProjectShowProps) {
       <Page>
         <PageHeader>
           <PageHeaderContent>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href={admin.projects.index.url()}>
-                  <ArrowLeft className="h-4 w-4" />
-                </Link>
-              </Button>
-              <div>
-                <PageTitle>{project.name}</PageTitle>
-                <PageDescription>
-                  {t('tenant.projects.created_by', { name: project.user.name, date: project.created_at })}
-                </PageDescription>
-              </div>
-            </div>
+            <PageTitle>{project.name}</PageTitle>
+            <PageDescription>
+              {t('tenant.projects.created_by', { name: project.user.name, date: project.created_at })}
+            </PageDescription>
           </PageHeaderContent>
           <PageHeaderActions>
             <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>

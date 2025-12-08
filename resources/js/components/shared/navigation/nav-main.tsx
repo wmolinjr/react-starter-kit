@@ -14,22 +14,23 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { resolveUrl } from '@/lib/utils';
+import { useBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useState } from 'react';
 
 /**
- * Extract pathname from URL (handles both relative and absolute URLs).
- * Wayfinder returns URLs like "//localhost/admin" but page.url is "/admin".
+ * Normalize href to pathname for comparison.
+ * Handles Wayfinder URLs (//host/path) and regular paths.
  */
-function getPathname(url: string): string {
-    // Handle protocol-relative URLs (//localhost/path) or full URLs
+function toPathname(href: NavItem['href']): string {
+    const url = typeof href === 'string' ? href : href.url;
+
+    // Handle protocol-relative (//host/path) or absolute URLs
     if (url.startsWith('//') || url.startsWith('http')) {
         try {
-            const fullUrl = url.startsWith('//') ? `https:${url}` : url;
-            return new URL(fullUrl).pathname;
+            return new URL(url.startsWith('//') ? `https:${url}` : url).pathname;
         } catch {
             return url;
         }
@@ -38,67 +39,56 @@ function getPathname(url: string): string {
 }
 
 /**
- * Check if current URL matches the nav item href.
- * Following Inertia.js docs pattern: url.startsWith(href)
- * @see https://inertiajs.com/links#active-states
+ * Check if current path matches the nav item exactly.
+ * Uses exact matching to prevent multiple items being active.
  */
-function isActiveRoute(url: string, item: NavItem): boolean {
-    const resolved = getPathname(resolveUrl(item.href));
-    const currentPath = url.split('?')[0];
-
-    // Prefix match (Inertia pattern: url.startsWith('/users'))
-    return currentPath.startsWith(resolved);
+function isActive(currentPath: string, item: NavItem): boolean {
+    return currentPath === toPathname(item.href);
 }
 
 /**
- * Check if any subitem is active (for collapsible menus).
- * This ensures parent menus stay open when navigating between subitems.
+ * Check if current path is within the nav item's scope (prefix match).
+ * Used to keep parent menus open for dynamic routes like /tenants/{id}.
  */
-function hasActiveSubitem(url: string, item: NavItem): boolean {
-    if (!item.items || item.items.length === 0) {
-        return false;
-    }
-
-    return item.items.some((subItem) => isActiveRoute(url, subItem));
+function isWithinScope(currentPath: string, item: NavItem): boolean {
+    return currentPath.startsWith(toPathname(item.href));
 }
 
-/**
- * State for tracking which menu items are open.
- * Keys are menu titles, values are open state.
- */
-type OpenMenuState = Record<string, boolean>;
+/** Track which menu groups are open */
+type OpenState = Record<string, boolean>;
 
 export function NavMain({ items = [], label }: { items: NavItem[]; label?: string }) {
     const { t } = useLaravelReactI18n();
-    const displayLabel = label ?? t('sidebar.platform');
-    const page = usePage();
+    const { url } = usePage();
+    const breadcrumbs = useBreadcrumbs();
 
-    // With Persistent Layouts, this component doesn't remount during navigation
-    // so useState is sufficient to preserve menu state
-    const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
+    // Use last breadcrumb for exact page matching, fallback to URL
+    const lastBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+    const currentPath = lastBreadcrumb?.href
+        ? toPathname(lastBreadcrumb.href)
+        : url.split('?')[0];
 
-    const handleOpenChange = (title: string, isOpen: boolean) => {
-        setOpenMenus((prev) => ({ ...prev, [title]: isOpen }));
-    };
+    // With Persistent Layouts, useState preserves state across navigations
+    const [openMenus, setOpenMenus] = useState<OpenState>({});
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>{displayLabel}</SidebarGroupLabel>
+            <SidebarGroupLabel>{label ?? t('sidebar.platform')}</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) =>
-                    item.items && item.items.length > 0 ? (
+                    item.items?.length ? (
                         <CollapsibleNavItem
                             key={item.title}
                             item={item}
-                            currentUrl={page.url}
+                            currentPath={currentPath}
                             isOpen={openMenus[item.title]}
-                            onOpenChange={(isOpen) => handleOpenChange(item.title, isOpen)}
+                            onToggle={(open) => setOpenMenus((prev) => ({ ...prev, [item.title]: open }))}
                         />
                     ) : (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                isActive={isActiveRoute(page.url, item)}
+                                isActive={isActive(currentPath, item)}
                                 tooltip={{ children: item.title }}
                             >
                                 <Link href={item.href} prefetch>
@@ -116,34 +106,30 @@ export function NavMain({ items = [], label }: { items: NavItem[]; label?: strin
 
 interface CollapsibleNavItemProps {
     item: NavItem;
-    currentUrl: string;
+    currentPath: string;
     isOpen: boolean | undefined;
-    onOpenChange: (isOpen: boolean) => void;
+    onToggle: (open: boolean) => void;
 }
 
 /**
- * Collapsible nav item with controlled open state.
- * With Persistent Layouts, state is naturally preserved across navigations.
- * Falls back to keeping menu open when any subitem is active.
+ * Collapsible menu group with subitems.
+ * Opens automatically when any subitem is active or we're in its scope.
  */
-function CollapsibleNavItem({ item, currentUrl, isOpen, onOpenChange }: CollapsibleNavItemProps) {
-    const hasActiveChild = hasActiveSubitem(currentUrl, item);
+function CollapsibleNavItem({ item, currentPath, isOpen, onToggle }: CollapsibleNavItemProps) {
+    // Check if any child is exactly active (for highlighting)
+    const hasActiveChild = item.items?.some((sub) => isActive(currentPath, sub)) ?? false;
 
-    // Determine open state:
-    // 1. If user has explicitly toggled (isOpen is defined), use that
-    // 2. Otherwise, open if any subitem is active
-    const effectiveOpen = isOpen ?? hasActiveChild;
+    // Check if we're within any child's scope (for keeping menu open on dynamic routes)
+    const isInChildScope = item.items?.some((sub) => isWithinScope(currentPath, sub)) ?? false;
+
+    // User toggle takes precedence, otherwise open if active or in scope
+    const open = isOpen ?? (hasActiveChild || isInChildScope);
 
     return (
-        <Collapsible
-            asChild
-            open={effectiveOpen}
-            onOpenChange={onOpenChange}
-            className="group/collapsible"
-        >
+        <Collapsible asChild open={open} onOpenChange={onToggle} className="group/collapsible">
             <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={{ children: item.title }} isActive={hasActiveChild}>
+                    <SidebarMenuButton tooltip={{ children: item.title }} isActive={hasActiveChild || isInChildScope}>
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -153,7 +139,7 @@ function CollapsibleNavItem({ item, currentUrl, isOpen, onOpenChange }: Collapsi
                     <SidebarMenuSub>
                         {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton asChild isActive={isActiveRoute(currentUrl, subItem)}>
+                                <SidebarMenuSubButton asChild isActive={isActive(currentPath, subItem)}>
                                     <Link href={subItem.href} prefetch>
                                         <span>{subItem.title}</span>
                                     </Link>

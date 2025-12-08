@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import AdminLayout from '@/layouts/central/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Trash2, Users, Shield, ArrowLeft } from 'lucide-react';
+import { Pencil, Trash2, Users, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -102,12 +102,6 @@ function ShowRole({ role }: Props) {
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
-                        <Button variant="outline" asChild>
-                            <Link href={admin.roles.index.url()}>
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                {t('common.back')}
-                            </Link>
-                        </Button>
                         <Button variant="outline" asChild>
                             <Link href={admin.roles.edit.url(role.id)}>
                                 <Pencil className="mr-2 h-4 w-4" />

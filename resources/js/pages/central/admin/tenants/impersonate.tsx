@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, KeyRound, Shield, User, Users } from 'lucide-react';
+import { KeyRound, Shield, User, Users } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -94,13 +94,6 @@ function ImpersonateTenant({ tenant, users }: Props) {
 
             <Page>
                 <PageHeader>
-                    <PageHeaderActions>
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={admin.tenants.show.url(tenant.id)}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </PageHeaderActions>
                     <PageHeaderContent>
                         <PageTitle>{t('impersonation.impersonate_tenant')}</PageTitle>
                         <PageDescription>
