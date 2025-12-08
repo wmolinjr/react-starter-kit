@@ -84,6 +84,11 @@ class HandleInertiaRequests extends Middleware
      * - A user belongs to exactly one tenant (the database they're in)
      * - No tenants() relationship on User model
      *
+     * ADMIN MODE:
+     * - Central admin enters tenant without logging in as a user
+     * - Provides full permissions for viewing (all tenant permissions)
+     * - Role shows as 'Admin Mode'
+     *
      * PERFORMANCE: Usa cache do Spatie Permission (isolado por tenant via SpatiePermissionsBootstrapper)
      * - getAllPermissions() cached automaticamente
      * - hasRole() cached automaticamente
@@ -91,6 +96,11 @@ class HandleInertiaRequests extends Middleware
      */
     protected function getAuthData($user): array
     {
+        // Admin Mode: Central admin viewing tenant without specific user
+        if (! $user && session('tenancy_admin_mode') && tenancy()->initialized) {
+            return $this->getAdminModeAuthData();
+        }
+
         if (! $user) {
             return [
                 'user' => null,
@@ -209,6 +219,45 @@ class HandleInertiaRequests extends Middleware
             'isAdmin' => $user->hasRole('admin'),
             'isAdminOrOwner' => $user->isAdminOrOwner(),
             'isSuperAdmin' => $isSuperAdmin,
+        ];
+    }
+
+    /**
+     * Get auth data for Admin Mode (central admin viewing tenant).
+     *
+     * Admin Mode allows central admins to enter a tenant without logging in
+     * as a specific user. They get full permissions for viewing the tenant.
+     */
+    protected function getAdminModeAuthData(): array
+    {
+        $tenant = tenant();
+
+        // Get all tenant permissions (full access for admin mode)
+        $allPermissions = \App\Enums\TenantPermission::values();
+
+        return [
+            'user' => [
+                'id' => null,
+                'name' => __('Admin Mode'),
+                'email' => __('Central Administrator'),
+            ],
+            'tenant' => [
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+                'slug' => $tenant->slug,
+                'role' => 'admin-mode',
+                'is_current' => true,
+            ],
+            'permissions' => $allPermissions,
+            'role' => [
+                'name' => 'admin-mode',
+                'isOwner' => false,
+                'isAdmin' => true,
+                'isAdminOrOwner' => true,
+                'isSuperAdmin' => true,
+                'isAdminMode' => true,
+            ],
+            'guard' => 'admin-mode',
         ];
     }
 

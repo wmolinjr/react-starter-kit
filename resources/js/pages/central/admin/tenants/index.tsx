@@ -64,12 +64,18 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
     };
 
     const handleImpersonate = (tenantId: string, userId?: string) => {
-        setImpersonating(tenantId);
-        // Use new impersonation routes (Option C architecture)
-        const url = userId
-            ? admin.tenants.impersonate.asUser.url({ tenant: tenantId, userId })
-            : admin.tenants.impersonate.adminMode.url(tenantId);
-        router.post(url, {}, { onFinish: () => setImpersonating(null) });
+        if (userId) {
+            // Direct impersonation as specific user
+            setImpersonating(tenantId);
+            router.post(
+                admin.tenants.impersonate.asUser.url({ tenant: tenantId, userId }),
+                {},
+                { onFinish: () => setImpersonating(null) }
+            );
+        } else {
+            // Navigate to impersonation selection page
+            router.visit(admin.tenants.impersonate.index.url(tenantId));
+        }
     };
 
     return (
