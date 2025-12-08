@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -28,6 +28,7 @@ import {
 import { InviteMemberDialog } from '@/components/tenant/dialogs/invite-member-dialog';
 import { Can } from '@/components/shared/auth/can';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
 interface Member {
   id: string;
@@ -49,7 +50,7 @@ interface Props {
   teamStats: TeamStats;
 }
 
-export default function TeamIndex({ members, teamStats }: Props) {
+function TeamIndex({ members, teamStats }: Props) {
   const { t } = useLaravelReactI18n();
   const { tenant: tenantData } = usePage<PageProps>().props;
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
@@ -58,6 +59,8 @@ export default function TeamIndex({ members, teamStats }: Props) {
     { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
     { title: t('tenant.team.title'), href: admin.team.index.url() },
   ];
+
+  useSetBreadcrumbs(breadcrumbs);
 
   const getRoleBadge = (role: string) => {
     const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; labelKey: string }> = {
@@ -98,7 +101,7 @@ export default function TeamIndex({ members, teamStats }: Props) {
   };
 
   return (
-    <AdminLayout breadcrumbs={breadcrumbs}>
+    <>
       <Head title={t('tenant.team.page_title')} />
 
       <Page>
@@ -220,6 +223,10 @@ export default function TeamIndex({ members, teamStats }: Props) {
         onOpenChange={setInviteDialogOpen}
         maxUsersReached={teamStats.max_users !== null && teamStats.current_users >= teamStats.max_users}
       />
-    </AdminLayout>
+    </>
   );
 }
+
+TeamIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TeamIndex;

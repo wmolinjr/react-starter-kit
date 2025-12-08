@@ -1,5 +1,7 @@
 import { send } from '@/routes/central/admin/auth/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -16,7 +18,7 @@ import settings from '@/routes/central/admin/settings';
 
 import DeleteUser from './components/delete-user';
 
-export default function Profile({
+function Profile({
     mustVerifyEmail,
     status,
 }: {
@@ -37,6 +39,8 @@ export default function Profile({
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     // Profile page requires authentication
     if (!auth.user) {
         return null;
@@ -46,7 +50,7 @@ export default function Profile({
     const user = auth.user;
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.profile.page_title')} />
 
             <CentralUserSettingsLayout>
@@ -156,6 +160,10 @@ export default function Profile({
 
                 <DeleteUser />
             </CentralUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+Profile.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default Profile;

@@ -8,6 +8,8 @@ import { ArrowLeft, Calendar, Mail, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface User {
     id: string;
@@ -24,7 +26,7 @@ interface Props {
     user: User;
 }
 
-export default function UserShow({ user }: Props) {
+function UserShow({ user }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -33,8 +35,10 @@ export default function UserShow({ user }: Props) {
         { title: user.name, href: admin.users.show.url(user.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`User: ${user.name}`} />
 
             <Page>
@@ -116,6 +120,10 @@ export default function UserShow({ user }: Props) {
                 </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+UserShow.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default UserShow;

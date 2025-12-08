@@ -8,6 +8,8 @@ import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, Page
 import { type BreadcrumbItem } from '@/types';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Role {
     id: string;
@@ -24,13 +26,15 @@ interface Props {
     centralRoles: Role[];
 }
 
-export default function RolesIndex({ centralRoles }: Props) {
+function RolesIndex({ centralRoles }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.role_management'), href: admin.roles.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = (role: Role) => {
         if (role.is_protected) {
@@ -113,7 +117,7 @@ export default function RolesIndex({ centralRoles }: Props) {
     );
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.roles.title')} />
 
             <Page>
@@ -157,6 +161,10 @@ export default function RolesIndex({ centralRoles }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+RolesIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default RolesIndex;

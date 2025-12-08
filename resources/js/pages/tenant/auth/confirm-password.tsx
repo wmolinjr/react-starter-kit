@@ -10,8 +10,10 @@ import { store } from '@/routes/tenant/admin/auth/confirm-password';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldCheck } from 'lucide-react';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
-export default function ConfirmPassword() {
+function ConfirmPassword() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -21,8 +23,10 @@ export default function ConfirmPassword() {
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('auth.confirm_password.page_title')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -67,6 +71,10 @@ export default function ConfirmPassword() {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+ConfirmPassword.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ConfirmPassword;

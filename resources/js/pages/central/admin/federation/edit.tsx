@@ -14,6 +14,8 @@ import {
 } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { FederationGroupForm } from './components/federation-group-form';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Tenant {
     id: string;
@@ -41,7 +43,7 @@ interface Props {
     tenants: Tenant[];
 }
 
-export default function FederationEdit({ group, tenants }: Props) {
+function FederationEdit({ group, tenants }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -51,12 +53,14 @@ export default function FederationEdit({ group, tenants }: Props) {
         { title: t('common.edit'), href: admin.federation.edit.url(group.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof FederationGroupForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.put(admin.federation.update.url(group.id), data as unknown as Record<string, FormDataConvertible>);
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('common.edit')}: ${group.name}`} />
 
             <Page>
@@ -73,6 +77,10 @@ export default function FederationEdit({ group, tenants }: Props) {
                     <FederationGroupForm group={group} tenants={tenants} onSubmit={handleSubmit} />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationEdit.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationEdit;

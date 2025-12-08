@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Activity, User, Filter, RefreshCw } from 'lucide-react';
@@ -10,6 +10,7 @@ import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import {
     Table,
     TableBody,
@@ -108,7 +109,7 @@ interface Props {
     tenant: Tenant;
 }
 
-export default function TeamActivity({
+function TeamActivity({
     activities,
     teamMembers,
     eventTypes,
@@ -124,6 +125,8 @@ export default function TeamActivity({
         { title: t('tenant.team.title'), href: admin.team.index.url() },
         { title: t('tenant.activity.title'), href: admin.team.activity.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const getEventBadge = (event: string) => {
         const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -183,7 +186,7 @@ export default function TeamActivity({
     const hasActiveFilters = Object.values(filters).some((v) => v !== null);
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.activity.page_title')} />
 
             <Page>
@@ -447,6 +450,10 @@ export default function TeamActivity({
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+TeamActivity.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TeamActivity;

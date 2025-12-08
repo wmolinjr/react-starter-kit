@@ -13,6 +13,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { formatPrice } from '@/lib/utils';
 
@@ -45,7 +47,7 @@ interface Props {
     };
 }
 
-export default function AdminAddonsIndex({ addons, stats }: Props) {
+function AdminAddonsIndex({ addons, stats }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -53,8 +55,10 @@ export default function AdminAddonsIndex({ addons, stats }: Props) {
         { title: t('breadcrumbs.addon_management'), href: admin.addons.index.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.addons.title')} />
 
             <Page>
@@ -136,6 +140,10 @@ export default function AdminAddonsIndex({ addons, stats }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminAddonsIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AdminAddonsIndex;

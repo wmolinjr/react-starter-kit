@@ -8,12 +8,13 @@ import { send } from '@/routes/central/admin/auth/verification';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Mail } from 'lucide-react';
+import { type ReactElement } from 'react';
 
-export default function VerifyEmail({ status }: { status?: string }) {
+function VerifyEmail({ status }: { status?: string }) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <AdminLayout>
+        <>
             <Head title={t('Email verification')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
@@ -54,6 +55,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+VerifyEmail.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default VerifyEmail;

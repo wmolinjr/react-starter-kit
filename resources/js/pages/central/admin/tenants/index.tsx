@@ -1,12 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/central/admin-layout';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, Pencil, Search, Users, Globe, LogIn } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
@@ -40,7 +41,7 @@ interface Props {
     isImpersonating?: boolean;
 }
 
-export default function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
+function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
     const { t } = useLaravelReactI18n();
     const [search, setSearch] = useState(filters.search || '');
     const [impersonating, setImpersonating] = useState<string | null>(null);
@@ -49,6 +50,7 @@ export default function TenantsIndex({ tenants, filters, isImpersonating }: Prop
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.tenants'), href: admin.tenants.index.url() },
     ];
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,7 +73,7 @@ export default function TenantsIndex({ tenants, filters, isImpersonating }: Prop
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.tenants.title')} />
 
             <Page>
@@ -217,6 +219,10 @@ export default function TenantsIndex({ tenants, filters, isImpersonating }: Prop
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+TenantsIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TenantsIndex;

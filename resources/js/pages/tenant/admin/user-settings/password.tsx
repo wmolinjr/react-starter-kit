@@ -13,7 +13,10 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import TenantUserSettingsLayout from '@/layouts/tenant/user-settings-layout';
 import userSettings from '@/routes/tenant/admin/user-settings';
 
-export default function Password() {
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
+function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
@@ -30,7 +33,7 @@ export default function Password() {
     ];
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.password.page_title')} />
 
             <TenantUserSettingsLayout>
@@ -146,6 +149,10 @@ export default function Password() {
                     </Form>
                 </div>
             </TenantUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+Password.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default Password;

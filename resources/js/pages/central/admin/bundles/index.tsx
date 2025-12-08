@@ -17,6 +17,8 @@ import { create, destroy, edit, sync, syncAll } from '@/routes/central/admin/bun
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit as EditIcon, Package, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn, formatPrice } from '@/lib/utils';
@@ -72,7 +74,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function BundleIndex({ bundles, badgePresets }: Props) {
+function BundleIndex({ bundles, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const getBadgePreset = (value: string | null) => {
@@ -84,6 +86,8 @@ export default function BundleIndex({ bundles, badgePresets }: Props) {
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.bundle_catalog'), href: admin.bundles.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = (bundle: Bundle) => {
         if (confirm(t('admin.bundles.delete_confirm', { name: bundle.name_display }))) {
@@ -100,7 +104,7 @@ export default function BundleIndex({ bundles, badgePresets }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.bundles.title')} />
 
             <Page>
@@ -256,6 +260,10 @@ export default function BundleIndex({ bundles, badgePresets }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+BundleIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default BundleIndex;

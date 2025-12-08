@@ -28,11 +28,14 @@ import { useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Props {
     tenant: { id: string; name: string; slug: string };
 }
 
-export default function DangerSettings({ tenant: tenantData }: Props) {
+function DangerSettings({ tenant: tenantData }: Props) {
     const { t } = useLaravelReactI18n();
     const [confirmText, setConfirmText] = useState('');
     const isConfirmed = confirmText === tenantData.slug;
@@ -54,7 +57,7 @@ export default function DangerSettings({ tenant: tenantData }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.settings.danger_zone')} />
 
             <Page>
@@ -174,6 +177,10 @@ export default function DangerSettings({ tenant: tenantData }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+DangerSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default DangerSettings;

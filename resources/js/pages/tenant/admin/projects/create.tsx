@@ -21,11 +21,12 @@ import admin from '@/routes/tenant/admin';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowLeft, FolderPlus } from 'lucide-react';
-import { FormEvent } from 'react';
+import { FormEvent, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
-export default function ProjectCreate() {
+function ProjectCreate() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -33,6 +34,9 @@ export default function ProjectCreate() {
         { title: t('tenant.projects.title'), href: admin.projects.index.url() },
         { title: t('tenant.projects.create_project'), href: admin.projects.create.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
+
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         description: '',
@@ -45,7 +49,7 @@ export default function ProjectCreate() {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.projects.new_project')} />
 
             <Page>
@@ -160,6 +164,10 @@ export default function ProjectCreate() {
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ProjectCreate.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ProjectCreate;

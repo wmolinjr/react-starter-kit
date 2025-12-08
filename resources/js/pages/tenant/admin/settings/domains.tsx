@@ -37,6 +37,9 @@ import { FormEvent } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Domain {
     id: string;
     domain: string;
@@ -50,7 +53,7 @@ interface Props {
     hasCustomDomainFeature: boolean;
 }
 
-export default function DomainsSettings({
+function DomainsSettings({
     tenant: tenantData,
     domains,
     hasCustomDomainFeature,
@@ -79,7 +82,7 @@ export default function DomainsSettings({
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.settings.domains')} />
 
             <Page>
@@ -262,6 +265,10 @@ export default function DomainsSettings({
                 )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+DomainsSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default DomainsSettings;

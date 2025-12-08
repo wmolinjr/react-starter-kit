@@ -6,6 +6,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Trash2, Users, Shield, ArrowLeft } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';
 import {
     Table,
@@ -45,7 +47,7 @@ interface Props {
     role: Role;
 }
 
-export default function ShowRole({ role }: Props) {
+function ShowRole({ role }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -53,6 +55,8 @@ export default function ShowRole({ role }: Props) {
         { title: t('admin.roles.title'), href: admin.roles.index.url() },
         { title: role.display_name, href: admin.roles.show.url(role.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = () => {
         if (role.is_protected) {
@@ -80,7 +84,7 @@ export default function ShowRole({ role }: Props) {
     );
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={role.display_name} />
 
             <Page>
@@ -226,6 +230,10 @@ export default function ShowRole({ role }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ShowRole.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ShowRole;

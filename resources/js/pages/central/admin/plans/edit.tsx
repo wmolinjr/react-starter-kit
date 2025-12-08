@@ -7,6 +7,8 @@ import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageCo
 import { type BreadcrumbItem, type EnumOption } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import type { BadgePreset } from '@/components/central/forms/badge-selector';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Addon {
     id: string;
@@ -49,7 +51,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -58,12 +60,14 @@ export default function EditPlan({ plan, addons, featureDefinitions, limitDefini
         { title: plan.name_display, href: admin.plans.edit.url(plan.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof PlanForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.put(admin.plans.update.url(plan.id), data as unknown as Record<string, FormDataConvertible>);
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.plans.edit_plan')}: ${plan.name_display}`} />
 
             <Page>
@@ -86,6 +90,10 @@ export default function EditPlan({ plan, addons, featureDefinitions, limitDefini
                     />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+EditPlan.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default EditPlan;

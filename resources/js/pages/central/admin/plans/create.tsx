@@ -7,6 +7,8 @@ import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageCo
 import { type BreadcrumbItem, type EnumOption } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import type { BadgePreset } from '@/components/central/forms/badge-selector';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Addon {
     id: string;
@@ -43,7 +45,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function CreatePlan({ addons, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function CreatePlan({ addons, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -52,12 +54,14 @@ export default function CreatePlan({ addons, featureDefinitions, limitDefinition
         { title: t('breadcrumbs.create_plan'), href: admin.plans.create.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof PlanForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.post(admin.plans.store.url(), data as unknown as Record<string, FormDataConvertible>);
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.plans.create_plan')} />
 
             <Page>
@@ -79,6 +83,10 @@ export default function CreatePlan({ addons, featureDefinitions, limitDefinition
                     />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+CreatePlan.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default CreatePlan;

@@ -8,6 +8,8 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
@@ -19,7 +21,7 @@ interface TwoFactorProps {
     setupPending?: boolean;
 }
 
-export default function TwoFactor({
+function TwoFactor({
     requiresConfirmation = false,
     twoFactorEnabled = false,
     setupPending = false,
@@ -49,8 +51,10 @@ export default function TwoFactor({
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.two_factor.title')} />
             <CentralUserSettingsLayout>
                 <div className="space-y-6">
@@ -136,6 +140,10 @@ export default function TwoFactor({
                     />
                 </div>
             </CentralUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+TwoFactor.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TwoFactor;

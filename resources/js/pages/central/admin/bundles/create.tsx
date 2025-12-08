@@ -4,6 +4,8 @@ import admin from '@/routes/central/admin';
 import { BundleForm } from './components/bundle-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface AddonOption {
@@ -37,7 +39,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function BundleCreate({ addons, plans, badgePresets }: Props) {
+function BundleCreate({ addons, plans, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -46,8 +48,10 @@ export default function BundleCreate({ addons, plans, badgePresets }: Props) {
         { title: t('breadcrumbs.create_bundle'), href: admin.bundles.create.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.bundles.create_bundle')} />
 
             <Page>
@@ -62,6 +66,10 @@ export default function BundleCreate({ addons, plans, badgePresets }: Props) {
                     <BundleForm addons={addons} plans={plans} badgePresets={badgePresets} />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+BundleCreate.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default BundleCreate;

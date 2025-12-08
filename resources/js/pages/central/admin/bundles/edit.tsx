@@ -4,6 +4,8 @@ import admin from '@/routes/central/admin';
 import { BundleForm } from './components/bundle-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface AddonOption {
@@ -68,7 +70,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function BundleEdit({ bundle, addons, plans, badgePresets }: Props) {
+function BundleEdit({ bundle, addons, plans, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -76,6 +78,8 @@ export default function BundleEdit({ bundle, addons, plans, badgePresets }: Prop
         { title: t('breadcrumbs.bundle_catalog'), href: admin.bundles.index.url() },
         { title: bundle.name_display, href: admin.bundles.edit.url(bundle.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     // Transform bundle addons to the format expected by the form
     const bundleForForm = {
@@ -87,7 +91,7 @@ export default function BundleEdit({ bundle, addons, plans, badgePresets }: Prop
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.bundles.edit_bundle')} - ${bundle.name_display}`} />
 
             <Page>
@@ -108,6 +112,10 @@ export default function BundleEdit({ bundle, addons, plans, badgePresets }: Prop
                     />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+BundleEdit.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default BundleEdit;

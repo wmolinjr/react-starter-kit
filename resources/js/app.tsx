@@ -3,13 +3,22 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { LaravelReactI18nProvider } from 'laravel-react-i18n';
-import { StrictMode, type ComponentType, type ReactNode } from 'react';
+import { StrictMode, type ComponentType, type ReactNode, type ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/shared/use-appearance';
 import { Toaster } from './components/ui/sonner';
 import { FlashMessages } from './components/shared/feedback/flash-messages';
+import { BreadcrumbProvider } from './contexts/breadcrumb-context';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+/**
+ * Page component type with optional persistent layout.
+ * @see https://inertiajs.com/pages#persistent-layouts
+ */
+type PageComponent = ComponentType<Record<string, unknown>> & {
+    layout?: (page: ReactElement) => ReactElement;
+};
 
 /**
  * AppShell wraps page content with FlashMessages.
@@ -26,24 +35,36 @@ function AppShell({ children }: { children: ReactNode }) {
 }
 
 /**
- * Creates a wrapped page component that includes the AppShell.
+ * Wraps the page with AppShell and applies persistent layout if defined.
+ * Persistent layouts don't remount on navigation, preserving their state.
  */
-function createWrappedPage(PageComponent: ComponentType<Record<string, unknown>>) {
-    return function WrappedPage(props: Record<string, unknown>) {
+function createWrappedPage(PageComponent: PageComponent) {
+    const WrappedPage = (props: Record<string, unknown>) => {
         return (
             <AppShell>
                 <PageComponent {...props} />
             </AppShell>
         );
     };
+
+    // Preserve the layout property for Inertia's persistent layout system
+    if (PageComponent.layout) {
+        WrappedPage.layout = PageComponent.layout;
+    }
+
+    return WrappedPage;
 }
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: async (name) => {
         const pages = import.meta.glob('./pages/**/*.tsx');
-        const page = await resolvePageComponent(`./pages/${name}.tsx`, pages) as { default: ComponentType<Record<string, unknown>> };
-        return { default: createWrappedPage(page.default) };
+        const page = await resolvePageComponent(`./pages/${name}.tsx`, pages) as { default: PageComponent };
+
+        // Apply wrapper and preserve layout
+        const wrappedPage = createWrappedPage(page.default);
+
+        return { default: wrappedPage, layout: page.default.layout };
     },
     setup({ el, App, props }) {
         const root = createRoot(el);
@@ -59,8 +80,10 @@ createInertiaApp({
                     fallbackLocale={fallbackLocale}
                     files={import.meta.glob('/lang/*.json', { eager: true })}
                 >
-                    <App {...props} />
-                    <Toaster position="top-right" richColors closeButton />
+                    <BreadcrumbProvider>
+                        <App {...props} />
+                        <Toaster position="top-right" richColors closeButton />
+                    </BreadcrumbProvider>
                 </LaravelReactI18nProvider>
             </StrictMode>,
         );

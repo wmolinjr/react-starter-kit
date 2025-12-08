@@ -8,7 +8,10 @@ import { useAddons } from '@/hooks/tenant/use-addons';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
-export default function AddonsUsage() {
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
+function AddonsUsage() {
     const { t } = useLaravelReactI18n();
     const { active } = useAddons();
 
@@ -21,7 +24,7 @@ export default function AddonsUsage() {
     const meteredAddons = active.filter((addon) => addon.is_metered);
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.addons.usage')} />
 
             <Page>
@@ -61,6 +64,10 @@ export default function AddonsUsage() {
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+AddonsUsage.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AddonsUsage;

@@ -16,6 +16,8 @@ import admin from '@/routes/central/admin';
 import { CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { AddonForm } from './components/addon-form';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { Translations } from '@/components/central/forms/translatable-input';
@@ -88,7 +90,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -97,12 +99,14 @@ export default function CatalogEdit({ addon, types, plans, featureDefinitions, l
         { title: addon.name_display, href: admin.catalog.edit.url(addon.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSync = () => {
         router.post(`/admin/catalog/${addon.id}/sync`);
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.catalog.edit_addon')}: ${addon.name_display}`} />
 
             <Page>
@@ -173,6 +177,10 @@ export default function CatalogEdit({ addon, types, plans, featureDefinitions, l
                     />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+CatalogEdit.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default CatalogEdit;

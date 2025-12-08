@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
 import admin from '@/routes/tenant/admin';
+import { type ReactElement } from 'react';
 
 interface Props {
     addon_name?: string;
@@ -12,11 +13,11 @@ interface Props {
     amount?: string;
 }
 
-export default function AddonsSuccess({ addon_name, quantity, amount }: Props) {
+function AddonsSuccess({ addon_name, quantity, amount }: Props) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <AdminLayout>
+        <>
             <Head title={t('tenant.addons.purchase_successful')} />
 
             <div className="flex items-center justify-center py-12">
@@ -53,6 +54,10 @@ export default function AddonsSuccess({ addon_name, quantity, amount }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+AddonsSuccess.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AddonsSuccess;

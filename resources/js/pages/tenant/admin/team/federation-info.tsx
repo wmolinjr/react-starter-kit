@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface TeamMember {
     id: string;
@@ -69,7 +71,7 @@ interface Props {
     canUnfederate: boolean;
 }
 
-export default function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }: Props) {
+function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -77,6 +79,8 @@ export default function FederationInfoPage({ user, federationInfo, canFederate, 
         { title: t('tenant.team.title'), href: admin.team.index.url() },
         { title: user.name, href: admin.settings.federation.show.url(user.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleFederate = () => {
         router.post(admin.settings.federation.users.federate.url(), { user_id: user.id });
@@ -103,7 +107,7 @@ export default function FederationInfoPage({ user, federationInfo, canFederate, 
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('tenant.federation.title')} - ${user.name}`} />
 
             <Page>
@@ -319,6 +323,10 @@ export default function FederationInfoPage({ user, federationInfo, canFederate, 
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationInfoPage.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationInfoPage;

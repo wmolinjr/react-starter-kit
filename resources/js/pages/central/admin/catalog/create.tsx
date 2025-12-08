@@ -4,6 +4,8 @@ import admin from '@/routes/central/admin';
 import { AddonForm } from './components/addon-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type BadgePreset } from '@/components/central/forms/badge-selector';
 
@@ -42,7 +44,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function CatalogCreate({ types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function CatalogCreate({ types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -51,8 +53,10 @@ export default function CatalogCreate({ types, plans, featureDefinitions, limitD
         { title: t('breadcrumbs.create_addon'), href: admin.catalog.create.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.catalog.create_addon')} />
 
             <Page>
@@ -74,6 +78,10 @@ export default function CatalogCreate({ types, plans, featureDefinitions, limitD
                     />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+CatalogCreate.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default CatalogCreate;

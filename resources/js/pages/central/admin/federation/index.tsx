@@ -8,6 +8,8 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertCircle, Eye, Network, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
 import { Page, PageContent, PageDescription, PageHeader, PageHeaderActions, PageHeaderContent, PageTitle } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface MasterTenant {
     id: string;
@@ -31,13 +33,15 @@ interface Props {
     groups: FederationGroup[];
 }
 
-export default function FederationIndex({ groups }: Props) {
+function FederationIndex({ groups }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = (group: FederationGroup) => {
         if (group.federated_users_count > 0) {
@@ -137,7 +141,7 @@ export default function FederationIndex({ groups }: Props) {
     );
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.federation.title')} />
 
             <Page>
@@ -200,6 +204,10 @@ export default function FederationIndex({ groups }: Props) {
                     </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationIndex;

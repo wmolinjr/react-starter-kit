@@ -21,9 +21,10 @@ import admin from '@/routes/tenant/admin';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowLeft, FolderEdit } from 'lucide-react';
-import { FormEvent } from 'react';
+import { FormEvent, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
 interface Project {
     id: string;
@@ -36,7 +37,7 @@ interface Props {
     project: Project;
 }
 
-export default function ProjectEdit({ project }: Props) {
+function ProjectEdit({ project }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -45,6 +46,8 @@ export default function ProjectEdit({ project }: Props) {
         { title: project.name, href: admin.projects.show.url(project.id) },
         { title: t('common.edit'), href: admin.projects.edit.url(project.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const { data, setData, patch, processing, errors } = useForm({
         name: project.name,
@@ -58,7 +61,7 @@ export default function ProjectEdit({ project }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.projects.edit_project', { name: project.name })} />
 
             <Page>
@@ -175,6 +178,10 @@ export default function ProjectEdit({ project }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ProjectEdit.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ProjectEdit;

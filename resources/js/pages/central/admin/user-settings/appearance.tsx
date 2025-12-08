@@ -10,8 +10,10 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import settings from '@/routes/central/admin/settings';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
-export default function Appearance() {
+function Appearance() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -25,8 +27,10 @@ export default function Appearance() {
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.preferences.page_title')} />
 
             <CentralUserSettingsLayout>
@@ -57,6 +61,10 @@ export default function Appearance() {
                     <AppearanceTabs />
                 </div>
             </CentralUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+Appearance.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default Appearance;

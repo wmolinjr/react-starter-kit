@@ -4,6 +4,8 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Translations } from '@/components/central/forms/translatable-input';
@@ -34,7 +36,7 @@ interface Props {
     permissions: Record<string, CategoryPermissions>;
 }
 
-export default function EditRole({ role, permissions }: Props) {
+function EditRole({ role, permissions }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -43,12 +45,14 @@ export default function EditRole({ role, permissions }: Props) {
         { title: role.display_name_display, href: admin.roles.edit.url(role.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof RoleForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.put(admin.roles.update.url(role.id), data as unknown as Record<string, FormDataConvertible>);
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.roles.edit_role')}: ${role.display_name_display}`} />
 
             <Page>
@@ -74,6 +78,10 @@ export default function EditRole({ role, permissions }: Props) {
                     />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+EditRole.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default EditRole;

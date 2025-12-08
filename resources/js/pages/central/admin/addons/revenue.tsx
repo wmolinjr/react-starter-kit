@@ -4,6 +4,8 @@ import admin from '@/routes/central/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { formatPrice } from '@/lib/utils';
 
@@ -20,7 +22,7 @@ interface Props {
     formatted_yearly: string;
 }
 
-export default function AdminAddonsRevenue({
+function AdminAddonsRevenue({
     monthly_revenue,
     yearly_revenue,
     revenue_by_type,
@@ -35,11 +37,13 @@ export default function AdminAddonsRevenue({
         { title: t('admin.addons.revenue'), href: admin.addons.revenue.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const totalRevenue = monthly_revenue + yearly_revenue / 12;
     const formattedTotal = formatPrice(Math.round(totalRevenue));
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.addons.revenue_dashboard')} />
 
             <Page>
@@ -111,6 +115,10 @@ export default function AdminAddonsRevenue({
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminAddonsRevenue.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AdminAddonsRevenue;

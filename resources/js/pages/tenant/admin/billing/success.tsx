@@ -11,17 +11,18 @@ import admin from '@/routes/tenant/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CheckCircle, CreditCard, LayoutGrid } from 'lucide-react';
+import { type ReactElement } from 'react';
 
 interface Props {
     plan?: string;
     message?: string;
 }
 
-export default function BillingSuccess({ plan, message }: Props) {
+function BillingSuccess({ plan, message }: Props) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <AdminLayout>
+        <>
             <Head title={t('tenant.billing.payment_confirmed')} />
 
             <div className="flex items-center justify-center min-h-[60vh]">
@@ -59,6 +60,10 @@ export default function BillingSuccess({ plan, message }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </>
     );
 }
+
+BillingSuccess.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default BillingSuccess;

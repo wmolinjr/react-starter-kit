@@ -16,7 +16,10 @@ import userSettings from '@/routes/tenant/admin/user-settings';
 
 import DeleteUser from './components/delete-user';
 
-export default function Profile({
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
+function Profile({
     mustVerifyEmail,
     status,
 }: {
@@ -46,7 +49,7 @@ export default function Profile({
     const user = auth.user;
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.profile.page_title')} />
 
             <TenantUserSettingsLayout>
@@ -156,6 +159,10 @@ export default function Profile({
 
                 <DeleteUser />
             </TenantUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+Profile.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default Profile;

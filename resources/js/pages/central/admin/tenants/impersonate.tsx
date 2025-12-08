@@ -8,6 +8,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, KeyRound, Shield, User, Users } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useState } from 'react';
 
@@ -31,7 +33,7 @@ interface Props {
     users: TenantUser[];
 }
 
-export default function ImpersonateTenant({ tenant, users }: Props) {
+function ImpersonateTenant({ tenant, users }: Props) {
     const { t } = useLaravelReactI18n();
     const [loading, setLoading] = useState<string | null>(null);
 
@@ -41,6 +43,8 @@ export default function ImpersonateTenant({ tenant, users }: Props) {
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
         { title: t('impersonation.select_user'), href: admin.tenants.impersonate.index.url(tenant.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleAdminMode = () => {
         setLoading('admin-mode');
@@ -85,7 +89,7 @@ export default function ImpersonateTenant({ tenant, users }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('impersonation.impersonate_tenant')}: ${tenant.name}`} />
 
             <Page>
@@ -206,6 +210,10 @@ export default function ImpersonateTenant({ tenant, users }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ImpersonateTenant.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ImpersonateTenant;

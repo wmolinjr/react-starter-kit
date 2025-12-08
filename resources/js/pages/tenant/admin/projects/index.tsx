@@ -10,6 +10,8 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { FolderOpen, Plus, Search } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Project {
     id: string;
@@ -23,7 +25,7 @@ interface Props {
     projects: Project[];
 }
 
-export default function ProjectsIndex({ projects: projectsList }: Props) {
+function ProjectsIndex({ projects: projectsList }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -31,8 +33,10 @@ export default function ProjectsIndex({ projects: projectsList }: Props) {
         { title: t('tenant.projects.title'), href: admin.projects.index.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.projects.title')} />
 
             <Page>
@@ -116,6 +120,10 @@ export default function ProjectsIndex({ projects: projectsList }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ProjectsIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ProjectsIndex;

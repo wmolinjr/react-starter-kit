@@ -17,6 +17,8 @@ import { create, destroy, sync, syncAll } from '@/routes/central/admin/catalog';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn, formatPrice } from '@/lib/utils';
@@ -46,7 +48,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function CatalogIndex({ addons, badgePresets }: Props) {
+function CatalogIndex({ addons, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const getBadgePreset = (value: string | null) => {
@@ -58,6 +60,8 @@ export default function CatalogIndex({ addons, badgePresets }: Props) {
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.addon_catalog'), href: admin.catalog.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleSync = (addon: Addon) => {
         router.post(sync.url(addon.id));
@@ -74,7 +78,7 @@ export default function CatalogIndex({ addons, badgePresets }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.catalog.title')} />
 
             <Page>
@@ -209,6 +213,10 @@ export default function CatalogIndex({ addons, badgePresets }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+CatalogIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default CatalogIndex;

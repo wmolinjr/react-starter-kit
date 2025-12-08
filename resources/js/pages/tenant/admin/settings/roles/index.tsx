@@ -10,6 +10,9 @@ import { type BreadcrumbItem } from '@/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 function useBreadcrumbs() {
     const { t } = useLaravelReactI18n();
     return [
@@ -43,7 +46,7 @@ interface Props {
     planInfo: PlanInfo;
 }
 
-export default function RolesIndex({ roles, planInfo }: Props) {
+function RolesIndex({ roles, planInfo }: Props) {
     const { t } = useLaravelReactI18n();
     const breadcrumbs = useBreadcrumbs();
 
@@ -68,7 +71,7 @@ export default function RolesIndex({ roles, planInfo }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('roles.title')} />
 
             <Page>
@@ -230,6 +233,10 @@ export default function RolesIndex({ roles, planInfo }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+RolesIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default RolesIndex;

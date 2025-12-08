@@ -24,6 +24,9 @@ import {
 } from '@/components/ui/table';
 import { Check, Download, ExternalLink } from 'lucide-react';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Plan {
   name: string;
   price_id: string;
@@ -67,7 +70,7 @@ interface BillingPageProps {
   [key: string]: unknown;
 }
 
-export default function BillingIndex() {
+function BillingIndex() {
   const { t } = useLaravelReactI18n();
   const { plans, subscription, invoices } = usePage<BillingPageProps>().props;
 
@@ -115,7 +118,7 @@ export default function BillingIndex() {
   const currentPlanKey = getCurrentPlan();
 
   return (
-    <AdminLayout breadcrumbs={breadcrumbs}>
+    <>
       <Head title={t('tenant.billing.title')} />
 
       <Page>
@@ -281,6 +284,10 @@ export default function BillingIndex() {
         )}
         </PageContent>
       </Page>
-    </AdminLayout>
+    </>
   );
 }
+
+BillingIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default BillingIndex;

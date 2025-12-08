@@ -4,12 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdminLayout from '@/layouts/central/admin-layout';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { type ReactElement } from 'react';
 
 interface Props {
     tenant: {
@@ -20,7 +22,7 @@ interface Props {
     plans: { id: string; name: string }[];
 }
 
-export default function TenantEdit({ tenant, plans }: Props) {
+function TenantEdit({ tenant, plans }: Props) {
     const { t } = useLaravelReactI18n();
     const { data, setData, put, processing } = useForm({
         name: tenant.name,
@@ -33,6 +35,7 @@ export default function TenantEdit({ tenant, plans }: Props) {
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
         { title: t('common.edit'), href: admin.tenants.edit.url(tenant.id) },
     ];
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,7 +43,7 @@ export default function TenantEdit({ tenant, plans }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.tenants.edit_tenant')}: ${tenant.name}`} />
 
             <Page>
@@ -106,6 +109,10 @@ export default function TenantEdit({ tenant, plans }: Props) {
                 </form>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+TenantEdit.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TenantEdit;

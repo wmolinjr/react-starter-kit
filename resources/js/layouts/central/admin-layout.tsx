@@ -2,17 +2,24 @@ import { AppContent } from '@/components/shared/layout/app-content';
 import { AppShell } from '@/components/shared/layout/app-shell';
 import { AdminSidebar } from '@/components/central/navigation/admin-sidebar';
 import { AppSidebarHeader } from '@/components/shared/navigation/sidebar-header';
-import { type BreadcrumbItem } from '@/types';
-import { type PropsWithChildren } from 'react';
+import { useBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactNode } from 'react';
 
-interface AdminLayoutProps extends PropsWithChildren {
-    breadcrumbs?: BreadcrumbItem[];
+interface AdminLayoutProps {
+    children: ReactNode;
 }
 
-export default function AdminLayout({
-    children,
-    breadcrumbs = [],
-}: AdminLayoutProps) {
+/**
+ * Central Admin Layout - Persistent Layout
+ *
+ * This layout doesn't remount on navigation, preserving sidebar state.
+ * Breadcrumbs are read from BreadcrumbContext (set by pages).
+ *
+ * @see https://inertiajs.com/pages#persistent-layouts
+ */
+export default function AdminLayout({ children }: AdminLayoutProps) {
+    const breadcrumbs = useBreadcrumbs();
+
     return (
         <AppShell variant="sidebar">
             <AdminSidebar />

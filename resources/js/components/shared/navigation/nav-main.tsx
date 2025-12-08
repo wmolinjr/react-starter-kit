@@ -18,6 +18,7 @@ import { resolveUrl } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { useState } from 'react';
 
 /**
  * Extract pathname from URL (handles both relative and absolute URLs).
@@ -49,10 +50,36 @@ function isActiveRoute(url: string, item: NavItem): boolean {
     return currentPath.startsWith(resolved);
 }
 
+/**
+ * Check if any subitem is active (for collapsible menus).
+ * This ensures parent menus stay open when navigating between subitems.
+ */
+function hasActiveSubitem(url: string, item: NavItem): boolean {
+    if (!item.items || item.items.length === 0) {
+        return false;
+    }
+
+    return item.items.some((subItem) => isActiveRoute(url, subItem));
+}
+
+/**
+ * State for tracking which menu items are open.
+ * Keys are menu titles, values are open state.
+ */
+type OpenMenuState = Record<string, boolean>;
+
 export function NavMain({ items = [], label }: { items: NavItem[]; label?: string }) {
     const { t } = useLaravelReactI18n();
     const displayLabel = label ?? t('sidebar.platform');
     const page = usePage();
+
+    // With Persistent Layouts, this component doesn't remount during navigation
+    // so useState is sufficient to preserve menu state
+    const [openMenus, setOpenMenus] = useState<OpenMenuState>({});
+
+    const handleOpenChange = (title: string, isOpen: boolean) => {
+        setOpenMenus((prev) => ({ ...prev, [title]: isOpen }));
+    };
 
     return (
         <SidebarGroup className="px-2 py-0">
@@ -60,41 +87,13 @@ export function NavMain({ items = [], label }: { items: NavItem[]; label?: strin
             <SidebarMenu>
                 {items.map((item) =>
                     item.items && item.items.length > 0 ? (
-                        <Collapsible
+                        <CollapsibleNavItem
                             key={item.title}
-                            asChild
-                            defaultOpen={isActiveRoute(page.url, item)}
-                            className="group/collapsible"
-                        >
-                            <SidebarMenuItem>
-                                <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton
-                                        tooltip={{ children: item.title }}
-                                        isActive={isActiveRoute(page.url, item)}
-                                    >
-                                        {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                    </SidebarMenuButton>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                    <SidebarMenuSub>
-                                        {item.items.map((subItem) => (
-                                            <SidebarMenuSubItem key={subItem.title}>
-                                                <SidebarMenuSubButton
-                                                    asChild
-                                                    isActive={page.url === resolveUrl(subItem.href)}
-                                                >
-                                                    <Link href={subItem.href} prefetch>
-                                                        <span>{subItem.title}</span>
-                                                    </Link>
-                                                </SidebarMenuSubButton>
-                                            </SidebarMenuSubItem>
-                                        ))}
-                                    </SidebarMenuSub>
-                                </CollapsibleContent>
-                            </SidebarMenuItem>
-                        </Collapsible>
+                            item={item}
+                            currentUrl={page.url}
+                            isOpen={openMenus[item.title]}
+                            onOpenChange={(isOpen) => handleOpenChange(item.title, isOpen)}
+                        />
                     ) : (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
@@ -112,5 +111,58 @@ export function NavMain({ items = [], label }: { items: NavItem[]; label?: strin
                 )}
             </SidebarMenu>
         </SidebarGroup>
+    );
+}
+
+interface CollapsibleNavItemProps {
+    item: NavItem;
+    currentUrl: string;
+    isOpen: boolean | undefined;
+    onOpenChange: (isOpen: boolean) => void;
+}
+
+/**
+ * Collapsible nav item with controlled open state.
+ * With Persistent Layouts, state is naturally preserved across navigations.
+ * Falls back to keeping menu open when any subitem is active.
+ */
+function CollapsibleNavItem({ item, currentUrl, isOpen, onOpenChange }: CollapsibleNavItemProps) {
+    const hasActiveChild = hasActiveSubitem(currentUrl, item);
+
+    // Determine open state:
+    // 1. If user has explicitly toggled (isOpen is defined), use that
+    // 2. Otherwise, open if any subitem is active
+    const effectiveOpen = isOpen ?? hasActiveChild;
+
+    return (
+        <Collapsible
+            asChild
+            open={effectiveOpen}
+            onOpenChange={onOpenChange}
+            className="group/collapsible"
+        >
+            <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={{ children: item.title }} isActive={hasActiveChild}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenuSub>
+                        {item.items?.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild isActive={isActiveRoute(currentUrl, subItem)}>
+                                    <Link href={subItem.href} prefetch>
+                                        <span>{subItem.title}</span>
+                                    </Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                        ))}
+                    </SidebarMenuSub>
+                </CollapsibleContent>
+            </SidebarMenuItem>
+        </Collapsible>
     );
 }

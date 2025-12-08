@@ -14,6 +14,8 @@ import {
 } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { FederationGroupForm } from './components/federation-group-form';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Tenant {
     id: string;
@@ -25,7 +27,7 @@ interface Props {
     tenants: Tenant[];
 }
 
-export default function FederationCreate({ tenants }: Props) {
+function FederationCreate({ tenants }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -34,12 +36,14 @@ export default function FederationCreate({ tenants }: Props) {
         { title: t('admin.federation.create_group'), href: admin.federation.create.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof FederationGroupForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.post(admin.federation.store.url(), data as unknown as Record<string, FormDataConvertible>);
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.federation.create_group')} />
 
             <Page>
@@ -54,6 +58,10 @@ export default function FederationCreate({ tenants }: Props) {
                     <FederationGroupForm tenants={tenants} onSubmit={handleSubmit} />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationCreate.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationCreate;

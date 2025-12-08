@@ -66,6 +66,9 @@ import {
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface ActivityProperties {
     old: Record<string, unknown> | null;
     new: Record<string, unknown> | null;
@@ -140,7 +143,7 @@ interface Props {
     tenant: Tenant;
 }
 
-export default function AuditLogIndex({
+function AuditLogIndex({
     activities,
     teamMembers,
     eventTypes,
@@ -158,6 +161,8 @@ export default function AuditLogIndex({
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('tenant.audit.title'), href: '/audit' },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const getEventBadge = (event: string) => {
         const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -278,7 +283,7 @@ export default function AuditLogIndex({
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.audit.page_title')} />
 
             <Page>
@@ -664,6 +669,10 @@ export default function AuditLogIndex({
                     )}
                 </DialogContent>
             </Dialog>
-        </AdminLayout>
+        </>
     );
 }
+
+AuditLogIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AuditLogIndex;

@@ -28,7 +28,7 @@ import {
     User,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import {
     Page,
     PageContent,
@@ -39,6 +39,7 @@ import {
     PageTitle,
 } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
 interface FederatedUser {
     id: string;
@@ -69,7 +70,7 @@ interface Props {
     conflicts: Conflict[];
 }
 
-export default function FederationConflicts({ group, conflicts }: Props) {
+function FederationConflicts({ group, conflicts }: Props) {
     const { t } = useLaravelReactI18n();
     const [resolving, setResolving] = useState<Conflict | null>(null);
     const [resolution, setResolution] = useState<'source' | 'target' | 'custom'>('source');
@@ -82,6 +83,8 @@ export default function FederationConflicts({ group, conflicts }: Props) {
         { title: group.name, href: admin.federation.show.url(group.id) },
         { title: t('admin.federation.conflicts'), href: admin.federation.conflicts.index.url(group.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const pendingConflicts = conflicts.filter((c) => c.status === 'pending');
     const resolvedConflicts = conflicts.filter((c) => c.status !== 'pending');
@@ -162,7 +165,7 @@ export default function FederationConflicts({ group, conflicts }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.federation.conflicts')} - ${group.name}`} />
 
             <Page>
@@ -472,6 +475,10 @@ export default function FederationConflicts({ group, conflicts }: Props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationConflicts.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationConflicts;

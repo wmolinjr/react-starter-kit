@@ -2,12 +2,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/central/admin-layout';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, CreditCard, Globe, Package, Users } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { type ReactElement } from 'react';
 
 interface Props {
     tenant: {
@@ -22,7 +24,7 @@ interface Props {
     };
 }
 
-export default function TenantShow({ tenant }: Props) {
+function TenantShow({ tenant }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -30,9 +32,10 @@ export default function TenantShow({ tenant }: Props) {
         { title: 'Tenants', href: admin.tenants.index.url() },
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
     ];
+    useSetBreadcrumbs(breadcrumbs);
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`Tenant: ${tenant.name}`} />
 
             <Page>
@@ -169,6 +172,10 @@ export default function TenantShow({ tenant }: Props) {
                 </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+TenantShow.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TenantShow;

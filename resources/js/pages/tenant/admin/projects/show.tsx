@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Upload, Download, Trash2, Image as ImageIcon, Paperclip } from 'lucide-react';
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useRef, useState, type ReactElement } from 'react';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
 interface Media {
   id: string;
@@ -52,7 +53,7 @@ interface ProjectShowProps {
   project: Project;
 }
 
-export default function ProjectShow({ project }: ProjectShowProps) {
+function ProjectShow({ project }: ProjectShowProps) {
   const { t } = useLaravelReactI18n();
 
   const breadcrumbs: BreadcrumbItem[] = [
@@ -60,6 +61,8 @@ export default function ProjectShow({ project }: ProjectShowProps) {
     { title: t('tenant.projects.title'), href: admin.projects.index.url() },
     { title: project.name, href: admin.projects.show.url(project.id) },
   ];
+
+  useSetBreadcrumbs(breadcrumbs);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -106,7 +109,7 @@ export default function ProjectShow({ project }: ProjectShowProps) {
   };
 
   return (
-    <AdminLayout breadcrumbs={breadcrumbs}>
+    <>
       <Head title={project.name} />
 
       <Page>
@@ -291,6 +294,10 @@ export default function ProjectShow({ project }: ProjectShowProps) {
         </Card>
         </PageContent>
       </Page>
-    </AdminLayout>
+    </>
   );
 }
+
+ProjectShow.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ProjectShow;

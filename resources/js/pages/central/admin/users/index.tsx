@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
 interface User {
     id: string;
@@ -32,7 +33,7 @@ interface Props {
     filters: { search?: string };
 }
 
-export default function UsersIndex({ users, filters }: Props) {
+function UsersIndex({ users, filters }: Props) {
     const { t } = useLaravelReactI18n();
     const [search, setSearch] = useState(filters.search || '');
 
@@ -40,6 +41,8 @@ export default function UsersIndex({ users, filters }: Props) {
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.users'), href: admin.users.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,7 +56,7 @@ export default function UsersIndex({ users, filters }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.users.title')} />
 
             <Page>
@@ -163,6 +166,10 @@ export default function UsersIndex({ users, filters }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+UsersIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default UsersIndex;

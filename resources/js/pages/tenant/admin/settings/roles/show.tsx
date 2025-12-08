@@ -17,6 +17,9 @@ import {
 } from '@/components/ui/table';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Permission {
     id: string;
     name: string;
@@ -45,7 +48,7 @@ interface Props {
     role: Role;
 }
 
-export default function ShowRole({ role }: Props) {
+function ShowRole({ role }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -81,7 +84,7 @@ export default function ShowRole({ role }: Props) {
     );
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={role.display_name} />
 
             <Page>
@@ -222,6 +225,10 @@ export default function ShowRole({ role }: Props) {
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ShowRole.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ShowRole;

@@ -7,8 +7,10 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { BarChart3, CreditCard, FolderOpen, TrendingUp, Users } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
-export default function TenantDashboard() {
+function TenantDashboard() {
     const { t } = useLaravelReactI18n();
     const { tenant, subscription, hasActiveSubscription, isOnTrial } = useTenant();
 
@@ -16,8 +18,10 @@ export default function TenantDashboard() {
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Dashboard" />
 
             <Page>
@@ -149,6 +153,10 @@ export default function TenantDashboard() {
                     </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+TenantDashboard.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TenantDashboard;

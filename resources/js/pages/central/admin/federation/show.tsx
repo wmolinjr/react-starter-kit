@@ -7,6 +7,8 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import {
     AlertTriangle,
     ArrowLeft,
@@ -89,7 +91,7 @@ interface Props {
     availableTenants: AvailableTenant[];
 }
 
-export default function FederationShow({ group, availableTenants }: Props) {
+function FederationShow({ group, availableTenants }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -97,6 +99,8 @@ export default function FederationShow({ group, availableTenants }: Props) {
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const getSyncStrategyLabel = (strategy: string) => {
         const labels: Record<string, string> = {
@@ -128,7 +132,7 @@ export default function FederationShow({ group, availableTenants }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={`${t('admin.federation.title')}: ${group.name}`} />
 
             <Page>
@@ -526,6 +530,10 @@ export default function FederationShow({ group, availableTenants }: Props) {
                     </Tabs>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationShow.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationShow;

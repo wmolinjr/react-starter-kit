@@ -8,11 +8,13 @@ import {
     PageContent,
 } from '@/components/shared/layout/page';
 import AdminLayout from '@/layouts/central/admin-layout';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Building2, CreditCard, Package, Shield } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { type ReactElement } from 'react';
 
 interface Stats {
     total_tenants: number;
@@ -25,15 +27,16 @@ interface Props {
     stats: Stats;
 }
 
-export default function AdminDashboard({ stats }: Props) {
+function AdminDashboard({ stats }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
     ];
+    useSetBreadcrumbs(breadcrumbs);
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.dashboard.title')} />
 
             <Page>
@@ -145,6 +148,10 @@ export default function AdminDashboard({ stats }: Props) {
                     </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+AdminDashboard.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AdminDashboard;

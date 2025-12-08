@@ -20,6 +20,8 @@ import { type BreadcrumbItem } from '@/types';
 import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn } from '@/lib/utils';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 
 interface Plan {
     id: string;
@@ -47,7 +49,7 @@ interface Props {
     badgePresets: BadgePreset[];
 }
 
-export default function PlansIndex({ plans, badgePresets }: Props) {
+function PlansIndex({ plans, badgePresets }: Props) {
     const { t } = useLaravelReactI18n();
 
     const getBadgePreset = (value: string | null) => {
@@ -59,6 +61,8 @@ export default function PlansIndex({ plans, badgePresets }: Props) {
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.plan_catalog'), href: admin.plans.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
 
     const handleSync = (planId: string) => {
         router.post(sync.url(planId));
@@ -75,7 +79,7 @@ export default function PlansIndex({ plans, badgePresets }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('admin.plans.title')} />
 
             <Page>
@@ -236,6 +240,10 @@ export default function PlansIndex({ plans, badgePresets }: Props) {
                 )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+PlansIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default PlansIndex;

@@ -1,5 +1,7 @@
 import InputError from '@/components/shared/feedback/input-error';
 import { type BreadcrumbItem } from '@/types';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -13,7 +15,7 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import CentralUserSettingsLayout from '@/layouts/central/user-settings-layout';
 import settings from '@/routes/central/admin/settings';
 
-export default function Password() {
+function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
     const { t } = useLaravelReactI18n();
@@ -29,8 +31,10 @@ export default function Password() {
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.password.page_title')} />
 
             <CentralUserSettingsLayout>
@@ -146,6 +150,10 @@ export default function Password() {
                     </Form>
                 </div>
             </CentralUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+Password.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default Password;
