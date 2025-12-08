@@ -58,6 +58,8 @@ function ShowRole({ role }: Props) {
         { title: role.display_name, href: admin.settings.roles.show.url(role.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleDelete = () => {
         if (role.is_protected) {
             alert(t('roles.delete_protected_error'));

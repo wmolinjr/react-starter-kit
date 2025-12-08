@@ -77,6 +77,8 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
         { title: t('tenant.invoices.title'), href: admin.billing.invoices.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const locale = currentLocale() === 'pt_BR' ? ptBR : undefined;

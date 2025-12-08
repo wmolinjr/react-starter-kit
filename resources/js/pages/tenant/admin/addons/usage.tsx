@@ -21,6 +21,8 @@ function AddonsUsage() {
         { title: t('tenant.addons.usage'), href: admin.addons.usage.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const meteredAddons = active.filter((addon) => addon.is_metered);
 
     return (

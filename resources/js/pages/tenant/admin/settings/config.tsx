@@ -61,6 +61,8 @@ function ConfigSettings({
         { title: t('tenant.config.title'), href: admin.settings.config.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const { data, setData, post, processing, recentlySuccessful, errors } = useForm({
         app_name: config.app_name ?? '',
         locale: config.locale,

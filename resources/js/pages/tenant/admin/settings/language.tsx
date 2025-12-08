@@ -47,6 +47,8 @@ function LanguageSettings({
         { title: t('tenant.settings.language'), href: admin.settings.language.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const { data, setData, post, processing, recentlySuccessful } = useForm({
         language: currentLanguage,
     });

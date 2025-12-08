@@ -32,6 +32,8 @@ function Password() {
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
         <>
             <Head title={t('settings.password.page_title')} />

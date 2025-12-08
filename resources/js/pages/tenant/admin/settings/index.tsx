@@ -52,6 +52,8 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const settingsLinks = [
         {
             title: 'Branding',

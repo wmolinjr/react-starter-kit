@@ -24,6 +24,9 @@ function AddonsIndex() {
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: 'Add-ons', href: admin.addons.index.url() },
     ];
+
+    useSetBreadcrumbs(breadcrumbs);
+
     const { active, catalog, formattedMonthlyCost } = useAddons();
     const { purchase, cancel, isPurchasing, isCanceling, error } = usePurchase();
     const [selectedAddon, setSelectedAddon] = useState<AddonCatalogItem | null>(null);

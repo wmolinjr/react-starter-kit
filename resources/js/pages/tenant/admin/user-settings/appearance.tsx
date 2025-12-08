@@ -28,6 +28,8 @@ function Appearance() {
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
         <>
             <Head title={t('settings.preferences.page_title')} />

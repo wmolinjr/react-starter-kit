@@ -46,6 +46,8 @@ function DangerSettings({ tenant: tenantData }: Props) {
         { title: t('tenant.settings.danger_zone'), href: admin.settings.danger.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {

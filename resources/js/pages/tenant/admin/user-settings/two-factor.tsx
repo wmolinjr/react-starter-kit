@@ -50,6 +50,8 @@ function TwoFactor({
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     return (
         <>
             <Head title={t('settings.two_factor.title')} />

@@ -43,6 +43,8 @@ function BrandingSettings({ tenant: tenantData, branding }: Props) {
         { title: 'Branding', href: admin.settings.branding.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const { data, setData, post, processing, errors } = useForm({
         logo: null as File | null,
         primary_color: branding.primary_color || '#000000',

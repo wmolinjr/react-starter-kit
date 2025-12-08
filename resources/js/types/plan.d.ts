@@ -16,6 +16,7 @@ export interface PlanFeatures {
     auditLog: boolean;
     prioritySupport: boolean;
     multiLanguage: boolean;
+    federation: boolean;
 }
 
 export interface PlanLimits {
@@ -40,6 +41,6 @@ export interface PlanUsage {
     locales: number;
 }
 
-export type PlanFeatureKey = 'projects' | 'customRoles' | 'apiAccess' | 'advancedReports' | 'sso' | 'whiteLabel' | 'auditLog' | 'prioritySupport' | 'multiLanguage';
+export type PlanFeatureKey = 'projects' | 'customRoles' | 'apiAccess' | 'advancedReports' | 'sso' | 'whiteLabel' | 'auditLog' | 'prioritySupport' | 'multiLanguage' | 'federation';
 
 export type PlanLimitKey = 'users' | 'projects' | 'storage' | 'apiCalls' | 'logRetention' | 'fileUploadSize' | 'customRoles' | 'locales';

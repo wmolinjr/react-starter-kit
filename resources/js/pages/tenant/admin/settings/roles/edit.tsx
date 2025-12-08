@@ -44,6 +44,8 @@ function EditRole({ role, permissions }: Props) {
         { title: role.display_name, href: admin.settings.roles.edit.url(role.id) },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleSubmit = (data: Parameters<typeof RoleForm>[0]['onSubmit'] extends (d: infer T) => void ? T : never) => {
         router.put(admin.settings.roles.update.url(role.id), data);
     };

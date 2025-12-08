@@ -8,6 +8,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTenant } from '@/hooks/tenant/use-tenant';
+import centralProfile from '@/routes/central/admin/settings/profile';
+import tenantProfile from '@/routes/tenant/admin/user-settings/profile';
 import { type SharedData } from '@/types';
 
 interface LanguageSelectorProps {
@@ -17,13 +20,17 @@ interface LanguageSelectorProps {
 
 export function LanguageSelector({ variant = 'dropdown', showLabel = true }: LanguageSelectorProps) {
     const { locale, availableLocales, localeLabels } = usePage<SharedData>().props;
+    const { isTenantContext } = useTenant();
+
+    // Use appropriate route based on context
+    const localeRoute = isTenantContext ? tenantProfile.locale : centralProfile.locale;
 
     const handleLocaleChange = (newLocale: string) => {
         if (newLocale === locale) return;
 
         // Persist to backend and hard reload to get new translations
         router.patch(
-            '/settings/profile/locale',
+            localeRoute.url(),
             { locale: newLocale },
             {
                 preserveScroll: true,

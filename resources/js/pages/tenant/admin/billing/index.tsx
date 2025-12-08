@@ -79,6 +79,8 @@ function BillingIndex() {
     { title: t('tenant.billing.title'), href: admin.billing.index.url() },
   ];
 
+  useSetBreadcrumbs(breadcrumbs);
+
   const handleSubscribe = (planKey: string) => {
     router.post('/billing/checkout', {
       plan: planKey,

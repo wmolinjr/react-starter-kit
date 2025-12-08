@@ -95,6 +95,8 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
         { title: t('tenant.federation.title'), href: admin.settings.federation.index.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const handleFederateUser = () => {
         if (!selectedUserId) return;
         router.post(

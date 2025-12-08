@@ -66,6 +66,8 @@ function DomainsSettings({
         { title: t('tenant.settings.domains'), href: admin.settings.domains.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const { data, setData, post, processing, errors, reset } = useForm({
         domain: '',
     });

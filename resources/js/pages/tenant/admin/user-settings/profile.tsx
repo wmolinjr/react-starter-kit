@@ -40,6 +40,8 @@ function Profile({
         },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     // Profile page requires authentication
     if (!auth.user) {
         return null;

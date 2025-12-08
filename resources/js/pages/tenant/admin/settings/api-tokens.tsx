@@ -64,6 +64,8 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
         { title: 'API Tokens', href: admin.settings.apiTokens.url() },
     ];
 
+    useSetBreadcrumbs(breadcrumbs);
+
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
     });
