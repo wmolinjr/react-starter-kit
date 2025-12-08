@@ -17,6 +17,51 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue Names (Priority Order)
+    |--------------------------------------------------------------------------
+    |
+    | The application uses multiple queues for different job types.
+    | Workers should process queues in priority order: high,default,federation,media
+    |
+    | Queue Structure:
+    | - high:       Critical jobs (emails, notifications, webhooks)
+    | - default:    Standard jobs (tenant seeding, permission sync)
+    | - federation: User federation sync (can be slow, isolated)
+    | - media:      MediaLibrary conversions (CPU intensive, long running)
+    |
+    | Development:
+    |   sail artisan queue:work redis --queue=high,default,federation,media
+    |
+    | Production (separate workers per queue for better control):
+    |   See docs/QUEUES.md for Supervisor configuration
+    |
+    */
+
+    'queues' => [
+        'high' => [
+            'description' => 'Critical jobs: emails, notifications, webhooks',
+            'timeout' => 60,
+            'tries' => 3,
+        ],
+        'default' => [
+            'description' => 'Standard jobs: tenant seeding, permission sync',
+            'timeout' => 300,
+            'tries' => 3,
+        ],
+        'federation' => [
+            'description' => 'User federation sync across tenants',
+            'timeout' => 600,
+            'tries' => 5,
+        ],
+        'media' => [
+            'description' => 'MediaLibrary image conversions',
+            'timeout' => 900,
+            'tries' => 3,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue Connections
     |--------------------------------------------------------------------------
     |

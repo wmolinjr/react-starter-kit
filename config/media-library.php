@@ -18,13 +18,14 @@ return [
      * This queue connection will be used to generate derived and responsive images.
      * Leave empty to use the default queue connection.
      */
-    'queue_connection_name' => env('QUEUE_CONNECTION', 'sync'),
+    'queue_connection_name' => env('QUEUE_CONNECTION', 'redis'),
 
     /*
      * This queue will be used to generate derived and responsive images.
-     * Leave empty to use the default queue.
+     * Uses dedicated 'media' queue to avoid blocking critical jobs.
+     * See config/queue.php for queue structure documentation.
      */
-    'queue_name' => env('MEDIA_QUEUE', ''),
+    'queue_name' => env('MEDIA_QUEUE', 'media'),
 
     /*
      * By default all conversions will be performed on a queue.

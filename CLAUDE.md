@@ -61,6 +61,76 @@ vendor/bin/pint        # Format PHP code with Laravel Pint
 vendor/bin/pint --test # Check formatting without changes
 ```
 
+### Complete Development Environment
+
+Para uma experiência igual à produção, execute os seguintes serviços em terminais separados:
+
+**Terminal 1 - Containers Docker:**
+```bash
+sail up -d                    # PostgreSQL, Redis, Mailpit
+```
+
+**Terminal 2 - Vite Dev Server:**
+```bash
+sail npm run dev              # Hot reload para frontend
+```
+
+**Terminal 3 - Queue Worker:**
+```bash
+sail artisan queue:work redis --queue=high,default,federation,media --tries=3 --timeout=300
+# Filas: high (emails), default (tenant ops), federation (user sync), media (images)
+# Veja docs/QUEUES.md para configuração de produção com Supervisor
+```
+
+**Terminal 4 - Scheduler (opcional para testes de agendamentos):**
+```bash
+sail artisan schedule:work    # Executa tarefas agendadas a cada minuto
+```
+
+**Terminal 5 - Stripe Webhooks (para testes de billing):**
+```bash
+# Instale o Stripe CLI: https://stripe.com/docs/stripe-cli
+stripe listen --forward-to http://app.test/stripe/webhook
+# Copie o webhook secret (whsec_...) para STRIPE_WEBHOOK_SECRET no .env
+```
+
+**Stripe Development Commands:**
+```bash
+sail artisan stripe:cleanup --list      # Listar recursos no Stripe
+sail artisan stripe:cleanup --all       # Limpar tudo (products, customers, subscriptions)
+sail artisan stripe:cleanup --all --force  # Limpar sem confirmação
+sail artisan stripe:cleanup --products  # Apenas products/prices
+sail artisan stripe:cleanup --customers # Apenas customers
+```
+
+**Serviços e suas funções:**
+
+| Serviço | Porta | Função |
+|---------|-------|--------|
+| App (Laravel) | 80 | Aplicação principal |
+| PostgreSQL | 5432 | Banco central + tenant databases |
+| Redis | 6379 | Sessions (DB 0), Cache (DB 1), Queue (DB 2) |
+| Mailpit | 8025 | UI de e-mails em http://localhost:8025 |
+| Vite | 5173 | Hot reload do frontend |
+| Telescope | /telescope | Debug em http://app.test/telescope |
+
+**Estrutura de Filas (por prioridade):**
+| Fila | Jobs |
+|------|------|
+| `high` | Emails (TeamInvitation), webhooks |
+| `default` | SeedTenantDatabase, SyncTenantPermissions |
+| `federation` | SyncUserToFederatedTenantsJob, PropagatePasswordChangeJob |
+| `media` | MediaLibrary conversions |
+
+**Comandos úteis para debug:**
+```bash
+sail artisan queue:monitor high,default,federation,media  # Monitorar filas
+sail artisan queue:failed              # Ver jobs falhos
+sail artisan queue:retry all           # Retentar todos os falhos
+sail artisan queue:clear               # Limpar fila
+sail artisan telescope:clear           # Limpar dados do Telescope
+```
+
 ### Tenant Commands (Stancl/Tenancy v4)
 
 ```bash
@@ -848,6 +918,7 @@ For in-depth technical documentation, see:
 - **[docs/DATABASE-IDS.md](docs/DATABASE-IDS.md)** - UUID architecture decision
 - **[docs/STANCL-FEATURES.md](docs/STANCL-FEATURES.md)** - Multi-tenancy features
 - **[docs/SESSION-SECURITY.md](docs/SESSION-SECURITY.md)** - Session security and Redis
+- **[docs/QUEUES.md](docs/QUEUES.md)** - Queue system and Supervisor configuration
 - **[docs/MEDIALIBRARY.md](docs/MEDIALIBRARY.md)** - MediaLibrary integration
 - **[docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md)** - MCP tools workflow
 - **[docs/I18N.md](docs/I18N.md)** - Internationalization guide

@@ -16,6 +16,12 @@ class TeamInvitation extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     /**
+     * The queue to use for sending the email.
+     * Uses 'high' priority queue for immediate delivery.
+     */
+    public string $queue = 'high';
+
+    /**
      * Create a new message instance.
      */
     public function __construct(
