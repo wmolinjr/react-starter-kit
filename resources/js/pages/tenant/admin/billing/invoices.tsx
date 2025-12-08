@@ -35,6 +35,9 @@ import {
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface InvoiceLine {
     description: string;
     quantity: number;
@@ -64,7 +67,7 @@ interface Props {
     tenant: Tenant;
 }
 
-export default function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
+function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
     const { t, currentLocale } = useLaravelReactI18n();
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
@@ -121,7 +124,7 @@ export default function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.invoices.page_title')} />
 
             <Page>
@@ -266,6 +269,10 @@ export default function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                     )}
                 </DialogContent>
             </Dialog>
-        </AdminLayout>
+        </>
     );
 }
+
+InvoicesIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default InvoicesIndex;

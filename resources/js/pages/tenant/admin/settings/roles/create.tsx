@@ -6,6 +6,9 @@ import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageCo
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 function useBreadcrumbs() {
     const { t } = useLaravelReactI18n();
     return [
@@ -31,7 +34,7 @@ interface Props {
     permissions: Record<string, CategoryPermissions>;
 }
 
-export default function CreateRole({ permissions }: Props) {
+function CreateRole({ permissions }: Props) {
     const { t } = useLaravelReactI18n();
     const breadcrumbs = useBreadcrumbs();
 
@@ -40,7 +43,7 @@ export default function CreateRole({ permissions }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('roles.create_title')} />
 
             <Page>
@@ -57,6 +60,10 @@ export default function CreateRole({ permissions }: Props) {
                     <RoleForm permissions={permissions} onSubmit={handleSubmit} />
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+CreateRole.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default CreateRole;

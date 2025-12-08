@@ -23,6 +23,9 @@ import {
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Domain {
     id: string;
     domain: string;
@@ -41,7 +44,7 @@ interface Props {
     domains: Domain[];
 }
 
-export default function SettingsIndex({ tenant: tenantData, domains }: Props) {
+function SettingsIndex({ tenant: tenantData, domains }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -98,7 +101,7 @@ export default function SettingsIndex({ tenant: tenantData, domains }: Props) {
     ];
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.settings.title')} />
 
             <Page>
@@ -183,6 +186,10 @@ export default function SettingsIndex({ tenant: tenantData, domains }: Props) {
                 </div>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+SettingsIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default SettingsIndex;

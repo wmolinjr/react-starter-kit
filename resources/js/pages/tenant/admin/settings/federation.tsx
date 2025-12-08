@@ -41,6 +41,9 @@ import {
 import { type BreadcrumbItem } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface FederationGroup {
     id: string;
     name: string;
@@ -81,7 +84,7 @@ interface Props {
     localOnlyUsers: TeamMember[];
 }
 
-export default function FederationSettings({ stats, group, membership, federatedUsers, localOnlyUsers }: Props) {
+function FederationSettings({ stats, group, membership, federatedUsers, localOnlyUsers }: Props) {
     const { t } = useLaravelReactI18n();
     const [federatingUser, setFederatingUser] = useState<string | null>(null);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
@@ -126,7 +129,7 @@ export default function FederationSettings({ stats, group, membership, federated
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.federation.title')} />
 
             <Page>
@@ -489,6 +492,10 @@ export default function FederationSettings({ stats, group, membership, federated
                     )}
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+FederationSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default FederationSettings;

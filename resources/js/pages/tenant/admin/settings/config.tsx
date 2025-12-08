@@ -24,6 +24,9 @@ import { FormEvent, useMemo, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Props {
     tenant: { id: string; name: string };
     config: {
@@ -41,7 +44,7 @@ interface Props {
     availableCurrencies: Record<string, string>;
 }
 
-export default function ConfigSettings({
+function ConfigSettings({
     tenant: tenantData,
     config,
     availableLocales,
@@ -104,7 +107,7 @@ export default function ConfigSettings({
     }, [availableTimezones, timezoneSearch]);
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('tenant.config.title')} />
 
             <Page>
@@ -358,6 +361,10 @@ export default function ConfigSettings({
                     </form>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ConfigSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ConfigSettings;

@@ -13,12 +13,15 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface TwoFactorProps {
     requiresConfirmation?: boolean;
     twoFactorEnabled?: boolean;
 }
 
-export default function TwoFactor({
+function TwoFactor({
     requiresConfirmation = false,
     twoFactorEnabled = false,
 }: TwoFactorProps) {
@@ -48,7 +51,7 @@ export default function TwoFactor({
     ];
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.two_factor.title')} />
             <TenantUserSettingsLayout>
                 <div className="space-y-6">
@@ -135,6 +138,10 @@ export default function TwoFactor({
                     />
                 </div>
             </TenantUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+TwoFactor.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default TwoFactor;

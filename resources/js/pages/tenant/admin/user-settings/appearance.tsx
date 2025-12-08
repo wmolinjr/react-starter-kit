@@ -11,7 +11,10 @@ import TenantUserSettingsLayout from '@/layouts/tenant/user-settings-layout';
 import userSettings from '@/routes/tenant/admin/user-settings';
 import { type BreadcrumbItem } from '@/types';
 
-export default function Appearance() {
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
+function Appearance() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -26,7 +29,7 @@ export default function Appearance() {
     ];
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title={t('settings.preferences.page_title')} />
 
             <TenantUserSettingsLayout>
@@ -57,6 +60,10 @@ export default function Appearance() {
                     <AppearanceTabs />
                 </div>
             </TenantUserSettingsLayout>
-        </AdminLayout>
+        </>
     );
 }
+
+Appearance.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default Appearance;

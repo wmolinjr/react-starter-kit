@@ -14,7 +14,10 @@ import type { AddonCatalogItem } from '@/types/addons';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
-export default function AddonsIndex() {
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
+function AddonsIndex() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -44,7 +47,7 @@ export default function AddonsIndex() {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Add-ons" />
 
             <Page>
@@ -109,6 +112,10 @@ export default function AddonsIndex() {
                 onConfirm={handleModalConfirm}
                 isPurchasing={isPurchasing}
             />
-        </AdminLayout>
+        </>
     );
 }
+
+AddonsIndex.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default AddonsIndex;

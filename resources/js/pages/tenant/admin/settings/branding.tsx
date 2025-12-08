@@ -18,6 +18,9 @@ import { FormEvent, useRef } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Branding {
     logo_url?: string;
     primary_color?: string;
@@ -30,7 +33,7 @@ interface Props {
     branding: Branding;
 }
 
-export default function BrandingSettings({ tenant: tenantData, branding }: Props) {
+function BrandingSettings({ tenant: tenantData, branding }: Props) {
     const { t } = useLaravelReactI18n();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +63,7 @@ export default function BrandingSettings({ tenant: tenantData, branding }: Props
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Branding" />
 
             <Page>
@@ -255,6 +258,10 @@ export default function BrandingSettings({ tenant: tenantData, branding }: Props
                 </form>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+BrandingSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default BrandingSettings;

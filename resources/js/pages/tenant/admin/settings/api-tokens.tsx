@@ -37,6 +37,9 @@ import { FormEvent, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
+import { type ReactElement } from 'react';
+
 interface Token {
     id: string;
     name: string;
@@ -50,7 +53,7 @@ interface Props {
     newToken?: string;
 }
 
-export default function ApiTokensSettings({ tokens, newToken }: Props) {
+function ApiTokensSettings({ tokens, newToken }: Props) {
     const { t } = useLaravelReactI18n();
     const [showNewToken, setShowNewToken] = useState(!!newToken);
     const [copied, setCopied] = useState(false);
@@ -88,7 +91,7 @@ export default function ApiTokensSettings({ tokens, newToken }: Props) {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="API Tokens" />
 
             <Page>
@@ -290,6 +293,10 @@ export default function ApiTokensSettings({ tokens, newToken }: Props) {
                 </Card>
                 </PageContent>
             </Page>
-        </AdminLayout>
+        </>
     );
 }
+
+ApiTokensSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+
+export default ApiTokensSettings;
