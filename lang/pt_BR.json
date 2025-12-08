@@ -162,6 +162,10 @@
   "sidebar.federation": "Federação",
   "sidebar.profile": "Perfil",
   "sidebar.account": "Conta",
+  "sidebar.tenant_management": "Gestão de Tenants",
+  "sidebar.catalog": "Catálogo",
+  "sidebar.access_control": "Controle de Acesso",
+  "sidebar.plans": "Planos",
 
   "user_menu.settings": "Configurações",
   "user_menu.logout": "Sair",

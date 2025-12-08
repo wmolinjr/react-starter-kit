@@ -162,6 +162,10 @@
   "sidebar.federation": "Federation",
   "sidebar.profile": "Profile",
   "sidebar.account": "Account",
+  "sidebar.tenant_management": "Tenant Management",
+  "sidebar.catalog": "Catalog",
+  "sidebar.access_control": "Access Control",
+  "sidebar.plans": "Plans",
 
   "user_menu.settings": "Settings",
   "user_menu.logout": "Log out",

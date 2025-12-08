@@ -188,7 +188,7 @@ class Tenant extends Model implements TenantWithDatabase
     public function getUsers(): \Illuminate\Database\Eloquent\Collection
     {
         return $this->run(function () {
-            return TenantUser::all();
+            return TenantUser::with('roles')->get();
         });
     }
 
