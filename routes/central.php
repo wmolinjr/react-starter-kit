@@ -253,6 +253,7 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
 
                     // Tenant management within group
                     Route::post('/{group}/tenants', [FederationGroupController::class, 'addTenant'])->name('tenants.add');
+                    Route::post('/{group}/tenants/{tenant}/toggle-sync', [FederationGroupController::class, 'toggleTenantSync'])->name('tenants.toggle-sync');
                     Route::delete('/{group}/tenants/{tenant}', [FederationGroupController::class, 'removeTenant'])->name('tenants.remove');
 
                     // User management within group

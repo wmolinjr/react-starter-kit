@@ -115,4 +115,34 @@ class FederationGroupTenant extends Pivot
             'joined_at' => now(),
         ]);
     }
+
+    /**
+     * Enable sync for this tenant.
+     */
+    public function enableSync(): bool
+    {
+        return $this->update([
+            'sync_enabled' => true,
+        ]);
+    }
+
+    /**
+     * Disable sync for this tenant.
+     */
+    public function disableSync(): bool
+    {
+        return $this->update([
+            'sync_enabled' => false,
+        ]);
+    }
+
+    /**
+     * Toggle sync for this tenant.
+     */
+    public function toggleSync(): bool
+    {
+        return $this->update([
+            'sync_enabled' => !$this->sync_enabled,
+        ]);
+    }
 }

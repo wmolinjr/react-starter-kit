@@ -1,3 +1,14 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,14 +23,14 @@ import { type ReactElement } from 'react';
 import {
     AlertTriangle,
     Building2,
-    Clock,
+    CheckCircle, CirclePlay, CircleStop,
     Crown,
     Mail,
     Network,
     Pencil,
-    Plus,
+    Play,
     RefreshCw,
-    Trash2,
+    StopCircle,
     User,
     Users,
     XCircle,
@@ -110,12 +121,6 @@ function FederationShow({ group, availableTenants }: Props) {
         return labels[strategy] || strategy;
     };
 
-    const handleRemoveTenant = (tenantId: string, tenantName: string) => {
-        if (confirm(t('admin.federation.remove_tenant_confirm', { name: tenantName }))) {
-            router.delete(admin.federation.tenants.remove.url({ group: group.id, tenant: tenantId }));
-        }
-    };
-
     const handleAddTenant = (tenantId: string) => {
         router.post(admin.federation.tenants.add.url(group.id), { tenant_id: tenantId });
     };
@@ -128,6 +133,10 @@ function FederationShow({ group, availableTenants }: Props) {
         if (confirm(t('admin.federation.retry_sync_confirm'))) {
             router.post(admin.federation.retrySync.url(group.id));
         }
+    };
+
+    const handleToggleTenantSync = (tenantId: string) => {
+        router.post(admin.federation.tenants.toggleSync.url({ group: group.id, tenant: tenantId }));
     };
 
     return (
@@ -163,7 +172,7 @@ function FederationShow({ group, availableTenants }: Props) {
                     {/* Stats Cards */}
                     <div className="grid gap-4 md:grid-cols-4">
                         <Card>
-                            <CardContent className="pt-6">
+                            <CardContent>
                                 <div className="flex items-center gap-4">
                                     <div className="bg-primary/10 rounded-full p-3">
                                         <Building2 className="text-primary h-5 w-5" />
@@ -176,7 +185,7 @@ function FederationShow({ group, availableTenants }: Props) {
                             </CardContent>
                         </Card>
                         <Card>
-                            <CardContent className="pt-6">
+                            <CardContent>
                                 <div className="flex items-center gap-4">
                                     <div className="bg-primary/10 rounded-full p-3">
                                         <Users className="text-primary h-5 w-5" />
@@ -191,7 +200,7 @@ function FederationShow({ group, availableTenants }: Props) {
                             </CardContent>
                         </Card>
                         <Card>
-                            <CardContent className="pt-6">
+                            <CardContent>
                                 <div className="flex items-center gap-4">
                                     <div className="bg-primary/10 rounded-full p-3">
                                         <RefreshCw className="text-primary h-5 w-5" />
@@ -205,7 +214,7 @@ function FederationShow({ group, availableTenants }: Props) {
                         </Card>
                         {group.stats && group.stats.pending_conflicts > 0 && (
                             <Card className="border-yellow-500">
-                                <CardContent className="pt-6">
+                                <CardContent>
                                     <div className="flex items-center gap-4">
                                         <div className="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900">
                                             <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
@@ -328,7 +337,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                         <TableCell>
                                                             {tenant.sync_enabled ? (
                                                                 <Badge variant="default">
-                                                                    <RefreshCw className="mr-1 h-3 w-3" />
+                                                                    <CheckCircle className="mr-1 h-3 w-3" />
                                                                     {t('admin.federation.sync_enabled')}
                                                                 </Badge>
                                                             ) : (
@@ -345,22 +354,57 @@ function FederationShow({ group, availableTenants }: Props) {
                                                         </TableCell>
                                                         <TableCell>
                                                             <div className="flex gap-1">
+                                                                {!tenant.is_master && (
+                                                                    <AlertDialog>
+                                                                        <AlertDialogTrigger asChild>
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                title={tenant.sync_enabled
+                                                                                    ? t('admin.federation.disable_sync')
+                                                                                    : t('admin.federation.enable_sync')
+                                                                                }
+                                                                            >
+                                                                                {tenant.sync_enabled ? (
+                                                                                    <CircleStop className="h-4 w-4 text-destructive" />
+                                                                                ) : (
+                                                                                    <CirclePlay className="h-4 w-4 text-green-600" />
+                                                                                )}
+                                                                            </Button>
+                                                                        </AlertDialogTrigger>
+                                                                        <AlertDialogContent>
+                                                                            <AlertDialogHeader>
+                                                                                <AlertDialogTitle>
+                                                                                    {tenant.sync_enabled
+                                                                                        ? t('admin.federation.disable_sync_title')
+                                                                                        : t('admin.federation.enable_sync_title')
+                                                                                    }
+                                                                                </AlertDialogTitle>
+                                                                                <AlertDialogDescription>
+                                                                                    {tenant.sync_enabled
+                                                                                        ? t('admin.federation.disable_sync_confirm', { name: tenant.name })
+                                                                                        : t('admin.federation.enable_sync_confirm', { name: tenant.name })
+                                                                                    }
+                                                                                </AlertDialogDescription>
+                                                                            </AlertDialogHeader>
+                                                                            <AlertDialogFooter>
+                                                                                <AlertDialogCancel>
+                                                                                    {t('common.cancel')}
+                                                                                </AlertDialogCancel>
+                                                                                <AlertDialogAction
+                                                                                    onClick={() => handleToggleTenantSync(tenant.id)}
+                                                                                >
+                                                                                    {t('common.confirm')}
+                                                                                </AlertDialogAction>
+                                                                            </AlertDialogFooter>
+                                                                        </AlertDialogContent>
+                                                                    </AlertDialog>
+                                                                )}
                                                                 <Button variant="ghost" size="icon" asChild>
                                                                     <Link href={admin.tenants.show.url(tenant.id)}>
                                                                         <Building2 className="h-4 w-4" />
                                                                     </Link>
                                                                 </Button>
-                                                                {!tenant.is_master && (
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() =>
-                                                                            handleRemoveTenant(tenant.id, tenant.name)
-                                                                        }
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4" />
-                                                                    </Button>
-                                                                )}
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>

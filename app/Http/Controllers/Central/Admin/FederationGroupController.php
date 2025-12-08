@@ -36,7 +36,7 @@ class FederationGroupController extends Controller implements HasMiddleware
         return [
             new Middleware('can:' . CentralPermission::FEDERATION_VIEW->value, only: ['index', 'show', 'showUser']),
             new Middleware('can:' . CentralPermission::FEDERATION_CREATE->value, only: ['create', 'store']),
-            new Middleware('can:' . CentralPermission::FEDERATION_EDIT->value, only: ['edit', 'update', 'addTenant', 'removeTenant', 'syncUser', 'retrySync']),
+            new Middleware('can:' . CentralPermission::FEDERATION_EDIT->value, only: ['edit', 'update', 'addTenant', 'removeTenant', 'toggleTenantSync', 'syncUser', 'retrySync']),
             new Middleware('can:' . CentralPermission::FEDERATION_DELETE->value, only: ['destroy']),
         ];
     }
@@ -223,6 +223,28 @@ class FederationGroupController extends Controller implements HasMiddleware
         } catch (FederationException $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Toggle sync for a tenant in the group.
+     */
+    public function toggleTenantSync(FederationGroup $group, Tenant $tenant): RedirectResponse
+    {
+        $pivot = $group->tenants()
+            ->where('tenant_id', $tenant->id)
+            ->first()?->pivot;
+
+        if (! $pivot) {
+            return back()->with('error', __('flash.federation.tenant_not_in_group'));
+        }
+
+        $pivot->toggleSync();
+
+        $message = $pivot->sync_enabled
+            ? __('flash.federation.sync_enabled', ['tenant' => $tenant->name])
+            : __('flash.federation.sync_disabled', ['tenant' => $tenant->name]);
+
+        return back()->with('success', $message);
     }
 
     /**
