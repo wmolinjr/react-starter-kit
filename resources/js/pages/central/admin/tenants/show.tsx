@@ -1,15 +1,56 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/central/admin-layout';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
-import { Head, Link } from '@inertiajs/react';
-import { CreditCard, Globe, Package, Users } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { Head, Link, router } from '@inertiajs/react';
+import {
+    CheckCircle,
+    CreditCard,
+    Crown,
+    Globe,
+    Network,
+    Package,
+    Play,
+    StopCircle,
+    Users,
+    XCircle,
+} from 'lucide-react';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type ReactElement } from 'react';
+
+interface FederationGroup {
+    id: string;
+    name: string;
+    description: string | null;
+    sync_strategy: string;
+    is_active: boolean;
+    federated_users_count: number;
+    master_tenant_id: string | null;
+    is_master: boolean;
+    master_tenant: { id: string; name: string } | null;
+    sync_enabled: boolean;
+    joined_at: string | null;
+}
+
+interface AvailableFederationGroup {
+    id: string;
+    name: string;
+}
 
 interface Props {
     tenant: {
@@ -21,18 +62,32 @@ interface Props {
         domains: { id: string; domain: string; is_primary: boolean }[];
         users: { id: string; name: string; email: string }[];
         addons: { id: string; name: string; status: string }[];
+        federation_groups?: FederationGroup[];
     };
+    availableFederationGroups: AvailableFederationGroup[];
 }
 
-function TenantShow({ tenant }: Props) {
+function TenantShow({ tenant, availableFederationGroups }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Dashboard', href: admin.dashboard.url() },
-        { title: 'Tenants', href: admin.tenants.index.url() },
+        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.tenants.title'), href: admin.tenants.index.url() },
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
     ];
     useSetBreadcrumbs(breadcrumbs);
+
+    const handleToggleFederationSync = (groupId: string) => {
+        router.post(admin.federation.tenants.toggleSync.url({ group: groupId, tenant: tenant.id }));
+    };
+
+    const handleAddToFederationGroup = (groupId: string) => {
+        router.post(admin.federation.tenants.add.url(groupId), { tenant_id: tenant.id });
+    };
+
+    const federationGroups = tenant.federation_groups || [];
+    const activeSyncs = federationGroups.filter((g) => g.sync_enabled).length;
+    const totalFederatedUsers = federationGroups.reduce((acc, g) => acc + g.federated_users_count, 0);
 
     return (
         <>
@@ -163,6 +218,160 @@ function TenantShow({ tenant }: Props) {
                         </CardContent>
                     </Card>
                 </div>
+
+                    {/* Federation Groups - Full Width */}
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Network className="h-5 w-5" />
+                                        {t('admin.tenants.federation_groups')} ({federationGroups.length})
+                                    </CardTitle>
+                                    <CardDescription>
+                                        {federationGroups.length > 0 ? (
+                                            <>
+                                                {activeSyncs} {t('admin.tenants.active_syncs')} · {totalFederatedUsers} {t('admin.tenants.federated_users')}
+                                            </>
+                                        ) : (
+                                            t('admin.tenants.federation_groups_description')
+                                        )}
+                                    </CardDescription>
+                                </div>
+                                {availableFederationGroups.length > 0 && (
+                                    <select
+                                        className="border-input bg-background rounded-md border px-3 py-2 text-sm"
+                                        onChange={(e) => e.target.value && handleAddToFederationGroup(e.target.value)}
+                                        defaultValue=""
+                                    >
+                                        <option value="">{t('admin.tenants.add_to_federation')}</option>
+                                        {availableFederationGroups.map((group) => (
+                                            <option key={group.id} value={group.id}>
+                                                {group.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {federationGroups.length > 0 ? (
+                                <div className="space-y-3">
+                                    {federationGroups.map((group) => (
+                                        <div
+                                            key={group.id}
+                                            className="flex items-center justify-between rounded-lg border p-4"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-primary/10 rounded-full p-2">
+                                                    <Network className="text-primary h-4 w-4" />
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        {group.is_master && (
+                                                            <Crown className="h-4 w-4 text-yellow-500" />
+                                                        )}
+                                                        <span className="font-medium">{group.name}</span>
+                                                        {!group.is_active && (
+                                                            <Badge variant="secondary">{t('common.inactive')}</Badge>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                                                        <span>
+                                                            {group.is_master
+                                                                ? t('admin.tenants.master_tenant')
+                                                                : t('admin.tenants.member_tenant')}
+                                                        </span>
+                                                        {group.joined_at && (
+                                                            <>
+                                                                <span>·</span>
+                                                                <span>
+                                                                    {t('admin.tenants.joined')}: {new Date(group.joined_at).toLocaleDateString()}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                        <span>·</span>
+                                                        <span>{group.federated_users_count} {t('admin.tenants.users')}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {group.sync_enabled ? (
+                                                    <Badge variant="default">
+                                                        <CheckCircle className="mr-1 h-3 w-3" />
+                                                        {t('admin.federation.sync_enabled')}
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary">
+                                                        <XCircle className="mr-1 h-3 w-3" />
+                                                        {t('admin.federation.sync_disabled')}
+                                                    </Badge>
+                                                )}
+                                                {!group.is_master && (
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                title={group.sync_enabled
+                                                                    ? t('admin.federation.disable_sync')
+                                                                    : t('admin.federation.enable_sync')
+                                                                }
+                                                            >
+                                                                {group.sync_enabled ? (
+                                                                    <StopCircle className="h-4 w-4 text-destructive" />
+                                                                ) : (
+                                                                    <Play className="h-4 w-4 text-green-600" />
+                                                                )}
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>
+                                                                    {group.sync_enabled
+                                                                        ? t('admin.federation.disable_sync_title')
+                                                                        : t('admin.federation.enable_sync_title')
+                                                                    }
+                                                                </AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    {group.sync_enabled
+                                                                        ? t('admin.federation.disable_sync_confirm', { name: tenant.name })
+                                                                        : t('admin.federation.enable_sync_confirm', { name: tenant.name })
+                                                                    }
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>
+                                                                    {t('common.cancel')}
+                                                                </AlertDialogCancel>
+                                                                <AlertDialogAction
+                                                                    onClick={() => handleToggleFederationSync(group.id)}
+                                                                >
+                                                                    {t('common.confirm')}
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                )}
+                                                <Button variant="ghost" size="sm" asChild>
+                                                    <Link href={admin.federation.show.url(group.id)}>
+                                                        {t('common.view')}
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-6 text-center">
+                                    <Network className="text-muted-foreground mx-auto mb-3 h-10 w-10" />
+                                    <p className="text-muted-foreground text-sm">
+                                        {t('admin.tenants.no_federation_groups')}
+                                    </p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
                 </PageContent>
             </Page>
         </>

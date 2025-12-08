@@ -8,6 +8,7 @@ use App\Http\Resources\Central\PlanSummaryResource;
 use App\Http\Resources\Central\TenantDetailResource;
 use App\Http\Resources\Central\TenantEditResource;
 use App\Http\Resources\Central\TenantResource;
+use App\Models\Central\FederationGroup;
 use App\Models\Central\Plan;
 use App\Models\Central\Tenant;
 use Illuminate\Http\Request;
@@ -56,10 +57,23 @@ class TenantManagementController extends Controller implements HasMiddleware
      */
     public function show(Tenant $tenant): Response
     {
-        $tenant->load(['domains', 'plan', 'addons']);
+        $tenant->load([
+            'domains',
+            'plan',
+            'addons',
+            'federationGroups' => fn ($q) => $q->with('masterTenant')->withCount('federatedUsers'),
+        ]);
+
+        // Get federation groups that this tenant is NOT already a member of
+        $availableFederationGroups = FederationGroup::query()
+            ->where('is_active', true)
+            ->whereDoesntHave('tenants', fn ($q) => $q->where('tenant_id', $tenant->id))
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return Inertia::render('central/admin/tenants/show', [
             'tenant' => new TenantDetailResource($tenant),
+            'availableFederationGroups' => $availableFederationGroups,
         ]);
     }
 

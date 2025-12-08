@@ -64,6 +64,29 @@ class TenantDetailResource extends BaseResource
             // Subscription info
             'trial_ends_at' => $this->formatIso($this->trial_ends_at),
             'is_on_trial' => $this->isOnTrial(),
+
+            // Federation groups
+            'federation_groups' => $this->when(
+                $this->relationLoaded('federationGroups'),
+                fn () => $this->federationGroups->map(fn ($group) => [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                    'description' => $group->description,
+                    'sync_strategy' => $group->sync_strategy,
+                    'is_active' => $group->is_active,
+                    'federated_users_count' => $group->federated_users_count ?? 0,
+                    'master_tenant_id' => $group->master_tenant_id,
+                    'is_master' => $group->master_tenant_id === $this->id,
+                    'master_tenant' => $group->masterTenant ? [
+                        'id' => $group->masterTenant->id,
+                        'name' => $group->masterTenant->name,
+                    ] : null,
+                    // Pivot data
+                    'sync_enabled' => $group->pivot->sync_enabled,
+                    'joined_at' => $this->formatIso($group->pivot->joined_at),
+                ])
+            ),
+            'federation_groups_count' => $this->whenCounted('federationGroups', fn () => $this->federation_groups_count ?? $this->federationGroups->count()),
         ];
     }
 }
