@@ -2,6 +2,16 @@
 
 namespace App\Providers;
 
+use App\Events\Central\Federation\FederatedUserCreated;
+use App\Events\Central\Federation\FederatedUserPasswordChanged;
+use App\Events\Central\Federation\FederatedUserTwoFactorChanged;
+use App\Events\Central\Federation\FederatedUserUpdated;
+use App\Events\Central\Federation\TenantJoinedFederation;
+use App\Listeners\Central\Federation\PropagatePasswordChange;
+use App\Listeners\Central\Federation\PropagateTwoFactorChange;
+use App\Listeners\Central\Federation\SyncNewFederatedUser;
+use App\Listeners\Central\Federation\SyncUpdatedFederatedUser;
+use App\Listeners\Central\Federation\SyncUsersToNewTenant;
 use App\Listeners\Central\SyncPermissionsOnSubscriptionChange;
 use App\Listeners\Central\UpdateTenantLimits;
 use App\Models\Central\AddonPurchase;
@@ -118,5 +128,12 @@ class AppServiceProvider extends ServiceProvider
             WebhookReceived::class,
             SyncPermissionsOnSubscriptionChange::class,
         );
+
+        // Federation Event Listeners
+        Event::listen(FederatedUserCreated::class, SyncNewFederatedUser::class);
+        Event::listen(FederatedUserUpdated::class, SyncUpdatedFederatedUser::class);
+        Event::listen(FederatedUserPasswordChanged::class, PropagatePasswordChange::class);
+        Event::listen(FederatedUserTwoFactorChanged::class, PropagateTwoFactorChange::class);
+        Event::listen(TenantJoinedFederation::class, SyncUsersToNewTenant::class);
     }
 }

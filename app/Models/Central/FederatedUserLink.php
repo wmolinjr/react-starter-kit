@@ -60,6 +60,7 @@ class FederatedUserLink extends Model
     public const CREATED_VIA_MANUAL_LINK = 'manual_link';
     public const CREATED_VIA_IMPORT = 'import';
     public const CREATED_VIA_LOGIN = 'login';
+    public const CREATED_VIA_BULK_SYNC = 'bulk_sync';
 
     /**
      * Federated user relationship.
@@ -176,6 +177,16 @@ class FederatedUserLink extends Model
     {
         return $this->sync_status === self::STATUS_SYNC_FAILED
             && $this->sync_attempts < $maxAttempts;
+    }
+
+    /**
+     * Increment sync attempts counter.
+     */
+    public function incrementSyncAttempts(): bool
+    {
+        return $this->update([
+            'sync_attempts' => $this->sync_attempts + 1,
+        ]);
     }
 
     /**

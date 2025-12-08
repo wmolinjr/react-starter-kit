@@ -6,6 +6,8 @@ use App\Http\Controllers\Central\Admin\AddonCatalogController;
 use App\Http\Controllers\Central\Admin\AddonManagementController;
 use App\Http\Controllers\Central\Admin\BundleCatalogController;
 use App\Http\Controllers\Central\Admin\DashboardController;
+use App\Http\Controllers\Central\Admin\FederationConflictController;
+use App\Http\Controllers\Central\Admin\FederationGroupController;
 use App\Http\Controllers\Central\Admin\ImpersonationController;
 use App\Http\Controllers\Central\Admin\PlanCatalogController;
 use App\Http\Controllers\Central\Admin\RoleManagementController;
@@ -237,6 +239,34 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::get('/{tenant}/edit', [TenantManagementController::class, 'edit'])->name('edit');
                     Route::put('/{tenant}', [TenantManagementController::class, 'update'])->name('update');
                     Route::delete('/{tenant}', [TenantManagementController::class, 'destroy'])->name('destroy');
+                });
+
+                // Federation Groups Management
+                Route::prefix('federation')->name('federation.')->group(function () {
+                    Route::get('/', [FederationGroupController::class, 'index'])->name('index');
+                    Route::get('/create', [FederationGroupController::class, 'create'])->name('create');
+                    Route::post('/', [FederationGroupController::class, 'store'])->name('store');
+                    Route::get('/{group}', [FederationGroupController::class, 'show'])->name('show');
+                    Route::get('/{group}/edit', [FederationGroupController::class, 'edit'])->name('edit');
+                    Route::put('/{group}', [FederationGroupController::class, 'update'])->name('update');
+                    Route::delete('/{group}', [FederationGroupController::class, 'destroy'])->name('destroy');
+
+                    // Tenant management within group
+                    Route::post('/{group}/tenants', [FederationGroupController::class, 'addTenant'])->name('tenants.add');
+                    Route::delete('/{group}/tenants/{tenant}', [FederationGroupController::class, 'removeTenant'])->name('tenants.remove');
+
+                    // User management within group
+                    Route::get('/{group}/users/{user}', [FederationGroupController::class, 'showUser'])->name('users.show');
+                    Route::post('/{group}/users/{user}/sync', [FederationGroupController::class, 'syncUser'])->name('users.sync');
+
+                    // Retry failed syncs
+                    Route::post('/{group}/retry-sync', [FederationGroupController::class, 'retrySync'])->name('retry-sync');
+
+                    // Conflicts
+                    Route::get('/{group}/conflicts', [FederationConflictController::class, 'index'])->name('conflicts.index');
+                    Route::get('/{group}/conflicts/{conflict}', [FederationConflictController::class, 'show'])->name('conflicts.show');
+                    Route::post('/{group}/conflicts/{conflict}/resolve', [FederationConflictController::class, 'resolve'])->name('conflicts.resolve');
+                    Route::post('/{group}/conflicts/{conflict}/dismiss', [FederationConflictController::class, 'dismiss'])->name('conflicts.dismiss');
                 });
 
                 /*

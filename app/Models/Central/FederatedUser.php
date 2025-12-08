@@ -80,11 +80,19 @@ class FederatedUser extends Model
     }
 
     /**
-     * Active links only.
+     * Active links only (not disabled).
      */
     public function activeLinks(): HasMany
     {
-        return $this->links()->where('sync_status', 'synced');
+        return $this->links()->where('sync_status', '!=', FederatedUserLink::STATUS_DISABLED);
+    }
+
+    /**
+     * Synced links only.
+     */
+    public function syncedLinks(): HasMany
+    {
+        return $this->links()->where('sync_status', FederatedUserLink::STATUS_SYNCED);
     }
 
     /**

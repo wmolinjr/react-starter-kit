@@ -354,6 +354,15 @@ Route::middleware([
                     Route::post('/config', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'updateConfig'])->name('config.update');
                     Route::delete('/delete', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'destroy'])->name('destroy');
                 });
+
+                // Federation Settings
+                Route::prefix('federation')->name('federation.')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'index'])->name('index');
+                    Route::get('/users/{user}', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'show'])->name('show');
+                    Route::post('/users/federate', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'federateUser'])->name('users.federate');
+                    Route::delete('/users/{user}/unfederate', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'unfederateUser'])->name('users.unfederate');
+                    Route::post('/users/{user}/sync', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'syncUser'])->name('users.sync');
+                });
             });
 
             /*
