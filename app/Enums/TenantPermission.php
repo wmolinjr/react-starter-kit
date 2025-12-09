@@ -91,91 +91,92 @@ enum TenantPermission: string
         $categoryEnum = $this->categoryEnum();
         $action = $this->action();
 
-        $catName = $categoryEnum?->name() ?? ['en' => ucfirst($this->category()), 'pt_BR' => ucfirst($this->category())];
-        $actName = PermissionAction::tryFrom($action)?->name() ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action)];
+        $catName = $categoryEnum?->name() ?? ['en' => ucfirst($this->category()), 'pt_BR' => ucfirst($this->category()), 'es' => ucfirst($this->category())];
+        $actName = PermissionAction::tryFrom($action)?->name() ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action), 'es' => ucfirst($action)];
 
         return [
             'en' => "{$catName['en']}: {$actName['en']}",
             'pt_BR' => "{$catName['pt_BR']}: {$actName['pt_BR']}",
+            'es' => "{$catName['es']}: {$actName['es']}",
         ];
     }
 
     /**
      * Get the description for this permission.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array{en: string, pt_BR: string, es: string}
      */
     public function description(): array
     {
         return match ($this) {
             // Projects
-            self::PROJECTS_VIEW => ['en' => 'View all projects', 'pt_BR' => 'Visualizar todos os projetos'],
-            self::PROJECTS_CREATE => ['en' => 'Create new projects', 'pt_BR' => 'Criar novos projetos'],
-            self::PROJECTS_EDIT => ['en' => 'Edit any project', 'pt_BR' => 'Editar qualquer projeto'],
-            self::PROJECTS_EDIT_OWN => ['en' => 'Edit own projects only', 'pt_BR' => 'Editar apenas projetos próprios'],
-            self::PROJECTS_DELETE => ['en' => 'Delete projects', 'pt_BR' => 'Excluir projetos'],
-            self::PROJECTS_UPLOAD => ['en' => 'Upload files', 'pt_BR' => 'Enviar arquivos'],
-            self::PROJECTS_DOWNLOAD => ['en' => 'Download files', 'pt_BR' => 'Baixar arquivos'],
-            self::PROJECTS_ARCHIVE => ['en' => 'Archive projects', 'pt_BR' => 'Arquivar projetos'],
+            self::PROJECTS_VIEW => ['en' => 'View all projects', 'pt_BR' => 'Visualizar todos os projetos', 'es' => 'Ver todos los proyectos'],
+            self::PROJECTS_CREATE => ['en' => 'Create new projects', 'pt_BR' => 'Criar novos projetos', 'es' => 'Crear nuevos proyectos'],
+            self::PROJECTS_EDIT => ['en' => 'Edit any project', 'pt_BR' => 'Editar qualquer projeto', 'es' => 'Editar cualquier proyecto'],
+            self::PROJECTS_EDIT_OWN => ['en' => 'Edit own projects only', 'pt_BR' => 'Editar apenas projetos próprios', 'es' => 'Editar solo proyectos propios'],
+            self::PROJECTS_DELETE => ['en' => 'Delete projects', 'pt_BR' => 'Excluir projetos', 'es' => 'Eliminar proyectos'],
+            self::PROJECTS_UPLOAD => ['en' => 'Upload files', 'pt_BR' => 'Enviar arquivos', 'es' => 'Subir archivos'],
+            self::PROJECTS_DOWNLOAD => ['en' => 'Download files', 'pt_BR' => 'Baixar arquivos', 'es' => 'Descargar archivos'],
+            self::PROJECTS_ARCHIVE => ['en' => 'Archive projects', 'pt_BR' => 'Arquivar projetos', 'es' => 'Archivar proyectos'],
 
             // Team
-            self::TEAM_VIEW => ['en' => 'View team members', 'pt_BR' => 'Visualizar membros da equipe'],
-            self::TEAM_INVITE => ['en' => 'Invite members', 'pt_BR' => 'Convidar membros'],
-            self::TEAM_REMOVE => ['en' => 'Remove members', 'pt_BR' => 'Remover membros'],
-            self::TEAM_MANAGE_ROLES => ['en' => 'Manage roles', 'pt_BR' => 'Gerenciar papéis'],
-            self::TEAM_ACTIVITY => ['en' => 'View activity logs', 'pt_BR' => 'Visualizar logs de atividade'],
+            self::TEAM_VIEW => ['en' => 'View team members', 'pt_BR' => 'Visualizar membros da equipe', 'es' => 'Ver miembros del equipo'],
+            self::TEAM_INVITE => ['en' => 'Invite members', 'pt_BR' => 'Convidar membros', 'es' => 'Invitar miembros'],
+            self::TEAM_REMOVE => ['en' => 'Remove members', 'pt_BR' => 'Remover membros', 'es' => 'Eliminar miembros'],
+            self::TEAM_MANAGE_ROLES => ['en' => 'Manage roles', 'pt_BR' => 'Gerenciar papéis', 'es' => 'Gestionar roles'],
+            self::TEAM_ACTIVITY => ['en' => 'View activity logs', 'pt_BR' => 'Visualizar logs de atividade', 'es' => 'Ver registros de actividad'],
 
             // Settings
-            self::SETTINGS_VIEW => ['en' => 'View settings', 'pt_BR' => 'Visualizar configurações'],
-            self::SETTINGS_EDIT => ['en' => 'Edit settings', 'pt_BR' => 'Editar configurações'],
-            self::SETTINGS_DANGER => ['en' => 'Danger zone access', 'pt_BR' => 'Acesso à zona de perigo'],
+            self::SETTINGS_VIEW => ['en' => 'View settings', 'pt_BR' => 'Visualizar configurações', 'es' => 'Ver configuración'],
+            self::SETTINGS_EDIT => ['en' => 'Edit settings', 'pt_BR' => 'Editar configurações', 'es' => 'Editar configuración'],
+            self::SETTINGS_DANGER => ['en' => 'Danger zone access', 'pt_BR' => 'Acesso à zona de perigo', 'es' => 'Acceso a zona de peligro'],
 
             // Billing
-            self::BILLING_VIEW => ['en' => 'View billing', 'pt_BR' => 'Visualizar faturamento'],
-            self::BILLING_MANAGE => ['en' => 'Manage subscriptions', 'pt_BR' => 'Gerenciar assinaturas'],
-            self::BILLING_INVOICES => ['en' => 'Download invoices', 'pt_BR' => 'Baixar faturas'],
+            self::BILLING_VIEW => ['en' => 'View billing', 'pt_BR' => 'Visualizar faturamento', 'es' => 'Ver facturación'],
+            self::BILLING_MANAGE => ['en' => 'Manage subscriptions', 'pt_BR' => 'Gerenciar assinaturas', 'es' => 'Gestionar suscripciones'],
+            self::BILLING_INVOICES => ['en' => 'Download invoices', 'pt_BR' => 'Baixar faturas', 'es' => 'Descargar facturas'],
 
             // API Tokens
-            self::API_TOKENS_VIEW => ['en' => 'View API tokens', 'pt_BR' => 'Visualizar tokens de API'],
-            self::API_TOKENS_CREATE => ['en' => 'Create API tokens', 'pt_BR' => 'Criar tokens de API'],
-            self::API_TOKENS_DELETE => ['en' => 'Delete API tokens', 'pt_BR' => 'Excluir tokens de API'],
+            self::API_TOKENS_VIEW => ['en' => 'View API tokens', 'pt_BR' => 'Visualizar tokens de API', 'es' => 'Ver tokens de API'],
+            self::API_TOKENS_CREATE => ['en' => 'Create API tokens', 'pt_BR' => 'Criar tokens de API', 'es' => 'Crear tokens de API'],
+            self::API_TOKENS_DELETE => ['en' => 'Delete API tokens', 'pt_BR' => 'Excluir tokens de API', 'es' => 'Eliminar tokens de API'],
 
             // Custom Roles
-            self::ROLES_VIEW => ['en' => 'View custom roles', 'pt_BR' => 'Visualizar papéis personalizados'],
-            self::ROLES_CREATE => ['en' => 'Create custom roles', 'pt_BR' => 'Criar papéis personalizados'],
-            self::ROLES_EDIT => ['en' => 'Edit custom roles', 'pt_BR' => 'Editar papéis personalizados'],
-            self::ROLES_DELETE => ['en' => 'Delete custom roles', 'pt_BR' => 'Excluir papéis personalizados'],
+            self::ROLES_VIEW => ['en' => 'View custom roles', 'pt_BR' => 'Visualizar papéis personalizados', 'es' => 'Ver roles personalizados'],
+            self::ROLES_CREATE => ['en' => 'Create custom roles', 'pt_BR' => 'Criar papéis personalizados', 'es' => 'Crear roles personalizados'],
+            self::ROLES_EDIT => ['en' => 'Edit custom roles', 'pt_BR' => 'Editar papéis personalizados', 'es' => 'Editar roles personalizados'],
+            self::ROLES_DELETE => ['en' => 'Delete custom roles', 'pt_BR' => 'Excluir papéis personalizados', 'es' => 'Eliminar roles personalizados'],
 
             // Advanced Reports
-            self::REPORTS_VIEW => ['en' => 'View reports', 'pt_BR' => 'Visualizar relatórios'],
-            self::REPORTS_EXPORT => ['en' => 'Export reports', 'pt_BR' => 'Exportar relatórios'],
-            self::REPORTS_SCHEDULE => ['en' => 'Schedule reports', 'pt_BR' => 'Agendar relatórios'],
-            self::REPORTS_CUSTOMIZE => ['en' => 'Customize reports', 'pt_BR' => 'Personalizar relatórios'],
+            self::REPORTS_VIEW => ['en' => 'View reports', 'pt_BR' => 'Visualizar relatórios', 'es' => 'Ver informes'],
+            self::REPORTS_EXPORT => ['en' => 'Export reports', 'pt_BR' => 'Exportar relatórios', 'es' => 'Exportar informes'],
+            self::REPORTS_SCHEDULE => ['en' => 'Schedule reports', 'pt_BR' => 'Agendar relatórios', 'es' => 'Programar informes'],
+            self::REPORTS_CUSTOMIZE => ['en' => 'Customize reports', 'pt_BR' => 'Personalizar relatórios', 'es' => 'Personalizar informes'],
 
             // SSO
-            self::SSO_CONFIGURE => ['en' => 'Configure SSO', 'pt_BR' => 'Configurar SSO'],
-            self::SSO_MANAGE => ['en' => 'Manage SSO providers', 'pt_BR' => 'Gerenciar provedores SSO'],
-            self::SSO_TEST_CONNECTION => ['en' => 'Test SSO connection', 'pt_BR' => 'Testar conexão SSO'],
+            self::SSO_CONFIGURE => ['en' => 'Configure SSO', 'pt_BR' => 'Configurar SSO', 'es' => 'Configurar SSO'],
+            self::SSO_MANAGE => ['en' => 'Manage SSO providers', 'pt_BR' => 'Gerenciar provedores SSO', 'es' => 'Gestionar proveedores SSO'],
+            self::SSO_TEST_CONNECTION => ['en' => 'Test SSO connection', 'pt_BR' => 'Testar conexão SSO', 'es' => 'Probar conexión SSO'],
 
             // White Label
-            self::BRANDING_VIEW => ['en' => 'View branding', 'pt_BR' => 'Visualizar marca'],
-            self::BRANDING_EDIT => ['en' => 'Edit branding', 'pt_BR' => 'Editar marca'],
-            self::BRANDING_PREVIEW => ['en' => 'Preview branding', 'pt_BR' => 'Pré-visualizar marca'],
-            self::BRANDING_PUBLISH => ['en' => 'Publish branding', 'pt_BR' => 'Publicar marca'],
+            self::BRANDING_VIEW => ['en' => 'View branding', 'pt_BR' => 'Visualizar marca', 'es' => 'Ver marca'],
+            self::BRANDING_EDIT => ['en' => 'Edit branding', 'pt_BR' => 'Editar marca', 'es' => 'Editar marca'],
+            self::BRANDING_PREVIEW => ['en' => 'Preview branding', 'pt_BR' => 'Pré-visualizar marca', 'es' => 'Previsualizar marca'],
+            self::BRANDING_PUBLISH => ['en' => 'Publish branding', 'pt_BR' => 'Publicar marca', 'es' => 'Publicar marca'],
 
             // Audit Log
-            self::AUDIT_VIEW => ['en' => 'View audit logs', 'pt_BR' => 'Visualizar logs de auditoria'],
-            self::AUDIT_EXPORT => ['en' => 'Export audit logs', 'pt_BR' => 'Exportar logs de auditoria'],
+            self::AUDIT_VIEW => ['en' => 'View audit logs', 'pt_BR' => 'Visualizar logs de auditoria', 'es' => 'Ver registros de auditoría'],
+            self::AUDIT_EXPORT => ['en' => 'Export audit logs', 'pt_BR' => 'Exportar logs de auditoria', 'es' => 'Exportar registros de auditoría'],
 
             // Multi-Language
-            self::LOCALES_VIEW => ['en' => 'View language settings', 'pt_BR' => 'Visualizar configurações de idioma'],
-            self::LOCALES_MANAGE => ['en' => 'Manage language settings', 'pt_BR' => 'Gerenciar configurações de idioma'],
+            self::LOCALES_VIEW => ['en' => 'View language settings', 'pt_BR' => 'Visualizar configurações de idioma', 'es' => 'Ver configuración de idioma'],
+            self::LOCALES_MANAGE => ['en' => 'Manage language settings', 'pt_BR' => 'Gerenciar configurações de idioma', 'es' => 'Gestionar configuración de idioma'],
 
             // Federation
-            self::FEDERATION_VIEW => ['en' => 'View federation settings', 'pt_BR' => 'Visualizar configurações de federação'],
-            self::FEDERATION_MANAGE => ['en' => 'Manage federation settings', 'pt_BR' => 'Gerenciar configurações de federação'],
-            self::FEDERATION_INVITE => ['en' => 'Invite tenants to federation', 'pt_BR' => 'Convidar tenants para federação'],
-            self::FEDERATION_LEAVE => ['en' => 'Leave federation group', 'pt_BR' => 'Sair do grupo de federação'],
+            self::FEDERATION_VIEW => ['en' => 'View federation settings', 'pt_BR' => 'Visualizar configurações de federação', 'es' => 'Ver configuración de federación'],
+            self::FEDERATION_MANAGE => ['en' => 'Manage federation settings', 'pt_BR' => 'Gerenciar configurações de federação', 'es' => 'Gestionar configuración de federación'],
+            self::FEDERATION_INVITE => ['en' => 'Invite tenants to federation', 'pt_BR' => 'Convidar tenants para federação', 'es' => 'Invitar inquilinos a la federación'],
+            self::FEDERATION_LEAVE => ['en' => 'Leave federation group', 'pt_BR' => 'Sair do grupo de federação', 'es' => 'Abandonar grupo de federación'],
         };
     }
 
@@ -252,7 +253,7 @@ enum TenantPermission: string
     /**
      * Get the description for a category.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array{en: string, pt_BR: string, es: string}
      */
     public static function categoryDescription(string $category): array
     {
@@ -263,7 +264,7 @@ enum TenantPermission: string
         }
 
         // Fallback for unknown categories
-        return ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)];
+        return ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)];
     }
 
     /**
@@ -350,7 +351,7 @@ enum TenantPermission: string
     /**
      * Get description for a permission value string.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array{en: string, pt_BR: string, es: string}
      */
     public static function descriptionFor(string $value): array
     {
@@ -366,6 +367,7 @@ enum TenantPermission: string
         return [
             'en' => "Manage {$category}",
             'pt_BR' => "Gerenciar {$category}",
+            'es' => "Gestionar {$category}",
         ];
     }
 

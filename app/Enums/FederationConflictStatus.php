@@ -28,9 +28,9 @@ enum FederationConflictStatus: string
     public function name(): array
     {
         return match ($this) {
-            self::PENDING => ['en' => 'Pending', 'pt_BR' => 'Pendente'],
-            self::RESOLVED => ['en' => 'Resolved', 'pt_BR' => 'Resolvido'],
-            self::DISMISSED => ['en' => 'Dismissed', 'pt_BR' => 'Descartado'],
+            self::PENDING => ['en' => 'Pending', 'pt_BR' => 'Pendente', 'es' => 'Pendiente'],
+            self::RESOLVED => ['en' => 'Resolved', 'pt_BR' => 'Resolvido', 'es' => 'Resuelto'],
+            self::DISMISSED => ['en' => 'Dismissed', 'pt_BR' => 'Descartado', 'es' => 'Descartado'],
         };
     }
 
@@ -45,14 +45,17 @@ enum FederationConflictStatus: string
             self::PENDING => [
                 'en' => 'Conflict needs to be reviewed and resolved',
                 'pt_BR' => 'Conflito precisa ser revisado e resolvido',
+                'es' => 'El conflicto necesita ser revisado y resuelto',
             ],
             self::RESOLVED => [
                 'en' => 'Conflict was resolved with a chosen value',
                 'pt_BR' => 'Conflito foi resolvido com um valor escolhido',
+                'es' => 'El conflicto fue resuelto con un valor elegido',
             ],
             self::DISMISSED => [
                 'en' => 'Conflict was dismissed without resolution',
                 'pt_BR' => 'Conflito foi descartado sem resolução',
+                'es' => 'El conflicto fue descartado sin resolución',
             ],
         };
     }

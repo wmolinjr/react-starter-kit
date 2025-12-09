@@ -228,6 +228,7 @@ class TenantSettingsService
      * Get all configuration settings for the config page.
      *
      * @return array{
+     *     tenant: array{id: string, name: string},
      *     config: array<string, mixed>,
      *     availableLocales: array<string>,
      *     localeLabels: array<string, string>,
@@ -238,6 +239,10 @@ class TenantSettingsService
     public function getConfigSettings(Tenant $tenant): array
     {
         return [
+            'tenant' => [
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+            ],
             'config' => $tenant->getAllConfig(),
             'availableLocales' => config('app.locales', ['en']),
             'localeLabels' => collect(config('app.locale_labels', []))

@@ -30,11 +30,11 @@ enum BillingPeriod: string
     public function name(): array
     {
         return match ($this) {
-            self::MONTHLY => ['en' => 'Monthly', 'pt_BR' => 'Mensal'],
-            self::YEARLY => ['en' => 'Yearly', 'pt_BR' => 'Anual'],
-            self::ONE_TIME => ['en' => 'One-time', 'pt_BR' => 'Único'],
-            self::METERED => ['en' => 'Metered', 'pt_BR' => 'Medido'],
-            self::MANUAL => ['en' => 'Manual', 'pt_BR' => 'Manual'],
+            self::MONTHLY => ['en' => 'Monthly', 'pt_BR' => 'Mensal', 'es' => 'Mensual'],
+            self::YEARLY => ['en' => 'Yearly', 'pt_BR' => 'Anual', 'es' => 'Anual'],
+            self::ONE_TIME => ['en' => 'One-time', 'pt_BR' => 'Único', 'es' => 'Único'],
+            self::METERED => ['en' => 'Metered', 'pt_BR' => 'Medido', 'es' => 'Medido'],
+            self::MANUAL => ['en' => 'Manual', 'pt_BR' => 'Manual', 'es' => 'Manual'],
         };
     }
 
@@ -49,22 +49,27 @@ enum BillingPeriod: string
             self::MONTHLY => [
                 'en' => 'Billed monthly',
                 'pt_BR' => 'Cobrado mensalmente',
+                'es' => 'Facturado mensualmente',
             ],
             self::YEARLY => [
                 'en' => 'Billed annually with discount',
                 'pt_BR' => 'Cobrado anualmente com desconto',
+                'es' => 'Facturado anualmente con descuento',
             ],
             self::ONE_TIME => [
                 'en' => 'One-time payment, no recurring charges',
                 'pt_BR' => 'Pagamento único, sem cobrança recorrente',
+                'es' => 'Pago único, sin cargos recurrentes',
             ],
             self::METERED => [
                 'en' => 'Usage-based billing',
                 'pt_BR' => 'Cobrança baseada em uso',
+                'es' => 'Facturación basada en uso',
             ],
             self::MANUAL => [
                 'en' => 'Manually managed billing',
                 'pt_BR' => 'Cobrança gerenciada manualmente',
+                'es' => 'Facturación gestionada manualmente',
             ],
         };
     }

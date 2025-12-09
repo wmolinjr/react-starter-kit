@@ -30,11 +30,11 @@ enum AddonStatus: string
     public function name(): array
     {
         return match ($this) {
-            self::PENDING => ['en' => 'Pending', 'pt_BR' => 'Pendente'],
-            self::ACTIVE => ['en' => 'Active', 'pt_BR' => 'Ativo'],
-            self::CANCELED => ['en' => 'Canceled', 'pt_BR' => 'Cancelado'],
-            self::EXPIRED => ['en' => 'Expired', 'pt_BR' => 'Expirado'],
-            self::FAILED => ['en' => 'Failed', 'pt_BR' => 'Falhou'],
+            self::PENDING => ['en' => 'Pending', 'pt_BR' => 'Pendente', 'es' => 'Pendiente'],
+            self::ACTIVE => ['en' => 'Active', 'pt_BR' => 'Ativo', 'es' => 'Activo'],
+            self::CANCELED => ['en' => 'Canceled', 'pt_BR' => 'Cancelado', 'es' => 'Cancelado'],
+            self::EXPIRED => ['en' => 'Expired', 'pt_BR' => 'Expirado', 'es' => 'Expirado'],
+            self::FAILED => ['en' => 'Failed', 'pt_BR' => 'Falhou', 'es' => 'Fallido'],
         };
     }
 
@@ -49,22 +49,27 @@ enum AddonStatus: string
             self::PENDING => [
                 'en' => 'Awaiting activation',
                 'pt_BR' => 'Aguardando ativação',
+                'es' => 'Esperando activación',
             ],
             self::ACTIVE => [
                 'en' => 'Currently active and in use',
                 'pt_BR' => 'Atualmente ativo e em uso',
+                'es' => 'Actualmente activo y en uso',
             ],
             self::CANCELED => [
                 'en' => 'Subscription was canceled',
                 'pt_BR' => 'Assinatura foi cancelada',
+                'es' => 'La suscripción fue cancelada',
             ],
             self::EXPIRED => [
                 'en' => 'Subscription period ended',
                 'pt_BR' => 'Período de assinatura encerrado',
+                'es' => 'El período de suscripción terminó',
             ],
             self::FAILED => [
                 'en' => 'Payment or activation failed',
                 'pt_BR' => 'Pagamento ou ativação falhou',
+                'es' => 'El pago o activación falló',
             ],
         };
     }

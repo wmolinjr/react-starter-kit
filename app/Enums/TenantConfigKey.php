@@ -36,13 +36,13 @@ enum TenantConfigKey: string
     public function name(): array
     {
         return match ($this) {
-            self::APP_NAME => ['en' => 'Application Name', 'pt_BR' => 'Nome da Aplicação'],
-            self::LOCALE => ['en' => 'Language', 'pt_BR' => 'Idioma'],
-            self::TIMEZONE => ['en' => 'Timezone', 'pt_BR' => 'Fuso Horário'],
-            self::MAIL_FROM_ADDRESS => ['en' => 'From Email', 'pt_BR' => 'E-mail de Origem'],
-            self::MAIL_FROM_NAME => ['en' => 'From Name', 'pt_BR' => 'Nome de Origem'],
-            self::CURRENCY => ['en' => 'Currency', 'pt_BR' => 'Moeda'],
-            self::CURRENCY_LOCALE => ['en' => 'Currency Locale', 'pt_BR' => 'Localidade da Moeda'],
+            self::APP_NAME => ['en' => 'Application Name', 'pt_BR' => 'Nome da Aplicação', 'es' => 'Nombre de la Aplicación'],
+            self::LOCALE => ['en' => 'Language', 'pt_BR' => 'Idioma', 'es' => 'Idioma'],
+            self::TIMEZONE => ['en' => 'Timezone', 'pt_BR' => 'Fuso Horário', 'es' => 'Zona Horaria'],
+            self::MAIL_FROM_ADDRESS => ['en' => 'From Email', 'pt_BR' => 'E-mail de Origem', 'es' => 'Correo de Origen'],
+            self::MAIL_FROM_NAME => ['en' => 'From Name', 'pt_BR' => 'Nome de Origem', 'es' => 'Nombre de Origen'],
+            self::CURRENCY => ['en' => 'Currency', 'pt_BR' => 'Moeda', 'es' => 'Moneda'],
+            self::CURRENCY_LOCALE => ['en' => 'Currency Locale', 'pt_BR' => 'Localidade da Moeda', 'es' => 'Configuración Regional de Moneda'],
         };
     }
 
@@ -57,30 +57,37 @@ enum TenantConfigKey: string
             self::APP_NAME => [
                 'en' => 'Custom name displayed to your users',
                 'pt_BR' => 'Nome personalizado exibido aos seus usuários',
+                'es' => 'Nombre personalizado mostrado a sus usuarios',
             ],
             self::LOCALE => [
                 'en' => 'Default language for your workspace',
                 'pt_BR' => 'Idioma padrão para o seu espaço de trabalho',
+                'es' => 'Idioma predeterminado para su espacio de trabajo',
             ],
             self::TIMEZONE => [
                 'en' => 'Timezone for dates and times',
                 'pt_BR' => 'Fuso horário para datas e horas',
+                'es' => 'Zona horaria para fechas y horas',
             ],
             self::MAIL_FROM_ADDRESS => [
                 'en' => 'Email address used for sending notifications',
                 'pt_BR' => 'Endereço de e-mail usado para enviar notificações',
+                'es' => 'Dirección de correo electrónico usada para enviar notificaciones',
             ],
             self::MAIL_FROM_NAME => [
                 'en' => 'Name displayed in email sender field',
                 'pt_BR' => 'Nome exibido no campo de remetente do e-mail',
+                'es' => 'Nombre mostrado en el campo de remitente del correo',
             ],
             self::CURRENCY => [
                 'en' => 'Default currency for billing',
                 'pt_BR' => 'Moeda padrão para faturamento',
+                'es' => 'Moneda predeterminada para facturación',
             ],
             self::CURRENCY_LOCALE => [
                 'en' => 'Locale for currency formatting',
                 'pt_BR' => 'Localidade para formatação de moeda',
+                'es' => 'Configuración regional para formato de moneda',
             ],
         };
     }
@@ -328,10 +335,10 @@ enum TenantConfigKey: string
     public static function categories(): array
     {
         return [
-            'branding' => ['en' => 'Branding', 'pt_BR' => 'Marca'],
-            'localization' => ['en' => 'Localization', 'pt_BR' => 'Localização'],
-            'email' => ['en' => 'Email', 'pt_BR' => 'E-mail'],
-            'payments' => ['en' => 'Payments', 'pt_BR' => 'Pagamentos'],
+            'branding' => ['en' => 'Branding', 'pt_BR' => 'Marca', 'es' => 'Marca'],
+            'localization' => ['en' => 'Localization', 'pt_BR' => 'Localização', 'es' => 'Localización'],
+            'email' => ['en' => 'Email', 'pt_BR' => 'E-mail', 'es' => 'Correo Electrónico'],
+            'payments' => ['en' => 'Payments', 'pt_BR' => 'Pagamentos', 'es' => 'Pagos'],
         ];
     }
 

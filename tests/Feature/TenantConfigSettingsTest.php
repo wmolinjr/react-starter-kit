@@ -45,11 +45,18 @@ class TenantConfigSettingsTest extends TestCase
     {
         $settings = $this->service->getConfigSettings($this->tenant);
 
+        $this->assertArrayHasKey('tenant', $settings);
         $this->assertArrayHasKey('config', $settings);
         $this->assertArrayHasKey('availableLocales', $settings);
         $this->assertArrayHasKey('localeLabels', $settings);
         $this->assertArrayHasKey('availableTimezones', $settings);
         $this->assertArrayHasKey('availableCurrencies', $settings);
+
+        // Verify tenant structure
+        $this->assertArrayHasKey('id', $settings['tenant']);
+        $this->assertArrayHasKey('name', $settings['tenant']);
+        $this->assertEquals($this->tenant->id, $settings['tenant']['id']);
+        $this->assertEquals($this->tenant->name, $settings['tenant']['name']);
     }
 
     public function test_get_config_settings_includes_all_config_keys(): void

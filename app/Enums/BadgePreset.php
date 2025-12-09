@@ -32,18 +32,18 @@ enum BadgePreset: string
     public function name(): array
     {
         return match ($this) {
-            self::MOST_POPULAR => ['en' => 'Most Popular', 'pt_BR' => 'Mais Popular'],
-            self::BEST_VALUE => ['en' => 'Best Value', 'pt_BR' => 'Melhor Custo-Benefício'],
-            self::BEST_FOR_TEAMS => ['en' => 'Best for Teams', 'pt_BR' => 'Melhor para Equipes'],
-            self::ENTERPRISE => ['en' => 'Enterprise', 'pt_BR' => 'Empresarial'],
-            self::ONE_TIME => ['en' => 'One Time', 'pt_BR' => 'Pagamento Único'],
-            self::NEW => ['en' => 'New', 'pt_BR' => 'Novo'],
-            self::LIMITED_TIME => ['en' => 'Limited Time', 'pt_BR' => 'Tempo Limitado'],
-            self::RECOMMENDED => ['en' => 'Recommended', 'pt_BR' => 'Recomendado'],
-            self::SALE => ['en' => 'Sale', 'pt_BR' => 'Promoção'],
-            self::HOT => ['en' => 'Hot', 'pt_BR' => 'Em Alta'],
-            self::STARTER => ['en' => 'Starter', 'pt_BR' => 'Iniciante'],
-            self::PRO => ['en' => 'Pro', 'pt_BR' => 'Profissional'],
+            self::MOST_POPULAR => ['en' => 'Most Popular', 'pt_BR' => 'Mais Popular', 'es' => 'Más Popular'],
+            self::BEST_VALUE => ['en' => 'Best Value', 'pt_BR' => 'Melhor Custo-Benefício', 'es' => 'Mejor Valor'],
+            self::BEST_FOR_TEAMS => ['en' => 'Best for Teams', 'pt_BR' => 'Melhor para Equipes', 'es' => 'Mejor para Equipos'],
+            self::ENTERPRISE => ['en' => 'Enterprise', 'pt_BR' => 'Empresarial', 'es' => 'Empresarial'],
+            self::ONE_TIME => ['en' => 'One Time', 'pt_BR' => 'Pagamento Único', 'es' => 'Pago Único'],
+            self::NEW => ['en' => 'New', 'pt_BR' => 'Novo', 'es' => 'Nuevo'],
+            self::LIMITED_TIME => ['en' => 'Limited Time', 'pt_BR' => 'Tempo Limitado', 'es' => 'Tiempo Limitado'],
+            self::RECOMMENDED => ['en' => 'Recommended', 'pt_BR' => 'Recomendado', 'es' => 'Recomendado'],
+            self::SALE => ['en' => 'Sale', 'pt_BR' => 'Promoção', 'es' => 'Oferta'],
+            self::HOT => ['en' => 'Hot', 'pt_BR' => 'Em Alta', 'es' => 'En Tendencia'],
+            self::STARTER => ['en' => 'Starter', 'pt_BR' => 'Iniciante', 'es' => 'Inicial'],
+            self::PRO => ['en' => 'Pro', 'pt_BR' => 'Profissional', 'es' => 'Profesional'],
         };
     }
 
@@ -55,18 +55,18 @@ enum BadgePreset: string
     public function description(): array
     {
         return match ($this) {
-            self::MOST_POPULAR => ['en' => 'Our most popular choice', 'pt_BR' => 'Nossa escolha mais popular'],
-            self::BEST_VALUE => ['en' => 'Best value for money', 'pt_BR' => 'Melhor custo-benefício'],
-            self::BEST_FOR_TEAMS => ['en' => 'Ideal for team collaboration', 'pt_BR' => 'Ideal para colaboração em equipe'],
-            self::ENTERPRISE => ['en' => 'For large organizations', 'pt_BR' => 'Para grandes organizações'],
-            self::ONE_TIME => ['en' => 'Pay once, use forever', 'pt_BR' => 'Pague uma vez, use para sempre'],
-            self::NEW => ['en' => 'Recently added feature', 'pt_BR' => 'Recurso adicionado recentemente'],
-            self::LIMITED_TIME => ['en' => 'Available for a limited time', 'pt_BR' => 'Disponível por tempo limitado'],
-            self::RECOMMENDED => ['en' => 'Recommended by our team', 'pt_BR' => 'Recomendado pela nossa equipe'],
-            self::SALE => ['en' => 'Special promotional price', 'pt_BR' => 'Preço promocional especial'],
-            self::HOT => ['en' => 'Trending right now', 'pt_BR' => 'Em alta agora'],
-            self::STARTER => ['en' => 'Perfect for getting started', 'pt_BR' => 'Perfeito para começar'],
-            self::PRO => ['en' => 'For professionals', 'pt_BR' => 'Para profissionais'],
+            self::MOST_POPULAR => ['en' => 'Our most popular choice', 'pt_BR' => 'Nossa escolha mais popular', 'es' => 'Nuestra opción más popular'],
+            self::BEST_VALUE => ['en' => 'Best value for money', 'pt_BR' => 'Melhor custo-benefício', 'es' => 'Mejor relación calidad-precio'],
+            self::BEST_FOR_TEAMS => ['en' => 'Ideal for team collaboration', 'pt_BR' => 'Ideal para colaboração em equipe', 'es' => 'Ideal para colaboración en equipo'],
+            self::ENTERPRISE => ['en' => 'For large organizations', 'pt_BR' => 'Para grandes organizações', 'es' => 'Para grandes organizaciones'],
+            self::ONE_TIME => ['en' => 'Pay once, use forever', 'pt_BR' => 'Pague uma vez, use para sempre', 'es' => 'Pague una vez, use para siempre'],
+            self::NEW => ['en' => 'Recently added feature', 'pt_BR' => 'Recurso adicionado recentemente', 'es' => 'Función añadida recientemente'],
+            self::LIMITED_TIME => ['en' => 'Available for a limited time', 'pt_BR' => 'Disponível por tempo limitado', 'es' => 'Disponible por tiempo limitado'],
+            self::RECOMMENDED => ['en' => 'Recommended by our team', 'pt_BR' => 'Recomendado pela nossa equipe', 'es' => 'Recomendado por nuestro equipo'],
+            self::SALE => ['en' => 'Special promotional price', 'pt_BR' => 'Preço promocional especial', 'es' => 'Precio promocional especial'],
+            self::HOT => ['en' => 'Trending right now', 'pt_BR' => 'Em alta agora', 'es' => 'En tendencia ahora'],
+            self::STARTER => ['en' => 'Perfect for getting started', 'pt_BR' => 'Perfeito para começar', 'es' => 'Perfecto para empezar'],
+            self::PRO => ['en' => 'For professionals', 'pt_BR' => 'Para profissionais', 'es' => 'Para profesionales'],
         };
     }
 

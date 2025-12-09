@@ -37,17 +37,17 @@ enum PlanFeature: string
     public function name(): array
     {
         return match ($this) {
-            self::BASE => ['en' => 'Base Features', 'pt_BR' => 'Recursos Base'],
-            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
-            self::CUSTOM_ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Roles Personalizados'],
-            self::API_ACCESS => ['en' => 'API Access', 'pt_BR' => 'Acesso à API'],
-            self::ADVANCED_REPORTS => ['en' => 'Advanced Reports', 'pt_BR' => 'Relatórios Avançados'],
-            self::SSO => ['en' => 'Single Sign-On (SSO)', 'pt_BR' => 'Single Sign-On (SSO)'],
-            self::WHITE_LABEL => ['en' => 'White Label', 'pt_BR' => 'White Label'],
-            self::AUDIT_LOG => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria'],
-            self::PRIORITY_SUPPORT => ['en' => 'Priority Support', 'pt_BR' => 'Suporte Prioritário'],
-            self::MULTI_LANGUAGE => ['en' => 'Multi-Language', 'pt_BR' => 'Multi-Idioma'],
-            self::FEDERATION => ['en' => 'User Federation', 'pt_BR' => 'Federação de Usuários'],
+            self::BASE => ['en' => 'Base Features', 'pt_BR' => 'Recursos Base', 'es' => 'Funciones Base'],
+            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos', 'es' => 'Proyectos'],
+            self::CUSTOM_ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Roles Personalizados', 'es' => 'Roles Personalizados'],
+            self::API_ACCESS => ['en' => 'API Access', 'pt_BR' => 'Acesso à API', 'es' => 'Acceso a API'],
+            self::ADVANCED_REPORTS => ['en' => 'Advanced Reports', 'pt_BR' => 'Relatórios Avançados', 'es' => 'Informes Avanzados'],
+            self::SSO => ['en' => 'Single Sign-On (SSO)', 'pt_BR' => 'Single Sign-On (SSO)', 'es' => 'Inicio de Sesión Único (SSO)'],
+            self::WHITE_LABEL => ['en' => 'White Label', 'pt_BR' => 'White Label', 'es' => 'Marca Blanca'],
+            self::AUDIT_LOG => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria', 'es' => 'Registro de Auditoría'],
+            self::PRIORITY_SUPPORT => ['en' => 'Priority Support', 'pt_BR' => 'Suporte Prioritário', 'es' => 'Soporte Prioritario'],
+            self::MULTI_LANGUAGE => ['en' => 'Multi-Language', 'pt_BR' => 'Multi-Idioma', 'es' => 'Multi-Idioma'],
+            self::FEDERATION => ['en' => 'User Federation', 'pt_BR' => 'Federação de Usuários', 'es' => 'Federación de Usuarios'],
         };
     }
 
@@ -62,46 +62,57 @@ enum PlanFeature: string
             self::BASE => [
                 'en' => 'Core team and settings management features',
                 'pt_BR' => 'Recursos básicos de gerenciamento de equipe e configurações',
+                'es' => 'Funciones básicas de gestión de equipo y configuración',
             ],
             self::PROJECTS => [
                 'en' => 'Create and manage projects with your team',
                 'pt_BR' => 'Crie e gerencie projetos com sua equipe',
+                'es' => 'Cree y gestione proyectos con su equipo',
             ],
             self::CUSTOM_ROLES => [
                 'en' => 'Create and manage custom roles with granular permissions',
                 'pt_BR' => 'Crie e gerencie roles personalizados com permissões granulares',
+                'es' => 'Cree y gestione roles personalizados con permisos granulares',
             ],
             self::API_ACCESS => [
                 'en' => 'Generate API tokens for external integrations',
                 'pt_BR' => 'Gere tokens de API para integrações externas',
+                'es' => 'Genere tokens de API para integraciones externas',
             ],
             self::ADVANCED_REPORTS => [
                 'en' => 'Access advanced analytics and custom report builder',
                 'pt_BR' => 'Acesse análises avançadas e construtor de relatórios personalizados',
+                'es' => 'Acceda a análisis avanzados y constructor de informes personalizados',
             ],
             self::SSO => [
                 'en' => 'Enable SAML/OIDC authentication for enterprise security',
                 'pt_BR' => 'Habilite autenticação SAML/OIDC para segurança empresarial',
+                'es' => 'Habilite autenticación SAML/OIDC para seguridad empresarial',
             ],
             self::WHITE_LABEL => [
                 'en' => 'Customize branding, colors, and remove platform branding',
                 'pt_BR' => 'Personalize marca, cores e remova a marca da plataforma',
+                'es' => 'Personalice marca, colores y elimine la marca de la plataforma',
             ],
             self::AUDIT_LOG => [
                 'en' => 'Track all user actions and system events',
                 'pt_BR' => 'Rastreie todas as ações de usuários e eventos do sistema',
+                'es' => 'Rastree todas las acciones de usuarios y eventos del sistema',
             ],
             self::PRIORITY_SUPPORT => [
                 'en' => '24/7 priority support with dedicated account manager',
                 'pt_BR' => 'Suporte prioritário 24/7 com gerente de conta dedicado',
+                'es' => 'Soporte prioritario 24/7 con gerente de cuenta dedicado',
             ],
             self::MULTI_LANGUAGE => [
                 'en' => 'Enable multiple language support for your users',
                 'pt_BR' => 'Habilite suporte a múltiplos idiomas para seus usuários',
+                'es' => 'Habilite soporte a múltiples idiomas para sus usuarios',
             ],
             self::FEDERATION => [
                 'en' => 'Sync users across multiple tenants in a federation group',
                 'pt_BR' => 'Sincronize usuários entre múltiplos tenants em um grupo de federação',
+                'es' => 'Sincronice usuarios entre múltiples tenants en un grupo de federación',
             ],
         };
     }
@@ -128,15 +139,15 @@ enum PlanFeature: string
     public static function categoryLabel(string $category): array
     {
         return match ($category) {
-            'modules' => ['en' => 'Modules', 'pt_BR' => 'Módulos'],
-            'security' => ['en' => 'Security', 'pt_BR' => 'Segurança'],
-            'integration' => ['en' => 'Integration', 'pt_BR' => 'Integração'],
-            'analytics' => ['en' => 'Analytics', 'pt_BR' => 'Análises'],
-            'customization' => ['en' => 'Customization', 'pt_BR' => 'Personalização'],
-            'support' => ['en' => 'Support', 'pt_BR' => 'Suporte'],
-            'collaboration' => ['en' => 'Collaboration', 'pt_BR' => 'Colaboração'],
-            'other' => ['en' => 'Other', 'pt_BR' => 'Outros'],
-            default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)],
+            'modules' => ['en' => 'Modules', 'pt_BR' => 'Módulos', 'es' => 'Módulos'],
+            'security' => ['en' => 'Security', 'pt_BR' => 'Segurança', 'es' => 'Seguridad'],
+            'integration' => ['en' => 'Integration', 'pt_BR' => 'Integração', 'es' => 'Integración'],
+            'analytics' => ['en' => 'Analytics', 'pt_BR' => 'Análises', 'es' => 'Análisis'],
+            'customization' => ['en' => 'Customization', 'pt_BR' => 'Personalização', 'es' => 'Personalización'],
+            'support' => ['en' => 'Support', 'pt_BR' => 'Suporte', 'es' => 'Soporte'],
+            'collaboration' => ['en' => 'Collaboration', 'pt_BR' => 'Colaboração', 'es' => 'Colaboración'],
+            'other' => ['en' => 'Other', 'pt_BR' => 'Outros', 'es' => 'Otros'],
+            default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)],
         };
     }
 

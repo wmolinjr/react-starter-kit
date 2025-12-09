@@ -27,9 +27,9 @@ enum TenantRole: string
     public function name(): array
     {
         return match ($this) {
-            self::OWNER => ['en' => 'Owner', 'pt_BR' => 'Proprietário'],
-            self::ADMIN => ['en' => 'Administrator', 'pt_BR' => 'Administrador'],
-            self::MEMBER => ['en' => 'Member', 'pt_BR' => 'Membro'],
+            self::OWNER => ['en' => 'Owner', 'pt_BR' => 'Proprietário', 'es' => 'Propietario'],
+            self::ADMIN => ['en' => 'Administrator', 'pt_BR' => 'Administrador', 'es' => 'Administrador'],
+            self::MEMBER => ['en' => 'Member', 'pt_BR' => 'Membro', 'es' => 'Miembro'],
         };
     }
 
@@ -56,14 +56,17 @@ enum TenantRole: string
             self::OWNER => [
                 'en' => 'Full access to all features including billing and API tokens',
                 'pt_BR' => 'Acesso total a todos os recursos incluindo faturamento e tokens de API',
+                'es' => 'Acceso total a todas las funciones incluyendo facturación y tokens de API',
             ],
             self::ADMIN => [
                 'en' => 'Manages team and projects, no access to billing or API tokens',
                 'pt_BR' => 'Gerencia equipe e projetos, sem acesso a faturamento ou tokens de API',
+                'es' => 'Gestiona equipo y proyectos, sin acceso a facturación o tokens de API',
             ],
             self::MEMBER => [
                 'en' => 'View access and can edit own projects',
                 'pt_BR' => 'Acesso de visualização e pode editar projetos próprios',
+                'es' => 'Acceso de visualización y puede editar proyectos propios',
             ],
         };
     }

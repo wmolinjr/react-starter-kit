@@ -35,14 +35,14 @@ enum PlanLimit: string
     public function name(): array
     {
         return match ($this) {
-            self::USERS => ['en' => 'User Seats', 'pt_BR' => 'Vagas de Usuário'],
-            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
-            self::STORAGE => ['en' => 'Storage', 'pt_BR' => 'Armazenamento'],
-            self::API_CALLS => ['en' => 'API Calls', 'pt_BR' => 'Chamadas de API'],
-            self::LOG_RETENTION => ['en' => 'Log Retention', 'pt_BR' => 'Retenção de Logs'],
-            self::FILE_UPLOAD_SIZE => ['en' => 'Max File Size', 'pt_BR' => 'Tamanho Máximo de Arquivo'],
-            self::CUSTOM_ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Roles Personalizados'],
-            self::LOCALES => ['en' => 'Languages', 'pt_BR' => 'Idiomas'],
+            self::USERS => ['en' => 'User Seats', 'pt_BR' => 'Vagas de Usuário', 'es' => 'Puestos de Usuario'],
+            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos', 'es' => 'Proyectos'],
+            self::STORAGE => ['en' => 'Storage', 'pt_BR' => 'Armazenamento', 'es' => 'Almacenamiento'],
+            self::API_CALLS => ['en' => 'API Calls', 'pt_BR' => 'Chamadas de API', 'es' => 'Llamadas de API'],
+            self::LOG_RETENTION => ['en' => 'Log Retention', 'pt_BR' => 'Retenção de Logs', 'es' => 'Retención de Logs'],
+            self::FILE_UPLOAD_SIZE => ['en' => 'Max File Size', 'pt_BR' => 'Tamanho Máximo de Arquivo', 'es' => 'Tamaño Máximo de Archivo'],
+            self::CUSTOM_ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Roles Personalizados', 'es' => 'Roles Personalizados'],
+            self::LOCALES => ['en' => 'Languages', 'pt_BR' => 'Idiomas', 'es' => 'Idiomas'],
         };
     }
 
@@ -57,34 +57,42 @@ enum PlanLimit: string
             self::USERS => [
                 'en' => 'Maximum number of team members',
                 'pt_BR' => 'Número máximo de membros da equipe',
+                'es' => 'Número máximo de miembros del equipo',
             ],
             self::PROJECTS => [
                 'en' => 'Maximum number of active projects',
                 'pt_BR' => 'Número máximo de projetos ativos',
+                'es' => 'Número máximo de proyectos activos',
             ],
             self::STORAGE => [
                 'en' => 'Total storage space available',
                 'pt_BR' => 'Espaço total de armazenamento disponível',
+                'es' => 'Espacio total de almacenamiento disponible',
             ],
             self::API_CALLS => [
                 'en' => 'Monthly API request limit',
                 'pt_BR' => 'Limite mensal de requisições de API',
+                'es' => 'Límite mensual de solicitudes de API',
             ],
             self::LOG_RETENTION => [
                 'en' => 'How long activity logs are kept',
                 'pt_BR' => 'Por quanto tempo os logs de atividade são mantidos',
+                'es' => 'Por cuánto tiempo se mantienen los logs de actividad',
             ],
             self::FILE_UPLOAD_SIZE => [
                 'en' => 'Maximum size per file upload',
                 'pt_BR' => 'Tamanho máximo por upload de arquivo',
+                'es' => 'Tamaño máximo por carga de archivo',
             ],
             self::CUSTOM_ROLES => [
                 'en' => 'Maximum number of custom roles that can be created',
                 'pt_BR' => 'Número máximo de roles personalizados que podem ser criados',
+                'es' => 'Número máximo de roles personalizados que se pueden crear',
             ],
             self::LOCALES => [
                 'en' => 'Maximum number of languages that can be enabled',
                 'pt_BR' => 'Número máximo de idiomas que podem ser habilitados',
+                'es' => 'Número máximo de idiomas que se pueden habilitar',
             ],
         };
     }
@@ -113,13 +121,13 @@ enum PlanLimit: string
     public function unitLabel(): array
     {
         return match ($this) {
-            self::USERS => ['en' => 'users', 'pt_BR' => 'usuários'],
-            self::PROJECTS => ['en' => 'projects', 'pt_BR' => 'projetos'],
-            self::STORAGE, self::FILE_UPLOAD_SIZE => ['en' => 'MB', 'pt_BR' => 'MB'],
-            self::API_CALLS => ['en' => 'calls/month', 'pt_BR' => 'chamadas/mês'],
-            self::LOG_RETENTION => ['en' => 'days', 'pt_BR' => 'dias'],
-            self::CUSTOM_ROLES => ['en' => 'roles', 'pt_BR' => 'roles'],
-            self::LOCALES => ['en' => 'languages', 'pt_BR' => 'idiomas'],
+            self::USERS => ['en' => 'users', 'pt_BR' => 'usuários', 'es' => 'usuarios'],
+            self::PROJECTS => ['en' => 'projects', 'pt_BR' => 'projetos', 'es' => 'proyectos'],
+            self::STORAGE, self::FILE_UPLOAD_SIZE => ['en' => 'MB', 'pt_BR' => 'MB', 'es' => 'MB'],
+            self::API_CALLS => ['en' => 'calls/month', 'pt_BR' => 'chamadas/mês', 'es' => 'llamadas/mes'],
+            self::LOG_RETENTION => ['en' => 'days', 'pt_BR' => 'dias', 'es' => 'días'],
+            self::CUSTOM_ROLES => ['en' => 'roles', 'pt_BR' => 'roles', 'es' => 'roles'],
+            self::LOCALES => ['en' => 'languages', 'pt_BR' => 'idiomas', 'es' => 'idiomas'],
         };
     }
 

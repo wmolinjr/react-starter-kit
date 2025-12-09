@@ -28,9 +28,9 @@ enum FederationSyncStrategy: string
     public function name(): array
     {
         return match ($this) {
-            self::MASTER_WINS => ['en' => 'Master Wins', 'pt_BR' => 'Mestre Vence'],
-            self::LAST_WRITE_WINS => ['en' => 'Last Write Wins', 'pt_BR' => 'Última Escrita Vence'],
-            self::MANUAL_REVIEW => ['en' => 'Manual Review', 'pt_BR' => 'Revisão Manual'],
+            self::MASTER_WINS => ['en' => 'Master Wins', 'pt_BR' => 'Mestre Vence', 'es' => 'Maestro Gana'],
+            self::LAST_WRITE_WINS => ['en' => 'Last Write Wins', 'pt_BR' => 'Última Escrita Vence', 'es' => 'Última Escritura Gana'],
+            self::MANUAL_REVIEW => ['en' => 'Manual Review', 'pt_BR' => 'Revisão Manual', 'es' => 'Revisión Manual'],
         };
     }
 
@@ -45,14 +45,17 @@ enum FederationSyncStrategy: string
             self::MASTER_WINS => [
                 'en' => 'Master tenant data always takes precedence in conflicts',
                 'pt_BR' => 'Dados do tenant mestre sempre têm precedência em conflitos',
+                'es' => 'Los datos del tenant maestro siempre tienen precedencia en conflictos',
             ],
             self::LAST_WRITE_WINS => [
                 'en' => 'Most recent change wins in case of conflicts',
                 'pt_BR' => 'Alteração mais recente vence em caso de conflitos',
+                'es' => 'El cambio más reciente gana en caso de conflictos',
             ],
             self::MANUAL_REVIEW => [
                 'en' => 'Conflicts are stored for manual resolution',
                 'pt_BR' => 'Conflitos são armazenados para resolução manual',
+                'es' => 'Los conflictos se almacenan para resolución manual',
             ],
         };
     }

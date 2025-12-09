@@ -30,11 +30,11 @@ enum FederatedUserLinkSyncStatus: string
     public function name(): array
     {
         return match ($this) {
-            self::SYNCED => ['en' => 'Synced', 'pt_BR' => 'Sincronizado'],
-            self::PENDING_SYNC => ['en' => 'Pending Sync', 'pt_BR' => 'Sincronização Pendente'],
-            self::SYNC_FAILED => ['en' => 'Sync Failed', 'pt_BR' => 'Falha na Sincronização'],
-            self::CONFLICT => ['en' => 'Conflict', 'pt_BR' => 'Conflito'],
-            self::DISABLED => ['en' => 'Disabled', 'pt_BR' => 'Desabilitado'],
+            self::SYNCED => ['en' => 'Synced', 'pt_BR' => 'Sincronizado', 'es' => 'Sincronizado'],
+            self::PENDING_SYNC => ['en' => 'Pending Sync', 'pt_BR' => 'Sincronização Pendente', 'es' => 'Sincronización Pendiente'],
+            self::SYNC_FAILED => ['en' => 'Sync Failed', 'pt_BR' => 'Falha na Sincronização', 'es' => 'Sincronización Fallida'],
+            self::CONFLICT => ['en' => 'Conflict', 'pt_BR' => 'Conflito', 'es' => 'Conflicto'],
+            self::DISABLED => ['en' => 'Disabled', 'pt_BR' => 'Desabilitado', 'es' => 'Deshabilitado'],
         };
     }
 
@@ -49,22 +49,27 @@ enum FederatedUserLinkSyncStatus: string
             self::SYNCED => [
                 'en' => 'User data is synchronized with this tenant',
                 'pt_BR' => 'Dados do usuário estão sincronizados com este tenant',
+                'es' => 'Los datos del usuario están sincronizados con este tenant',
             ],
             self::PENDING_SYNC => [
                 'en' => 'User data needs to be synchronized',
                 'pt_BR' => 'Dados do usuário precisam ser sincronizados',
+                'es' => 'Los datos del usuario necesitan ser sincronizados',
             ],
             self::SYNC_FAILED => [
                 'en' => 'Last synchronization attempt failed',
                 'pt_BR' => 'Última tentativa de sincronização falhou',
+                'es' => 'El último intento de sincronización falló',
             ],
             self::CONFLICT => [
                 'en' => 'Data conflict detected, requires resolution',
                 'pt_BR' => 'Conflito de dados detectado, requer resolução',
+                'es' => 'Conflicto de datos detectado, requiere resolución',
             ],
             self::DISABLED => [
                 'en' => 'Synchronization is disabled for this link',
                 'pt_BR' => 'Sincronização está desabilitada para este link',
+                'es' => 'La sincronización está deshabilitada para este enlace',
             ],
         };
     }

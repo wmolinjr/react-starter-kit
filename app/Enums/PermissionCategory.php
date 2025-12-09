@@ -52,18 +52,18 @@ enum PermissionCategory: string
     public function name(): array
     {
         return match ($this) {
-            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
-            self::TEAM => ['en' => 'Team', 'pt_BR' => 'Equipe'],
-            self::SETTINGS => ['en' => 'Settings', 'pt_BR' => 'Configurações'],
-            self::BILLING => ['en' => 'Billing', 'pt_BR' => 'Faturamento'],
-            self::API_TOKENS => ['en' => 'API Tokens', 'pt_BR' => 'Tokens de API'],
-            self::ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Papéis Personalizados'],
-            self::REPORTS => ['en' => 'Reports', 'pt_BR' => 'Relatórios'],
-            self::SSO => ['en' => 'Single Sign-On', 'pt_BR' => 'Login Único (SSO)'],
-            self::BRANDING => ['en' => 'Branding', 'pt_BR' => 'Marca'],
-            self::AUDIT => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria'],
-            self::LOCALES => ['en' => 'Languages', 'pt_BR' => 'Idiomas'],
-            self::FEDERATION => ['en' => 'Federation', 'pt_BR' => 'Federação'],
+            self::PROJECTS => ['en' => 'Projects', 'pt_BR' => 'Projetos', 'es' => 'Proyectos'],
+            self::TEAM => ['en' => 'Team', 'pt_BR' => 'Equipe', 'es' => 'Equipo'],
+            self::SETTINGS => ['en' => 'Settings', 'pt_BR' => 'Configurações', 'es' => 'Configuración'],
+            self::BILLING => ['en' => 'Billing', 'pt_BR' => 'Faturamento', 'es' => 'Facturación'],
+            self::API_TOKENS => ['en' => 'API Tokens', 'pt_BR' => 'Tokens de API', 'es' => 'Tokens de API'],
+            self::ROLES => ['en' => 'Custom Roles', 'pt_BR' => 'Papéis Personalizados', 'es' => 'Roles Personalizados'],
+            self::REPORTS => ['en' => 'Reports', 'pt_BR' => 'Relatórios', 'es' => 'Informes'],
+            self::SSO => ['en' => 'Single Sign-On', 'pt_BR' => 'Login Único (SSO)', 'es' => 'Inicio de Sesión Único (SSO)'],
+            self::BRANDING => ['en' => 'Branding', 'pt_BR' => 'Marca', 'es' => 'Marca'],
+            self::AUDIT => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria', 'es' => 'Registro de Auditoría'],
+            self::LOCALES => ['en' => 'Languages', 'pt_BR' => 'Idiomas', 'es' => 'Idiomas'],
+            self::FEDERATION => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
         };
     }
 

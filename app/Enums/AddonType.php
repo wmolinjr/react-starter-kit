@@ -26,10 +26,10 @@ enum AddonType: string
     public function name(): array
     {
         return match ($this) {
-            self::QUOTA => ['en' => 'Quota Increase', 'pt_BR' => 'Aumento de Cota'],
-            self::FEATURE => ['en' => 'Feature', 'pt_BR' => 'Funcionalidade'],
-            self::METERED => ['en' => 'Usage-Based', 'pt_BR' => 'Baseado em Uso'],
-            self::CREDIT => ['en' => 'Credit Pack', 'pt_BR' => 'Pacote de Créditos'],
+            self::QUOTA => ['en' => 'Quota Increase', 'pt_BR' => 'Aumento de Cota', 'es' => 'Aumento de Cuota'],
+            self::FEATURE => ['en' => 'Feature', 'pt_BR' => 'Funcionalidade', 'es' => 'Funcionalidad'],
+            self::METERED => ['en' => 'Usage-Based', 'pt_BR' => 'Baseado em Uso', 'es' => 'Basado en Uso'],
+            self::CREDIT => ['en' => 'Credit Pack', 'pt_BR' => 'Pacote de Créditos', 'es' => 'Paquete de Créditos'],
         };
     }
 
@@ -42,18 +42,22 @@ enum AddonType: string
             self::QUOTA => [
                 'en' => 'Increase your plan limits (storage, users, etc.)',
                 'pt_BR' => 'Aumente os limites do seu plano (armazenamento, usuários, etc.)',
+                'es' => 'Aumente los límites de su plan (almacenamiento, usuarios, etc.)',
             ],
             self::FEATURE => [
                 'en' => 'Unlock additional features',
                 'pt_BR' => 'Desbloqueie funcionalidades adicionais',
+                'es' => 'Desbloquee funcionalidades adicionales',
             ],
             self::METERED => [
                 'en' => 'Pay only for what you use',
                 'pt_BR' => 'Pague apenas pelo que usar',
+                'es' => 'Pague solo por lo que use',
             ],
             self::CREDIT => [
                 'en' => 'One-time purchase with validity period',
                 'pt_BR' => 'Compra única com período de validade',
+                'es' => 'Compra única con período de validez',
             ],
         };
     }
@@ -103,10 +107,10 @@ enum AddonType: string
     public function unitLabel(): array
     {
         return match ($this) {
-            self::QUOTA => ['en' => 'units', 'pt_BR' => 'unidades'],
-            self::FEATURE => ['en' => 'feature', 'pt_BR' => 'recurso'],
-            self::METERED => ['en' => 'units', 'pt_BR' => 'unidades'],
-            self::CREDIT => ['en' => 'credits', 'pt_BR' => 'créditos'],
+            self::QUOTA => ['en' => 'units', 'pt_BR' => 'unidades', 'es' => 'unidades'],
+            self::FEATURE => ['en' => 'feature', 'pt_BR' => 'recurso', 'es' => 'función'],
+            self::METERED => ['en' => 'units', 'pt_BR' => 'unidades', 'es' => 'unidades'],
+            self::CREDIT => ['en' => 'credits', 'pt_BR' => 'créditos', 'es' => 'créditos'],
         };
     }
 

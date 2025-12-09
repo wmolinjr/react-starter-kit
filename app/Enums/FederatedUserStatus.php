@@ -29,10 +29,10 @@ enum FederatedUserStatus: string
     public function name(): array
     {
         return match ($this) {
-            self::ACTIVE => ['en' => 'Active', 'pt_BR' => 'Ativo'],
-            self::SUSPENDED => ['en' => 'Suspended', 'pt_BR' => 'Suspenso'],
-            self::PENDING_REVIEW => ['en' => 'Pending Review', 'pt_BR' => 'Aguardando Revisão'],
-            self::PENDING_MASTER_SYNC => ['en' => 'Pending Master Sync', 'pt_BR' => 'Aguardando Sincronização do Mestre'],
+            self::ACTIVE => ['en' => 'Active', 'pt_BR' => 'Ativo', 'es' => 'Activo'],
+            self::SUSPENDED => ['en' => 'Suspended', 'pt_BR' => 'Suspenso', 'es' => 'Suspendido'],
+            self::PENDING_REVIEW => ['en' => 'Pending Review', 'pt_BR' => 'Aguardando Revisão', 'es' => 'Pendiente de Revisión'],
+            self::PENDING_MASTER_SYNC => ['en' => 'Pending Master Sync', 'pt_BR' => 'Aguardando Sincronização do Mestre', 'es' => 'Pendiente de Sincronización Maestra'],
         };
     }
 
@@ -47,18 +47,22 @@ enum FederatedUserStatus: string
             self::ACTIVE => [
                 'en' => 'User is active and synchronized across tenants',
                 'pt_BR' => 'Usuário está ativo e sincronizado entre tenants',
+                'es' => 'El usuario está activo y sincronizado entre tenants',
             ],
             self::SUSPENDED => [
                 'en' => 'User is suspended and not syncing',
                 'pt_BR' => 'Usuário está suspenso e não sincronizando',
+                'es' => 'El usuario está suspendido y no se sincroniza',
             ],
             self::PENDING_REVIEW => [
                 'en' => 'User has conflicts that need manual review',
                 'pt_BR' => 'Usuário possui conflitos que precisam de revisão manual',
+                'es' => 'El usuario tiene conflictos que necesitan revisión manual',
             ],
             self::PENDING_MASTER_SYNC => [
                 'en' => 'Awaiting creation in new master tenant after master change',
                 'pt_BR' => 'Aguardando criação no novo tenant mestre após troca de mestre',
+                'es' => 'Esperando creación en nuevo tenant maestro después del cambio de maestro',
             ],
         };
     }

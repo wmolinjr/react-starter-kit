@@ -108,7 +108,7 @@ return [
     |
     */
 
-    'locales' => explode(',', env('APP_LOCALES', 'en,pt_BR')),
+    'locales' => explode(',', env('APP_LOCALES', 'en,pt_BR,es')),
 
     /*
     |--------------------------------------------------------------------------

@@ -61,6 +61,13 @@ class GenerateTypes extends Command
      */
     protected array $enums = [];
 
+    /**
+     * Track missing translations per locale.
+     *
+     * @var array<string, array<string>>
+     */
+    protected array $missingTranslations = [];
+
     public function __construct()
     {
         parent::__construct();
@@ -89,6 +96,7 @@ class GenerateTypes extends Command
 
         $this->newLine();
         $this->displaySummary();
+        $this->reportMissingTranslations();
 
         return self::SUCCESS;
     }
@@ -131,7 +139,7 @@ class GenerateTypes extends Command
                     'is_one_time' => $case->isOneTime(),
                     'has_validity' => $case->hasValidity(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.addon_type',
             ],
             'AddonStatus' => [
@@ -156,7 +164,7 @@ class GenerateTypes extends Command
                     'is_usable' => $case->isUsable(),
                     'is_terminal' => $case->isTerminal(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.addon_status',
             ],
             'BillingPeriod' => [
@@ -179,7 +187,7 @@ class GenerateTypes extends Command
                     'badge_variant' => $case->badgeVariant(),
                     'is_recurring' => $case->isRecurring(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.billing_period',
             ],
             'PlanFeature' => [
@@ -206,7 +214,7 @@ class GenerateTypes extends Command
                     'permissions' => $case->permissions(),
                     'is_customizable' => $case->isCustomizable(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.plan_feature',
             ],
             'PlanLimit' => [
@@ -237,7 +245,7 @@ class GenerateTypes extends Command
                     'allows_unlimited' => $case->allowsUnlimited(),
                     'is_customizable' => $case->isCustomizable(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.plan_limit',
             ],
             'TenantRole' => [
@@ -260,7 +268,7 @@ class GenerateTypes extends Command
                     'badge_variant' => $case->badgeVariant(),
                     'is_system' => $case->isSystemRole(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.tenant_role',
             ],
             'FederatedUserStatus' => [
@@ -285,7 +293,7 @@ class GenerateTypes extends Command
                     'can_sync' => $case->canSync(),
                     'is_pending' => $case->isPending(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'admin.federation.user_status',
             ],
             'FederatedUserLinkSyncStatus' => [
@@ -310,7 +318,7 @@ class GenerateTypes extends Command
                     'needs_sync' => $case->needsSync(),
                     'has_issue' => $case->hasIssue(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'admin.federation.link_status',
             ],
             'FederationConflictStatus' => [
@@ -335,7 +343,7 @@ class GenerateTypes extends Command
                     'requires_action' => $case->requiresAction(),
                     'is_terminal' => $case->isTerminal(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'admin.federation.conflict',
             ],
             'FederationSyncStrategy' => [
@@ -360,7 +368,7 @@ class GenerateTypes extends Command
                     'creates_conflicts' => $case->createsConflicts(),
                     'auto_resolves' => $case->autoResolves(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'admin.federation.sync_strategy',
             ],
             'CentralPermission' => [
@@ -385,7 +393,7 @@ class GenerateTypes extends Command
                     'category' => $case->category(),
                     'action' => $case->action(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'permissions.central',
             ],
             'TenantPermission' => [
@@ -410,7 +418,7 @@ class GenerateTypes extends Command
                     'category' => $case->category(),
                     'action' => $case->action(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'permissions.tenant',
             ],
             'PermissionCategory' => [
@@ -429,7 +437,7 @@ class GenerateTypes extends Command
                     'color' => $case->color(),
                     'badge_variant' => $case->badgeVariant(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.permission_category',
             ],
             'PermissionAction' => [
@@ -442,7 +450,7 @@ class GenerateTypes extends Command
                     'value' => $case->value,
                     'label' => $case->label('en'),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.permission_action',
             ],
             'BadgePreset' => [
@@ -469,7 +477,7 @@ class GenerateTypes extends Command
                     'text' => $case->colorClasses()['text'],
                     'border' => $case->colorClasses()['border'],
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.badge_preset',
             ],
             'TenantConfigKey' => [
@@ -494,7 +502,7 @@ class GenerateTypes extends Command
                     'category' => $case->category(),
                     'default_value' => $case->defaultValue(),
                 ],
-                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.tenant_config_key',
             ],
         ];
@@ -1117,7 +1125,8 @@ TS;
 
     protected function generateTranslations(): void
     {
-        $locales = ['en', 'pt_BR'];
+        // Get locales from config (reads from APP_LOCALES env)
+        $locales = config('app.locales', ['en', 'pt_BR', 'es']);
 
         foreach ($locales as $locale) {
             $this->updateTranslationFile($locale);
@@ -1152,7 +1161,7 @@ TS;
             foreach ($cases as $case) {
                 $key = "{$prefix}.{$case->value}";
                 $enumKeys[] = $key;
-                $translations[$key] = $getter($case, $locale);
+                $translations[$key] = $getter($case, $locale, $key);
             }
         }
 
@@ -1195,6 +1204,76 @@ TS;
     // =========================================================================
     // UTILITIES
     // =========================================================================
+
+    /**
+     * Get translation with fallback to default locale.
+     *
+     * Safeguard: If locale doesn't exist in translations array,
+     * falls back to APP_FALLBACK_LOCALE (default: 'en') to avoid
+     * showing raw strings in the UI.
+     *
+     * @param  array<string, string>  $translations  Keyed by locale
+     * @param  string  $locale  Desired locale
+     * @param  string|null  $key  Translation key for tracking missing translations
+     * @return string Translation in requested locale or fallback
+     */
+    protected function getTranslation(array $translations, string $locale, ?string $key = null): string
+    {
+        // If locale exists, return it directly
+        if (isset($translations[$locale])) {
+            return $translations[$locale];
+        }
+
+        // Track missing translation
+        if ($key !== null) {
+            $this->missingTranslations[$locale][] = $key;
+        }
+
+        // Fallback chain: APP_FALLBACK_LOCALE -> 'en' -> first available -> empty
+        $fallback = config('app.fallback_locale', 'en');
+
+        return $translations[$fallback] ?? $translations['en'] ?? array_values($translations)[0] ?? '';
+    }
+
+    /**
+     * Report missing translations at the end of generation.
+     */
+    protected function reportMissingTranslations(): void
+    {
+        if (empty($this->missingTranslations)) {
+            return;
+        }
+
+        $this->newLine();
+        $this->warn('  ╔══════════════════════════════════════════════════════════╗');
+        $this->warn('  ║  Missing Translations (used fallback)                    ║');
+        $this->warn('  ╚══════════════════════════════════════════════════════════╝');
+        $this->newLine();
+
+        $fallback = config('app.fallback_locale', 'en');
+
+        foreach ($this->missingTranslations as $locale => $keys) {
+            $uniqueKeys = array_unique($keys);
+            $count = count($uniqueKeys);
+
+            $this->warn("  ⚠ Locale '{$locale}': {$count} translations missing (using '{$fallback}' fallback)");
+
+            // Show first 5 missing keys as examples
+            $examples = array_slice($uniqueKeys, 0, 5);
+            foreach ($examples as $key) {
+                $this->line("      - {$key}");
+            }
+
+            if ($count > 5) {
+                $remaining = $count - 5;
+                $this->line("      ... and {$remaining} more");
+            }
+        }
+
+        $this->newLine();
+        $this->info('  💡 To fix: Add translations in the enum\'s name() method for the missing locales.');
+        $this->newLine();
+    }
 
     protected function phpToTypescript(array $data): string
     {

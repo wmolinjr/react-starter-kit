@@ -76,37 +76,38 @@ enum CentralPermission: string
         $action = $this->action();
 
         $categoryNames = [
-            'tenants' => ['en' => 'Tenants', 'pt_BR' => 'Tenants'],
-            'users' => ['en' => 'Users', 'pt_BR' => 'Usuários'],
-            'plans' => ['en' => 'Plans', 'pt_BR' => 'Planos'],
-            'catalog' => ['en' => 'Catalog', 'pt_BR' => 'Catálogo'],
-            'addons' => ['en' => 'Addons', 'pt_BR' => 'Add-ons'],
-            'roles' => ['en' => 'Roles', 'pt_BR' => 'Papéis'],
-            'system' => ['en' => 'System', 'pt_BR' => 'Sistema'],
-            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
+            'tenants' => ['en' => 'Tenants', 'pt_BR' => 'Tenants', 'es' => 'Inquilinos'],
+            'users' => ['en' => 'Users', 'pt_BR' => 'Usuários', 'es' => 'Usuarios'],
+            'plans' => ['en' => 'Plans', 'pt_BR' => 'Planos', 'es' => 'Planes'],
+            'catalog' => ['en' => 'Catalog', 'pt_BR' => 'Catálogo', 'es' => 'Catálogo'],
+            'addons' => ['en' => 'Addons', 'pt_BR' => 'Add-ons', 'es' => 'Complementos'],
+            'roles' => ['en' => 'Roles', 'pt_BR' => 'Papéis', 'es' => 'Roles'],
+            'system' => ['en' => 'System', 'pt_BR' => 'Sistema', 'es' => 'Sistema'],
+            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
         ];
 
         $actionNames = [
-            'view' => ['en' => 'View', 'pt_BR' => 'Visualizar'],
-            'show' => ['en' => 'Show Details', 'pt_BR' => 'Ver Detalhes'],
-            'create' => ['en' => 'Create', 'pt_BR' => 'Criar'],
-            'edit' => ['en' => 'Edit', 'pt_BR' => 'Editar'],
-            'delete' => ['en' => 'Delete', 'pt_BR' => 'Excluir'],
-            'sync' => ['en' => 'Sync', 'pt_BR' => 'Sincronizar'],
-            'impersonate' => ['en' => 'Impersonate', 'pt_BR' => 'Personificar'],
-            'logs' => ['en' => 'Logs', 'pt_BR' => 'Logs'],
-            'revenue' => ['en' => 'Revenue', 'pt_BR' => 'Receita'],
-            'grant' => ['en' => 'Grant', 'pt_BR' => 'Conceder'],
-            'revoke' => ['en' => 'Revoke', 'pt_BR' => 'Revogar'],
-            'manageConflicts' => ['en' => 'Manage Conflicts', 'pt_BR' => 'Gerenciar Conflitos'],
+            'view' => ['en' => 'View', 'pt_BR' => 'Visualizar', 'es' => 'Ver'],
+            'show' => ['en' => 'Show Details', 'pt_BR' => 'Ver Detalhes', 'es' => 'Ver Detalles'],
+            'create' => ['en' => 'Create', 'pt_BR' => 'Criar', 'es' => 'Crear'],
+            'edit' => ['en' => 'Edit', 'pt_BR' => 'Editar', 'es' => 'Editar'],
+            'delete' => ['en' => 'Delete', 'pt_BR' => 'Excluir', 'es' => 'Eliminar'],
+            'sync' => ['en' => 'Sync', 'pt_BR' => 'Sincronizar', 'es' => 'Sincronizar'],
+            'impersonate' => ['en' => 'Impersonate', 'pt_BR' => 'Personificar', 'es' => 'Personificar'],
+            'logs' => ['en' => 'Logs', 'pt_BR' => 'Logs', 'es' => 'Registros'],
+            'revenue' => ['en' => 'Revenue', 'pt_BR' => 'Receita', 'es' => 'Ingresos'],
+            'grant' => ['en' => 'Grant', 'pt_BR' => 'Conceder', 'es' => 'Conceder'],
+            'revoke' => ['en' => 'Revoke', 'pt_BR' => 'Revogar', 'es' => 'Revocar'],
+            'manageConflicts' => ['en' => 'Manage Conflicts', 'pt_BR' => 'Gerenciar Conflitos', 'es' => 'Gestionar Conflictos'],
         ];
 
-        $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)];
-        $actName = $actionNames[$action] ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action)];
+        $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)];
+        $actName = $actionNames[$action] ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action), 'es' => ucfirst($action)];
 
         return [
             'en' => "{$catName['en']}: {$actName['en']}",
             'pt_BR' => "{$catName['pt_BR']}: {$actName['pt_BR']}",
+            'es' => "{$catName['es']}: {$actName['es']}",
         ];
     }
 
@@ -119,55 +120,55 @@ enum CentralPermission: string
     {
         return match ($this) {
             // Tenants
-            self::TENANTS_VIEW => ['en' => 'View all tenants', 'pt_BR' => 'Visualizar todos os tenants'],
-            self::TENANTS_SHOW => ['en' => 'View tenant details', 'pt_BR' => 'Visualizar detalhes do tenant'],
-            self::TENANTS_EDIT => ['en' => 'Edit tenant settings', 'pt_BR' => 'Editar configurações do tenant'],
-            self::TENANTS_DELETE => ['en' => 'Delete tenants', 'pt_BR' => 'Excluir tenants'],
-            self::TENANTS_IMPERSONATE => ['en' => 'Impersonate tenant users', 'pt_BR' => 'Personificar usuários de tenants'],
+            self::TENANTS_VIEW => ['en' => 'View all tenants', 'pt_BR' => 'Visualizar todos os tenants', 'es' => 'Ver todos los inquilinos'],
+            self::TENANTS_SHOW => ['en' => 'View tenant details', 'pt_BR' => 'Visualizar detalhes do tenant', 'es' => 'Ver detalles del inquilino'],
+            self::TENANTS_EDIT => ['en' => 'Edit tenant settings', 'pt_BR' => 'Editar configurações do tenant', 'es' => 'Editar configuración del inquilino'],
+            self::TENANTS_DELETE => ['en' => 'Delete tenants', 'pt_BR' => 'Excluir tenants', 'es' => 'Eliminar inquilinos'],
+            self::TENANTS_IMPERSONATE => ['en' => 'Impersonate tenant users', 'pt_BR' => 'Personificar usuários de tenants', 'es' => 'Personificar usuarios de inquilinos'],
 
             // Users
-            self::USERS_VIEW => ['en' => 'View all users', 'pt_BR' => 'Visualizar todos os usuários'],
-            self::USERS_SHOW => ['en' => 'View user details', 'pt_BR' => 'Visualizar detalhes do usuário'],
-            self::USERS_EDIT => ['en' => 'Edit user details', 'pt_BR' => 'Editar detalhes do usuário'],
-            self::USERS_DELETE => ['en' => 'Delete users', 'pt_BR' => 'Excluir usuários'],
+            self::USERS_VIEW => ['en' => 'View all users', 'pt_BR' => 'Visualizar todos os usuários', 'es' => 'Ver todos los usuarios'],
+            self::USERS_SHOW => ['en' => 'View user details', 'pt_BR' => 'Visualizar detalhes do usuário', 'es' => 'Ver detalles del usuario'],
+            self::USERS_EDIT => ['en' => 'Edit user details', 'pt_BR' => 'Editar detalhes do usuário', 'es' => 'Editar detalles del usuario'],
+            self::USERS_DELETE => ['en' => 'Delete users', 'pt_BR' => 'Excluir usuários', 'es' => 'Eliminar usuarios'],
 
             // Plans
-            self::PLANS_VIEW => ['en' => 'View all plans', 'pt_BR' => 'Visualizar todos os planos'],
-            self::PLANS_CREATE => ['en' => 'Create new plans', 'pt_BR' => 'Criar novos planos'],
-            self::PLANS_EDIT => ['en' => 'Edit plans', 'pt_BR' => 'Editar planos'],
-            self::PLANS_DELETE => ['en' => 'Delete plans', 'pt_BR' => 'Excluir planos'],
-            self::PLANS_SYNC => ['en' => 'Sync plans with Stripe', 'pt_BR' => 'Sincronizar planos com Stripe'],
+            self::PLANS_VIEW => ['en' => 'View all plans', 'pt_BR' => 'Visualizar todos os planos', 'es' => 'Ver todos los planes'],
+            self::PLANS_CREATE => ['en' => 'Create new plans', 'pt_BR' => 'Criar novos planos', 'es' => 'Crear nuevos planes'],
+            self::PLANS_EDIT => ['en' => 'Edit plans', 'pt_BR' => 'Editar planos', 'es' => 'Editar planes'],
+            self::PLANS_DELETE => ['en' => 'Delete plans', 'pt_BR' => 'Excluir planos', 'es' => 'Eliminar planes'],
+            self::PLANS_SYNC => ['en' => 'Sync plans with Stripe', 'pt_BR' => 'Sincronizar planos com Stripe', 'es' => 'Sincronizar planes con Stripe'],
 
             // Catalog
-            self::CATALOG_VIEW => ['en' => 'View addon catalog', 'pt_BR' => 'Visualizar catálogo de add-ons'],
-            self::CATALOG_CREATE => ['en' => 'Create new addons', 'pt_BR' => 'Criar novos add-ons'],
-            self::CATALOG_EDIT => ['en' => 'Edit addons', 'pt_BR' => 'Editar add-ons'],
-            self::CATALOG_DELETE => ['en' => 'Delete addons', 'pt_BR' => 'Excluir add-ons'],
-            self::CATALOG_SYNC => ['en' => 'Sync addons with Stripe', 'pt_BR' => 'Sincronizar add-ons com Stripe'],
+            self::CATALOG_VIEW => ['en' => 'View addon catalog', 'pt_BR' => 'Visualizar catálogo de add-ons', 'es' => 'Ver catálogo de complementos'],
+            self::CATALOG_CREATE => ['en' => 'Create new addons', 'pt_BR' => 'Criar novos add-ons', 'es' => 'Crear nuevos complementos'],
+            self::CATALOG_EDIT => ['en' => 'Edit addons', 'pt_BR' => 'Editar add-ons', 'es' => 'Editar complementos'],
+            self::CATALOG_DELETE => ['en' => 'Delete addons', 'pt_BR' => 'Excluir add-ons', 'es' => 'Eliminar complementos'],
+            self::CATALOG_SYNC => ['en' => 'Sync addons with Stripe', 'pt_BR' => 'Sincronizar add-ons com Stripe', 'es' => 'Sincronizar complementos con Stripe'],
 
             // Addons
-            self::ADDONS_VIEW => ['en' => 'View tenant addons', 'pt_BR' => 'Visualizar add-ons de tenants'],
-            self::ADDONS_REVENUE => ['en' => 'View addon revenue reports', 'pt_BR' => 'Visualizar relatórios de receita de add-ons'],
-            self::ADDONS_GRANT => ['en' => 'Grant addons to tenants', 'pt_BR' => 'Conceder add-ons a tenants'],
-            self::ADDONS_REVOKE => ['en' => 'Revoke addons from tenants', 'pt_BR' => 'Revogar add-ons de tenants'],
+            self::ADDONS_VIEW => ['en' => 'View tenant addons', 'pt_BR' => 'Visualizar add-ons de tenants', 'es' => 'Ver complementos de inquilinos'],
+            self::ADDONS_REVENUE => ['en' => 'View addon revenue reports', 'pt_BR' => 'Visualizar relatórios de receita de add-ons', 'es' => 'Ver informes de ingresos de complementos'],
+            self::ADDONS_GRANT => ['en' => 'Grant addons to tenants', 'pt_BR' => 'Conceder add-ons a tenants', 'es' => 'Conceder complementos a inquilinos'],
+            self::ADDONS_REVOKE => ['en' => 'Revoke addons from tenants', 'pt_BR' => 'Revogar add-ons de tenants', 'es' => 'Revocar complementos de inquilinos'],
 
             // Roles
-            self::ROLES_VIEW => ['en' => 'View central roles', 'pt_BR' => 'Visualizar papéis centrais'],
-            self::ROLES_CREATE => ['en' => 'Create central roles', 'pt_BR' => 'Criar papéis centrais'],
-            self::ROLES_EDIT => ['en' => 'Edit central roles', 'pt_BR' => 'Editar papéis centrais'],
-            self::ROLES_DELETE => ['en' => 'Delete central roles', 'pt_BR' => 'Excluir papéis centrais'],
+            self::ROLES_VIEW => ['en' => 'View central roles', 'pt_BR' => 'Visualizar papéis centrais', 'es' => 'Ver roles centrales'],
+            self::ROLES_CREATE => ['en' => 'Create central roles', 'pt_BR' => 'Criar papéis centrais', 'es' => 'Crear roles centrales'],
+            self::ROLES_EDIT => ['en' => 'Edit central roles', 'pt_BR' => 'Editar papéis centrais', 'es' => 'Editar roles centrales'],
+            self::ROLES_DELETE => ['en' => 'Delete central roles', 'pt_BR' => 'Excluir papéis centrais', 'es' => 'Eliminar roles centrales'],
 
             // System
-            self::SYSTEM_VIEW => ['en' => 'View system settings', 'pt_BR' => 'Visualizar configurações do sistema'],
-            self::SYSTEM_EDIT => ['en' => 'Edit system settings', 'pt_BR' => 'Editar configurações do sistema'],
-            self::SYSTEM_LOGS => ['en' => 'View system logs', 'pt_BR' => 'Visualizar logs do sistema'],
+            self::SYSTEM_VIEW => ['en' => 'View system settings', 'pt_BR' => 'Visualizar configurações do sistema', 'es' => 'Ver configuración del sistema'],
+            self::SYSTEM_EDIT => ['en' => 'Edit system settings', 'pt_BR' => 'Editar configurações do sistema', 'es' => 'Editar configuración del sistema'],
+            self::SYSTEM_LOGS => ['en' => 'View system logs', 'pt_BR' => 'Visualizar logs do sistema', 'es' => 'Ver registros del sistema'],
 
             // Federation
-            self::FEDERATION_VIEW => ['en' => 'View federation groups', 'pt_BR' => 'Visualizar grupos de federação'],
-            self::FEDERATION_CREATE => ['en' => 'Create federation groups', 'pt_BR' => 'Criar grupos de federação'],
-            self::FEDERATION_EDIT => ['en' => 'Edit federation groups', 'pt_BR' => 'Editar grupos de federação'],
-            self::FEDERATION_DELETE => ['en' => 'Delete federation groups', 'pt_BR' => 'Excluir grupos de federação'],
-            self::FEDERATION_MANAGE_CONFLICTS => ['en' => 'Manage federation conflicts', 'pt_BR' => 'Gerenciar conflitos de federação'],
+            self::FEDERATION_VIEW => ['en' => 'View federation groups', 'pt_BR' => 'Visualizar grupos de federação', 'es' => 'Ver grupos de federación'],
+            self::FEDERATION_CREATE => ['en' => 'Create federation groups', 'pt_BR' => 'Criar grupos de federação', 'es' => 'Crear grupos de federación'],
+            self::FEDERATION_EDIT => ['en' => 'Edit federation groups', 'pt_BR' => 'Editar grupos de federação', 'es' => 'Editar grupos de federación'],
+            self::FEDERATION_DELETE => ['en' => 'Delete federation groups', 'pt_BR' => 'Excluir grupos de federação', 'es' => 'Eliminar grupos de federación'],
+            self::FEDERATION_MANAGE_CONFLICTS => ['en' => 'Manage federation conflicts', 'pt_BR' => 'Gerenciar conflitos de federação', 'es' => 'Gestionar conflictos de federación'],
         };
     }
 
@@ -262,20 +263,20 @@ enum CentralPermission: string
     /**
      * Get the description for a category.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array{en: string, pt_BR: string, es: string}
      */
     public static function categoryDescription(string $category): array
     {
         return match ($category) {
-            'tenants' => ['en' => 'Tenants', 'pt_BR' => 'Tenants'],
-            'users' => ['en' => 'Users', 'pt_BR' => 'Usuários'],
-            'plans' => ['en' => 'Plans', 'pt_BR' => 'Planos'],
-            'catalog' => ['en' => 'Addon Catalog', 'pt_BR' => 'Catálogo de Add-ons'],
-            'addons' => ['en' => 'Tenant Addons', 'pt_BR' => 'Add-ons de Tenants'],
-            'roles' => ['en' => 'Central Roles', 'pt_BR' => 'Papéis Centrais'],
-            'system' => ['en' => 'System', 'pt_BR' => 'Sistema'],
-            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
-            default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)],
+            'tenants' => ['en' => 'Tenants', 'pt_BR' => 'Tenants', 'es' => 'Inquilinos'],
+            'users' => ['en' => 'Users', 'pt_BR' => 'Usuários', 'es' => 'Usuarios'],
+            'plans' => ['en' => 'Plans', 'pt_BR' => 'Planos', 'es' => 'Planes'],
+            'catalog' => ['en' => 'Addon Catalog', 'pt_BR' => 'Catálogo de Add-ons', 'es' => 'Catálogo de Complementos'],
+            'addons' => ['en' => 'Tenant Addons', 'pt_BR' => 'Add-ons de Tenants', 'es' => 'Complementos de Inquilinos'],
+            'roles' => ['en' => 'Central Roles', 'pt_BR' => 'Papéis Centrais', 'es' => 'Roles Centrales'],
+            'system' => ['en' => 'System', 'pt_BR' => 'Sistema', 'es' => 'Sistema'],
+            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
+            default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)],
         };
     }
 
@@ -340,7 +341,7 @@ enum CentralPermission: string
     /**
      * Get description for a permission value string.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array{en: string, pt_BR: string, es: string}
      */
     public static function descriptionFor(string $value): array
     {
@@ -356,6 +357,7 @@ enum CentralPermission: string
         return [
             'en' => "Manage {$category}",
             'pt_BR' => "Gerenciar {$category}",
+            'es' => "Gestionar {$category}",
         ];
     }
 
