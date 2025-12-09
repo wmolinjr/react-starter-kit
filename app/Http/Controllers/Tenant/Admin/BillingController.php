@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\CheckoutRequest;
+use App\Http\Resources\Tenant\BillingPlanResource;
+use App\Http\Resources\Tenant\InvoiceDetailResource;
+use App\Http\Resources\Tenant\InvoiceResource;
+use App\Http\Resources\Tenant\SubscriptionResource;
 use App\Services\Tenant\BillingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -40,9 +44,9 @@ class BillingController extends Controller implements HasMiddleware
         $overview = $this->billingService->getBillingOverview($tenant);
 
         return Inertia::render('tenant/admin/billing/index', [
-            'plans' => $overview['plans'],
-            'subscription' => $overview['subscription'],
-            'invoices' => $overview['invoices'],
+            'plans' => BillingPlanResource::collection(collect($overview['plans'])),
+            'subscription' => $overview['subscription'] ? new SubscriptionResource($overview['subscription']) : null,
+            'invoices' => InvoiceResource::collection($overview['invoices']),
         ]);
     }
 
@@ -81,7 +85,7 @@ class BillingController extends Controller implements HasMiddleware
     public function invoices(): Response
     {
         return Inertia::render('tenant/admin/billing/invoices', [
-            'invoices' => $this->billingService->getDetailedInvoices(tenant()),
+            'invoices' => InvoiceDetailResource::collection($this->billingService->getDetailedInvoices(tenant())),
         ]);
     }
 

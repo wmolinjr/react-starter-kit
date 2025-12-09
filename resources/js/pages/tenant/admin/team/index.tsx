@@ -1,6 +1,6 @@
 import { useState, type ReactElement } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
-import type { PageProps } from '@/types';
+import type { PageProps, TeamMemberResource } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield } from 'lucide-react';
 
@@ -32,10 +32,11 @@ import { Can } from '@/components/shared/auth/can';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
-interface Member {
-  id: string;
-  name: string;
-  email: string;
+/**
+ * Extended TeamMemberResource with invitation tracking fields.
+ * The team index page shows both active members and pending invitations.
+ */
+interface TeamMember extends Omit<TeamMemberResource, 'role'> {
   role: TenantRole | string; // TenantRole for system roles, string for custom roles
   invited_at: string;
   joined_at: string | null;
@@ -48,7 +49,7 @@ interface TeamStats {
 }
 
 interface Props {
-  members: Member[];
+  members: TeamMember[];
   teamStats: TeamStats;
 }
 

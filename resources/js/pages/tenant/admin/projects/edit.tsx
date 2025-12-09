@@ -23,18 +23,11 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { FolderEdit } from 'lucide-react';
 import { FormEvent, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type ProjectEditResource } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
-interface Project {
-    id: string;
-    name: string;
-    description: string | null;
-    status: string;
-}
-
 interface Props {
-    project: Project;
+    project: ProjectEditResource;
 }
 
 function ProjectEdit({ project }: Props) {

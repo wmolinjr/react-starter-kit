@@ -13,15 +13,13 @@ import type { FormDataConvertible } from '@inertiajs/core';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertCircle, Crown, Info, RefreshCw } from 'lucide-react';
 import type { FederationSyncStrategy } from '@/types/enums';
+import type { TenantSummaryResource } from '@/types';
 
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-interface GroupData {
-    id?: string;
+/**
+ * Federation group form data structure
+ * Exported for use in edit page
+ */
+export interface FederationGroupFormData {
     name: string;
     description: string;
     sync_strategy: FederationSyncStrategy;
@@ -38,14 +36,14 @@ interface GroupData {
 }
 
 interface Props {
-    group?: GroupData;
-    tenants: Tenant[];
-    onSubmit: (data: Omit<GroupData, 'id'>) => void;
+    group?: FederationGroupFormData & { id?: string };
+    tenants: TenantSummaryResource[];
+    onSubmit: (data: FederationGroupFormData) => void;
 }
 
 export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
     const { t } = useLaravelReactI18n();
-    const { data, setData, processing, errors } = useForm<Omit<GroupData, 'id'>>({
+    const { data, setData, processing, errors } = useForm<FederationGroupFormData>({
         name: group?.name ?? '',
         description: group?.description ?? '',
         sync_strategy: group?.sync_strategy ?? 'master_wins',

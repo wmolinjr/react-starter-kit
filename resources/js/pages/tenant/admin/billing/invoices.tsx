@@ -8,7 +8,7 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type InvoiceDetailResource, type TenantSummaryResource } from '@/types';
 import {
     Table,
     TableBody,
@@ -38,38 +38,14 @@ import { useState } from 'react';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface InvoiceLine {
-    description: string;
-    quantity: number;
-    amount: string;
-}
-
-interface Invoice {
-    id: string;
-    number: string | null;
-    date: string;
-    date_formatted: string;
-    due_date: string | null;
-    total: string;
-    status: string;
-    paid: boolean;
-    download_url: string;
-    lines: InvoiceLine[];
-}
-
-interface Tenant {
-    id: string;
-    name: string;
-}
-
 interface Props {
-    invoices: Invoice[];
-    tenant: Tenant;
+    invoices: InvoiceDetailResource[];
+    tenant: TenantSummaryResource;
 }
 
 function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
     const { t, currentLocale } = useLaravelReactI18n();
-    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+    const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDetailResource | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },

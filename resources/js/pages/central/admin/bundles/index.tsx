@@ -16,7 +16,7 @@ import admin from '@/routes/central/admin';
 import { create, destroy, edit, sync, syncAll } from '@/routes/central/admin/bundles';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit as EditIcon, Package, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PlanSummaryResource } from '@/types';
 import type { BadgePreset } from '@/types/enums';
 import { BADGE_PRESET } from '@/lib/enum-metadata';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -24,6 +24,10 @@ import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn, formatPrice } from '@/lib/utils';
 
+/**
+ * Bundle addon item structure
+ * TODO: Create BundleAddonResource in backend for auto-generation
+ */
 interface BundleAddon {
     id: string;
     addon_id: string;
@@ -35,12 +39,10 @@ interface BundleAddon {
     quantity: number;
 }
 
-interface Plan {
-    id: string;
-    name: string;
-    slug: string;
-}
-
+/**
+ * Bundle resource structure
+ * TODO: Create BundleResource in backend for auto-generation
+ */
 interface Bundle {
     id: string;
     slug: string;
@@ -63,7 +65,7 @@ interface Bundle {
     addon_count: number;
     addons: BundleAddon[];
     plan_ids: string[];
-    plans: Plan[];
+    plans: Pick<PlanSummaryResource, 'id' | 'name' | 'slug'>[];
     stripe_product_id: string | null;
     stripe_price_monthly_id: string | null;
     stripe_price_yearly_id: string | null;

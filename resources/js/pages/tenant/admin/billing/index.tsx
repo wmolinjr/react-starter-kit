@@ -4,7 +4,12 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import {
+  type BreadcrumbItem,
+  type BillingPlanResource,
+  type SubscriptionResource,
+  type InvoiceResource,
+} from '@/types';
 import {
   Card,
   CardContent,
@@ -27,46 +32,15 @@ import { Check, Download, ExternalLink } from 'lucide-react';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Plan {
-  name: string;
-  price_id: string;
-  price: string;
-  interval: string;
-  features: string[];
-  limits: {
-    max_users: number | null;
-    max_projects: number | null;
-    storage_mb: number;
-  };
-}
-
-interface Plans {
-  starter: Plan;
-  professional: Plan;
-  enterprise: Plan;
-}
-
-interface Subscription {
-  name: string;
-  status: string;
-  trial_ends_at: string | null;
-  ends_at: string | null;
-  on_trial: boolean;
-  on_grace_period: boolean;
-  canceled: boolean;
-}
-
-interface Invoice {
-  id: string;
-  date: string;
-  total: string;
-  download_url: string;
-}
+/**
+ * Plans organized by slug for display
+ */
+type PlansMap = Record<string, BillingPlanResource>;
 
 interface BillingPageProps {
-  plans: Plans;
-  subscription: Subscription | null;
-  invoices: Invoice[];
+  plans: PlansMap;
+  subscription: SubscriptionResource | null;
+  invoices: InvoiceResource[];
   [key: string]: unknown;
 }
 
@@ -111,7 +85,7 @@ function BillingIndex() {
     if (!subscription) return null;
 
     const planKey = Object.keys(plans).find(
-      (key) => plans[key as keyof Plans].price_id === subscription.name
+      (key) => plans[key].price_id === subscription.name
     );
 
     return planKey || null;

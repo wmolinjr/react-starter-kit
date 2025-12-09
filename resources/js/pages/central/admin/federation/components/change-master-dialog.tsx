@@ -22,13 +22,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertTriangle, Crown } from 'lucide-react';
 import admin from '@/routes/central/admin';
-
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-    is_master?: boolean;
-}
+import type { FederationGroupTenant } from '@/types';
 
 interface Props {
     open: boolean;
@@ -36,7 +30,7 @@ interface Props {
     groupId: string;
     groupName: string;
     currentMasterId: string;
-    tenants: Tenant[];
+    tenants: FederationGroupTenant[];
 }
 
 export function ChangeMasterDialog({

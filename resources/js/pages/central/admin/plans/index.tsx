@@ -16,7 +16,7 @@ import admin from '@/routes/central/admin';
 import { create, destroy, sync, syncAll } from '@/routes/central/admin/plans';
 import { Head, Link, router } from '@inertiajs/react';
 import { Check, Pencil, Plus, RefreshCw, Trash2, Users, X } from 'lucide-react';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PlanResource } from '@/types';
 import { BADGE_PRESET } from '@/lib/enum-metadata';
 import type { BadgePreset } from '@/types/enums';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -24,29 +24,8 @@ import { cn } from '@/lib/utils';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Plan {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
-    price: number;
-    formatted_price: string;
-    currency: string;
-    billing_period: string;
-    stripe_price_id: string | null;
-    features: Record<string, boolean> | null;
-    limits: Record<string, number> | null;
-    is_active: boolean;
-    is_featured: boolean;
-    badge: BadgePreset | null;
-    icon: string | null;
-    icon_color: string | null;
-    tenants_count: number;
-    addons_count: number;
-}
-
 interface Props {
-    plans: Plan[];
+    plans: PlanResource[];
 }
 
 function PlansIndex({ plans }: Props) {
@@ -192,13 +171,13 @@ function PlansIndex({ plans }: Props) {
 
                                 {plan.limits && (
                                     <div className="text-muted-foreground space-y-1 text-sm">
-                                        {plan.limits.users && (
+                                        {plan.limits.users !== undefined && (
                                             <div>Users: {plan.limits.users === -1 ? t('common.unlimited') : plan.limits.users}</div>
                                         )}
-                                        {plan.limits.projects && (
+                                        {plan.limits.projects !== undefined && (
                                             <div>Projects: {plan.limits.projects === -1 ? t('common.unlimited') : plan.limits.projects}</div>
                                         )}
-                                        {plan.limits.storage && (
+                                        {plan.limits.storage !== undefined && (
                                             <div>Storage: {plan.limits.storage === -1 ? t('common.unlimited') : `${plan.limits.storage}MB`}</div>
                                         )}
                                     </div>

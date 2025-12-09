@@ -5,24 +5,13 @@ import admin from '@/routes/central/admin';
 import { Head } from '@inertiajs/react';
 import { Calendar, Mail, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type CentralUserDetailResource } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    email_verified_at: string | null;
-    created_at: string;
-    role: string | null;
-    role_display_name: string | null;
-    isSuperAdmin: boolean;
-}
-
 interface Props {
-    user: User;
+    user: CentralUserDetailResource;
 }
 
 function UserShow({ user }: Props) {
@@ -97,12 +86,12 @@ function UserShow({ user }: Props) {
                                             {user.role_display_name || user.role || t('common.no_role')}
                                         </p>
                                         <p className="text-muted-foreground text-xs">
-                                            {user.isSuperAdmin
+                                            {user.is_super_admin
                                                 ? t('admin.users.super_admin_description')
                                                 : t('admin.users.admin_description')}
                                         </p>
                                     </div>
-                                    <Badge variant={user.isSuperAdmin ? 'default' : 'secondary'}>
+                                    <Badge variant={user.is_super_admin ? 'default' : 'secondary'}>
                                         {user.role_display_name || user.role || t('common.no_role')}
                                     </Badge>
                                 </div>

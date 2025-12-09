@@ -45,6 +45,40 @@ import type {
 // Shared Resources
 // =============================================================================
 
+export interface CentralUserDetailResource {
+    id: string;
+    name: string;
+    email: string;
+    locale: string | null;
+    email_verified_at: string | null;
+    two_factor_confirmed_at: string | null;
+    created_at: string;
+    updated_at: string;
+    role: string | null;
+    role_display_name: string | null;
+    roles: RoleResource[] | undefined;
+    permissions: string[] | undefined;
+    is_super_admin: boolean;
+    has_2fa: boolean;
+}
+
+export interface CentralUserResource {
+    id: string;
+    name: string;
+    email: string;
+    locale: string | null;
+    email_verified_at: string | null;
+    two_factor_confirmed_at: string | null;
+    created_at: string;
+    updated_at: string;
+    role: string | null;
+    role_display_name: string | null;
+    roles: string[] | undefined;
+    permissions: string[] | undefined;
+    is_super_admin: boolean;
+    has_2fa: boolean;
+}
+
 export interface DomainResource {
     id: string;
     domain: string;
@@ -278,6 +312,16 @@ export interface ActivityResource {
     properties: ActivityProperties;
 }
 
+export interface BillingPlanResource {
+    slug: string;
+    name: string;
+    price: string;
+    price_id: string;
+    interval: string;
+    features: string[];
+    limits: { max_users: number | null; max_projects: number | null; storage_mb: number };
+}
+
 export interface FederationInfoResource {
     is_federated: boolean;
     is_master: boolean;
@@ -287,6 +331,26 @@ export interface FederationInfoResource {
     federated_users_count: number;
     local_users_count: number;
     total_group_tenants: number;
+}
+
+export interface InvoiceDetailResource {
+    id: string;
+    number: string | null;
+    date: string;
+    date_formatted: string;
+    due_date: string | null;
+    total: string;
+    status: string;
+    paid: boolean;
+    download_url: string;
+    lines: { description: string; quantity: number; amount: string }[];
+}
+
+export interface InvoiceResource {
+    id: string;
+    date: string;
+    total: string;
+    download_url: string;
 }
 
 export interface MediaResource {
@@ -336,6 +400,16 @@ export interface ProjectResource {
     user_id: string | null;
     attachments_count: number | undefined;
     images_count: number | undefined;
+}
+
+export interface SubscriptionResource {
+    name: string;
+    status: string;
+    trial_ends_at: string | null;
+    ends_at: string | null;
+    on_trial: boolean;
+    on_grace_period: boolean;
+    canceled: boolean;
 }
 
 export interface TeamMemberResource {

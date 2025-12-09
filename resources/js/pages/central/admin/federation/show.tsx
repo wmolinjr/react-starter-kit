@@ -20,8 +20,13 @@ import { useFederation, isCentralFederation } from '@/hooks/shared/use-federatio
 import AdminLayout from '@/layouts/central/admin-layout';
 import { FEDERATION_SYNC_STRATEGY } from '@/lib/enum-metadata';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem } from '@/types';
-import type { FederatedUserStatus, FederationSyncStrategy } from '@/types/enums';
+import {
+    type BreadcrumbItem,
+    type FederationGroupDetailResource,
+    type FederatedUserResource,
+    type FederationGroupTenant,
+    type TenantSummaryResource,
+} from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -54,60 +59,28 @@ import {
     PageTitle,
 } from '@/components/shared/layout/page';
 
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-    is_master: boolean;
-    sync_enabled: boolean;
-    joined_at: string;
-    left_at: string | null;
-    settings: Record<string, unknown>;
-}
-
-interface FederatedUser {
-    id: string;
-    global_email: string;
-    name: string | null;
-    status: FederatedUserStatus;
-    created_at: string;
-    master_tenant: { id: string; name: string; slug: string } | null;
-    links_count: number;
-}
-
-interface Stats {
+/**
+ * Extended stats interface for show page
+ * FederationGroupDetailResource.stats has different structure
+ */
+interface ShowPageStats {
     total_users: number;
     active_syncs: number;
     pending_conflicts: number;
     failed_syncs: number;
 }
 
-interface FederationGroup {
-    id: string;
-    name: string;
-    description: string | null;
-    sync_strategy: FederationSyncStrategy;
-    settings: Record<string, unknown>;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-    master_tenant: { id: string; name: string; slug: string } | null;
-    tenants: Tenant[];
-    federated_users: FederatedUser[];
-    tenants_count: number;
-    federated_users_count: number;
-    stats?: Stats;
-}
-
-interface AvailableTenant {
-    id: string;
-    name: string;
-    slug: string;
+/**
+ * Extended group interface combining FederationGroupDetailResource
+ * with show-page specific stats format
+ */
+interface FederationGroupShowData extends Omit<FederationGroupDetailResource, 'stats'> {
+    stats?: ShowPageStats;
 }
 
 interface Props {
-    group: FederationGroup;
-    availableTenants: AvailableTenant[];
+    group: FederationGroupShowData;
+    availableTenants: TenantSummaryResource[];
 }
 
 function FederationShow({ group, availableTenants }: Props) {

@@ -3,25 +3,15 @@ import type { FormDataConvertible } from '@inertiajs/core';
 import AdminLayout from '@/layouts/central/admin-layout';
 import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type CategoryPermissions } from '@/types';
+import { type BreadcrumbItem, type CategoryPermissions, type RoleEditResource } from '@/types';
+import type { Translations } from '@/components/central/forms/translatable-input';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Translations } from '@/components/central/forms/translatable-input';
-
-interface Role {
-    id: string;
-    name: string;
-    display_name: Translations;
-    display_name_display: string;
-    description: Translations | null;
-    is_protected: boolean;
-    permission_ids: string[];
-}
 
 interface Props {
-    role: Role;
+    role: RoleEditResource;
     permissions: Record<string, CategoryPermissions>;
 }
 
@@ -57,9 +47,9 @@ function EditRole({ role, permissions }: Props) {
                         role={{
                             id: role.id,
                             name: role.name,
-                            display_name: role.display_name,
-                            description: role.description ?? { en: '', pt_BR: '' },
-                            permissions: role.permission_ids,
+                            display_name: role.display_name as Translations,
+                            description: (role.description ?? { en: '', pt_BR: '' }) as Translations,
+                            permissions: role.permission_ids ?? [],
                             is_protected: role.is_protected,
                         }}
                         permissions={permissions}

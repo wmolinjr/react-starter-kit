@@ -60,3 +60,27 @@ export interface CursorPaginatedResponse<T> {
     prev_cursor: string | null;
     per_page: number;
 }
+
+/**
+ * Pagination link for Inertia default format
+ */
+export interface InertiaPaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+/**
+ * Inertia paginated response (Laravel's default paginate() format)
+ * Used by most Inertia pages when Resource::collection() wraps a paginator
+ */
+export interface InertiaPaginatedResponse<T> {
+    data: T[];
+    links: InertiaPaginationLink[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+}

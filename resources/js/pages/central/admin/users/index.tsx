@@ -9,27 +9,12 @@ import { Trash2, Eye, Search } from 'lucide-react';
 import { useState, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type CentralUserResource, type InertiaPaginatedResponse } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    email_verified_at: string | null;
-    created_at: string;
-    role: string | null;
-    role_display_name: string | null;
-}
-
 interface Props {
-    users: {
-        data: User[];
-        links: { url: string | null; label: string; active: boolean }[];
-        current_page: number;
-        last_page: number;
-    };
+    users: InertiaPaginatedResponse<CentralUserResource>;
     filters: { search?: string };
 }
 

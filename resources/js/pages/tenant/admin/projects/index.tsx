@@ -9,20 +9,12 @@ import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { FolderOpen, Plus, Search } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type ProjectResource } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Project {
-    id: string;
-    name: string;
-    description: string | null;
-    status: string;
-    created_at: string;
-}
-
 interface Props {
-    projects: Project[];
+    projects: ProjectResource[];
 }
 
 function ProjectsIndex({ projects: projectsList }: Props) {

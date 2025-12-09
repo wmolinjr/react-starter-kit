@@ -11,30 +11,29 @@ import { useState, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { useImpersonation } from '@/hooks/central/use-impersonation';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type TenantResource, type UserSummaryResource, type DomainResource, type PlanSummaryResource } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
+/**
+ * Extended TenantResource with users for impersonation feature.
+ * The index page receives users for quick impersonation buttons.
+ */
+interface TenantWithUsers extends Omit<TenantResource, 'domains' | 'plan'> {
+    domains: DomainResource[];
+    plan: PlanSummaryResource | null;
+    users: UserSummaryResource[];
 }
 
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-    created_at: string;
-    users_count: number;
-    plan: { name: string } | null;
-    domains: { domain: string; is_primary: boolean }[];
-    users: User[];
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
 }
 
 interface Props {
     tenants: {
-        data: Tenant[];
-        links: { url: string | null; label: string; active: boolean }[];
+        data: TenantWithUsers[];
+        links: PaginationLink[];
         current_page: number;
         last_page: number;
     };

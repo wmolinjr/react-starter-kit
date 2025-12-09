@@ -18,7 +18,13 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type ActivityResource,
+    type UserSummaryResource,
+    type TenantSummaryResource,
+    type ActivityProperties,
+} from '@/types';
 import {
     Table,
     TableBody,
@@ -69,56 +75,27 @@ import {
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface ActivityProperties {
-    old: Record<string, unknown> | null;
-    new: Record<string, unknown> | null;
-    extra: Record<string, unknown>;
-}
-
-interface ActivityItem {
-    id: string;
-    description: string;
-    event: string;
-    log_name: string | null;
-    subject_type: string | null;
-    subject_id: string | null;
-    subject_name: string | null;
-    causer: {
-        id: string;
-        name: string;
-        email: string;
-    } | null;
-    properties: ActivityProperties;
-    created_at: string;
-    created_at_human: string;
-    created_at_formatted: string;
-}
-
-interface TeamMember {
-    id: string;
-    name: string;
-    email: string;
-}
-
 interface SubjectType {
     value: string;
     label: string;
 }
 
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
 interface PaginatedActivities {
-    data: ActivityItem[];
+    data: ActivityResource[];
     current_page: number;
     last_page: number;
     per_page: number;
     total: number;
-    links: Array<{
-        url: string | null;
-        label: string;
-        active: boolean;
-    }>;
+    links: PaginationLink[];
 }
 
-interface Filters {
+interface AuditFilters {
     user_id: string | null;
     event: string | null;
     subject_type: string | null;
@@ -128,19 +105,14 @@ interface Filters {
     search: string | null;
 }
 
-interface Tenant {
-    id: string;
-    name: string;
-}
-
 interface Props {
     activities: PaginatedActivities;
-    teamMembers: TeamMember[];
+    teamMembers: UserSummaryResource[];
     eventTypes: string[];
     subjectTypes: SubjectType[];
     logNames: string[];
-    filters: Filters;
-    tenant: Tenant;
+    filters: AuditFilters;
+    tenant: TenantSummaryResource;
 }
 
 function AuditLogIndex({
@@ -153,8 +125,8 @@ function AuditLogIndex({
     tenant: tenantData,
 }: Props) {
     const { t, currentLocale } = useLaravelReactI18n();
-    const [localFilters, setLocalFilters] = useState<Filters>(filters);
-    const [selectedActivity, setSelectedActivity] = useState<ActivityItem | null>(null);
+    const [localFilters, setLocalFilters] = useState<AuditFilters>(filters);
+    const [selectedActivity, setSelectedActivity] = useState<ActivityResource | null>(null);
     const [isExporting, setIsExporting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -183,7 +155,7 @@ function AuditLogIndex({
         );
     };
 
-    const handleFilterChange = (key: keyof Filters, value: string | null) => {
+    const handleFilterChange = (key: keyof AuditFilters, value: string | null) => {
         const newFilters = { ...localFilters, [key]: value === '__all__' ? null : value };
         setLocalFilters(newFilters);
     };
@@ -199,7 +171,7 @@ function AuditLogIndex({
     };
 
     const clearFilters = () => {
-        const emptyFilters: Filters = {
+        const emptyFilters: AuditFilters = {
             user_id: null,
             event: null,
             subject_type: null,

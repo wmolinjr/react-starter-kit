@@ -12,19 +12,13 @@ import {
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type TenantSummaryResource } from '@/types';
 import { FederationGroupForm } from './components/federation-group-form';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-}
-
 interface Props {
-    tenants: Tenant[];
+    tenants: TenantSummaryResource[];
 }
 
 function FederationCreate({ tenants }: Props) {

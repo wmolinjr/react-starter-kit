@@ -6,7 +6,7 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Users, Shield, Eye, Info } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type RoleResource } from '@/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
@@ -22,17 +22,6 @@ function useBreadcrumbs() {
     ] as BreadcrumbItem[];
 }
 
-interface Role {
-    id: string;
-    name: string;
-    display_name: string;
-    description: string | null;
-    users_count: number;
-    permissions_count: number;
-    is_protected: boolean;
-    created_at: string | null;
-}
-
 interface PlanInfo {
     canCreateCustomRoles: boolean;
     customRolesLimit: number;
@@ -42,7 +31,7 @@ interface PlanInfo {
 }
 
 interface Props {
-    roles: Role[];
+    roles: RoleResource[];
     planInfo: PlanInfo;
 }
 
@@ -58,7 +47,7 @@ function RolesIndex({ roles, planInfo }: Props) {
         return String(limit);
     };
 
-    const handleDelete = (role: Role) => {
+    const handleDelete = (role: RoleResource) => {
         if (role.is_protected) {
             alert(t('roles.delete_protected_error'));
             return;

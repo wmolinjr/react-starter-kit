@@ -7,31 +7,12 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertCircle, Eye, Network, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
 import { Page, PageContent, PageDescription, PageHeader, PageHeaderActions, PageHeaderContent, PageTitle } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
-import type { FederationSyncStrategy } from '@/types/enums';
+import { type BreadcrumbItem, type FederationGroupResource } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface MasterTenant {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-interface FederationGroup {
-    id: string;
-    name: string;
-    description: string | null;
-    sync_strategy: FederationSyncStrategy;
-    is_active: boolean;
-    created_at: string;
-    master_tenant: MasterTenant | null;
-    tenants_count: number;
-    federated_users_count: number;
-}
-
 interface Props {
-    groups: FederationGroup[];
+    groups: FederationGroupResource[];
 }
 
 function FederationIndex({ groups }: Props) {
@@ -44,7 +25,7 @@ function FederationIndex({ groups }: Props) {
 
     useSetBreadcrumbs(breadcrumbs);
 
-    const handleDelete = (group: FederationGroup) => {
+    const handleDelete = (group: FederationGroupResource) => {
         if (group.federated_users_count > 0) {
             alert(t('admin.federation.delete_has_users_error'));
             return;
@@ -72,7 +53,7 @@ function FederationIndex({ groups }: Props) {
         return variants[strategy] || 'outline';
     };
 
-    const GroupCard = ({ group }: { group: FederationGroup }) => (
+    const GroupCard = ({ group }: { group: FederationGroupResource }) => (
         <Card className={!group.is_active ? 'opacity-60' : ''}>
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">

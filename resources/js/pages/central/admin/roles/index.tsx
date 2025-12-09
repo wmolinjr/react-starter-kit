@@ -5,25 +5,14 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Users, Shield, Eye } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type RoleResource } from '@/types';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Role {
-    id: string;
-    name: string;
-    display_name: string;
-    description: string | null;
-    users_count: number;
-    permissions_count: number;
-    is_protected: boolean;
-    created_at: string | null;
-}
-
 interface Props {
-    centralRoles: Role[];
+    centralRoles: RoleResource[];
 }
 
 function RolesIndex({ centralRoles }: Props) {
@@ -36,7 +25,7 @@ function RolesIndex({ centralRoles }: Props) {
 
     useSetBreadcrumbs(breadcrumbs);
 
-    const handleDelete = (role: Role) => {
+    const handleDelete = (role: RoleResource) => {
         if (role.is_protected) {
             alert(t('admin.roles.delete_protected_error'));
             return;
@@ -50,7 +39,7 @@ function RolesIndex({ centralRoles }: Props) {
         }
     };
 
-    const RoleCard = ({ role }: { role: Role }) => (
+    const RoleCard = ({ role }: { role: RoleResource }) => (
         <Card className={role.is_protected ? 'border-primary/20' : ''}>
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">

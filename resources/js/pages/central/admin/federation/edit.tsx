@@ -12,38 +12,15 @@ import {
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type TenantSummaryResource } from '@/types';
 import type { FederationSyncStrategy } from '@/types/enums';
-import { FederationGroupForm } from './components/federation-group-form';
+import { FederationGroupForm, type FederationGroupFormData } from './components/federation-group-form';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-interface GroupData {
-    id: string;
-    name: string;
-    description: string;
-    sync_strategy: FederationSyncStrategy;
-    master_tenant_id: string;
-    is_active: boolean;
-    settings: {
-        sync_password: boolean;
-        sync_profile: boolean;
-        sync_two_factor: boolean;
-        sync_roles: boolean;
-        auto_create_on_login: boolean;
-        auto_federate_new_users: boolean;
-    };
-}
-
 interface Props {
-    group: GroupData;
-    tenants: Tenant[];
+    group: FederationGroupFormData & { id: string };
+    tenants: TenantSummaryResource[];
 }
 
 function FederationEdit({ group, tenants }: Props) {

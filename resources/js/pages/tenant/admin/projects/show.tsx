@@ -4,7 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Button } from '@/components/ui/button';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type ProjectDetailResource } from '@/types';
 import {
   Card,
   CardContent,
@@ -26,31 +26,8 @@ import { Upload, Download, Trash2, Image as ImageIcon, Paperclip } from 'lucide-
 import { FormEvent, useRef, useState, type ReactElement } from 'react';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
-interface Media {
-  id: string;
-  name: string;
-  size: string;
-  mime_type?: string;
-  url: string;
-  thumb_url?: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string | null;
-  status: string;
-  user: {
-    id: string;
-    name: string;
-  };
-  created_at: string;
-  attachments: Media[];
-  images: Media[];
-}
-
 interface ProjectShowProps {
-  project: Project;
+  project: ProjectDetailResource;
 }
 
 function ProjectShow({ project }: ProjectShowProps) {
@@ -117,7 +94,7 @@ function ProjectShow({ project }: ProjectShowProps) {
           <PageHeaderContent>
             <PageTitle>{project.name}</PageTitle>
             <PageDescription>
-              {t('tenant.projects.created_by', { name: project.user.name, date: project.created_at })}
+              {t('tenant.projects.created_by', { name: project.user?.name ?? t('common.unknown'), date: project.created_at })}
             </PageDescription>
           </PageHeaderContent>
           <PageHeaderActions>
