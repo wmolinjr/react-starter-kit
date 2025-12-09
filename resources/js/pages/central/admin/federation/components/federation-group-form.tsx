@@ -114,6 +114,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                             <Select
                                 value={data.master_tenant_id}
                                 onValueChange={(value) => setData('master_tenant_id', value)}
+                                disabled={!!group?.id}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder={t('admin.federation.form.select_master')} />
@@ -133,7 +134,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                                 <p className="text-destructive text-sm">{errors.master_tenant_id}</p>
                             )}
                             <p className="text-muted-foreground text-xs">
-                                {t('admin.federation.form.master_hint')}
+                                {group?.id
+                                    ? t('admin.federation.form.master_change_hint')
+                                    : t('admin.federation.form.master_hint')}
                             </p>
                         </div>
                     </div>

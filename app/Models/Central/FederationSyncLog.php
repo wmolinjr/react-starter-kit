@@ -62,6 +62,7 @@ class FederationSyncLog extends Model
     public const OP_CONFLICT_RESOLVED = 'conflict_resolved';
     public const OP_SYNC_FAILED = 'sync_failed';
     public const OP_SYNC_RETRY = 'sync_retry';
+    public const OP_MASTER_CHANGED = 'master_changed';
 
     /**
      * Status constants.

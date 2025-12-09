@@ -96,6 +96,31 @@ class FederationAuditService
     }
 
     /**
+     * Log master tenant change.
+     */
+    public function logMasterChanged(
+        FederationGroup $group,
+        Tenant $oldMaster,
+        Tenant $newMaster
+    ): void {
+        FederationSyncLog::logSuccess(
+            groupId: $group->id,
+            operation: FederationSyncLog::OP_MASTER_CHANGED,
+            sourceTenantId: $oldMaster->id,
+            targetTenantId: $newMaster->id,
+            oldData: [
+                'master_tenant_id' => $oldMaster->id,
+                'master_tenant_name' => $oldMaster->name,
+            ],
+            newData: [
+                'master_tenant_id' => $newMaster->id,
+                'master_tenant_name' => $newMaster->name,
+                'event' => 'master_changed',
+            ]
+        );
+    }
+
+    /**
      * Log federated user creation.
      */
     public function logUserCreated(

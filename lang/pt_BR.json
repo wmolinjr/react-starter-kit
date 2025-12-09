@@ -33,6 +33,8 @@
   "common.inactive": "Inativo",
   "common.pending": "Pendente",
   "common.suspended": "Suspenso",
+  "common.pending_master_sync": "Aguardando Sincronização do Mestre",
+  "common.pending_review": "Aguardando Revisão",
   "common.enabled": "Habilitado",
   "common.disabled": "Desabilitado",
   "common.user": "Usuário",
@@ -560,6 +562,7 @@
   "admin.federation.form.name_placeholder": "ex., Corporação ACME",
   "admin.federation.form.select_master": "Selecione o tenant mestre...",
   "admin.federation.form.master_hint": "O tenant mestre é a fonte autoritativa para dados de usuário",
+  "admin.federation.form.master_change_hint": "Para trocar o tenant mestre, use a opção Trocar Mestre na página de detalhes do grupo",
   "admin.federation.form.description_placeholder": "Descreva o propósito deste grupo de federação...",
   "admin.federation.form.is_active": "Ativo (sincronização habilitada)",
   "admin.federation.form.sync_settings": "Configurações de Sincronização",
@@ -574,6 +577,15 @@
   "admin.federation.settings.sync_two_factor_description": "Sincronizar configurações de 2FA e códigos de recuperação",
   "admin.federation.settings.sync_roles": "Sincronizar Funções",
   "admin.federation.settings.sync_roles_description": "Sincronizar atribuições de função (use com cautela)",
+
+  "admin.federation.change_master.title": "Trocar Tenant Mestre",
+  "admin.federation.change_master.description": "Transferir o papel de mestre do tenant atual para outro tenant em :group",
+  "admin.federation.change_master.warning": "Esta é uma operação crítica. Todos os usuários federados serão migrados para o novo tenant mestre. Isso pode levar algum tempo dependendo do número de usuários.",
+  "admin.federation.change_master.new_master": "Novo Tenant Mestre",
+  "admin.federation.change_master.select_tenant": "Selecione o novo tenant mestre...",
+  "admin.federation.change_master.selected_info": ":tenant se tornará o novo tenant mestre deste grupo de federação.",
+  "admin.federation.change_master.confirm_text": "Eu entendo que esta operação irá migrar todos os usuários federados para o novo tenant mestre e não pode ser facilmente desfeita.",
+  "admin.federation.change_master.confirm_button": "Trocar Tenant Mestre",
 
   "admin.federation.about_title": "Sobre Federação",
   "admin.federation.about_description": "A federação permite que usuários sejam sincronizados entre múltiplos tenants em um grupo. Isso é útil para organizações com múltiplas filiais ou departamentos que precisam de acesso compartilhado de usuários.",
@@ -1421,6 +1433,7 @@
   "tenant.federation.federated": "Federado",
   "tenant.federation.sync": "Sincronizar",
   "tenant.federation.unfederate": "Desfederar",
+  "tenant.federation.unfederate_title": "Desfederar Usuário",
   "tenant.federation.unfederate_confirm": "Tem certeza que deseja desfederar \":name\"? Ele se tornará um usuário apenas local.",
   "tenant.federation.no_federated_users": "Nenhum usuário federado neste tenant",
   "tenant.federation.user_info_title": "Informações de Federação - :name",
@@ -1467,6 +1480,7 @@
   "flash.federation.bulk_federated_partial": ":success usuários federados com sucesso, :failed falharam.",
   "flash.federation.no_local_users": "Não há usuários locais disponíveis para federar.",
   "flash.federation.no_users_selected": "Nenhum usuário selecionado para federação.",
+  "flash.federation.master_changed": "Tenant mestre alterado para :tenant com sucesso.",
 
   "admin.federation.settings.auto_create_on_login": "Auto-Criar no Login",
   "admin.federation.settings.auto_create_on_login_description": "Criar automaticamente usuário local quando um usuário federado faz login em um tenant filial pela primeira vez",
@@ -1475,6 +1489,10 @@
 
   "tenant.federation.federate_all": "Federar Todos",
   "tenant.federation.federate_selected": "Federar Selecionados (:count)",
+  "tenant.federation.federate_selected_title": "Federar Usuários Selecionados",
   "tenant.federation.federate_all_confirm": "Tem certeza que deseja federar todos os :count usuários locais?",
-  "tenant.federation.federate_selected_confirm": "Tem certeza que deseja federar os :count usuários selecionados?"
+  "tenant.federation.federate_selected_confirm": "Tem certeza que deseja federar os :count usuários selecionados?",
+
+  "validation.federation.tenant_not_in_group": "O tenant selecionado não é membro deste grupo de federação.",
+  "validation.federation.already_master": "O tenant selecionado já é o tenant mestre."
 }

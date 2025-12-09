@@ -49,7 +49,7 @@ interface FederatedUser {
     id: string;
     federation_group_id: string;
     global_email: string;
-    status: 'active' | 'pending' | 'suspended';
+    status: 'active' | 'pending' | 'suspended' | 'pending_master_sync' | 'pending_review';
     sync_version: number;
     last_synced_at: string | null;
     last_sync_source: string | null;
@@ -99,6 +99,10 @@ function FederationUserShow({ group, user }: Props) {
                 return <Badge variant="default"><CheckCircle className="mr-1 h-3 w-3" />{t('common.active')}</Badge>;
             case 'pending':
                 return <Badge variant="secondary"><Clock className="mr-1 h-3 w-3" />{t('common.pending')}</Badge>;
+            case 'pending_master_sync':
+                return <Badge variant="outline"><Clock className="mr-1 h-3 w-3" />{t('common.pending_master_sync')}</Badge>;
+            case 'pending_review':
+                return <Badge variant="secondary"><Clock className="mr-1 h-3 w-3" />{t('common.pending_review')}</Badge>;
             case 'suspended':
                 return <Badge variant="destructive"><XCircle className="mr-1 h-3 w-3" />{t('common.suspended')}</Badge>;
             default:

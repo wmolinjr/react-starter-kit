@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Enums\FederatedUserStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +25,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property \Carbon\Carbon|null $last_synced_at
  * @property string|null $last_sync_source
  * @property int $sync_version
- * @property string $status
+ * @property FederatedUserStatus $status
  */
 class FederatedUser extends Model
 {
@@ -46,6 +47,7 @@ class FederatedUser extends Model
         'synced_data' => 'array',
         'last_synced_at' => 'datetime',
         'sync_version' => 'integer',
+        'status' => FederatedUserStatus::class,
     ];
 
     /**
@@ -54,6 +56,7 @@ class FederatedUser extends Model
     public const STATUS_ACTIVE = 'active';
     public const STATUS_SUSPENDED = 'suspended';
     public const STATUS_PENDING_REVIEW = 'pending_review';
+    public const STATUS_PENDING_MASTER_SYNC = 'pending_master_sync';
 
     /**
      * Federation group relationship.

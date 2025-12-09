@@ -37,6 +37,15 @@ class FederationException extends Exception
         return new self(__('federation.errors.cannot_remove_master'));
     }
 
+    public static function alreadyMaster(Tenant $tenant): self
+    {
+        return new self(
+            __('federation.errors.already_master', [
+                'tenant' => $tenant->name,
+            ])
+        );
+    }
+
     public static function userAlreadyFederated(string $email): self
     {
         return new self(

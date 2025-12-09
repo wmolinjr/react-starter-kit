@@ -133,6 +133,132 @@ class FederationService
     }
 
     /**
+     * Change the master tenant of a federation group.
+     *
+     * This is a complex operation that:
+     * 1. Updates the group's master_tenant_id
+     * 2. Updates all federated_users to point to new master
+     * 3. Updates link metadata
+     * 4. Optionally triggers a full re-sync
+     *
+     * @throws FederationException
+     */
+    public function changeMasterTenant(
+        FederationGroup $group,
+        Tenant $newMaster,
+        bool $triggerSync = true
+    ): FederationGroup {
+        $oldMaster = $group->masterTenant;
+
+        // Validate new master is in group
+        if (!$group->hasTenant($newMaster)) {
+            throw FederationException::tenantNotInGroup($newMaster, $group);
+        }
+
+        // Cannot change to same master
+        if ($group->isMaster($newMaster)) {
+            throw FederationException::alreadyMaster($newMaster);
+        }
+
+        return DB::transaction(function () use ($group, $newMaster, $oldMaster, $triggerSync) {
+            // 1. Update group master
+            $group->update(['master_tenant_id' => $newMaster->id]);
+
+            // 2. Update all federated users in this group
+            $this->migrateFederatedUsersToNewMaster($group, $oldMaster, $newMaster);
+
+            // 3. Update link metadata
+            $this->updateLinkMasterFlags($group, $oldMaster, $newMaster);
+
+            // 4. Log the change
+            $this->auditService->logMasterChanged($group, $oldMaster, $newMaster);
+
+            // 5. Invalidate caches
+            $this->cacheService->invalidateGroup($group->id);
+            $this->cacheService->invalidateTenant($oldMaster->id);
+            $this->cacheService->invalidateTenant($newMaster->id);
+
+            // 6. Optionally trigger sync from new master
+            if ($triggerSync) {
+                dispatch(new \App\Jobs\Central\SyncFromNewMaster($group, $newMaster));
+            }
+
+            return $group->fresh();
+        });
+    }
+
+    /**
+     * Migrate federated users to point to new master tenant.
+     */
+    protected function migrateFederatedUsersToNewMaster(
+        FederationGroup $group,
+        Tenant $oldMaster,
+        Tenant $newMaster
+    ): void {
+        // Get all federated users in this group
+        $federatedUsers = FederatedUser::where('federation_group_id', $group->id)->get();
+
+        foreach ($federatedUsers as $federatedUser) {
+            // Find the user's link to the new master tenant
+            $newMasterLink = FederatedUserLink::where('federated_user_id', $federatedUser->id)
+                ->where('tenant_id', $newMaster->id)
+                ->first();
+
+            if ($newMasterLink) {
+                // User exists in new master - update references
+                $federatedUser->update([
+                    'master_tenant_id' => $newMaster->id,
+                    'master_tenant_user_id' => $newMasterLink->tenant_user_id,
+                    'last_sync_source' => $newMaster->id,
+                ]);
+            } else {
+                // User doesn't exist in new master - mark for sync
+                // Keep master_tenant_user_id temporarily pointing to old master user
+                // The SyncFromNewMaster job will create user in new master and update this
+                $federatedUser->update([
+                    'master_tenant_id' => $newMaster->id,
+                    'status' => FederatedUser::STATUS_PENDING_MASTER_SYNC,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Update is_master flags in federated_user_links.
+     */
+    protected function updateLinkMasterFlags(
+        FederationGroup $group,
+        Tenant $oldMaster,
+        Tenant $newMaster
+    ): void {
+        // Get all federated user IDs in this group
+        $federatedUserIds = FederatedUser::where('federation_group_id', $group->id)
+            ->pluck('id');
+
+        // Remove is_master from old master links
+        FederatedUserLink::whereIn('federated_user_id', $federatedUserIds)
+            ->where('tenant_id', $oldMaster->id)
+            ->get()
+            ->each(function ($link) {
+                $metadata = $link->metadata ?? [];
+                $metadata['is_master'] = false;
+                $metadata['was_master_until'] = now()->toIso8601String();
+                $link->update(['metadata' => $metadata]);
+            });
+
+        // Set is_master on new master links
+        FederatedUserLink::whereIn('federated_user_id', $federatedUserIds)
+            ->where('tenant_id', $newMaster->id)
+            ->get()
+            ->each(function ($link) {
+                $metadata = $link->metadata ?? [];
+                $metadata['is_master'] = true;
+                $metadata['became_master_at'] = now()->toIso8601String();
+                $link->update(['metadata' => $metadata]);
+            });
+    }
+
+    /**
      * Get a federation group by ID.
      */
     public function getGroup(string $groupId): ?FederationGroup

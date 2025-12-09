@@ -6,6 +6,7 @@ use App\Enums\CentralPermission;
 use App\Exceptions\Central\FederationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\AddTenantToGroupRequest;
+use App\Http\Requests\Central\ChangeMasterTenantRequest;
 use App\Http\Requests\Central\StoreFederationGroupRequest;
 use App\Http\Requests\Central\UpdateFederationGroupRequest;
 use App\Http\Resources\Central\FederatedUserDetailResource;
@@ -36,7 +37,7 @@ class FederationGroupController extends Controller implements HasMiddleware
         return [
             new Middleware('can:' . CentralPermission::FEDERATION_VIEW->value, only: ['index', 'show', 'showUser']),
             new Middleware('can:' . CentralPermission::FEDERATION_CREATE->value, only: ['create', 'store']),
-            new Middleware('can:' . CentralPermission::FEDERATION_EDIT->value, only: ['edit', 'update', 'addTenant', 'removeTenant', 'toggleTenantSync', 'syncUser', 'retrySync']),
+            new Middleware('can:' . CentralPermission::FEDERATION_EDIT->value, only: ['edit', 'update', 'addTenant', 'removeTenant', 'toggleTenantSync', 'syncUser', 'retrySync', 'changeMaster']),
             new Middleware('can:' . CentralPermission::FEDERATION_DELETE->value, only: ['destroy']),
         ];
     }
@@ -245,6 +246,24 @@ class FederationGroupController extends Controller implements HasMiddleware
             : __('flash.federation.sync_disabled', ['tenant' => $tenant->name]);
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Change the master tenant of the group.
+     */
+    public function changeMaster(ChangeMasterTenantRequest $request, FederationGroup $group): RedirectResponse
+    {
+        try {
+            $newMaster = Tenant::findOrFail($request->validated()['new_master_tenant_id']);
+
+            $this->federationService->changeMasterTenant($group, $newMaster);
+
+            return redirect()->route('central.admin.federation.show', $group)
+                ->with('success', __('flash.federation.master_changed', ['tenant' => $newMaster->name]));
+
+        } catch (FederationException $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     /**

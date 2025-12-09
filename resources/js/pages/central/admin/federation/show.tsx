@@ -20,9 +20,11 @@ import admin from '@/routes/central/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
-import { type ReactElement } from 'react';
+import { type ReactElement, useState } from 'react';
+import { ChangeMasterDialog } from './components/change-master-dialog';
 import {
     AlertTriangle,
+    ArrowRightLeft,
     Building2,
     CheckCircle,
     CirclePlay,
@@ -64,7 +66,7 @@ interface FederatedUser {
     id: string;
     global_email: string;
     name: string | null;
-    status: 'active' | 'pending' | 'suspended';
+    status: 'active' | 'pending' | 'suspended' | 'pending_master_sync' | 'pending_review';
     created_at: string;
     master_tenant: { id: string; name: string; slug: string } | null;
     links_count: number;
@@ -108,6 +110,7 @@ interface Props {
 function FederationShow({ group, availableTenants }: Props) {
     const { t } = useLaravelReactI18n();
     const federation = useFederation();
+    const [changeMasterOpen, setChangeMasterOpen] = useState(false);
 
     // Type guard ensures we have central operations
     if (!isCentralFederation(federation)) {
@@ -268,16 +271,28 @@ function FederationShow({ group, availableTenants }: Props) {
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
                                     <p className="text-muted-foreground text-sm">{t('admin.federation.master')}</p>
-                                    <p className="font-medium">
-                                        {group.master_tenant ? (
-                                            <span className="flex items-center gap-1">
-                                                <Crown className="h-4 w-4 text-yellow-500" />
-                                                {group.master_tenant.name}
-                                            </span>
-                                        ) : (
-                                            t('admin.federation.no_master')
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-medium">
+                                            {group.master_tenant ? (
+                                                <span className="flex items-center gap-1">
+                                                    <Crown className="h-4 w-4 text-yellow-500" />
+                                                    {group.master_tenant.name}
+                                                </span>
+                                            ) : (
+                                                t('admin.federation.no_master')
+                                            )}
+                                        </p>
+                                        {group.tenants && group.tenants.filter(t => !t.left_at).length > 1 && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setChangeMasterOpen(true)}
+                                                title={t('admin.federation.change_master.title')}
+                                            >
+                                                <ArrowRightLeft className="h-4 w-4" />
+                                            </Button>
                                         )}
-                                    </p>
+                                    </div>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground text-sm">{t('common.created')}</p>
@@ -286,6 +301,18 @@ function FederationShow({ group, availableTenants }: Props) {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* Change Master Dialog */}
+                    {group.master_tenant && (
+                        <ChangeMasterDialog
+                            open={changeMasterOpen}
+                            onOpenChange={setChangeMasterOpen}
+                            groupId={group.id}
+                            groupName={group.name}
+                            currentMasterId={group.master_tenant.id}
+                            tenants={group.tenants?.filter(t => !t.left_at) || []}
+                        />
+                    )}
 
                     {/* Tabs for Tenants and Users */}
                     <Tabs defaultValue="tenants">
@@ -591,6 +618,10 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                 <Badge variant="default">{t('common.active')}</Badge>
                                                             ) : user.status === 'pending' ? (
                                                                 <Badge variant="secondary">{t('common.pending')}</Badge>
+                                                            ) : user.status === 'pending_master_sync' ? (
+                                                                <Badge variant="outline">{t('common.pending_master_sync')}</Badge>
+                                                            ) : user.status === 'pending_review' ? (
+                                                                <Badge variant="secondary">{t('common.pending_review')}</Badge>
                                                             ) : (
                                                                 <Badge variant="destructive">{t('common.suspended')}</Badge>
                                                             )}

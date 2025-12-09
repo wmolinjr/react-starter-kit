@@ -1,3 +1,13 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,12 +31,10 @@ import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     AlertCircle,
-    Check,
     Crown,
     Link as LinkIcon,
     Network,
     RefreshCw,
-    Settings,
     Unlink,
     User,
     Users,
@@ -91,6 +99,13 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+    const [unfederateDialog, setUnfederateDialog] = useState<{ open: boolean; userId: string; userName: string }>({
+        open: false,
+        userId: '',
+        userName: '',
+    });
+    const [federateAllDialog, setFederateAllDialog] = useState(false);
+    const [federateBulkDialog, setFederateBulkDialog] = useState(false);
     const federation = useFederation();
 
     // Type guard ensures we have tenant operations
@@ -116,9 +131,12 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
     };
 
     const handleUnfederateUser = (userId: string, userName: string) => {
-        if (confirm(t('tenant.federation.unfederate_confirm', { name: userName }))) {
-            unfederateUser(userId);
-        }
+        setUnfederateDialog({ open: true, userId, userName });
+    };
+
+    const confirmUnfederateUser = () => {
+        unfederateUser(unfederateDialog.userId);
+        setUnfederateDialog({ open: false, userId: '', userName: '' });
     };
 
     const handleSyncUser = (userId: string) => {
@@ -126,18 +144,24 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
     };
 
     const handleFederateAll = () => {
-        if (confirm(t('tenant.federation.federate_all_confirm', { count: localOnlyUsers.length }))) {
-            federateAll();
-            setSelectedUsers(new Set());
-        }
+        setFederateAllDialog(true);
+    };
+
+    const confirmFederateAll = () => {
+        federateAll();
+        setSelectedUsers(new Set());
+        setFederateAllDialog(false);
     };
 
     const handleFederateBulk = () => {
         if (selectedUsers.size === 0) return;
-        if (confirm(t('tenant.federation.federate_selected_confirm', { count: selectedUsers.size }))) {
-            federateBulk(Array.from(selectedUsers));
-            setSelectedUsers(new Set());
-        }
+        setFederateBulkDialog(true);
+    };
+
+    const confirmFederateBulk = () => {
+        federateBulk(Array.from(selectedUsers));
+        setSelectedUsers(new Set());
+        setFederateBulkDialog(false);
     };
 
     const toggleUserSelection = (userId: string, checked: boolean) => {
@@ -566,6 +590,60 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                     )}
                 </PageContent>
             </Page>
+
+            {/* Unfederate User Confirmation Dialog */}
+            <AlertDialog open={unfederateDialog.open} onOpenChange={(open) => !open && setUnfederateDialog({ open: false, userId: '', userName: '' })}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('tenant.federation.unfederate_title')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('tenant.federation.unfederate_confirm', { name: unfederateDialog.userName })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmUnfederateUser}>
+                            {t('tenant.federation.unfederate')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Federate All Confirmation Dialog */}
+            <AlertDialog open={federateAllDialog} onOpenChange={setFederateAllDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('tenant.federation.federate_all')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('tenant.federation.federate_all_confirm', { count: localOnlyUsers.length })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmFederateAll}>
+                            {t('tenant.federation.federate_all')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Federate Selected Confirmation Dialog */}
+            <AlertDialog open={federateBulkDialog} onOpenChange={setFederateBulkDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('tenant.federation.federate_selected_title')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('tenant.federation.federate_selected_confirm', { count: selectedUsers.size })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmFederateBulk}>
+                            {t('tenant.federation.federate_selected', { count: selectedUsers.size })}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

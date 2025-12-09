@@ -33,6 +33,8 @@
   "common.inactive": "Inactive",
   "common.pending": "Pending",
   "common.suspended": "Suspended",
+  "common.pending_master_sync": "Pending Master Sync",
+  "common.pending_review": "Pending Review",
   "common.enabled": "Enabled",
   "common.disabled": "Disabled",
   "common.user": "User",
@@ -1019,6 +1021,7 @@
   "flash.federation.bulk_federated_partial": ":success users federated successfully, :failed failed.",
   "flash.federation.no_local_users": "No local users available to federate.",
   "flash.federation.no_users_selected": "No users selected for federation.",
+  "flash.federation.master_changed": "Master tenant changed to :tenant successfully.",
 
   "admin.federation.title": "Federation Groups",
   "admin.federation.description": "Manage user federation groups for multi-tenant user synchronization",
@@ -1104,6 +1107,7 @@
   "admin.federation.form.name_placeholder": "e.g., ACME Corporation",
   "admin.federation.form.select_master": "Select master tenant...",
   "admin.federation.form.master_hint": "The master tenant is the authoritative source for user data",
+  "admin.federation.form.master_change_hint": "To change the master tenant, use the Change Master option on the group detail page",
   "admin.federation.form.description_placeholder": "Describe the purpose of this federation group...",
   "admin.federation.form.is_active": "Active (syncing enabled)",
   "admin.federation.form.sync_settings": "Sync Settings",
@@ -1122,6 +1126,15 @@
   "admin.federation.settings.auto_create_on_login_description": "Automatically create local user when a federated user logs into a branch tenant for the first time",
   "admin.federation.settings.auto_federate_new_users": "Auto-Federate New Users",
   "admin.federation.settings.auto_federate_new_users_description": "Automatically federate new users when they are created in member tenants",
+
+  "admin.federation.change_master.title": "Change Master Tenant",
+  "admin.federation.change_master.description": "Transfer the master role from the current tenant to another tenant in :group",
+  "admin.federation.change_master.warning": "This is a critical operation. All federated users will be migrated to the new master tenant. This may take some time depending on the number of users.",
+  "admin.federation.change_master.new_master": "New Master Tenant",
+  "admin.federation.change_master.select_tenant": "Select the new master tenant...",
+  "admin.federation.change_master.selected_info": ":tenant will become the new master tenant for this federation group.",
+  "admin.federation.change_master.confirm_text": "I understand that this operation will migrate all federated users to the new master tenant and cannot be easily undone.",
+  "admin.federation.change_master.confirm_button": "Change Master Tenant",
 
   "admin.federation.about_title": "About Federation",
   "admin.federation.about_description": "Federation allows users to be synchronized across multiple tenants in a group. This is useful for organizations with multiple branches or departments that need shared user access.",
@@ -1197,9 +1210,11 @@
   "tenant.federation.federated": "Federated",
   "tenant.federation.sync": "Sync",
   "tenant.federation.unfederate": "Unfederate",
+  "tenant.federation.unfederate_title": "Unfederate User",
   "tenant.federation.unfederate_confirm": "Are you sure you want to unfederate \":name\"? They will become a local-only user.",
   "tenant.federation.federate_all": "Federate All",
   "tenant.federation.federate_selected": "Federate Selected (:count)",
+  "tenant.federation.federate_selected_title": "Federate Selected Users",
   "tenant.federation.federate_all_confirm": "Are you sure you want to federate all :count local users?",
   "tenant.federation.federate_selected_confirm": "Are you sure you want to federate :count selected users?",
   "tenant.federation.no_federated_users": "No federated users in this tenant",
@@ -1225,5 +1240,8 @@
   "components.federated_badge.federated": "Federated",
   "components.federated_badge.master": "Master",
   "components.federated_badge.tooltip": "This user is federated across multiple tenants",
-  "components.federated_badge.tooltip_with_group": "Federated with :group"
+  "components.federated_badge.tooltip_with_group": "Federated with :group",
+
+  "validation.federation.tenant_not_in_group": "The selected tenant is not a member of this federation group.",
+  "validation.federation.already_master": "The selected tenant is already the master tenant."
 }

@@ -256,6 +256,9 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::post('/{group}/tenants/{tenant}/toggle-sync', [FederationGroupController::class, 'toggleTenantSync'])->name('tenants.toggle-sync');
                     Route::delete('/{group}/tenants/{tenant}', [FederationGroupController::class, 'removeTenant'])->name('tenants.remove');
 
+                    // Change master tenant
+                    Route::post('/{group}/change-master', [FederationGroupController::class, 'changeMaster'])->name('change-master');
+
                     // User management within group
                     Route::get('/{group}/users/{user}', [FederationGroupController::class, 'showUser'])->name('users.show');
                     Route::post('/{group}/users/{user}/sync', [FederationGroupController::class, 'syncUser'])->name('users.sync');
