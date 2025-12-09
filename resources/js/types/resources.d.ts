@@ -393,21 +393,6 @@ export interface TenantSummaryResource {
     slug: string;
 }
 
-export interface ActivityResource {
-    id: string;
-    description: string;
-    event: string;
-    log_name: string;
-    subject_type: string | null;
-    subject_id: string | null;
-    subject_name: string | null;
-    causer: ActivityCauser | undefined;
-    created_at: string;
-    created_at_human: string;
-    created_at_formatted: string;
-    properties: ActivityProperties;
-}
-
 export interface ApiTokenResource {
     id: string;
     name: string;
@@ -587,6 +572,21 @@ export interface UserSummaryResource {
     id: string;
     name: string;
     email: string;
+}
+
+export interface ActivityResource {
+    id: string;
+    description: string;
+    event: string;
+    log_name: string;
+    subject_type: string | null;
+    subject_id: string | null;
+    subject_name: string | null;
+    causer: ActivityCauser | undefined;
+    created_at: string;
+    created_at_human: string;
+    created_at_formatted: string;
+    properties: ActivityProperties;
 }
 
 export interface CategoryOptionResource {

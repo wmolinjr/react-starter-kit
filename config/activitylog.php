@@ -11,7 +11,7 @@ return [
      * When the clean-command is executed, all recording activities older than
      * the number of days specified here will be deleted.
      */
-    'delete_records_older_than_days' => 90,
+    'delete_records_older_than_days' => 365,
 
     /*
      * If no log name is passed to the activity() helper
@@ -35,7 +35,7 @@ return [
      * It should implement the Spatie\Activitylog\Contracts\Activity interface
      * and extend Illuminate\Database\Eloquent\Model.
      */
-    'activity_model' => \App\Models\Tenant\Activity::class,
+    'activity_model' => \App\Models\Shared\Activity::class,
 
     /*
      * This is the name of the table that will be created by the migration and

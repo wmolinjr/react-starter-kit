@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Tenant\ActivityResource;
+use App\Http\Resources\Shared\ActivityResource;
 use App\Http\Resources\Tenant\UserSummaryResource;
-use App\Models\Tenant\Activity;
+use App\Models\Shared\Activity;
 use App\Models\Tenant\User;
 use App\Services\Tenant\AuditLogService;
 use Illuminate\Http\Request;

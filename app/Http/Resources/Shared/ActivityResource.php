@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Tenant;
+namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\Concerns\HasTypescriptType;
@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 /**
  * ActivityResource
  *
- * Audit log entry for listing views.
+ * SHARED RESOURCE:
+ * - Works in both Central and Tenant contexts
+ * - Transforms App\Models\Shared\Activity for listing views
  */
 class ActivityResource extends BaseResource
 {

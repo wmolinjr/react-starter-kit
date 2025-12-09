@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Tenant\ActivityResource;
-use App\Models\Tenant\Activity;
+use App\Http\Resources\Shared\ActivityResource;
+use App\Models\Shared\Activity;
 use App\Models\Tenant\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
