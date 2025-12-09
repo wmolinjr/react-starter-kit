@@ -41,6 +41,9 @@ class GenerateEnumTypes extends Command
         file_put_contents($metadataPath, $metadata);
         $this->info("✅ Generated metadata: {$metadataPath}");
 
+        // Generate translations
+        $this->generateTranslations();
+
         $this->newLine();
 
         // Display summary
@@ -387,5 +390,93 @@ TS;
         }
 
         return '{ '.implode(', ', $pairs).' }';
+    }
+
+    /**
+     * Generate translations from enums into lang JSON files.
+     *
+     * Updates the translation files with enum labels and descriptions.
+     * PHP enums are the single source of truth for translations.
+     */
+    protected function generateTranslations(): void
+    {
+        $locales = ['en', 'pt_BR'];
+
+        // Define enum translations to generate
+        $enumTranslations = [
+            'admin.federation.user_status' => $this->getEnumTranslations(
+                FederatedUserStatus::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'admin.federation.link_status' => $this->getEnumTranslations(
+                FederatedUserLinkSyncStatus::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'admin.federation.conflict' => $this->getEnumTranslations(
+                FederationConflictStatus::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'admin.federation.sync_strategy' => $this->getEnumTranslations(
+                FederationSyncStrategy::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+        ];
+
+        foreach ($locales as $locale) {
+            $this->updateTranslationFile($locale, $enumTranslations);
+        }
+    }
+
+    /**
+     * Get translations for enum cases.
+     *
+     * @param  array<\BackedEnum>  $cases
+     * @return array<string, callable>
+     */
+    protected function getEnumTranslations(array $cases, callable $labelGetter): array
+    {
+        $translations = [];
+        foreach ($cases as $case) {
+            $translations[$case->value] = $labelGetter;
+        }
+
+        return ['cases' => $cases, 'getter' => $labelGetter];
+    }
+
+    /**
+     * Update a translation file with enum translations.
+     *
+     * @param  array<string, array>  $enumTranslations
+     */
+    protected function updateTranslationFile(string $locale, array $enumTranslations): void
+    {
+        $filePath = lang_path("{$locale}.json");
+
+        // Read existing translations
+        $translations = [];
+        if (file_exists($filePath)) {
+            $content = file_get_contents($filePath);
+            $translations = json_decode($content, true) ?? [];
+        }
+
+        // Update enum translations
+        foreach ($enumTranslations as $prefix => $config) {
+            $cases = $config['cases'];
+            $getter = $config['getter'];
+
+            foreach ($cases as $case) {
+                $key = "{$prefix}.{$case->value}";
+                $translations[$key] = $getter($case, $locale);
+            }
+        }
+
+        // Sort translations alphabetically
+        ksort($translations);
+
+        // Write back
+        $json = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        file_put_contents($filePath, $json."\n");
+
+        $this->info("✅ Updated translations: {$filePath}");
     }
 }
