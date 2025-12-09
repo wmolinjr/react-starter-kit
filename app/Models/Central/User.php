@@ -4,6 +4,7 @@ namespace App\Models\Central;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -30,6 +31,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property string $locale
  * @property \Carbon\Carbon|null $email_verified_at
  * @property \Carbon\Carbon|null $two_factor_confirmed_at
+ * @property \Carbon\Carbon|null $deleted_at
  */
 class User extends Authenticatable
 {
@@ -39,6 +41,7 @@ class User extends Authenticatable
     use HasRoles;
     use HasUuids;
     use Notifiable;
+    use SoftDeletes;
     use TwoFactorAuthenticatable;
 
     /**

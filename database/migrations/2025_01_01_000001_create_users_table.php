@@ -31,7 +31,8 @@ return new class extends Migration
             $table->timestamp('two_factor_confirmed_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
-
+            $table->softDeletes();
+            $table->index('deleted_at');
             $table->index('email');
         });
 
