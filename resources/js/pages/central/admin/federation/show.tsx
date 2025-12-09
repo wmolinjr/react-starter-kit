@@ -31,6 +31,7 @@ import {
     Network,
     Pencil,
     RefreshCw,
+    Trash2,
     User,
     Users,
     XCircle,
@@ -137,6 +138,10 @@ function FederationShow({ group, availableTenants }: Props) {
 
     const handleToggleTenantSync = (tenantId: string) => {
         router.post(admin.federation.tenants.toggleSync.url({ group: group.id, tenant: tenantId }));
+    };
+
+    const handleRemoveTenant = (tenantId: string) => {
+        router.delete(admin.federation.tenants.remove.url({ group: group.id, tenant: tenantId }));
     };
 
     return (
@@ -405,6 +410,40 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                         <Building2 className="h-4 w-4" />
                                                                     </Link>
                                                                 </Button>
+                                                                {!tenant.is_master && (
+                                                                    <AlertDialog>
+                                                                        <AlertDialogTrigger asChild>
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                title={t('admin.federation.remove_tenant')}
+                                                                            >
+                                                                                <Trash2 className="text-destructive h-4 w-4" />
+                                                                            </Button>
+                                                                        </AlertDialogTrigger>
+                                                                        <AlertDialogContent>
+                                                                            <AlertDialogHeader>
+                                                                                <AlertDialogTitle>
+                                                                                    {t('admin.federation.remove_tenant_title')}
+                                                                                </AlertDialogTitle>
+                                                                                <AlertDialogDescription>
+                                                                                    {t('admin.federation.remove_tenant_confirm', { name: tenant.name })}
+                                                                                </AlertDialogDescription>
+                                                                            </AlertDialogHeader>
+                                                                            <AlertDialogFooter>
+                                                                                <AlertDialogCancel>
+                                                                                    {t('common.cancel')}
+                                                                                </AlertDialogCancel>
+                                                                                <AlertDialogAction
+                                                                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                                                    onClick={() => handleRemoveTenant(tenant.id)}
+                                                                                >
+                                                                                    {t('common.remove')}
+                                                                                </AlertDialogAction>
+                                                                            </AlertDialogFooter>
+                                                                        </AlertDialogContent>
+                                                                    </AlertDialog>
+                                                                )}
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>

@@ -502,6 +502,7 @@
   "admin.federation.member_tenants": "Tenants Membros",
   "admin.federation.member_tenants_description": "Tenants que fazem parte deste grupo de federação",
   "admin.federation.add_tenant": "Adicionar Tenant...",
+  "admin.federation.remove_tenant": "Remover da Federação",
   "admin.federation.remove_tenant_title": "Remover Tenant da Federação",
   "admin.federation.remove_tenant_confirm": "Tem certeza que deseja remover \":name\" deste grupo de federação?",
   "admin.federation.sync_status": "Status de Sincronização",

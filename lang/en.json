@@ -1042,6 +1042,7 @@
   "admin.federation.member_tenants": "Member Tenants",
   "admin.federation.member_tenants_description": "Tenants that are part of this federation group",
   "admin.federation.add_tenant": "Add Tenant...",
+  "admin.federation.remove_tenant": "Remove from Federation",
   "admin.federation.remove_tenant_title": "Remove Tenant from Federation",
   "admin.federation.remove_tenant_confirm": "Are you sure you want to remove \":name\" from this federation group?",
   "admin.federation.sync_status": "Sync Status",

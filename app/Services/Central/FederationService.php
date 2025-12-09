@@ -172,12 +172,42 @@ class FederationService
         Tenant $tenant,
         array $settings = []
     ): FederationGroupTenant {
-        // Check if tenant is already in any group
+        // Check if tenant is already in an active group
         $existingGroup = $this->getTenantGroup($tenant);
         if ($existingGroup) {
             throw FederationException::tenantAlreadyInGroup($tenant);
         }
 
+        // Check if tenant previously left this group (can rejoin)
+        $existingMembership = FederationGroupTenant::where('federation_group_id', $group->id)
+            ->where('tenant_id', $tenant->id)
+            ->whereNotNull('left_at')
+            ->first();
+
+        if ($existingMembership) {
+            // Rejoin existing membership
+            return DB::transaction(function () use ($existingMembership, $group, $tenant, $settings) {
+                $existingMembership->rejoin();
+
+                // Update settings if provided
+                if (!empty($settings)) {
+                    $existingMembership->update([
+                        'settings' => array_merge($existingMembership->settings ?? [], $settings),
+                    ]);
+                }
+
+                // Log the operation
+                $this->auditService->logTenantJoined($group, $tenant);
+
+                // Clear cache
+                $this->cacheService->invalidateTenant($tenant->id);
+                $this->cacheService->invalidateGroup($group->id);
+
+                return $existingMembership->fresh();
+            });
+        }
+
+        // Create new membership
         return DB::transaction(function () use ($group, $tenant, $settings) {
             $membership = FederationGroupTenant::create([
                 'federation_group_id' => $group->id,
