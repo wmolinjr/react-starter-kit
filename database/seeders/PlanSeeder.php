@@ -3,7 +3,10 @@
 namespace Database\Seeders;
 
 use App\Console\Commands\SyncPlanPermissions;
+use App\Enums\BadgePreset;
+use App\Enums\BillingPeriod;
 use App\Enums\PlanFeature;
+use App\Enums\PlanLimit;
 use App\Models\Central\Plan;
 use Illuminate\Database\Seeder;
 
@@ -75,25 +78,25 @@ class PlanSeeder extends Seeder
             ],
             'price' => 2900, // 29.00/month in configured currency
             'currency' => stripe_currency(),
-            'billing_period' => 'monthly',
+            'billing_period' => BillingPeriod::MONTHLY->value,
             'features' => $this->features([
                 PlanFeature::BASE,
                 PlanFeature::PROJECTS,
             ]),
             'limits' => $this->limits([
-                'users' => 1,
-                'projects' => 50,
-                'storage' => 1024, // 1GB in MB
-                'logRetention' => 30, // days
-                'apiCalls' => 0, // no API access
-                'fileUploadSize' => 10, // 10MB
-                'customRoles' => 0, // no custom roles
-                'locales' => 1, // single language
+                PlanLimit::USERS->value => 1,
+                PlanLimit::PROJECTS->value => 50,
+                PlanLimit::STORAGE->value => 1024, // 1GB in MB
+                PlanLimit::LOG_RETENTION->value => 30, // days
+                PlanLimit::API_CALLS->value => 0, // no API access
+                PlanLimit::FILE_UPLOAD_SIZE->value => 10, // 10MB
+                PlanLimit::CUSTOM_ROLES->value => 0, // no custom roles
+                PlanLimit::LOCALES->value => 1, // single language
             ]),
             'is_active' => true,
             'is_featured' => false,
             'badge' => null,
-            'icon' => 'Rocket',
+            'icon' => BadgePreset::STARTER->icon(), // Uses Rocket icon from enum
             'icon_color' => 'slate',
             'sort_order' => 1,
         ];
@@ -118,7 +121,7 @@ class PlanSeeder extends Seeder
             ],
             'price' => 9900, // 99.00/month in configured currency
             'currency' => stripe_currency(),
-            'billing_period' => 'monthly',
+            'billing_period' => BillingPeriod::MONTHLY->value,
             'features' => $this->features([
                 PlanFeature::BASE,
                 PlanFeature::PROJECTS,
@@ -127,20 +130,20 @@ class PlanSeeder extends Seeder
                 PlanFeature::MULTI_LANGUAGE,   // ⭐ Pro+
             ]),
             'limits' => $this->limits([
-                'users' => 50,
-                'projects' => -1, // unlimited
-                'storage' => 10240, // 10GB
-                'logRetention' => 90,
-                'apiCalls' => 10000, // 10k/month
-                'fileUploadSize' => 50, // 50MB
-                'customRoles' => 5, // up to 5 custom roles
-                'locales' => 3, // up to 3 languages
+                PlanLimit::USERS->value => 50,
+                PlanLimit::PROJECTS->value => -1, // unlimited
+                PlanLimit::STORAGE->value => 10240, // 10GB
+                PlanLimit::LOG_RETENTION->value => 90,
+                PlanLimit::API_CALLS->value => 10000, // 10k/month
+                PlanLimit::FILE_UPLOAD_SIZE->value => 50, // 50MB
+                PlanLimit::CUSTOM_ROLES->value => 5, // up to 5 custom roles
+                PlanLimit::LOCALES->value => 3, // up to 3 languages
             ]),
             'is_active' => true,
             'is_featured' => true, // Most popular
-            'badge' => 'Most Popular',
-            'icon' => 'Zap',
-            'icon_color' => 'blue',
+            'badge' => BadgePreset::MOST_POPULAR->value,
+            'icon' => BadgePreset::PRO->icon(), // Uses Crown icon from enum
+            'icon_color' => BadgePreset::MOST_POPULAR->color(), // amber
             'sort_order' => 2,
         ];
     }
@@ -164,7 +167,7 @@ class PlanSeeder extends Seeder
             ],
             'price' => 0, // Custom pricing
             'currency' => stripe_currency(),
-            'billing_period' => 'monthly',
+            'billing_period' => BillingPeriod::MONTHLY->value,
             'features' => $this->features([
                 PlanFeature::BASE,
                 PlanFeature::PROJECTS,
@@ -179,20 +182,20 @@ class PlanSeeder extends Seeder
                 PlanFeature::FEDERATION,        // ⭐ Enterprise
             ]),
             'limits' => $this->limits([
-                'users' => -1, // unlimited
-                'projects' => -1,
-                'storage' => 102400, // 100GB
-                'logRetention' => 365, // 1 year
-                'apiCalls' => -1, // unlimited
-                'fileUploadSize' => 100, // 100MB
-                'customRoles' => -1, // unlimited
-                'locales' => -1, // unlimited languages
+                PlanLimit::USERS->value => -1, // unlimited
+                PlanLimit::PROJECTS->value => -1,
+                PlanLimit::STORAGE->value => 102400, // 100GB
+                PlanLimit::LOG_RETENTION->value => 365, // 1 year
+                PlanLimit::API_CALLS->value => -1, // unlimited
+                PlanLimit::FILE_UPLOAD_SIZE->value => 100, // 100MB
+                PlanLimit::CUSTOM_ROLES->value => -1, // unlimited
+                PlanLimit::LOCALES->value => -1, // unlimited languages
             ]),
             'is_active' => true,
             'is_featured' => false,
-            'badge' => 'Enterprise',
-            'icon' => 'Building2',
-            'icon_color' => 'purple',
+            'badge' => BadgePreset::ENTERPRISE->value,
+            'icon' => BadgePreset::ENTERPRISE->icon(), // Building2 from enum
+            'icon_color' => BadgePreset::ENTERPRISE->color(), // purple
             'sort_order' => 3,
         ];
     }

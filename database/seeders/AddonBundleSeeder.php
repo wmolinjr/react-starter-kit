@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BadgePreset;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonBundle;
 use App\Models\Central\Plan;
@@ -50,9 +51,9 @@ class AddonBundleSeeder extends Seeder
                     'es' => 'Todo lo que necesitas para escalar: almacenamiento extra, usuarios e informes avanzados',
                 ],
                 'discount_percent' => 20,
-                'badge' => 'most_popular', // BadgePreset value
-                'icon' => 'Zap',
-                'icon_color' => 'amber',
+                'badge' => BadgePreset::MOST_POPULAR->value,
+                'icon' => BadgePreset::MOST_POPULAR->icon(), // Star from enum
+                'icon_color' => BadgePreset::MOST_POPULAR->color(), // amber from enum
                 'features' => [
                     ['en' => '50GB extra storage', 'pt_BR' => '50GB de armazenamento extra', 'es' => '50GB de almacenamiento extra'],
                     ['en' => '5 additional user seats', 'pt_BR' => '5 vagas de usuários adicionais', 'es' => '5 puestos de usuario adicionales'],
@@ -84,9 +85,9 @@ class AddonBundleSeeder extends Seeder
                     'es' => 'Perfecto para equipos en crecimiento: añade usuarios y personaliza sus permisos',
                 ],
                 'discount_percent' => 15,
-                'badge' => 'best_for_teams', // BadgePreset value
-                'icon' => 'Users',
-                'icon_color' => 'blue',
+                'badge' => BadgePreset::BEST_FOR_TEAMS->value,
+                'icon' => BadgePreset::BEST_FOR_TEAMS->icon(), // Users from enum
+                'icon_color' => BadgePreset::BEST_FOR_TEAMS->color(), // blue from enum
                 'features' => [
                     ['en' => '5 additional user seats', 'pt_BR' => '5 vagas de usuários adicionais', 'es' => '5 puestos de usuario adicionales'],
                     ['en' => 'Custom roles & permissions', 'pt_BR' => 'Papéis e permissões personalizados', 'es' => 'Roles y permisos personalizados'],
@@ -116,9 +117,9 @@ class AddonBundleSeeder extends Seeder
                     'es' => 'Capacidad máxima de almacenamiento para cargas de datos pesadas',
                 ],
                 'discount_percent' => 25,
-                'badge' => 'best_value', // BadgePreset value
-                'icon' => 'HardDrive',
-                'icon_color' => 'green',
+                'badge' => BadgePreset::BEST_VALUE->value,
+                'icon' => BadgePreset::BEST_VALUE->icon(), // Trophy from enum
+                'icon_color' => BadgePreset::BEST_VALUE->color(), // green from enum
                 'features' => [
                     ['en' => '300GB total storage (50GB + 250GB)', 'pt_BR' => '300GB de armazenamento total (50GB + 250GB)', 'es' => '300GB de almacenamiento total (50GB + 250GB)'],
                     ['en' => 'High-performance SSD', 'pt_BR' => 'SSD de alta performance', 'es' => 'SSD de alto rendimiento'],
@@ -149,9 +150,9 @@ class AddonBundleSeeder extends Seeder
                     'es' => 'Paquete completo para necesidades empresariales: almacenamiento, equipo y todas las funciones',
                 ],
                 'discount_percent' => 30,
-                'badge' => 'enterprise', // BadgePreset value
-                'icon' => 'Building2',
-                'icon_color' => 'purple',
+                'badge' => BadgePreset::ENTERPRISE->value,
+                'icon' => BadgePreset::ENTERPRISE->icon(), // Building2 from enum
+                'icon_color' => BadgePreset::ENTERPRISE->color(), // purple from enum
                 'features' => [
                     ['en' => '250GB enterprise storage', 'pt_BR' => '250GB de armazenamento enterprise', 'es' => '250GB de almacenamiento empresarial'],
                     ['en' => '10 user seats (2x 5-seat packs)', 'pt_BR' => '10 vagas de usuários (2x pacotes de 5)', 'es' => '10 puestos de usuario (2x paquetes de 5)'],

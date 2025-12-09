@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Enums\AddonType;
+use App\Enums\BadgePreset;
+use App\Enums\PlanLimit;
 use App\Models\Central\Addon;
 use App\Models\Central\Plan;
 use Illuminate\Database\Seeder;
@@ -60,7 +62,7 @@ class AddonSeeder extends Seeder
                     'es' => 'Añade 50GB de almacenamiento adicional a tu plan',
                 ],
                 'type' => AddonType::QUOTA,
-                'limit_key' => 'storage', // Which plan limit to increase
+                'limit_key' => PlanLimit::STORAGE->value, // Which plan limit to increase
                 'unit_value' => 50000, // 50GB in MB
                 'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_monthly' => 4900, // $49/month
@@ -68,9 +70,9 @@ class AddonSeeder extends Seeder
                 'available_for_plans' => ['starter', 'professional'],
                 'min_quantity' => 1,
                 'max_quantity' => 20,
-                'icon' => 'HardDrive',
+                'icon' => PlanLimit::STORAGE->icon(), // HardDrive from enum
                 'icon_color' => null, // System color
-                'badge' => 'most_popular', // BadgePreset value
+                'badge' => BadgePreset::MOST_POPULAR->value,
                 'sort_order' => 1,
                 'features' => [
                     'High-performance SSD storage',
@@ -91,7 +93,7 @@ class AddonSeeder extends Seeder
                     'es' => 'Añade 250GB de almacenamiento adicional (mejor valor)',
                 ],
                 'type' => AddonType::QUOTA,
-                'limit_key' => 'storage',
+                'limit_key' => PlanLimit::STORAGE->value,
                 'unit_value' => 250000, // 250GB in MB
                 'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_monthly' => 19900, // $199/month
@@ -100,8 +102,8 @@ class AddonSeeder extends Seeder
                 'min_quantity' => 1,
                 'max_quantity' => 10,
                 'icon' => 'Database',
-                'icon_color' => 'blue',
-                'badge' => 'best_value', // BadgePreset value
+                'icon_color' => PlanLimit::STORAGE->color(), // purple from enum
+                'badge' => BadgePreset::BEST_VALUE->value,
                 'sort_order' => 2,
             ],
 
@@ -117,16 +119,16 @@ class AddonSeeder extends Seeder
                     'es' => 'Añade 5 puestos de usuario adicionales a tu equipo',
                 ],
                 'type' => AddonType::QUOTA,
-                'limit_key' => 'users',
+                'limit_key' => PlanLimit::USERS->value,
                 'unit_value' => 5, // 5 users per unit
-                'unit_label' => ['en' => 'seats', 'pt_BR' => 'vagas', 'es' => 'puestos'],
+                'unit_label' => PlanLimit::USERS->unitLabel(), // ['en' => 'users', 'pt_BR' => 'usuários', 'es' => 'usuarios']
                 'price_monthly' => 4900, // $49/month for 5 users
                 'price_yearly' => 49000, // $490/year
                 'available_for_plans' => ['starter', 'professional'],
                 'min_quantity' => 1,
                 'max_quantity' => 100,
-                'icon' => 'Users',
-                'icon_color' => 'violet',
+                'icon' => PlanLimit::USERS->icon(), // Users from enum
+                'icon_color' => PlanLimit::USERS->color(), // blue from enum
                 'sort_order' => 3,
             ],
 
@@ -154,7 +156,7 @@ class AddonSeeder extends Seeder
                 'max_quantity' => 1,
                 'icon' => 'BarChart3',
                 'icon_color' => 'emerald',
-                'badge' => 'pro', // BadgePreset value
+                'badge' => BadgePreset::PRO->value,
                 'sort_order' => 10,
                 'features' => [
                     'Custom report builder',
@@ -183,8 +185,8 @@ class AddonSeeder extends Seeder
                 'available_for_plans' => ['starter'],
                 'min_quantity' => 1,
                 'max_quantity' => 1,
-                'icon' => 'Shield',
-                'icon_color' => 'amber',
+                'icon' => PlanLimit::CUSTOM_ROLES->icon(), // Shield from enum
+                'icon_color' => PlanLimit::CUSTOM_ROLES->color(), // red from enum
                 'sort_order' => 11,
                 'metadata' => [
                     'feature_key' => 'customRoles',
@@ -208,7 +210,7 @@ class AddonSeeder extends Seeder
                     'es' => 'Compra única de 100GB de almacenamiento (válido por 1 año)',
                 ],
                 'type' => AddonType::CREDIT,
-                'limit_key' => 'storage',
+                'limit_key' => PlanLimit::STORAGE->value,
                 'unit_value' => 100000, // 100GB in MB
                 'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_one_time' => 7900, // $79 one-time
@@ -216,9 +218,9 @@ class AddonSeeder extends Seeder
                 'available_for_plans' => ['starter', 'professional', 'enterprise'],
                 'min_quantity' => 1,
                 'max_quantity' => 50,
-                'icon' => 'CreditCard',
-                'icon_color' => 'green',
-                'badge' => 'one_time', // BadgePreset value
+                'icon' => AddonType::CREDIT->icon(), // CreditCard from enum
+                'icon_color' => AddonType::CREDIT->color(), // green from enum
+                'badge' => BadgePreset::ONE_TIME->value,
                 'sort_order' => 20,
             ],
 
@@ -243,8 +245,8 @@ class AddonSeeder extends Seeder
                 'price_metered' => 10, // $0.10/GB
                 'free_tier' => 0, // No free tier (already in plan)
                 'available_for_plans' => ['starter', 'professional', 'enterprise'],
-                'icon' => 'Activity',
-                'icon_color' => 'orange',
+                'icon' => AddonType::METERED->icon(), // Activity from enum
+                'icon_color' => AddonType::METERED->color(), // orange from enum
                 'sort_order' => 30,
                 'metadata' => [
                     'unit_price_display' => '$0.10 per GB',
