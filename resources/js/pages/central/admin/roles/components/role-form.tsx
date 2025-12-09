@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
 import { useLocales } from '@/hooks/shared/use-locales';
-import type { PermissionRecord, CategoryPermissions } from '@/types';
+import type { PermissionResource, CategoryPermissions } from '@/types';
 
 interface RoleData {
     id?: string;
@@ -50,7 +50,7 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
         }
     };
 
-    const toggleCategory = (perms: PermissionRecord[]) => {
+    const toggleCategory = (perms: PermissionResource[]) => {
         const categoryIds = perms.map((p) => p.id);
         const allSelected = categoryIds.every((id) => data.permissions.includes(id));
 
@@ -67,7 +67,7 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
         }
     };
 
-    const getCategorySelectionState = (perms: PermissionRecord[]) => {
+    const getCategorySelectionState = (perms: PermissionResource[]) => {
         const categoryIds = perms.map((p) => p.id);
         const selectedCount = categoryIds.filter((id) => data.permissions.includes(id)).length;
         if (selectedCount === 0) return 'none';

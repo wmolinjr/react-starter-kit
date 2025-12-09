@@ -135,25 +135,16 @@ export interface EnumOption {
 }
 
 /**
- * Permission record from API Resource (database).
- * Used in role management pages for permission assignment.
- *
- * Note: Different from `Permission` type (string union for permission checking).
- */
-export interface PermissionRecord {
-    id: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-}
-
-/**
  * Grouped permissions by category.
  * Used in role forms for permission assignment.
+ *
+ * Uses PermissionResource from auto-generated types.
+ * Note: The `category` field in PermissionResource is not used here
+ * since permissions are already grouped by category key.
  */
 export interface CategoryPermissions {
     label: string;
-    permissions: PermissionRecord[];
+    permissions: PermissionResource[];
 }
 
 export interface PageProps extends LocaleConfig {
