@@ -503,6 +503,113 @@ public function getTeamMembers(): Collection
 - **Inertia props**: Typed via `resources/js/types/index.d.ts`
 - **Laravel Wayfinder**: Type-safe route helpers for TypeScript
 
+### Frontend Types (Single Source of Truth)
+
+**Princípio**: Tipos TypeScript são auto-gerados a partir dos API Resources PHP. O backend é a fonte única de verdade.
+
+**Estrutura de Tipos**:
+```
+resources/js/types/
+├── resources.d.ts    # Auto-gerado: API Resources (PlanResource, UserResource, etc.)
+├── enums.d.ts        # Auto-gerado: Enums PHP (TenantRole, BillingPeriod, etc.)
+├── plan.d.ts         # Auto-gerado: PlanFeatures, PlanLimits, PlanUsage
+├── common.d.ts       # Tipos auxiliares (Translations, ActivityProperties, etc.)
+├── pagination.d.ts   # Tipos de paginação (PaginatedResponse, InertiaPaginatedResponse)
+├── permissions.d.ts  # Tipos de permissões (Auth, Permission unions)
+├── addons.d.ts       # Tipos de addons
+└── index.d.ts        # Re-exports + tipos globais (PageProps, User, Tenant, etc.)
+```
+
+**Comando para Regenerar Tipos**:
+```bash
+sail artisan types:generate    # Regenera resources.d.ts, enums.d.ts, plan.d.ts
+```
+
+**Workflow para Novos Resources**:
+1. Criar Resource PHP com trait `HasTypescriptType`
+2. Implementar método `typescriptType()` no Resource
+3. Rodar `sail artisan types:generate`
+4. Importar tipo no frontend: `import type { MyResource } from '@/types'`
+5. Verificar: `npm run types`
+
+**Exemplo de Resource com TypeScript**:
+```php
+<?php
+namespace App\Http\Resources\Tenant;
+
+use App\Http\Resources\BaseResource;
+use App\Traits\HasTypescriptType;
+
+class ProjectResource extends BaseResource
+{
+    use HasTypescriptType;
+
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'status' => $this->status,
+            'created_at' => $this->formatIso($this->created_at),
+        ];
+    }
+
+    public static function typescriptType(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'status' => 'string',
+            'created_at' => 'string',
+        ];
+    }
+}
+```
+
+**Uso no Frontend**:
+```tsx
+// ✅ CORRETO: Importar tipos auto-gerados
+import type { ProjectResource, InertiaPaginatedResponse } from '@/types';
+
+interface Props {
+    projects: InertiaPaginatedResponse<ProjectResource>;
+}
+
+// ❌ ERRADO: Definir interfaces inline
+interface Project {  // NÃO FAÇA ISSO!
+    id: string;
+    name: string;
+}
+```
+
+**Convenções de Nomenclatura**:
+| Sufixo | Uso | Exemplo |
+|--------|-----|---------|
+| `Resource` | Listagens | `ProjectResource`, `UserResource` |
+| `DetailResource` | Páginas show com relacionamentos | `ProjectDetailResource` |
+| `EditResource` | Formulários de edição | `ProjectEditResource` |
+| `SummaryResource` | Dropdowns/selects | `PlanSummaryResource` |
+
+**Tipos de Paginação**:
+```tsx
+// Para respostas paginadas do Inertia (formato padrão do Laravel)
+import type { InertiaPaginatedResponse } from '@/types';
+
+interface Props {
+    users: InertiaPaginatedResponse<UserResource>;
+}
+
+// Estrutura inclui: data[], links[], current_page, last_page, per_page, total
+```
+
+**⚠️ Regras Importantes**:
+- **NUNCA** defina interfaces inline para dados vindos da API
+- **SEMPRE** importe tipos de `@/types`
+- **SEMPRE** rode `types:generate` após criar/modificar Resources
+- **SEMPRE** verifique com `npm run types` antes de commitar
+
+**See**: [docs/FRONTEND-TYPES-MIGRATION-PLAN.md](docs/FRONTEND-TYPES-MIGRATION-PLAN.md) for migration guide.
+
 ### Laravel Wayfinder
 
 **Generate TypeScript routes with form support:**
@@ -935,5 +1042,6 @@ For in-depth technical documentation, see:
 - **[docs/I18N.md](docs/I18N.md)** - Internationalization guide
 - **[docs/ADDONS.md](docs/ADDONS.md)** - Add-ons system
 - **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources for data transformation
+- **[docs/FRONTEND-TYPES-MIGRATION-PLAN.md](docs/FRONTEND-TYPES-MIGRATION-PLAN.md)** - Frontend TypeScript types migration guide
 - **[docs/FORTIFY-REMOVAL-PLAN.md](docs/archive/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
 - **[docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md)** - User sync across tenants (multi-branch companies)
