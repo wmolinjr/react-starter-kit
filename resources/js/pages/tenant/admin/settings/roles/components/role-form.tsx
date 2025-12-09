@@ -9,17 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-
-interface Permission {
-    id: string;
-    name: string;
-    description: string | null;
-}
-
-interface CategoryPermissions {
-    label: string;
-    permissions: Permission[];
-}
+import type { Permission, CategoryPermissions } from '@/types';
 
 interface RoleData {
     id?: string;

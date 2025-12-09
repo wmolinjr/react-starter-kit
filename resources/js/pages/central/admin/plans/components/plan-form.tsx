@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
 import { useLocales } from '@/hooks/shared/use-locales';
-import { BadgeSelector, BadgePreset } from '@/components/central/forms/badge-selector';
+import { BadgeSelector } from '@/components/central/forms/badge-selector';
+import type { BadgePresetOption } from '@/types/enums';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
@@ -68,7 +69,7 @@ interface Props {
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: EnumOption[];
-    badgePresets?: BadgePreset[];
+    badgePresets?: BadgePresetOption[];
     onSubmit: (data: PlanData) => void;
     isSubmitting?: boolean;
 }

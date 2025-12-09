@@ -11,7 +11,8 @@ import { TranslatableInput, Translations } from '@/components/central/forms/tran
 import { useLocales } from '@/hooks/shared/use-locales';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
-import { BadgeSelector, BadgePreset } from '@/components/central/forms/badge-selector';
+import { BadgeSelector } from '@/components/central/forms/badge-selector';
+import type { BadgePresetOption } from '@/types/enums';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { TrendingUp, Sparkles, Activity, CreditCard, Info } from 'lucide-react';
@@ -91,7 +92,7 @@ interface Props {
     featureDefinitions?: FeatureDefinition[];
     limitDefinitions?: LimitDefinition[];
     categories?: CategoryOption[];
-    badgePresets?: BadgePreset[];
+    badgePresets?: BadgePresetOption[];
     isEdit?: boolean;
 }
 

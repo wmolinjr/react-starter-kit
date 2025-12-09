@@ -10,17 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
 import { useLocales } from '@/hooks/shared/use-locales';
-
-interface Permission {
-    id: string;
-    name: string;
-    description: string | null;
-}
-
-interface CategoryPermissions {
-    label: string;
-    permissions: Permission[];
-}
+import type { Permission, CategoryPermissions } from '@/types';
 
 interface RoleData {
     id?: string;

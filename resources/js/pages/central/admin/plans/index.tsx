@@ -17,7 +17,7 @@ import { create, destroy, sync, syncAll } from '@/routes/central/admin/plans';
 import { Head, Link, router } from '@inertiajs/react';
 import { Check, Pencil, Plus, RefreshCw, Trash2, Users, X } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
-import { type BadgePreset } from '@/components/central/forms/badge-selector';
+import type { BadgePresetOption } from '@/types/enums';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn } from '@/lib/utils';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -46,7 +46,7 @@ interface Plan {
 
 interface Props {
     plans: Plan[];
-    badgePresets: BadgePreset[];
+    badgePresets: BadgePresetOption[];
 }
 
 function PlansIndex({ plans, badgePresets }: Props) {

@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type CategoryPermissions } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Shield } from 'lucide-react';
 
@@ -18,17 +18,6 @@ function useBreadcrumbs() {
         { title: t('breadcrumbs.custom_roles'), href: admin.settings.roles.index.url() },
         { title: t('breadcrumbs.create_role'), href: admin.settings.roles.create.url() },
     ] as BreadcrumbItem[];
-}
-
-interface Permission {
-    id: string;
-    name: string;
-    description: string | null;
-}
-
-interface CategoryPermissions {
-    label: string;
-    permissions: Permission[];
 }
 
 interface Props {

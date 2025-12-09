@@ -19,7 +19,7 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { type BadgePreset } from '@/components/central/forms/badge-selector';
+import type { BadgePresetOption } from '@/types/enums';
 import { Translations } from '@/components/central/forms/translatable-input';
 
 interface Addon {
@@ -87,7 +87,7 @@ interface Props {
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: CategoryOption[];
-    badgePresets: BadgePreset[];
+    badgePresets: BadgePresetOption[];
 }
 
 function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {

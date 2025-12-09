@@ -131,6 +131,26 @@ export interface EnumOption {
     description: string;
 }
 
+/**
+ * Permission from API Resource (database record).
+ * Used in role management pages.
+ */
+export interface Permission {
+    id: string;
+    name: string;
+    description: string | null;
+    category: string | null;
+}
+
+/**
+ * Grouped permissions by category.
+ * Used in role forms for permission assignment.
+ */
+export interface CategoryPermissions {
+    label: string;
+    permissions: Permission[];
+}
+
 export interface PageProps extends LocaleConfig {
     name: string;
     quote: { message: string; author: string };

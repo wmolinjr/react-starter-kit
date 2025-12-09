@@ -3,22 +3,11 @@ import type { FormDataConvertible } from '@inertiajs/core';
 import AdminLayout from '@/layouts/central/admin-layout';
 import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type CategoryPermissions } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-
-interface Permission {
-    id: string;
-    name: string;
-    description: string | null;
-}
-
-interface CategoryPermissions {
-    label: string;
-    permissions: Permission[];
-}
 
 interface Props {
     permissions: Record<string, CategoryPermissions>;

@@ -5,7 +5,7 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Trash2, Users, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type Permission } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';
@@ -18,13 +18,6 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-
-interface Permission {
-    id: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-}
 
 interface User {
     id: string;

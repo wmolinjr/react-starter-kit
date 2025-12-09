@@ -7,6 +7,7 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import type { BadgePresetOption } from '@/types/enums';
 
 interface AddonOption {
     id: string;
@@ -24,19 +25,10 @@ interface PlanOption {
     slug: string;
 }
 
-interface BadgePreset {
-    value: string;
-    label: string;
-    icon: string;
-    bg: string;
-    text: string;
-    border: string;
-}
-
 interface Props {
     addons: AddonOption[];
     plans: PlanOption[];
-    badgePresets: BadgePreset[];
+    badgePresets: BadgePresetOption[];
 }
 
 function BundleCreate({ addons, plans, badgePresets }: Props) {

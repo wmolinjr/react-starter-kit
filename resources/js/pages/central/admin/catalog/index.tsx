@@ -17,9 +17,9 @@ import { create, destroy, sync, syncAll } from '@/routes/central/admin/catalog';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
+import type { BadgePresetOption } from '@/types/enums';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
-import { type BadgePreset } from '@/components/central/forms/badge-selector';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn, formatPrice } from '@/lib/utils';
 
@@ -45,7 +45,7 @@ interface Addon {
 interface Props {
     addons: Addon[];
     types: { value: string; label: string }[];
-    badgePresets: BadgePreset[];
+    badgePresets: BadgePresetOption[];
 }
 
 function CatalogIndex({ addons, badgePresets }: Props) {

@@ -3,23 +3,12 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type CategoryPermissions } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Shield } from 'lucide-react';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
-
-interface Permission {
-    id: string;
-    name: string;
-    description: string | null;
-}
-
-interface CategoryPermissions {
-    label: string;
-    permissions: Permission[];
-}
 
 interface Role {
     id: string;

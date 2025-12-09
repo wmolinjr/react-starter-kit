@@ -3,21 +3,13 @@ import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
-
-export interface BadgePreset {
-    value: string;
-    label: string;
-    icon: string;
-    bg: string;
-    text: string;
-    border: string;
-}
+import type { BadgePresetOption } from '@/types/enums';
 
 interface BadgeSelectorProps {
     label?: string;
     value: string | null;
     onChange: (value: string | null) => void;
-    presets: BadgePreset[];
+    presets: BadgePresetOption[];
     className?: string;
 }
 
