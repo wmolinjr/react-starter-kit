@@ -6,6 +6,8 @@ use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
+use App\Enums\FederationSyncStrategy;
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Models\Central\FederationGroupTenant;
 use App\Models\Central\Tenant;
 use App\Services\Central\FederationService;
@@ -81,7 +83,7 @@ class FederatedUserSyncTest extends TestCase
         $this->group = $this->federationService->createGroup(
             name: 'Test Federation',
             masterTenant: $this->masterTenant,
-            syncStrategy: FederationGroup::STRATEGY_MASTER_WINS
+            syncStrategy: FederationSyncStrategy::MASTER_WINS
         );
 
         // Add branch tenants to group
@@ -95,6 +97,8 @@ class FederatedUserSyncTest extends TestCase
 
     public function test_federated_user_can_be_created(): void
     {
+        $userId = \Illuminate\Support\Str::uuid()->toString();
+
         $federatedUser = $this->federationService->createFederatedUser(
             group: $this->group,
             email: 'john@example.com',
@@ -104,7 +108,7 @@ class FederatedUserSyncTest extends TestCase
                 'locale' => 'en',
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: $userId
         );
 
         $this->assertDatabaseHas('federated_users', [
@@ -119,8 +123,8 @@ class FederatedUserSyncTest extends TestCase
         $this->assertDatabaseHas('federated_user_links', [
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->masterTenant->id,
-            'tenant_user_id' => 'user-123',
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'tenant_user_id' => $userId,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED->value,
         ]);
     }
 
@@ -138,7 +142,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: $syncedData,
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $this->assertEquals('John Doe', $federatedUser->getName());
@@ -153,7 +157,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'John.Doe@Example.COM',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $this->assertEquals('john.doe@example.com', $federatedUser->global_email);
@@ -165,27 +169,29 @@ class FederatedUserSyncTest extends TestCase
 
     public function test_user_link_can_be_created(): void
     {
+        $branchUserId = \Illuminate\Support\Str::uuid()->toString();
+
         $federatedUser = $this->federationService->createFederatedUser(
             group: $this->group,
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         // Create link to branch tenant
         $link = $this->federationService->createUserLink(
             federatedUser: $federatedUser,
             tenant: $this->branchTenant1,
-            tenantUserId: 'branch-user-456'
+            tenantUserId: $branchUserId
         );
 
         $this->assertDatabaseHas('federated_user_links', [
             'id' => $link->id,
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-456',
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'tenant_user_id' => $branchUserId,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED->value,
         ]);
 
         $this->assertTrue($federatedUser->hasLinkToTenant($this->branchTenant1));
@@ -198,12 +204,12 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         // Create links to branch tenants
-        $this->federationService->createUserLink($federatedUser, $this->branchTenant1, 'branch1-user-456');
-        $this->federationService->createUserLink($federatedUser, $this->branchTenant2, 'branch2-user-789');
+        $this->federationService->createUserLink($federatedUser, $this->branchTenant1, \Illuminate\Support\Str::uuid()->toString());
+        $this->federationService->createUserLink($federatedUser, $this->branchTenant2, \Illuminate\Support\Str::uuid()->toString());
 
         $linkedTenantIds = $federatedUser->getLinkedTenantIds();
 
@@ -215,20 +221,22 @@ class FederatedUserSyncTest extends TestCase
 
     public function test_get_link_for_tenant(): void
     {
+        $branchUserId = \Illuminate\Support\Str::uuid()->toString();
+
         $federatedUser = $this->federationService->createFederatedUser(
             group: $this->group,
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
-        $this->federationService->createUserLink($federatedUser, $this->branchTenant1, 'branch-user-456');
+        $this->federationService->createUserLink($federatedUser, $this->branchTenant1, $branchUserId);
 
         $link = $federatedUser->getLinkForTenant($this->branchTenant1);
 
         $this->assertNotNull($link);
-        $this->assertEquals('branch-user-456', $link->tenant_user_id);
+        $this->assertEquals($branchUserId, $link->tenant_user_id);
         $this->assertEquals($this->branchTenant1->id, $link->tenant_id);
     }
 
@@ -243,7 +251,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe', 'locale' => 'en'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $initialVersion = $federatedUser->sync_version;
@@ -263,7 +271,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe', 'locale' => 'en'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $federatedUser->updateSyncedData([
@@ -291,21 +299,21 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $link = FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-456',
-            'sync_status' => FederatedUserLink::STATUS_PENDING_SYNC,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::PENDING_SYNC->value,
         ]);
 
         $link->markAsSynced();
 
         $link->refresh();
 
-        $this->assertEquals(FederatedUserLink::STATUS_SYNCED, $link->sync_status);
+        $this->assertEquals(FederatedUserLinkSyncStatus::SYNCED, $link->sync_status);
         $this->assertNotNull($link->last_synced_at);
         $this->assertEquals(0, $link->sync_attempts);
         $this->assertNull($link->last_sync_error);
@@ -318,14 +326,14 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $link = FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-456',
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED->value,
             'sync_attempts' => 0,
         ]);
 
@@ -333,7 +341,7 @@ class FederatedUserSyncTest extends TestCase
 
         $link->refresh();
 
-        $this->assertEquals(FederatedUserLink::STATUS_SYNC_FAILED, $link->sync_status);
+        $this->assertEquals(FederatedUserLinkSyncStatus::SYNC_FAILED, $link->sync_status);
         $this->assertEquals(1, $link->sync_attempts);
         $this->assertEquals('Connection timeout', $link->last_sync_error);
     }
@@ -345,14 +353,14 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $link = FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-456',
-            'sync_status' => FederatedUserLink::STATUS_SYNC_FAILED,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::SYNC_FAILED->value,
             'sync_attempts' => 1,
         ]);
 
@@ -361,7 +369,7 @@ class FederatedUserSyncTest extends TestCase
         $link->update(['sync_attempts' => 3]);
         $this->assertFalse($link->shouldRetry(3));
 
-        $link->update(['sync_status' => FederatedUserLink::STATUS_SYNCED]);
+        $link->update(['sync_status' => FederatedUserLinkSyncStatus::SYNCED->value]);
         $this->assertFalse($link->shouldRetry(3));
     }
 
@@ -372,7 +380,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $link = $federatedUser->getLinkForTenant($this->masterTenant);
@@ -382,7 +390,7 @@ class FederatedUserSyncTest extends TestCase
         $link->refresh();
 
         $this->assertTrue($link->isDisabled());
-        $this->assertEquals(FederatedUserLink::STATUS_DISABLED, $link->sync_status);
+        $this->assertEquals(FederatedUserLinkSyncStatus::DISABLED, $link->sync_status);
     }
 
     // =========================================================================
@@ -396,7 +404,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $found = $this->federationService->findFederatedUserByEmail($this->group, 'john@example.com');
@@ -412,7 +420,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $found = $this->federationService->findFederatedUserByEmail($this->group, 'JOHN@EXAMPLE.COM');
@@ -423,17 +431,19 @@ class FederatedUserSyncTest extends TestCase
 
     public function test_find_federated_user_by_tenant_user(): void
     {
+        $userId = \Illuminate\Support\Str::uuid()->toString();
+
         $federatedUser = $this->federationService->createFederatedUser(
             group: $this->group,
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: $userId
         );
 
         $found = $this->federationService->findFederatedUserByTenantUser(
             $this->masterTenant->id,
-            'user-123'
+            $userId
         );
 
         $this->assertNotNull($found);
@@ -451,7 +461,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'active@example.com',
             syncedData: ['name' => 'Active User'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-1'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $suspendedUser = $this->federationService->createFederatedUser(
@@ -459,7 +469,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'suspended@example.com',
             syncedData: ['name' => 'Suspended User'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-2'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
         $suspendedUser->update(['status' => FederatedUserStatus::SUSPENDED]);
 
@@ -475,7 +485,7 @@ class FederatedUserSyncTest extends TestCase
         $otherGroup = FederationGroup::create([
             'name' => 'Other Group',
             'master_tenant_id' => $this->branchTenant1->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -484,7 +494,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'ingroup@example.com',
             syncedData: ['name' => 'In Group'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-1'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         FederatedUser::create([
@@ -492,7 +502,7 @@ class FederatedUserSyncTest extends TestCase
             'global_email' => 'other@example.com',
             'synced_data' => ['name' => 'Other User'],
             'master_tenant_id' => $this->branchTenant1->id,
-            'master_tenant_user_id' => 'user-2',
+            'master_tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
             'status' => FederatedUserStatus::ACTIVE,
         ]);
 
@@ -513,21 +523,21 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-1',
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED->value,
         ]);
 
         FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant2->id,
-            'tenant_user_id' => 'branch-user-2',
-            'sync_status' => FederatedUserLink::STATUS_PENDING_SYNC,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::PENDING_SYNC->value,
         ]);
 
         $syncedLinks = $federatedUser->syncedLinks()->get();
@@ -543,14 +553,14 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-1',
-            'sync_status' => FederatedUserLink::STATUS_PENDING_SYNC,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::PENDING_SYNC->value,
         ]);
 
         $pendingLinks = $federatedUser->pendingLinks()->get();
@@ -566,14 +576,14 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $link = FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-1',
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED->value,
         ]);
 
         // 2 active links (master + branch1)
@@ -596,7 +606,7 @@ class FederatedUserSyncTest extends TestCase
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $found = FederatedUser::findByEmailInGroup('john@example.com', $this->group->id);
@@ -607,15 +617,17 @@ class FederatedUserSyncTest extends TestCase
 
     public function test_find_by_tenant_user(): void
     {
+        $userId = \Illuminate\Support\Str::uuid()->toString();
+
         $federatedUser = $this->federationService->createFederatedUser(
             group: $this->group,
             email: 'john@example.com',
             syncedData: ['name' => 'John Doe'],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: $userId
         );
 
-        $link = FederatedUserLink::findByTenantUser($this->masterTenant->id, 'user-123');
+        $link = FederatedUserLink::findByTenantUser($this->masterTenant->id, $userId);
 
         $this->assertNotNull($link);
         $this->assertEquals($federatedUser->id, $link->federated_user_id);

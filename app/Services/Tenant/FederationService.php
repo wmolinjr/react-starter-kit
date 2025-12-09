@@ -2,7 +2,9 @@
 
 namespace App\Services\Tenant;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Exceptions\Central\FederationException;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
@@ -193,7 +195,9 @@ class FederationService
         }
 
         // Create new federated user
-        return DB::transaction(function () use ($user, $group, $tenant) {
+        // Use central connection for transaction since FederatedUser/Link are in central database
+        $centralConnection = config('tenancy.database.central_connection');
+        return DB::connection($centralConnection)->transaction(function () use ($user, $group, $tenant) {
             $syncedData = $user->toFederationSyncData();
 
             $federatedUser = FederatedUser::create([
@@ -213,7 +217,7 @@ class FederationService
                 'federated_user_id' => $federatedUser->id,
                 'tenant_id' => $tenant->id,
                 'tenant_user_id' => $user->id,
-                'sync_status' => FederatedUserLink::STATUS_SYNCED,
+                'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
                 'last_synced_at' => now(),
                 'metadata' => [
                     'created_via' => FederatedUserLink::CREATED_VIA_MANUAL_LINK,
@@ -253,7 +257,7 @@ class FederationService
                 'federated_user_id' => $federatedUser->id,
                 'tenant_id' => $tenant->id,
                 'tenant_user_id' => $user->id,
-                'sync_status' => FederatedUserLink::STATUS_SYNCED,
+                'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
                 'last_synced_at' => now(),
                 'metadata' => [
                     'created_via' => FederatedUserLink::CREATED_VIA_MANUAL_LINK,
@@ -323,7 +327,7 @@ class FederationService
         $tenant = tenant();
 
         // Check if we can sync (master_wins strategy)
-        if ($group->sync_strategy === FederationGroup::STRATEGY_MASTER_WINS) {
+        if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
             if (!$group->isMaster($tenant)) {
                 // Non-master tenants can't initiate sync with master_wins
                 return;
@@ -363,7 +367,7 @@ class FederationService
         $tenant = tenant();
 
         // Check if we can sync
-        if ($group->sync_strategy === FederationGroup::STRATEGY_MASTER_WINS) {
+        if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
             if (!$group->isMaster($tenant)) {
                 return;
             }
@@ -391,7 +395,7 @@ class FederationService
         $tenant = tenant();
 
         // Check if we can sync
-        if ($group->sync_strategy === FederationGroup::STRATEGY_MASTER_WINS) {
+        if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
             if (!$group->isMaster($tenant)) {
                 return;
             }
@@ -483,17 +487,21 @@ class FederationService
         $defaultRole = $membership?->getDefaultRole() ?? 'member';
 
         $syncedData = $federatedUser->synced_data;
+        $centralConnection = config('tenancy.database.central_connection');
 
-        $user = DB::transaction(function () use ($federatedUser, $syncedData, $tenant, $defaultRole) {
-            // Create user
+        // Create user in tenant database
+        $user = DB::transaction(function () use ($federatedUser, $syncedData, $defaultRole) {
+            // Create user (federated_user_id is guarded, so we set it separately)
             $user = User::create([
                 'name' => $syncedData['name'] ?? 'User',
                 'email' => $federatedUser->global_email,
                 'password' => $syncedData['password_hash'] ?? Hash::make(str()->random(32)),
                 'locale' => $syncedData['locale'] ?? 'en',
                 'email_verified_at' => now(),
-                'federated_user_id' => $federatedUser->id,
             ]);
+
+            // Set federated_user_id (guarded field, use forceFill)
+            $user->forceFill(['federated_user_id' => $federatedUser->id])->save();
 
             // Apply 2FA if enabled
             if (!empty($syncedData['two_factor_secret'])) {
@@ -508,21 +516,25 @@ class FederationService
             // Assign default role
             $user->assignRole($defaultRole);
 
-            // Create link
-            FederatedUserLink::create([
-                'federated_user_id' => $federatedUser->id,
-                'tenant_id' => $tenant->id,
-                'tenant_user_id' => $user->id,
-                'sync_status' => FederatedUserLink::STATUS_SYNCED,
-                'last_synced_at' => now(),
-                'metadata' => [
-                    'created_via' => FederatedUserLink::CREATED_VIA_LOGIN,
-                    'default_role' => $defaultRole,
-                ],
-            ]);
-
             return $user;
         });
+
+        // Create link in central database (use direct DB insert to bypass tenant connection issues)
+        DB::connection($centralConnection)->table('federated_user_links')->insert([
+            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'federated_user_id' => $federatedUser->id,
+            'tenant_id' => $tenant->id,
+            'tenant_user_id' => $user->id,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED->value,
+            'last_synced_at' => now(),
+            'metadata' => json_encode([
+                'created_via' => FederatedUserLink::CREATED_VIA_LOGIN,
+                'default_role' => $defaultRole,
+            ]),
+            'sync_attempts' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         // Invalidate caches
         $this->cacheService->invalidateUserLinks($federatedUser->id);

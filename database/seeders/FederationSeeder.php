@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
@@ -50,7 +52,7 @@ class FederationSeeder extends Seeder
             'name' => 'ACME Corporation',
             'description' => 'Federation group for ACME subsidiaries',
             'master_tenant_id' => $tenant1->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS,
             'settings' => [
                 'sync_fields' => FederationGroup::DEFAULT_SYNC_FIELDS,
                 'auto_create_on_login' => true,
@@ -122,7 +124,7 @@ class FederationSeeder extends Seeder
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $tenant1->id,
             'tenant_user_id' => $sharedUserTenant1->id,
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
             'last_synced_at' => now(),
             'metadata' => [
                 'created_via' => FederatedUserLink::CREATED_VIA_AUTO_SYNC,
@@ -157,7 +159,7 @@ class FederationSeeder extends Seeder
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $tenant2->id,
             'tenant_user_id' => $sharedUserTenant2->id,
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
             'last_synced_at' => now(),
             'metadata' => [
                 'created_via' => FederatedUserLink::CREATED_VIA_AUTO_SYNC,

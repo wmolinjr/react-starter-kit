@@ -29,7 +29,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_page_can_be_rendered(): void
     {
-        $response = $this->get('/admin/forgot-password');
+        $response = $this->get(route('central.admin.auth.password.request'));
 
         $response->assertStatus(200);
     }
@@ -44,7 +44,7 @@ class ForgotPasswordTest extends TestCase
             'email' => $uniqueEmail,
         ]);
 
-        $response = $this->post('/admin/forgot-password', [
+        $response = $this->post(route('central.admin.auth.password.email'), [
             'email' => $admin->email,
         ]);
 
@@ -59,7 +59,7 @@ class ForgotPasswordTest extends TestCase
     {
         Notification::fake();
 
-        $response = $this->post('/admin/forgot-password', [
+        $response = $this->post(route('central.admin.auth.password.email'), [
             'email' => 'nonexistent@example.com',
         ]);
 
@@ -68,14 +68,14 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_requires_email(): void
     {
-        $response = $this->post('/admin/forgot-password', []);
+        $response = $this->post(route('central.admin.auth.password.email'), []);
 
         $response->assertSessionHasErrors('email');
     }
 
     public function test_forgot_password_requires_valid_email(): void
     {
-        $response = $this->post('/admin/forgot-password', [
+        $response = $this->post(route('central.admin.auth.password.email'), [
             'email' => 'not-an-email',
         ]);
 

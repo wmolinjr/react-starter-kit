@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Central;
 
-use App\Models\Central\FederationGroup;
+use App\Enums\FederationSyncStrategy;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,11 +22,7 @@ class UpdateFederationGroupRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                Rule::in([
-                    FederationGroup::STRATEGY_MASTER_WINS,
-                    FederationGroup::STRATEGY_LAST_WRITE_WINS,
-                    FederationGroup::STRATEGY_MANUAL_REVIEW,
-                ]),
+                Rule::in(FederationSyncStrategy::values()),
             ],
             'settings' => 'nullable|array',
             'settings.sync_fields' => 'nullable|array',

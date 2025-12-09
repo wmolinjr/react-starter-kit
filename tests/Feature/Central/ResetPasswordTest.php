@@ -29,7 +29,10 @@ class ResetPasswordTest extends TestCase
 
         $token = Password::broker('central_users')->createToken($admin);
 
-        $response = $this->get('/admin/reset-password/'.$token.'?email='.$admin->email);
+        $response = $this->get(route('central.admin.auth.password.reset', [
+            'token' => $token,
+            'email' => $admin->email,
+        ]));
 
         $response->assertStatus(200);
     }
@@ -42,14 +45,14 @@ class ResetPasswordTest extends TestCase
 
         $token = Password::broker('central_users')->createToken($admin);
 
-        $response = $this->post('/admin/reset-password', [
+        $response = $this->post(route('central.admin.auth.password.update'), [
             'token' => $token,
             'email' => $admin->email,
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
         ]);
 
-        $response->assertRedirect('/admin/login');
+        $response->assertRedirect(route('central.admin.auth.login'));
 
         $admin->refresh();
         $this->assertTrue(Hash::check('new-password', $admin->password));
@@ -61,7 +64,7 @@ class ResetPasswordTest extends TestCase
             'password' => Hash::make('old-password'),
         ]);
 
-        $response = $this->post('/admin/reset-password', [
+        $response = $this->post(route('central.admin.auth.password.update'), [
             'token' => 'invalid-token',
             'email' => $admin->email,
             'password' => 'new-password',
@@ -80,7 +83,7 @@ class ResetPasswordTest extends TestCase
 
         $token = Password::broker('central_users')->createToken($admin);
 
-        $response = $this->post('/admin/reset-password', [
+        $response = $this->post(route('central.admin.auth.password.update'), [
             'token' => $token,
             'email' => $admin->email,
             'password' => 'short',
@@ -96,7 +99,7 @@ class ResetPasswordTest extends TestCase
 
         $token = Password::broker('central_users')->createToken($admin);
 
-        $response = $this->post('/admin/reset-password', [
+        $response = $this->post(route('central.admin.auth.password.update'), [
             'token' => $token,
             'email' => $admin->email,
             'password' => 'new-password',

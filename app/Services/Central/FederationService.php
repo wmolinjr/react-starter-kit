@@ -2,7 +2,9 @@
 
 namespace App\Services\Central;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Exceptions\Central\FederationException;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
@@ -46,7 +48,7 @@ class FederationService
         string $name,
         Tenant $masterTenant,
         ?string $description = null,
-        string $syncStrategy = FederationGroup::STRATEGY_MASTER_WINS,
+        FederationSyncStrategy $syncStrategy = FederationSyncStrategy::MASTER_WINS,
         array $settings = []
     ): FederationGroup {
         // Check if master tenant is already in a group
@@ -460,7 +462,7 @@ class FederationService
                 'federated_user_id' => $federatedUser->id,
                 'tenant_id' => $masterTenant->id,
                 'tenant_user_id' => $masterTenantUserId,
-                'sync_status' => FederatedUserLink::STATUS_SYNCED,
+                'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
                 'last_synced_at' => now(),
                 'metadata' => [
                     'created_via' => FederatedUserLink::CREATED_VIA_AUTO_SYNC,
@@ -507,7 +509,7 @@ class FederationService
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $tenant->id,
             'tenant_user_id' => $tenantUserId,
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
             'last_synced_at' => now(),
             'metadata' => [
                 'created_via' => $createdVia,
@@ -527,11 +529,11 @@ class FederationService
         $oldData = $federatedUser->synced_data;
 
         // Check sync strategy
-        if ($group->sync_strategy === FederationGroup::STRATEGY_MASTER_WINS) {
+        if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
             // Only accept updates from master tenant
             if ($sourceTenant->id !== $group->master_tenant_id) {
                 // Non-master update - check if we should create a conflict
-                if ($group->sync_strategy === FederationGroup::STRATEGY_MANUAL_REVIEW) {
+                if ($group->sync_strategy === FederationSyncStrategy::MANUAL_REVIEW) {
                     $this->createConflict($federatedUser, $newData, $sourceTenant);
                 }
                 return;

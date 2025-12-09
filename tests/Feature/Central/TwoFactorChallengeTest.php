@@ -25,9 +25,9 @@ class TwoFactorChallengeTest extends TestCase
 
     public function test_two_factor_challenge_page_redirects_without_pending_login(): void
     {
-        $response = $this->get('/admin/two-factor-challenge');
+        $response = $this->get(route('central.admin.auth.two-factor.challenge'));
 
-        $response->assertRedirect('/admin/login');
+        $response->assertRedirect(route('central.admin.auth.login'));
     }
 
     public function test_two_factor_challenge_page_can_be_rendered_with_pending_login(): void
@@ -38,18 +38,18 @@ class TwoFactorChallengeTest extends TestCase
         session(['central_admin.login.id' => $admin->id]);
 
         $response = $this->withSession(['central_admin.login.id' => $admin->id])
-            ->get('/admin/two-factor-challenge');
+            ->get(route('central.admin.auth.two-factor.challenge'));
 
         $response->assertStatus(200);
     }
 
     public function test_two_factor_challenge_fails_without_pending_login(): void
     {
-        $response = $this->post('/admin/two-factor-challenge', [
+        $response = $this->post(route('central.admin.auth.two-factor.challenge.store'), [
             'code' => '123456',
         ]);
 
-        $response->assertRedirect('/admin/login');
+        $response->assertRedirect(route('central.admin.auth.login'));
     }
 
     public function test_two_factor_challenge_fails_with_invalid_code(): void
@@ -65,7 +65,7 @@ class TwoFactorChallengeTest extends TestCase
         $this->app->instance(TwoFactorAuthenticationProvider::class, $provider);
 
         $response = $this->withSession(['central_admin.login.id' => $admin->id])
-            ->post('/admin/two-factor-challenge', [
+            ->post(route('central.admin.auth.two-factor.challenge.store'), [
                 'code' => '000000',
             ]);
 
@@ -87,11 +87,11 @@ class TwoFactorChallengeTest extends TestCase
         $response = $this->withSession([
             'central_admin.login.id' => $admin->id,
             'central_admin.login.remember' => false,
-        ])->post('/admin/two-factor-challenge', [
+        ])->post(route('central.admin.auth.two-factor.challenge.store'), [
             'code' => '123456',
         ]);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect(route('central.admin.dashboard'));
         $this->assertAuthenticatedAs($admin, 'central');
     }
 
@@ -103,11 +103,11 @@ class TwoFactorChallengeTest extends TestCase
         $response = $this->withSession([
             'central_admin.login.id' => $admin->id,
             'central_admin.login.remember' => false,
-        ])->post('/admin/two-factor-challenge', [
+        ])->post(route('central.admin.auth.two-factor.challenge.store'), [
             'recovery_code' => 'CODE1-12345',
         ]);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect(route('central.admin.dashboard'));
         $this->assertAuthenticatedAs($admin, 'central');
 
         // Verify recovery code was removed
@@ -124,7 +124,7 @@ class TwoFactorChallengeTest extends TestCase
 
         $response = $this->withSession([
             'central_admin.login.id' => $admin->id,
-        ])->post('/admin/two-factor-challenge', [
+        ])->post(route('central.admin.auth.two-factor.challenge.store'), [
             'recovery_code' => 'INVALID-CODE',
         ]);
 
@@ -135,12 +135,12 @@ class TwoFactorChallengeTest extends TestCase
     {
         $admin = $this->createAdminWith2FA();
 
-        $response = $this->post('/admin/login', [
+        $response = $this->post(route('central.admin.auth.login.store'), [
             'email' => $admin->email,
             'password' => 'password',
         ]);
 
-        $response->assertRedirect('/admin/two-factor-challenge');
+        $response->assertRedirect(route('central.admin.auth.two-factor.challenge'));
         $this->assertGuest('central');
     }
 

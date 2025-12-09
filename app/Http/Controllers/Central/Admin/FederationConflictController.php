@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\CentralPermission;
+use App\Enums\FederationConflictStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\ResolveConflictRequest;
 use App\Http\Resources\Central\FederationConflictResource;
@@ -85,7 +86,7 @@ class FederationConflictController extends Controller implements HasMiddleware
     public function dismiss(FederationGroup $group, FederationConflict $conflict): RedirectResponse
     {
         $conflict->update([
-            'status' => FederationConflict::STATUS_DISMISSED,
+            'status' => FederationConflictStatus::DISMISSED,
             'resolved_by' => auth('central')->id(),
             'resolved_at' => now(),
         ]);

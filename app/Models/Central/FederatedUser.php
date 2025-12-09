@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +31,18 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
 class FederatedUser extends Model
 {
     use CentralConnection, HasUuids, SoftDeletes;
+
+    /**
+     * Boot the model and ensure central connection is used.
+     */
+    protected static function booted(): void
+    {
+        // Ensure new query builders use the central connection
+        static::addGlobalScope('central_connection', function ($query) {
+            $centralConnection = config('tenancy.database.central_connection');
+            $query->getModel()->setConnection($centralConnection);
+        });
+    }
 
     protected $fillable = [
         'federation_group_id',
@@ -79,7 +92,7 @@ class FederatedUser extends Model
      */
     public function activeLinks(): HasMany
     {
-        return $this->links()->where('sync_status', '!=', FederatedUserLink::STATUS_DISABLED);
+        return $this->links()->where('sync_status', '!=', FederatedUserLinkSyncStatus::DISABLED);
     }
 
     /**
@@ -87,7 +100,7 @@ class FederatedUser extends Model
      */
     public function syncedLinks(): HasMany
     {
-        return $this->links()->where('sync_status', FederatedUserLink::STATUS_SYNCED);
+        return $this->links()->where('sync_status', FederatedUserLinkSyncStatus::SYNCED);
     }
 
     /**
@@ -215,9 +228,15 @@ class FederatedUser extends Model
 
     /**
      * Find by email within a group.
+     * Explicitly uses central connection to avoid issues when running in tenant context.
      */
     public static function findByEmailInGroup(string $email, string $groupId): ?self
     {
-        return static::byEmail($email)->inGroup($groupId)->first();
+        $centralConnection = config('tenancy.database.central_connection');
+
+        return static::on($centralConnection)
+            ->byEmail($email)
+            ->inGroup($groupId)
+            ->first();
     }
 }

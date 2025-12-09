@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\CentralPermission;
+use App\Enums\FederationSyncStrategy;
 use App\Exceptions\Central\FederationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\AddTenantToGroupRequest;
@@ -74,7 +75,7 @@ class FederationGroupController extends Controller implements HasMiddleware
 
         return Inertia::render('central/admin/federation/create', [
             'availableTenants' => TenantSummaryResource::collection($availableTenants),
-            'syncStrategies' => FederationGroup::SYNC_STRATEGIES,
+            'syncStrategies' => FederationSyncStrategy::toFrontendArray(),
             'defaultSyncFields' => FederationGroup::DEFAULT_SYNC_FIELDS,
         ]);
     }
@@ -92,7 +93,7 @@ class FederationGroupController extends Controller implements HasMiddleware
                 name: $validated['name'],
                 masterTenant: $masterTenant,
                 description: $validated['description'] ?? null,
-                syncStrategy: $validated['sync_strategy'],
+                syncStrategy: FederationSyncStrategy::from($validated['sync_strategy']),
                 settings: $validated['settings'] ?? []
             );
 
@@ -158,7 +159,7 @@ class FederationGroupController extends Controller implements HasMiddleware
         return Inertia::render('central/admin/federation/edit', [
             'group' => new FederationGroupDetailResource($group),
             'tenants' => TenantSummaryResource::collection($tenants),
-            'syncStrategies' => FederationGroup::SYNC_STRATEGIES,
+            'syncStrategies' => FederationSyncStrategy::toFrontendArray(),
             'defaultSyncFields' => FederationGroup::DEFAULT_SYNC_FIELDS,
         ]);
     }

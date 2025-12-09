@@ -5,6 +5,7 @@ namespace Tests\Feature\Central;
 use App\Enums\CentralPermission;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationGroup;
+use App\Enums\FederationSyncStrategy;
 use App\Models\Central\Tenant;
 use App\Models\Central\User;
 use App\Models\Shared\Role;
@@ -36,7 +37,7 @@ class FederationGroupTest extends TestCase
 
         // Create admin with federation permissions
         $this->admin = User::factory()->create();
-        $adminRole = Role::findByName('admin', 'central');
+        $adminRole = Role::findByName('central-admin', 'central');
         $this->admin->assignRole($adminRole);
 
         // Grant federation permissions explicitly
@@ -93,7 +94,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Federation',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -161,7 +162,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Existing Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -191,7 +192,7 @@ class FederationGroupTest extends TestCase
                 'name' => 'New Federation Group',
                 'description' => 'A test federation group',
                 'master_tenant_id' => $this->masterTenant->id,
-                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
                 'settings' => [
                     'sync_fields' => FederationGroup::DEFAULT_SYNC_FIELDS,
                     'auto_create_on_login' => true,
@@ -204,7 +205,7 @@ class FederationGroupTest extends TestCase
         $this->assertDatabaseHas('federation_groups', [
             'name' => 'New Federation Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
         ]);
 
         // Check master tenant was added to group
@@ -238,7 +239,7 @@ class FederationGroupTest extends TestCase
             ->post(route('central.admin.federation.store'), [
                 'name' => 'Test Group',
                 'master_tenant_id' => '00000000-0000-0000-0000-000000000000',
-                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             ]);
 
         $response->assertSessionHasErrors(['master_tenant_id']);
@@ -250,7 +251,7 @@ class FederationGroupTest extends TestCase
         $existingGroup = FederationGroup::create([
             'name' => 'Existing Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -264,7 +265,7 @@ class FederationGroupTest extends TestCase
             ->post(route('central.admin.federation.store'), [
                 'name' => 'New Group',
                 'master_tenant_id' => $this->masterTenant->id,
-                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             ]);
 
         $response->assertSessionHas('error');
@@ -279,7 +280,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -312,7 +313,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -323,7 +324,7 @@ class FederationGroupTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('central/admin/federation/edit')
             ->has('group')
-            ->has('availableTenants')
+            ->has('tenants')
             ->where('group.name', 'Test Group')
         );
     }
@@ -333,7 +334,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -356,7 +357,7 @@ class FederationGroupTest extends TestCase
             'name' => 'Original Name',
             'description' => 'Original description',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -364,7 +365,7 @@ class FederationGroupTest extends TestCase
             ->put(route('central.admin.federation.update', $group), [
                 'name' => 'Updated Name',
                 'description' => 'Updated description',
-                'sync_strategy' => FederationGroup::STRATEGY_LAST_WRITE_WINS,
+                'sync_strategy' => FederationSyncStrategy::LAST_WRITE_WINS->value,
                 'is_active' => false,
             ]);
 
@@ -374,7 +375,7 @@ class FederationGroupTest extends TestCase
         $group->refresh();
         $this->assertEquals('Updated Name', $group->name);
         $this->assertEquals('Updated description', $group->description);
-        $this->assertEquals(FederationGroup::STRATEGY_LAST_WRITE_WINS, $group->sync_strategy);
+        $this->assertEquals(FederationSyncStrategy::LAST_WRITE_WINS, $group->sync_strategy);
         $this->assertFalse($group->is_active);
     }
 
@@ -383,7 +384,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -407,7 +408,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -427,7 +428,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -452,7 +453,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -479,7 +480,7 @@ class FederationGroupTest extends TestCase
         $group1 = FederationGroup::create([
             'name' => 'Group 1',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -497,7 +498,7 @@ class FederationGroupTest extends TestCase
         $group2 = FederationGroup::create([
             'name' => 'Group 2',
             'master_tenant_id' => $this->thirdTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -524,7 +525,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -555,7 +556,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -579,11 +580,11 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Master Wins Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
-        $this->assertEquals(FederationGroup::STRATEGY_MASTER_WINS, $group->sync_strategy);
+        $this->assertEquals(FederationSyncStrategy::MASTER_WINS, $group->sync_strategy);
         $this->assertTrue($group->isMaster($this->masterTenant));
         $this->assertFalse($group->isMaster($this->secondTenant));
     }
@@ -593,11 +594,11 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Last Write Wins Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_LAST_WRITE_WINS,
+            'sync_strategy' => FederationSyncStrategy::LAST_WRITE_WINS->value,
             'is_active' => true,
         ]);
 
-        $this->assertEquals(FederationGroup::STRATEGY_LAST_WRITE_WINS, $group->sync_strategy);
+        $this->assertEquals(FederationSyncStrategy::LAST_WRITE_WINS, $group->sync_strategy);
     }
 
     public function test_group_with_manual_review_strategy(): void
@@ -605,11 +606,11 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Manual Review Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MANUAL_REVIEW,
+            'sync_strategy' => FederationSyncStrategy::MANUAL_REVIEW->value,
             'is_active' => true,
         ]);
 
-        $this->assertEquals(FederationGroup::STRATEGY_MANUAL_REVIEW, $group->sync_strategy);
+        $this->assertEquals(FederationSyncStrategy::MANUAL_REVIEW, $group->sync_strategy);
     }
 
     // =========================================================================
@@ -621,7 +622,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -637,7 +638,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Test Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'settings' => [
                 'sync_fields' => ['name', 'email'],
                 'auto_create_on_login' => false,
@@ -660,14 +661,14 @@ class FederationGroupTest extends TestCase
         FederationGroup::create([
             'name' => 'Active Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
         FederationGroup::create([
             'name' => 'Inactive Group',
             'master_tenant_id' => $this->secondTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => false,
         ]);
 
@@ -686,7 +687,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Auto Federate Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'settings' => [
                 'auto_federate_new_users' => true,
             ],
@@ -701,7 +702,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Manual Federate Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'settings' => [
                 'auto_federate_new_users' => false,
             ],
@@ -716,7 +717,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Default Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
@@ -729,7 +730,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Null Settings Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'settings' => null,
             'is_active' => true,
         ]);
@@ -742,7 +743,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Updatable Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'settings' => [
                 'auto_federate_new_users' => false,
             ],
@@ -765,7 +766,7 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Multi Settings Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'settings' => [
                 'sync_fields' => ['name', 'email', 'password'],
                 'auto_create_on_login' => true,
@@ -788,14 +789,14 @@ class FederationGroupTest extends TestCase
         $group = FederationGroup::create([
             'name' => 'Original Name',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 
         $response = $this->actingAs($this->admin, 'central')
             ->put(route('central.admin.federation.update', $group), [
                 'name' => 'Updated Name',
-                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
                 'is_active' => true,
                 'settings' => [
                     'sync_password' => true,
@@ -819,7 +820,7 @@ class FederationGroupTest extends TestCase
             ->post(route('central.admin.federation.store'), [
                 'name' => 'Auto Federate Group',
                 'master_tenant_id' => $this->masterTenant->id,
-                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
                 'settings' => [
                     'sync_password' => true,
                     'sync_profile' => true,

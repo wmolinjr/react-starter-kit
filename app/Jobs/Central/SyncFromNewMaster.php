@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Central;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
@@ -118,7 +119,7 @@ class SyncFromNewMaster implements ShouldQueue
                     'federated_user_id' => $federatedUser->id,
                     'tenant_id' => $this->newMaster->id,
                     'tenant_user_id' => $localUser->id,
-                    'sync_status' => FederatedUserLink::STATUS_SYNCED,
+                    'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
                     'last_synced_at' => now(),
                     'metadata' => [
                         'created_via' => 'master_change_sync',
@@ -178,7 +179,7 @@ class SyncFromNewMaster implements ShouldQueue
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->newMaster->id,
             'tenant_user_id' => $localUser->id,
-            'sync_status' => FederatedUserLink::STATUS_SYNCED,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
             'last_synced_at' => now(),
             'metadata' => [
                 'created_via' => 'master_change_creation',

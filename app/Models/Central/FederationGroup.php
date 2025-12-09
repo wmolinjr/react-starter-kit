@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Enums\FederationSyncStrategy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,24 +41,9 @@ class FederationGroup extends Model
     ];
 
     protected $casts = [
+        'sync_strategy' => FederationSyncStrategy::class,
         'settings' => 'array',
         'is_active' => 'boolean',
-    ];
-
-    /**
-     * Sync strategies for conflict resolution.
-     */
-    public const STRATEGY_MASTER_WINS = 'master_wins';
-    public const STRATEGY_LAST_WRITE_WINS = 'last_write_wins';
-    public const STRATEGY_MANUAL_REVIEW = 'manual_review';
-
-    /**
-     * All available sync strategies (for UI dropdowns).
-     */
-    public const SYNC_STRATEGIES = [
-        self::STRATEGY_MASTER_WINS => 'Master tenant data always wins',
-        self::STRATEGY_LAST_WRITE_WINS => 'Most recent change wins',
-        self::STRATEGY_MANUAL_REVIEW => 'Require manual review for conflicts',
     ];
 
     /**
@@ -198,6 +184,6 @@ class FederationGroup extends Model
      */
     public function scopeMasterWins($query)
     {
-        return $query->where('sync_strategy', self::STRATEGY_MASTER_WINS);
+        return $query->where('sync_strategy', FederationSyncStrategy::MASTER_WINS);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Services\Central;
 
+use App\Enums\FederatedUserLinkSyncStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Exceptions\Central\FederationException;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
@@ -284,7 +286,7 @@ class FederationSyncService
                 'federated_user_id' => $federatedUser->id,
                 'tenant_id' => $tenant->id,
                 'tenant_user_id' => $this->getTenantUserId($federatedUser, $tenant),
-                'sync_status' => FederatedUserLink::STATUS_SYNCED,
+                'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
                 'last_synced_at' => now(),
                 'metadata' => [
                     'created_via' => FederatedUserLink::CREATED_VIA_BULK_SYNC,
@@ -366,7 +368,7 @@ class FederationSyncService
         ];
 
         $failedLinks = $federatedUser->links()
-            ->where('sync_status', FederatedUserLink::STATUS_SYNC_FAILED)
+            ->where('sync_status', FederatedUserLinkSyncStatus::SYNC_FAILED)
             ->get();
 
         foreach ($failedLinks as $link) {
@@ -406,7 +408,7 @@ class FederationSyncService
      */
     public function getFailedSyncsForGroup(FederationGroup $group): Collection
     {
-        return FederatedUserLink::where('sync_status', FederatedUserLink::STATUS_SYNC_FAILED)
+        return FederatedUserLink::where('sync_status', FederatedUserLinkSyncStatus::SYNC_FAILED)
             ->whereHas('federatedUser', fn($q) => $q->where('federation_group_id', $group->id))
             ->with(['federatedUser', 'tenant'])
             ->get();
@@ -453,7 +455,7 @@ class FederationSyncService
         FederationGroup $group,
         Tenant $tenant
     ): bool {
-        if ($group->sync_strategy === FederationGroup::STRATEGY_MASTER_WINS) {
+        if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
             return $group->isMaster($tenant);
         }
 

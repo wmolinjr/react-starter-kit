@@ -21,8 +21,7 @@ class ResolveConflictRequest extends FormRequest
                 'required',
                 'string',
                 Rule::in([
-                    FederationConflict::RESOLUTION_MASTER,
-                    FederationConflict::RESOLUTION_SOURCE,
+                    FederationConflict::RESOLUTION_MASTER_VALUE,
                     FederationConflict::RESOLUTION_MANUAL,
                 ]),
             ],

@@ -7,6 +7,7 @@ use App\Listeners\Tenant\AutoFederateNewUser;
 use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationGroup;
+use App\Enums\FederationSyncStrategy;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
 use App\Services\Central\FederationService as CentralFederationService;
@@ -36,7 +37,7 @@ class AutoFederateNewUserTest extends TenantTestCase
         $this->group = $this->centralFederationService->createGroup(
             name: 'Test Federation',
             masterTenant: $this->tenant,
-            syncStrategy: FederationGroup::STRATEGY_MASTER_WINS
+            syncStrategy: FederationSyncStrategy::MASTER_WINS
         );
 
         // Create branch tenant and add to group
@@ -305,7 +306,7 @@ class AutoFederateNewUserTest extends TenantTestCase
         $group = FederationGroup::create([
             'name' => 'Default Settings Group',
             'master_tenant_id' => $this->tenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'sync_strategy' => FederationSyncStrategy::MASTER_WINS->value,
             'is_active' => true,
         ]);
 

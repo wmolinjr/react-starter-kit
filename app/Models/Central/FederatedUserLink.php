@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,19 +40,11 @@ class FederatedUserLink extends Model
     ];
 
     protected $casts = [
+        'sync_status' => FederatedUserLinkSyncStatus::class,
         'last_synced_at' => 'datetime',
         'sync_attempts' => 'integer',
         'metadata' => 'array',
     ];
-
-    /**
-     * Sync status constants.
-     */
-    public const STATUS_SYNCED = 'synced';
-    public const STATUS_PENDING_SYNC = 'pending_sync';
-    public const STATUS_SYNC_FAILED = 'sync_failed';
-    public const STATUS_CONFLICT = 'conflict';
-    public const STATUS_DISABLED = 'disabled';
 
     /**
      * Created via constants.
@@ -111,7 +104,7 @@ class FederatedUserLink extends Model
     public function markAsSynced(): bool
     {
         return $this->update([
-            'sync_status' => self::STATUS_SYNCED,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNCED,
             'last_synced_at' => now(),
             'sync_attempts' => 0,
             'last_sync_error' => null,
@@ -124,7 +117,7 @@ class FederatedUserLink extends Model
     public function markAsPendingSync(): bool
     {
         return $this->update([
-            'sync_status' => self::STATUS_PENDING_SYNC,
+            'sync_status' => FederatedUserLinkSyncStatus::PENDING_SYNC,
         ]);
     }
 
@@ -134,7 +127,7 @@ class FederatedUserLink extends Model
     public function markAsFailed(string $error): bool
     {
         return $this->update([
-            'sync_status' => self::STATUS_SYNC_FAILED,
+            'sync_status' => FederatedUserLinkSyncStatus::SYNC_FAILED,
             'sync_attempts' => $this->sync_attempts + 1,
             'last_sync_error' => $error,
         ]);
@@ -146,7 +139,7 @@ class FederatedUserLink extends Model
     public function markAsConflict(): bool
     {
         return $this->update([
-            'sync_status' => self::STATUS_CONFLICT,
+            'sync_status' => FederatedUserLinkSyncStatus::CONFLICT,
         ]);
     }
 
@@ -156,7 +149,7 @@ class FederatedUserLink extends Model
     public function disable(): bool
     {
         return $this->update([
-            'sync_status' => self::STATUS_DISABLED,
+            'sync_status' => FederatedUserLinkSyncStatus::DISABLED,
         ]);
     }
 
@@ -166,7 +159,7 @@ class FederatedUserLink extends Model
     public function enable(): bool
     {
         return $this->update([
-            'sync_status' => self::STATUS_PENDING_SYNC,
+            'sync_status' => FederatedUserLinkSyncStatus::PENDING_SYNC,
         ]);
     }
 
@@ -175,7 +168,7 @@ class FederatedUserLink extends Model
      */
     public function shouldRetry(int $maxAttempts = 3): bool
     {
-        return $this->sync_status === self::STATUS_SYNC_FAILED
+        return $this->sync_status === FederatedUserLinkSyncStatus::SYNC_FAILED
             && $this->sync_attempts < $maxAttempts;
     }
 
@@ -194,7 +187,7 @@ class FederatedUserLink extends Model
      */
     public function isSynced(): bool
     {
-        return $this->sync_status === self::STATUS_SYNCED;
+        return $this->sync_status === FederatedUserLinkSyncStatus::SYNCED;
     }
 
     /**
@@ -202,7 +195,7 @@ class FederatedUserLink extends Model
      */
     public function isDisabled(): bool
     {
-        return $this->sync_status === self::STATUS_DISABLED;
+        return $this->sync_status === FederatedUserLinkSyncStatus::DISABLED;
     }
 
     /**
@@ -210,7 +203,7 @@ class FederatedUserLink extends Model
      */
     public function scopeSynced($query)
     {
-        return $query->where('sync_status', self::STATUS_SYNCED);
+        return $query->where('sync_status', FederatedUserLinkSyncStatus::SYNCED);
     }
 
     /**
@@ -218,7 +211,7 @@ class FederatedUserLink extends Model
      */
     public function scopePending($query)
     {
-        return $query->where('sync_status', self::STATUS_PENDING_SYNC);
+        return $query->where('sync_status', FederatedUserLinkSyncStatus::PENDING_SYNC);
     }
 
     /**
@@ -226,7 +219,7 @@ class FederatedUserLink extends Model
      */
     public function scopeFailed($query)
     {
-        return $query->where('sync_status', self::STATUS_SYNC_FAILED);
+        return $query->where('sync_status', FederatedUserLinkSyncStatus::SYNC_FAILED);
     }
 
     /**
@@ -234,7 +227,7 @@ class FederatedUserLink extends Model
      */
     public function scopeConflict($query)
     {
-        return $query->where('sync_status', self::STATUS_CONFLICT);
+        return $query->where('sync_status', FederatedUserLinkSyncStatus::CONFLICT);
     }
 
     /**

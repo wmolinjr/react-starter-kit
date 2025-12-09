@@ -5,6 +5,8 @@ namespace Tests\Feature\Central;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
+use App\Enums\FederationSyncStrategy;
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Models\Central\Tenant;
 use App\Services\Central\FederationService;
 use App\Services\Central\FederationSyncService;
@@ -79,7 +81,7 @@ class FederationPasswordSyncTest extends TestCase
         $this->group = $this->federationService->createGroup(
             name: 'Test Federation',
             masterTenant: $this->masterTenant,
-            syncStrategy: FederationGroup::STRATEGY_MASTER_WINS
+            syncStrategy: FederationSyncStrategy::MASTER_WINS
         );
 
         // Add branch tenants to group
@@ -103,7 +105,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => $hashedPassword,
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $this->assertEquals($hashedPassword, $federatedUser->getPasswordHash());
@@ -122,7 +124,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => $initialPassword,
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $federatedUser->updateSyncedField('password_hash', $newPassword);
@@ -147,7 +149,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $newHashedPassword = Hash::make('new-secure-password');
@@ -174,12 +176,12 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         // Add links to branch tenants
-        $this->federationService->createUserLink($federatedUser, $this->branchTenant1, 'branch1-user');
-        $this->federationService->createUserLink($federatedUser, $this->branchTenant2, 'branch2-user');
+        $this->federationService->createUserLink($federatedUser, $this->branchTenant1, \Illuminate\Support\Str::uuid()->toString());
+        $this->federationService->createUserLink($federatedUser, $this->branchTenant2, \Illuminate\Support\Str::uuid()->toString());
 
         $results = $this->syncService->syncPasswordToAllTenants(
             $federatedUser,
@@ -208,7 +210,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $this->assertNull($federatedUser->getSyncedField('password_changed_at'));
@@ -239,7 +241,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $initialVersion = $federatedUser->sync_version;
@@ -271,7 +273,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $canSync = $this->syncService->canTenantInitiateSync($this->group, $this->masterTenant);
@@ -291,7 +293,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $canSync = $this->syncService->canTenantInitiateSync($this->group, $this->branchTenant1);
@@ -309,7 +311,7 @@ class FederationPasswordSyncTest extends TestCase
         $lastWriteGroup = FederationGroup::create([
             'name' => 'Last Write Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_LAST_WRITE_WINS,
+            'sync_strategy' => FederationSyncStrategy::LAST_WRITE_WINS->value,
             'is_active' => true,
         ]);
 
@@ -330,7 +332,7 @@ class FederationPasswordSyncTest extends TestCase
         $manualReviewGroup = FederationGroup::create([
             'name' => 'Manual Review Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MANUAL_REVIEW,
+            'sync_strategy' => FederationSyncStrategy::MANUAL_REVIEW->value,
             'is_active' => true,
         ]);
 
@@ -403,18 +405,18 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('old-password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         // Create link and mark as pending
         $link = FederatedUserLink::create([
             'federated_user_id' => $federatedUser->id,
             'tenant_id' => $this->branchTenant1->id,
-            'tenant_user_id' => 'branch-user-1',
-            'sync_status' => FederatedUserLink::STATUS_PENDING_SYNC,
+            'tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'sync_status' => FederatedUserLinkSyncStatus::PENDING_SYNC->value,
         ]);
 
-        $this->assertEquals(FederatedUserLink::STATUS_PENDING_SYNC, $link->sync_status);
+        $this->assertEquals(FederatedUserLinkSyncStatus::PENDING_SYNC, $link->sync_status);
     }
 
     // =========================================================================
@@ -431,7 +433,7 @@ class FederationPasswordSyncTest extends TestCase
                 'password_hash' => Hash::make('password'),
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $twoFactorData = [
@@ -466,7 +468,7 @@ class FederationPasswordSyncTest extends TestCase
                 'two_factor_secret' => 'old-secret',
             ],
             masterTenant: $this->masterTenant,
-            masterTenantUserId: 'user-123'
+            masterTenantUserId: \Illuminate\Support\Str::uuid()->toString()
         );
 
         $this->assertTrue($federatedUser->hasTwoFactorEnabled());

@@ -39,6 +39,9 @@ abstract class TestCase extends BaseTestCase
         config(['tenancy.queue_database_creation' => false]);
         config(['tenancy.queue_database_deletion' => false]);
 
+        // Disable domain resolver cache for tests (avoids stale cache issues)
+        config(['tenancy.identification.resolvers.' . \Stancl\Tenancy\Resolvers\DomainTenantResolver::class . '.cache' => false]);
+
         // Run migrations once per test class
         if (! static::$classMigrationsRun) {
             // Fresh migration for central testing database
@@ -84,12 +87,12 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Central domain for tests.
+     * Central domain for tests (matches APP_DOMAIN in Laravel Sail).
      *
      * Used to ensure HTTP requests go to the correct domain
      * when there are conflicting routes between central and tenant.
      */
-    protected string $centralDomain = 'localhost';
+    protected string $centralDomain = 'app.test';
 
     /**
      * Generate a full URL for central routes.

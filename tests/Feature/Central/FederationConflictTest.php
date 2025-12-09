@@ -7,6 +7,8 @@ use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationConflict;
 use App\Models\Central\FederationGroup;
+use App\Enums\FederationSyncStrategy;
+use App\Enums\FederationConflictStatus;
 use App\Models\Central\Tenant;
 use App\Models\Central\User;
 use App\Models\Shared\Role;
@@ -42,7 +44,7 @@ class FederationConflictTest extends TestCase
 
         // Create admin with federation permissions
         $this->admin = User::factory()->create();
-        $adminRole = Role::findByName('admin', 'central');
+        $adminRole = Role::findByName('central-admin', 'central');
         $this->admin->assignRole($adminRole);
 
         $this->admin->givePermissionTo([
@@ -75,7 +77,7 @@ class FederationConflictTest extends TestCase
         $this->group = FederationGroup::create([
             'name' => 'Manual Review Group',
             'master_tenant_id' => $this->masterTenant->id,
-            'sync_strategy' => FederationGroup::STRATEGY_MANUAL_REVIEW,
+            'sync_strategy' => FederationSyncStrategy::MANUAL_REVIEW->value,
             'is_active' => true,
         ]);
 
@@ -101,7 +103,7 @@ class FederationConflictTest extends TestCase
             'global_email' => 'john@example.com',
             'synced_data' => ['name' => 'John Doe'],
             'master_tenant_id' => $this->masterTenant->id,
-            'master_tenant_user_id' => 'user-123',
+            'master_tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
             'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
@@ -117,14 +119,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $this->assertDatabaseHas('federation_conflicts', [
             'id' => $conflict->id,
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
     }
 
@@ -134,7 +136,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $conflict->addConflictingValue($this->masterTenant->id, 'John Doe');
@@ -152,7 +154,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $conflict->addConflictingValue($this->masterTenant->id, 'Value 1');
@@ -176,7 +178,7 @@ class FederationConflictTest extends TestCase
                 $this->masterTenant->id => ['value' => 'John Doe', 'updated_at' => now()->toIso8601String()],
                 $this->branchTenant1->id => ['value' => 'John Smith', 'updated_at' => now()->toIso8601String()],
             ],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $conflict->resolve(
@@ -188,7 +190,7 @@ class FederationConflictTest extends TestCase
 
         $conflict->refresh();
 
-        $this->assertEquals(FederationConflict::STATUS_RESOLVED, $conflict->status);
+        $this->assertEquals(FederationConflictStatus::RESOLVED, $conflict->status);
         $this->assertEquals($this->admin->id, $conflict->resolved_by);
         $this->assertEquals(FederationConflict::RESOLUTION_MASTER_VALUE, $conflict->resolution);
         $this->assertEquals('Used master tenant value', $conflict->resolution_notes);
@@ -201,7 +203,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $conflict->dismiss(
@@ -211,7 +213,7 @@ class FederationConflictTest extends TestCase
 
         $conflict->refresh();
 
-        $this->assertEquals(FederationConflict::STATUS_DISMISSED, $conflict->status);
+        $this->assertEquals(FederationConflictStatus::DISMISSED, $conflict->status);
         $this->assertEquals(FederationConflict::RESOLUTION_DISMISSED, $conflict->resolution);
     }
 
@@ -221,14 +223,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $resolvedConflict = FederationConflict::create([
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'email',
             'values' => [],
-            'status' => FederationConflict::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED->value,
         ]);
 
         $this->assertTrue($pendingConflict->isPending());
@@ -241,14 +243,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $resolvedConflict = FederationConflict::create([
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'email',
             'values' => [],
-            'status' => FederationConflict::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED->value,
         ]);
 
         $this->assertFalse($pendingConflict->isResolved());
@@ -265,14 +267,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         FederationConflict::create([
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'email',
             'values' => [],
-            'status' => FederationConflict::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED->value,
         ]);
 
         $pendingConflicts = FederationConflict::pending()->get();
@@ -287,14 +289,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         FederationConflict::create([
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'email',
             'values' => [],
-            'status' => FederationConflict::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED->value,
         ]);
 
         $resolvedConflicts = FederationConflict::resolved()->get();
@@ -309,14 +311,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         FederationConflict::create([
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'email',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $nameConflicts = FederationConflict::forField('name')->get();
@@ -331,7 +333,7 @@ class FederationConflictTest extends TestCase
             'global_email' => 'other@example.com',
             'synced_data' => ['name' => 'Other User'],
             'master_tenant_id' => $this->masterTenant->id,
-            'master_tenant_user_id' => 'user-456',
+            'master_tenant_user_id' => \Illuminate\Support\Str::uuid()->toString(),
             'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
@@ -340,14 +342,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         FederationConflict::create([
             'federated_user_id' => $otherUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $userConflicts = FederationConflict::forUser($this->federatedUser->id)->get();
@@ -365,7 +367,7 @@ class FederationConflictTest extends TestCase
 
         $this->assertNotNull($conflict);
         $this->assertEquals('locale', $conflict->field);
-        $this->assertEquals(FederationConflict::STATUS_PENDING, $conflict->status);
+        $this->assertEquals(FederationConflictStatus::PENDING, $conflict->status);
     }
 
     public function test_find_or_create_pending_returns_existing(): void
@@ -376,7 +378,7 @@ class FederationConflictTest extends TestCase
             'values' => [
                 $this->masterTenant->id => ['value' => 'en', 'updated_at' => now()->toIso8601String()],
             ],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $found = FederationConflict::findOrCreatePending($this->federatedUser->id, 'locale');
@@ -391,12 +393,12 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'locale',
             'values' => [],
-            'status' => FederationConflict::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED->value,
         ]);
 
         $newConflict = FederationConflict::findOrCreatePending($this->federatedUser->id, 'locale');
 
-        $this->assertEquals(FederationConflict::STATUS_PENDING, $newConflict->status);
+        $this->assertEquals(FederationConflictStatus::PENDING, $newConflict->status);
     }
 
     // =========================================================================
@@ -409,7 +411,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->admin, 'central')
@@ -453,7 +455,7 @@ class FederationConflictTest extends TestCase
                 $this->masterTenant->id => ['value' => 'John Doe', 'updated_at' => now()->toIso8601String()],
                 $this->branchTenant1->id => ['value' => 'John Smith', 'updated_at' => now()->toIso8601String()],
             ],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->admin, 'central')
@@ -480,7 +482,7 @@ class FederationConflictTest extends TestCase
                 $this->masterTenant->id => ['value' => 'John Doe', 'updated_at' => now()->toIso8601String()],
                 $this->branchTenant1->id => ['value' => 'John Smith', 'updated_at' => now()->toIso8601String()],
             ],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->admin, 'central')
@@ -494,7 +496,7 @@ class FederationConflictTest extends TestCase
         $response->assertSessionHas('success');
 
         $conflict->refresh();
-        $this->assertEquals(FederationConflict::STATUS_RESOLVED, $conflict->status);
+        $this->assertEquals(FederationConflictStatus::RESOLVED, $conflict->status);
     }
 
     public function test_resolve_requires_manage_conflicts_permission(): void
@@ -506,7 +508,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($viewOnlyAdmin, 'central')
@@ -528,7 +530,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->admin, 'central')
@@ -538,7 +540,7 @@ class FederationConflictTest extends TestCase
         $response->assertSessionHas('success');
 
         $conflict->refresh();
-        $this->assertEquals(FederationConflict::STATUS_DISMISSED, $conflict->status);
+        $this->assertEquals(FederationConflictStatus::DISMISSED, $conflict->status);
     }
 
     public function test_dismiss_requires_manage_conflicts_permission(): void
@@ -550,7 +552,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($viewOnlyAdmin, 'central')
@@ -576,7 +578,7 @@ class FederationConflictTest extends TestCase
         $this->assertDatabaseHas('federation_conflicts', [
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
     }
 
@@ -586,14 +588,14 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         FederationConflict::create([
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'locale',
             'values' => [],
-            'status' => FederationConflict::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED->value,
         ]);
 
         $service = app(FederationService::class);
@@ -611,7 +613,7 @@ class FederationConflictTest extends TestCase
                 $this->masterTenant->id => ['value' => 'John Doe', 'updated_at' => now()->toIso8601String()],
                 $this->branchTenant1->id => ['value' => 'John Smith', 'updated_at' => now()->toIso8601String()],
             ],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $service = app(FederationService::class);
@@ -626,7 +628,7 @@ class FederationConflictTest extends TestCase
         $conflict->refresh();
         $this->federatedUser->refresh();
 
-        $this->assertEquals(FederationConflict::STATUS_RESOLVED, $conflict->status);
+        $this->assertEquals(FederationConflictStatus::RESOLVED, $conflict->status);
         $this->assertEquals('John Smith', $this->federatedUser->getSyncedField('name'));
     }
 
@@ -640,7 +642,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $this->assertNotNull($conflict->federatedUser);
@@ -653,7 +655,7 @@ class FederationConflictTest extends TestCase
             'federated_user_id' => $this->federatedUser->id,
             'field' => 'name',
             'values' => [],
-            'status' => FederationConflict::STATUS_PENDING,
+            'status' => FederationConflictStatus::PENDING->value,
         ]);
 
         $conflict->resolve('John Doe', $this->admin->id);

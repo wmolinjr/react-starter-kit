@@ -191,6 +191,7 @@ enum TenantRole: string
                 PermissionCategory::SSO,
                 PermissionCategory::BRANDING,
                 PermissionCategory::REPORTS,
+                PermissionCategory::FEDERATION,
             ],
         };
     }

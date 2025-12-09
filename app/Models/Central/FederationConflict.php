@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Enums\FederationConflictStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,16 +40,10 @@ class FederationConflict extends Model
     ];
 
     protected $casts = [
+        'status' => FederationConflictStatus::class,
         'values' => 'array',
         'resolved_at' => 'datetime',
     ];
-
-    /**
-     * Status constants.
-     */
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_RESOLVED = 'resolved';
-    public const STATUS_DISMISSED = 'dismissed';
 
     /**
      * Resolution constants.
@@ -117,7 +112,7 @@ class FederationConflict extends Model
     public function resolve(mixed $resolvedValue, string $resolverId, string $resolution = self::RESOLUTION_MANUAL, ?string $notes = null): bool
     {
         return $this->update([
-            'status' => self::STATUS_RESOLVED,
+            'status' => FederationConflictStatus::RESOLVED,
             'resolved_by' => $resolverId,
             'resolution' => $resolution,
             'resolution_notes' => $notes,
@@ -131,7 +126,7 @@ class FederationConflict extends Model
     public function dismiss(string $resolverId, ?string $notes = null): bool
     {
         return $this->update([
-            'status' => self::STATUS_DISMISSED,
+            'status' => FederationConflictStatus::DISMISSED,
             'resolved_by' => $resolverId,
             'resolution' => self::RESOLUTION_DISMISSED,
             'resolution_notes' => $notes,
@@ -144,7 +139,7 @@ class FederationConflict extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === FederationConflictStatus::PENDING;
     }
 
     /**
@@ -152,7 +147,7 @@ class FederationConflict extends Model
      */
     public function isResolved(): bool
     {
-        return $this->status === self::STATUS_RESOLVED;
+        return $this->status === FederationConflictStatus::RESOLVED;
     }
 
     /**
@@ -160,7 +155,7 @@ class FederationConflict extends Model
      */
     public function scopePending($query)
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $query->where('status', FederationConflictStatus::PENDING);
     }
 
     /**
@@ -168,7 +163,7 @@ class FederationConflict extends Model
      */
     public function scopeResolved($query)
     {
-        return $query->where('status', self::STATUS_RESOLVED);
+        return $query->where('status', FederationConflictStatus::RESOLVED);
     }
 
     /**
@@ -196,7 +191,7 @@ class FederationConflict extends Model
             [
                 'federated_user_id' => $federatedUserId,
                 'field' => $field,
-                'status' => self::STATUS_PENDING,
+                'status' => FederationConflictStatus::PENDING,
             ],
             [
                 'values' => [],
