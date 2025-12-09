@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { FormDataConvertible } from '@inertiajs/core';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertCircle, Crown, Info, RefreshCw } from 'lucide-react';
+import type { FederationSyncStrategy } from '@/types/enums';
 
 interface Tenant {
     id: string;
@@ -23,7 +24,7 @@ interface GroupData {
     id?: string;
     name: string;
     description: string;
-    sync_strategy: 'master_wins' | 'last_write_wins' | 'manual_review';
+    sync_strategy: FederationSyncStrategy;
     master_tenant_id: string;
     is_active: boolean;
     settings: {

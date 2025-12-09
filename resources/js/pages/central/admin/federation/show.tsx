@@ -1,3 +1,4 @@
+import { FederatedUserStatusBadge } from '@/components/shared/status-badge';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,14 +15,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AdminLayout from '@/layouts/central/admin-layout';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { useFederation, isCentralFederation } from '@/hooks/shared/use-federation';
+import AdminLayout from '@/layouts/central/admin-layout';
+import { FEDERATION_SYNC_STRATEGY } from '@/lib/enum-metadata';
 import admin from '@/routes/central/admin';
+import { type BreadcrumbItem } from '@/types';
+import type { FederatedUserStatus, FederationSyncStrategy } from '@/types/enums';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
-import { type ReactElement, useState } from 'react';
-import { ChangeMasterDialog } from './components/change-master-dialog';
 import {
     AlertTriangle,
     ArrowRightLeft,
@@ -40,6 +42,8 @@ import {
     Users,
     XCircle,
 } from 'lucide-react';
+import { type ReactElement, useState } from 'react';
+import { ChangeMasterDialog } from './components/change-master-dialog';
 import {
     Page,
     PageContent,
@@ -49,7 +53,6 @@ import {
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
 
 interface Tenant {
     id: string;
@@ -66,7 +69,7 @@ interface FederatedUser {
     id: string;
     global_email: string;
     name: string | null;
-    status: 'active' | 'pending' | 'suspended' | 'pending_master_sync' | 'pending_review';
+    status: FederatedUserStatus;
     created_at: string;
     master_tenant: { id: string; name: string; slug: string } | null;
     links_count: number;
@@ -83,7 +86,7 @@ interface FederationGroup {
     id: string;
     name: string;
     description: string | null;
-    sync_strategy: 'master_wins' | 'last_write_wins' | 'manual_review';
+    sync_strategy: FederationSyncStrategy;
     settings: Record<string, unknown>;
     is_active: boolean;
     created_at: string;
@@ -134,15 +137,6 @@ function FederationShow({ group, availableTenants }: Props) {
     ];
 
     useSetBreadcrumbs(breadcrumbs);
-
-    const getSyncStrategyLabel = (strategy: string) => {
-        const labels: Record<string, string> = {
-            master_wins: t('admin.federation.sync_strategy.master_wins'),
-            last_write_wins: t('admin.federation.sync_strategy.last_write_wins'),
-            manual_review: t('admin.federation.sync_strategy.manual_review'),
-        };
-        return labels[strategy] || strategy;
-    };
 
     const handleAddTenant = (tenantId: string) => {
         addTenant(group.id, tenantId);
@@ -238,7 +232,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground text-sm">{t('admin.federation.strategy')}</p>
-                                        <p className="text-sm font-medium">{getSyncStrategyLabel(group.sync_strategy)}</p>
+                                        <p className="text-sm font-medium">{FEDERATION_SYNC_STRATEGY[group.sync_strategy].label}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -614,17 +608,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                             <Badge variant="outline">{user.links_count}</Badge>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {user.status === 'active' ? (
-                                                                <Badge variant="default">{t('common.active')}</Badge>
-                                                            ) : user.status === 'pending' ? (
-                                                                <Badge variant="secondary">{t('common.pending')}</Badge>
-                                                            ) : user.status === 'pending_master_sync' ? (
-                                                                <Badge variant="outline">{t('common.pending_master_sync')}</Badge>
-                                                            ) : user.status === 'pending_review' ? (
-                                                                <Badge variant="secondary">{t('common.pending_review')}</Badge>
-                                                            ) : (
-                                                                <Badge variant="destructive">{t('common.suspended')}</Badge>
-                                                            )}
+                                                            <FederatedUserStatusBadge status={user.status} />
                                                         </TableCell>
                                                         <TableCell>
                                                             <div className="flex gap-1">

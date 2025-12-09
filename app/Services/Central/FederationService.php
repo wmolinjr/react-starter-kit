@@ -2,6 +2,7 @@
 
 namespace App\Services\Central;
 
+use App\Enums\FederatedUserStatus;
 use App\Exceptions\Central\FederationException;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
@@ -217,7 +218,7 @@ class FederationService
                 // The SyncFromNewMaster job will create user in new master and update this
                 $federatedUser->update([
                     'master_tenant_id' => $newMaster->id,
-                    'status' => FederatedUser::STATUS_PENDING_MASTER_SYNC,
+                    'status' => FederatedUserStatus::PENDING_MASTER_SYNC,
                 ]);
             }
         }
@@ -451,7 +452,7 @@ class FederationService
                 'last_synced_at' => now(),
                 'last_sync_source' => $masterTenant->id,
                 'sync_version' => 1,
-                'status' => FederatedUser::STATUS_ACTIVE,
+                'status' => FederatedUserStatus::ACTIVE,
             ]);
 
             // Create link for master tenant

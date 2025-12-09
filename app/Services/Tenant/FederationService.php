@@ -2,6 +2,7 @@
 
 namespace App\Services\Tenant;
 
+use App\Enums\FederatedUserStatus;
 use App\Exceptions\Central\FederationException;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
@@ -204,7 +205,7 @@ class FederationService
                 'last_synced_at' => now(),
                 'last_sync_source' => $tenant->id,
                 'sync_version' => 1,
-                'status' => FederatedUser::STATUS_ACTIVE,
+                'status' => FederatedUserStatus::ACTIVE,
             ]);
 
             // Create link

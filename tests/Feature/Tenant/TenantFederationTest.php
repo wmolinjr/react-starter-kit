@@ -3,6 +3,7 @@
 namespace Tests\Feature\Tenant;
 
 use App\Enums\TenantPermission;
+use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
@@ -200,7 +201,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Test'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $localUser->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -229,7 +230,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Federated User'],
             'master_tenant_id' => $this->branchTenant->id, // Not master in this tenant
             'master_tenant_user_id' => 'other-user-id',
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -264,7 +265,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Master User'],
             'master_tenant_id' => $this->tenant->id, // THIS tenant is master
             'master_tenant_user_id' => $masterUser->id, // THIS user is master
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -298,7 +299,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Federated'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $federatedLocal->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $federatedLocal->update(['federated_user_id' => $federatedUser->id]);
@@ -324,7 +325,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Federated'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $federatedLocal->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $federatedLocal->update(['federated_user_id' => $federatedUser->id]);
@@ -359,7 +360,7 @@ class TenantFederationTest extends TenantTestCase
             ],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $localUser->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -403,7 +404,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Info User'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $localUser->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 5,
             'last_synced_at' => now(),
         ]);
@@ -450,7 +451,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Fed'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $federatedLocal->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $federatedLocal->update(['federated_user_id' => $federatedUser->id]);
@@ -485,7 +486,7 @@ class TenantFederationTest extends TenantTestCase
             ],
             'master_tenant_id' => $this->branchTenant->id,
             'master_tenant_user_id' => 'other-user-id',
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -519,7 +520,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Federated Name'],
             'master_tenant_id' => $this->branchTenant->id,
             'master_tenant_user_id' => 'other-id',
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -573,7 +574,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Original Name'],
             'master_tenant_id' => $this->tenant->id, // Current tenant is master
             'master_tenant_user_id' => $localUser->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 
@@ -641,7 +642,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Test'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $alreadyFederatedUser->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $alreadyFederatedUser->forceFill(['federated_user_id' => $federatedUser->id])->save();
@@ -789,7 +790,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Test'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $federatedLocal->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $federatedLocal->forceFill(['federated_user_id' => $federatedUser->id])->save();
@@ -823,7 +824,7 @@ class TenantFederationTest extends TenantTestCase
             'synced_data' => ['name' => 'Test'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $federatedLocal->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 

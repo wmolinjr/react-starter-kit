@@ -1,3 +1,4 @@
+import { FederationConflictStatusBadge } from '@/components/shared/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,8 +14,11 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
+import { type BreadcrumbItem } from '@/types';
+import type { FederationConflictStatus } from '@/types/enums';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -24,7 +28,6 @@ import {
     GitCompare,
     Mail,
     User,
-    X,
 } from 'lucide-react';
 import { useState, type ReactElement } from 'react';
 import {
@@ -36,8 +39,6 @@ import {
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
-import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
 interface FederatedUser {
     id: string;
@@ -52,7 +53,7 @@ interface Conflict {
     source_value: string;
     target_value: string;
     source_tenant: { id: string; name: string };
-    status: 'pending' | 'resolved' | 'dismissed';
+    status: FederationConflictStatus;
     created_at: string;
     resolved_at: string | null;
     federated_user: FederatedUser;
@@ -86,34 +87,6 @@ function FederationConflicts({ group, conflicts }: Props) {
 
     const pendingConflicts = conflicts.filter((c) => c.status === 'pending');
     const resolvedConflicts = conflicts.filter((c) => c.status !== 'pending');
-
-    const getStatusBadge = (status: string) => {
-        switch (status) {
-            case 'pending':
-                return (
-                    <Badge variant="outline" className="text-yellow-600">
-                        <Clock className="mr-1 h-3 w-3" />
-                        {t('admin.federation.conflict_status.pending')}
-                    </Badge>
-                );
-            case 'resolved':
-                return (
-                    <Badge variant="default">
-                        <Check className="mr-1 h-3 w-3" />
-                        {t('admin.federation.conflict_status.resolved')}
-                    </Badge>
-                );
-            case 'dismissed':
-                return (
-                    <Badge variant="secondary">
-                        <X className="mr-1 h-3 w-3" />
-                        {t('admin.federation.conflict_status.dismissed')}
-                    </Badge>
-                );
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
 
     const getFieldLabel = (field: string) => {
         const labels: Record<string, string> = {
@@ -356,7 +329,9 @@ function FederationConflicts({ group, conflicts }: Props) {
                                                 <TableCell>
                                                     <Badge variant="outline">{getFieldLabel(conflict.field)}</Badge>
                                                 </TableCell>
-                                                <TableCell>{getStatusBadge(conflict.status)}</TableCell>
+                                                <TableCell>
+                                                    <FederationConflictStatusBadge status={conflict.status} />
+                                                </TableCell>
                                                 <TableCell>
                                                     {conflict.resolved_at
                                                         ? new Date(conflict.resolved_at).toLocaleDateString()

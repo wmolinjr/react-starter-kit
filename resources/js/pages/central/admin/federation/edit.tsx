@@ -13,6 +13,7 @@ import {
     PageTitle,
 } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import type { FederationSyncStrategy } from '@/types/enums';
 import { FederationGroupForm } from './components/federation-group-form';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -27,7 +28,7 @@ interface GroupData {
     id: string;
     name: string;
     description: string;
-    sync_strategy: 'master_wins' | 'last_write_wins' | 'manual_review';
+    sync_strategy: FederationSyncStrategy;
     master_tenant_id: string;
     is_active: boolean;
     settings: {

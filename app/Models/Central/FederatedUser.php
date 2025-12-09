@@ -51,14 +51,6 @@ class FederatedUser extends Model
     ];
 
     /**
-     * Status constants.
-     */
-    public const STATUS_ACTIVE = 'active';
-    public const STATUS_SUSPENDED = 'suspended';
-    public const STATUS_PENDING_REVIEW = 'pending_review';
-    public const STATUS_PENDING_MASTER_SYNC = 'pending_master_sync';
-
-    /**
      * Federation group relationship.
      */
     public function federationGroup(): BelongsTo
@@ -202,7 +194,7 @@ class FederatedUser extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('status', self::STATUS_ACTIVE);
+        return $query->where('status', FederatedUserStatus::ACTIVE);
     }
 
     /**

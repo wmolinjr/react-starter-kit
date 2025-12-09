@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Central;
 
+use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
@@ -111,7 +112,7 @@ class FederatedUserSyncTest extends TestCase
             'global_email' => 'john@example.com',
             'federation_group_id' => $this->group->id,
             'master_tenant_id' => $this->masterTenant->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
         ]);
 
         // Check link was created for master tenant
@@ -460,7 +461,7 @@ class FederatedUserSyncTest extends TestCase
             masterTenant: $this->masterTenant,
             masterTenantUserId: 'user-2'
         );
-        $suspendedUser->update(['status' => FederatedUser::STATUS_SUSPENDED]);
+        $suspendedUser->update(['status' => FederatedUserStatus::SUSPENDED]);
 
         $activeUsers = FederatedUser::active()->get();
 
@@ -492,7 +493,7 @@ class FederatedUserSyncTest extends TestCase
             'synced_data' => ['name' => 'Other User'],
             'master_tenant_id' => $this->branchTenant1->id,
             'master_tenant_user_id' => 'user-2',
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
         ]);
 
         $usersInGroup = FederatedUser::inGroup($this->group->id)->get();

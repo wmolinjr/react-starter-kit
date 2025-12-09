@@ -1,26 +1,27 @@
+import { FederatedUserLinkSyncStatusBadge, FederatedUserStatusBadge } from '@/components/shared/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
+import { type BreadcrumbItem } from '@/types';
+import type { FederatedUserLinkSyncStatus, FederatedUserStatus } from '@/types/enums';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
-import { type ReactElement } from 'react';
 import {
     AlertTriangle,
     Building2,
     CheckCircle,
-    Clock,
     Crown,
     Mail,
     Network,
     RefreshCw,
     Shield,
     User,
-    XCircle,
 } from 'lucide-react';
+import { type ReactElement } from 'react';
 import {
     Page,
     PageContent,
@@ -30,14 +31,13 @@ import {
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
 
 interface TenantLink {
     id: string;
     tenant_id: string;
     tenant_name: string | null;
     tenant_user_id: string | null;
-    sync_status: 'synced' | 'pending' | 'failed' | 'disabled';
+    sync_status: FederatedUserLinkSyncStatus;
     sync_attempts: number;
     last_synced_at: string | null;
     last_sync_error: string | null;
@@ -49,7 +49,7 @@ interface FederatedUser {
     id: string;
     federation_group_id: string;
     global_email: string;
-    status: 'active' | 'pending' | 'suspended' | 'pending_master_sync' | 'pending_review';
+    status: FederatedUserStatus;
     sync_version: number;
     last_synced_at: string | null;
     last_sync_source: string | null;
@@ -93,40 +93,8 @@ function FederationUserShow({ group, user }: Props) {
         router.post(admin.federation.users.sync.url({ group: group.id, user: user.id }));
     };
 
-    const getStatusBadge = (status: string) => {
-        switch (status) {
-            case 'active':
-                return <Badge variant="default"><CheckCircle className="mr-1 h-3 w-3" />{t('common.active')}</Badge>;
-            case 'pending':
-                return <Badge variant="secondary"><Clock className="mr-1 h-3 w-3" />{t('common.pending')}</Badge>;
-            case 'pending_master_sync':
-                return <Badge variant="outline"><Clock className="mr-1 h-3 w-3" />{t('common.pending_master_sync')}</Badge>;
-            case 'pending_review':
-                return <Badge variant="secondary"><Clock className="mr-1 h-3 w-3" />{t('common.pending_review')}</Badge>;
-            case 'suspended':
-                return <Badge variant="destructive"><XCircle className="mr-1 h-3 w-3" />{t('common.suspended')}</Badge>;
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
-
-    const getSyncStatusBadge = (status: string) => {
-        switch (status) {
-            case 'synced':
-                return <Badge variant="default"><CheckCircle className="mr-1 h-3 w-3" />{t('admin.federation.synced')}</Badge>;
-            case 'pending':
-                return <Badge variant="secondary"><Clock className="mr-1 h-3 w-3" />{t('common.pending')}</Badge>;
-            case 'failed':
-                return <Badge variant="destructive"><AlertTriangle className="mr-1 h-3 w-3" />{t('admin.federation.failed')}</Badge>;
-            case 'disabled':
-                return <Badge variant="outline"><XCircle className="mr-1 h-3 w-3" />{t('admin.federation.sync_disabled')}</Badge>;
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
-
     const syncedLinks = user.links.filter((l) => l.sync_status === 'synced').length;
-    const failedLinks = user.links.filter((l) => l.sync_status === 'failed').length;
+    const failedLinks = user.links.filter((l) => l.sync_status === 'sync_failed').length;
 
     return (
         <>
@@ -137,7 +105,7 @@ function FederationUserShow({ group, user }: Props) {
                     <PageHeaderContent>
                         <PageTitle icon={User}>
                             {user.synced_data.name || user.global_email}
-                            {getStatusBadge(user.status)}
+                            <FederatedUserStatusBadge status={user.status} />
                         </PageTitle>
                         <PageDescription className="flex items-center gap-2">
                             <Mail className="h-4 w-4" />
@@ -324,8 +292,8 @@ function FederationUserShow({ group, user }: Props) {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="space-y-1">
-                                                        {getSyncStatusBadge(link.sync_status)}
-                                                        {link.sync_status === 'failed' && link.last_sync_error && (
+                                                        <FederatedUserLinkSyncStatusBadge status={link.sync_status} />
+                                                        {link.sync_status === 'sync_failed' && link.last_sync_error && (
                                                             <p className="text-destructive text-xs">{link.last_sync_error}</p>
                                                         )}
                                                     </div>

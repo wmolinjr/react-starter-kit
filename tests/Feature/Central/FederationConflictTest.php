@@ -3,6 +3,7 @@
 namespace Tests\Feature\Central;
 
 use App\Enums\CentralPermission;
+use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationConflict;
 use App\Models\Central\FederationGroup;
@@ -101,7 +102,7 @@ class FederationConflictTest extends TestCase
             'synced_data' => ['name' => 'John Doe'],
             'master_tenant_id' => $this->masterTenant->id,
             'master_tenant_user_id' => 'user-123',
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
     }
@@ -331,7 +332,7 @@ class FederationConflictTest extends TestCase
             'synced_data' => ['name' => 'Other User'],
             'master_tenant_id' => $this->masterTenant->id,
             'master_tenant_user_id' => 'user-456',
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
 

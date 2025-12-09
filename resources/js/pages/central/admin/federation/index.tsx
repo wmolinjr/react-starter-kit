@@ -8,6 +8,7 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertCircle, Eye, Network, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
 import { Page, PageContent, PageDescription, PageHeader, PageHeaderActions, PageHeaderContent, PageTitle } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import type { FederationSyncStrategy } from '@/types/enums';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
@@ -21,7 +22,7 @@ interface FederationGroup {
     id: string;
     name: string;
     description: string | null;
-    sync_strategy: 'master_wins' | 'last_write_wins' | 'manual_review';
+    sync_strategy: FederationSyncStrategy;
     is_active: boolean;
     created_at: string;
     master_tenant: MasterTenant | null;

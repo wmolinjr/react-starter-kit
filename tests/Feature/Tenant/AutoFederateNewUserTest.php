@@ -4,6 +4,7 @@ namespace Tests\Feature\Tenant;
 
 use App\Events\Tenant\UserCreated;
 use App\Listeners\Tenant\AutoFederateNewUser;
+use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationGroup;
 use App\Models\Central\Tenant;
@@ -131,7 +132,7 @@ class AutoFederateNewUserTest extends TenantTestCase
             'synced_data' => ['name' => 'Test'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $user->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $user->update(['federated_user_id' => $federatedUser->id]);
@@ -165,7 +166,7 @@ class AutoFederateNewUserTest extends TenantTestCase
             'synced_data' => ['name' => 'Test'],
             'master_tenant_id' => $this->tenant->id,
             'master_tenant_user_id' => $user->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
             'sync_version' => 1,
         ]);
         $user->forceFill(['federated_user_id' => $federatedUser->id])->save();

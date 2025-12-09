@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
@@ -113,7 +114,7 @@ class FederationSeeder extends Seeder
             'last_synced_at' => now(),
             'last_sync_source' => $tenant1->id,
             'sync_version' => 1,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
         ]);
 
         // Create link for tenant1

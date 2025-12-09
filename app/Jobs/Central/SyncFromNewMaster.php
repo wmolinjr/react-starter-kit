@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Central;
 
+use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
@@ -52,7 +53,7 @@ class SyncFromNewMaster implements ShouldQueue
 
         // Get users pending master sync
         $pendingUsers = FederatedUser::where('federation_group_id', $this->group->id)
-            ->where('status', FederatedUser::STATUS_PENDING_MASTER_SYNC)
+            ->where('status', FederatedUserStatus::PENDING_MASTER_SYNC)
             ->get();
 
         if ($pendingUsers->isEmpty()) {
@@ -103,7 +104,7 @@ class SyncFromNewMaster implements ShouldQueue
                 'synced_data' => $localUser->toFederationSyncData(),
                 'last_synced_at' => now(),
                 'last_sync_source' => $this->newMaster->id,
-                'status' => FederatedUser::STATUS_ACTIVE,
+                'status' => FederatedUserStatus::ACTIVE,
                 'sync_version' => $federatedUser->sync_version + 1,
             ]);
 
@@ -188,7 +189,7 @@ class SyncFromNewMaster implements ShouldQueue
         // Update federated user
         $federatedUser->update([
             'master_tenant_user_id' => $localUser->id,
-            'status' => FederatedUser::STATUS_ACTIVE,
+            'status' => FederatedUserStatus::ACTIVE,
         ]);
 
         Log::info('Created user in new master during master change', [
