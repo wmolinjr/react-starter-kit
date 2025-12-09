@@ -4,15 +4,11 @@ import admin from '@/routes/central/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { type RevenueByType } from '@/types/common';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { formatPrice } from '@/lib/utils';
-
-interface RevenueByType {
-    addon_type: string;
-    total: number;
-}
 
 interface Props {
     monthly_revenue: number;
@@ -97,11 +93,11 @@ function AdminAddonsRevenue({
                                     <div className="flex items-center gap-2">
                                         <div className="bg-primary h-3 w-3 rounded-full" />
                                         <span className="font-medium capitalize">
-                                            {item.addon_type.replace('_', ' ')}
+                                            {item.addon_type_label}
                                         </span>
                                     </div>
                                     <span className="text-muted-foreground">
-                                        {formatPrice(item.total)}
+                                        {item.formatted_total}
                                     </span>
                                 </div>
                             ))}

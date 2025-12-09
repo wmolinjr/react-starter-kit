@@ -11,20 +11,14 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
+import { type CentralDashboardStats } from '@/types/common';
 import { Head, Link } from '@inertiajs/react';
 import { Building2, CreditCard, Layers, Network, Package, Shield, Users } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type ReactElement } from 'react';
 
-interface Stats {
-    total_tenants: number;
-    total_admins: number;
-    total_addons: number;
-    total_plans: number;
-}
-
 interface Props {
-    stats: Stats;
+    stats: CentralDashboardStats;
 }
 
 function AdminDashboard({ stats }: Props) {

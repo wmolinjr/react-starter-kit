@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\CentralPermission;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\BundleResource;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonBundle;
 use App\Models\Central\Plan;
@@ -37,11 +38,10 @@ class BundleCatalogController extends Controller implements HasMiddleware
         $bundles = AddonBundle::with(['addons', 'plans'])
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get()
-            ->map(fn ($bundle) => $this->transformBundle($bundle));
+            ->get();
 
         return Inertia::render('central/admin/bundles/index', [
-            'bundles' => $bundles,
+            'bundles' => BundleResource::collection($bundles),
         ]);
     }
 
@@ -114,7 +114,7 @@ class BundleCatalogController extends Controller implements HasMiddleware
         $bundle->load(['addons', 'plans']);
 
         return Inertia::render('central/admin/bundles/edit', [
-            'bundle' => $this->transformBundle($bundle),
+            'bundle' => new BundleResource($bundle),
             'addons' => $this->getAddonsForSelect(),
             'plans' => $this->getPlansForSelect(),
         ]);
@@ -205,51 +205,6 @@ class BundleCatalogController extends Controller implements HasMiddleware
         }
 
         return back()->with($failed > 0 ? 'warning' : 'success', $message);
-    }
-
-    protected function transformBundle(AddonBundle $bundle): array
-    {
-        return [
-            'id' => $bundle->id,
-            'slug' => $bundle->slug,
-            'name' => $bundle->getTranslations('name'),
-            'name_display' => $bundle->getTranslation('name', app()->getLocale()),
-            'description' => $bundle->getTranslations('description'),
-            'active' => $bundle->active,
-            'discount_percent' => $bundle->discount_percent,
-            'price_monthly' => $bundle->price_monthly,
-            'price_yearly' => $bundle->price_yearly,
-            'price_monthly_effective' => $bundle->getEffectivePriceMonthly(),
-            'price_yearly_effective' => $bundle->getEffectivePriceYearly(),
-            'base_price_monthly' => $bundle->getBasePriceMonthly(),
-            'savings_monthly' => $bundle->getSavingsMonthly(),
-            'badge' => $bundle->badge,
-            'icon' => $bundle->icon ?? 'Package',
-            'icon_color' => $bundle->icon_color ?? 'slate',
-            'features' => $bundle->features ?? [],
-            'sort_order' => $bundle->sort_order,
-            'addon_count' => $bundle->addons->count(),
-            'addons' => $bundle->addons->map(fn ($addon) => [
-                'id' => $addon->id,
-                'addon_id' => $addon->id,
-                'slug' => $addon->slug,
-                'name' => $addon->trans('name'),
-                'type' => $addon->type->value,
-                'type_label' => $addon->type->label(),
-                'price_monthly' => $addon->price_monthly,
-                'quantity' => $addon->pivot->quantity ?? 1,
-            ]),
-            'plan_ids' => $bundle->plans->pluck('id')->toArray(),
-            'plans' => $bundle->plans->map(fn ($p) => [
-                'id' => $p->id,
-                'name' => $p->trans('name'),
-                'slug' => $p->slug,
-            ]),
-            'stripe_product_id' => $bundle->stripe_product_id,
-            'stripe_price_monthly_id' => $bundle->stripe_price_monthly_id,
-            'stripe_price_yearly_id' => $bundle->stripe_price_yearly_id,
-            'is_synced' => (bool) $bundle->stripe_product_id,
-        ];
     }
 
     protected function getAddonsForSelect(): array

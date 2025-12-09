@@ -17,8 +17,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem } from '@/types';
-import type { FederationConflictStatus } from '@/types/enums';
+import {
+    type BreadcrumbItem,
+    type FederationGroupResource,
+    type FederationConflictResource,
+} from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -40,38 +43,24 @@ import {
     PageTitle,
 } from '@/components/shared/layout/page';
 
-interface FederatedUser {
-    id: string;
-    email: string;
-    name: string;
-    master_tenant: { id: string; name: string } | null;
-}
-
-interface Conflict {
-    id: string;
-    field: string;
+/**
+ * Extended conflict interface with additional fields from controller
+ * The controller returns extra fields not in the base FederationConflictResource
+ */
+interface ConflictWithSourceTenant extends FederationConflictResource {
     source_value: string;
     target_value: string;
     source_tenant: { id: string; name: string };
-    status: FederationConflictStatus;
-    created_at: string;
-    resolved_at: string | null;
-    federated_user: FederatedUser;
-}
-
-interface FederationGroup {
-    id: string;
-    name: string;
 }
 
 interface Props {
-    group: FederationGroup;
-    conflicts: Conflict[];
+    group: FederationGroupResource;
+    conflicts: ConflictWithSourceTenant[];
 }
 
 function FederationConflicts({ group, conflicts }: Props) {
     const { t } = useLaravelReactI18n();
-    const [resolving, setResolving] = useState<Conflict | null>(null);
+    const [resolving, setResolving] = useState<ConflictWithSourceTenant | null>(null);
     const [resolution, setResolution] = useState<'source' | 'target' | 'custom'>('source');
     const [customValue, setCustomValue] = useState('');
     const [notes, setNotes] = useState('');
@@ -99,7 +88,7 @@ function FederationConflicts({ group, conflicts }: Props) {
         return labels[field] || field;
     };
 
-    const openResolveDialog = (conflict: Conflict) => {
+    const openResolveDialog = (conflict: ConflictWithSourceTenant) => {
         setResolving(conflict);
         setResolution('source');
         setCustomValue('');
@@ -235,7 +224,7 @@ function FederationConflicts({ group, conflicts }: Props) {
                                                             </p>
                                                             <p className="text-muted-foreground flex items-center gap-1 text-xs">
                                                                 <Mail className="h-3 w-3" />
-                                                                {conflict.federated_user?.email || '-'}
+                                                                {conflict.federated_user?.global_email || '-'}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -323,7 +312,7 @@ function FederationConflicts({ group, conflicts }: Props) {
                                             <TableRow key={conflict.id}>
                                                 <TableCell>
                                                     <span className="font-medium">
-                                                        {conflict.federated_user?.email || '-'}
+                                                        {conflict.federated_user?.global_email || '-'}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
@@ -357,7 +346,7 @@ function FederationConflicts({ group, conflicts }: Props) {
                                 <>
                                     {t('admin.federation.resolve_conflict_description', {
                                         field: getFieldLabel(resolving.field),
-                                        user: resolving.federated_user?.email,
+                                        user: resolving.federated_user?.global_email ?? '-',
                                     })}
                                 </>
                             )}

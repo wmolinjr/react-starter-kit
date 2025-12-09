@@ -16,33 +16,7 @@ import { ColorSelector } from '@/components/central/forms/color-selector';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
 import { formatPrice } from '@/lib/utils';
 import type { EnumOption } from '@/types';
-
-interface Addon {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-interface FeatureDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-    icon: string | null;
-}
-
-interface LimitDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    unit: string | null;
-    unit_label: string | null;
-    default_value: number;
-    allows_unlimited: boolean;
-    icon: string | null;
-}
+import type { FeatureDefinition, LimitDefinition, AddonOptionForPlan } from '@/types/common';
 
 export interface PlanData {
     id?: string;
@@ -65,7 +39,7 @@ export interface PlanData {
 
 interface Props {
     plan?: PlanData;
-    addons: Addon[];
+    addons: AddonOptionForPlan[];
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: EnumOption[];

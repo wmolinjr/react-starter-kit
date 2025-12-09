@@ -16,7 +16,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import type { BadgePreset } from '@/types/enums';
 
-interface AddonOption {
+export interface AddonOption {
     id: string;
     slug: string;
     name: string;
@@ -26,22 +26,23 @@ interface AddonOption {
     price_yearly: number;
 }
 
-interface PlanOption {
+export interface PlanOption {
     id: string;
     name: string;
     slug: string;
 }
 
-interface BundleAddon {
+export interface BundleAddon {
     addon_id: string;
     quantity: number;
 }
 
-interface BundleInput {
+export interface BundleInput {
     id?: string;
     slug?: string;
-    name?: Translations;
-    description?: Translations | null;
+    name?: Translations | Record<string, string | undefined>;
+    name_display?: string;
+    description?: Translations | Record<string, string | undefined> | null;
     active?: boolean;
     discount_percent?: number;
     price_monthly?: number | string | null;
@@ -49,7 +50,7 @@ interface BundleInput {
     badge?: BadgePreset | null;
     icon?: string | null;
     icon_color?: string | null;
-    features?: Translations[];
+    features?: Array<Translations | Record<string, string | undefined>>;
     sort_order?: number;
     addons?: BundleAddon[];
     plan_ids?: string[];
@@ -67,15 +68,15 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
     const { ensureTranslations } = useLocales();
 
     // Ensure features have proper translation structure
-    const ensureFeaturesTranslations = (features?: Translations[]): Translations[] => {
+    const ensureFeaturesTranslations = (features?: BundleInput['features']): Translations[] => {
         if (!features || features.length === 0) return [];
-        return features.map(f => ensureTranslations(f));
+        return features.map(f => ensureTranslations(f as Translations));
     };
 
     const { data, setData, post, put, processing, errors } = useForm({
         slug: bundle?.slug || '',
-        name: ensureTranslations(bundle?.name),
-        description: ensureTranslations(bundle?.description ?? undefined),
+        name: ensureTranslations(bundle?.name as Translations | undefined),
+        description: ensureTranslations((bundle?.description ?? undefined) as Translations | undefined),
         active: bundle?.active ?? true,
         discount_percent: bundle?.discount_percent || 0,
         price_monthly: bundle?.price_monthly?.toString() || '',

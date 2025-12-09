@@ -24,6 +24,7 @@ import {
     type UserSummaryResource,
     type TenantSummaryResource,
     type ActivityProperties,
+    type InertiaPaginatedResponse,
 } from '@/types';
 import {
     Table,
@@ -80,21 +81,6 @@ interface SubjectType {
     label: string;
 }
 
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
-
-interface PaginatedActivities {
-    data: ActivityResource[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    links: PaginationLink[];
-}
-
 interface AuditFilters {
     user_id: string | null;
     event: string | null;
@@ -106,7 +92,7 @@ interface AuditFilters {
 }
 
 interface Props {
-    activities: PaginatedActivities;
+    activities: InertiaPaginatedResponse<ActivityResource>;
     teamMembers: UserSummaryResource[];
     eventTypes: string[];
     subjectTypes: SubjectType[];

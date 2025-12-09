@@ -45,6 +45,74 @@ import type {
 // Shared Resources
 // =============================================================================
 
+export interface AddonSubscriptionResource {
+    id: string;
+    addon_slug: string;
+    addon_type: AddonType;
+    name: string;
+    description: string | null;
+    quantity: number;
+    price: number;
+    currency: string;
+    total_price: number;
+    formatted_price: string;
+    formatted_total_price: string;
+    billing_period: BillingPeriod;
+    billing_period_label: string;
+    status: AddonStatus;
+    status_label: string;
+    started_at: string | null;
+    expires_at: string | null;
+    canceled_at: string | null;
+    is_active: boolean;
+    is_recurring: boolean;
+    is_metered: boolean;
+    metered_usage: number | null;
+    stripe_subscription_item_id: string | null;
+    tenant: AddonSubscriptionTenant | null;
+    created_at: string;
+}
+
+export interface BundleAddonResource {
+    id: string;
+    addon_id: string;
+    slug: string;
+    name: string;
+    type: AddonType;
+    type_label: string;
+    price_monthly: number;
+    quantity: number;
+}
+
+export interface BundleResource {
+    id: string;
+    slug: string;
+    name: Translations;
+    name_display: string;
+    description: Translations;
+    active: boolean;
+    discount_percent: number;
+    price_monthly: number | null;
+    price_yearly: number | null;
+    price_monthly_effective: number;
+    price_yearly_effective: number;
+    base_price_monthly: number;
+    savings_monthly: number;
+    badge: BadgePreset | null;
+    icon: string;
+    icon_color: string | null;
+    features: Translations[];
+    sort_order: number;
+    addon_count: number;
+    addons: BundleAddonResource[];
+    plan_ids: string[];
+    plans: BundlePlanSummary[];
+    stripe_product_id: string | null;
+    stripe_price_monthly_id: string | null;
+    stripe_price_yearly_id: string | null;
+    is_synced: boolean;
+}
+
 export interface CentralUserDetailResource {
     id: string;
     name: string;

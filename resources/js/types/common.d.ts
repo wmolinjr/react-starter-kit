@@ -156,7 +156,7 @@ export interface TenantFederationGroup {
 }
 
 /**
- * Federation group statistics
+ * Federation group statistics (list view)
  */
 export interface FederationGroupStats {
     total_users: number;
@@ -164,6 +164,16 @@ export interface FederationGroupStats {
     pending_users: number;
     conflicts_count: number;
     last_sync_at: string | null;
+}
+
+/**
+ * Federation group stats for show page (detailed)
+ */
+export interface FederationGroupShowStats {
+    total_users: number;
+    active_syncs: number;
+    pending_conflicts: number;
+    failed_syncs: number;
 }
 
 /**
@@ -225,4 +235,138 @@ export interface UserFederationInfoGroup {
     id: string;
     name: string;
     sync_strategy: FederationSyncStrategy;
+}
+
+// =============================================================================
+// Team Types
+// =============================================================================
+
+/**
+ * Team usage statistics
+ */
+export interface TeamStats {
+    max_users: number | null;
+    current_users: number;
+}
+
+// =============================================================================
+// Addon Subscription Types
+// =============================================================================
+
+/**
+ * Tenant info in addon subscription views
+ */
+export interface AddonSubscriptionTenant {
+    id: string;
+    name: string;
+}
+
+/**
+ * Addon management statistics
+ */
+export interface AddonManagementStats {
+    total_addons: number;
+    active_addons: number;
+    total_revenue: number;
+    tenants_with_addons: number;
+}
+
+/**
+ * Revenue breakdown by addon type
+ */
+export interface RevenueByType {
+    addon_type: string;
+    addon_type_label: string;
+    total: number;
+    formatted_total: string;
+}
+
+// =============================================================================
+// Plan/Addon Form Types (shared across plan and addon forms)
+// =============================================================================
+
+/**
+ * Feature definition from backend (used in plan/addon forms)
+ */
+export interface FeatureDefinition {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    category: string | null;
+    icon: string | null;
+}
+
+/**
+ * Limit definition from backend (used in plan/addon forms)
+ */
+export interface LimitDefinition {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    unit: string | null;
+    unit_label: string | null;
+    default_value: number;
+    allows_unlimited: boolean;
+    icon: string | null;
+}
+
+/**
+ * Category option for feature/limit grouping
+ */
+export interface CategoryOption {
+    value: string;
+    label: string;
+}
+
+/**
+ * Simple addon info for plan forms
+ */
+export interface AddonOptionForPlan {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+/**
+ * Addon type info from backend (used in addon forms)
+ */
+export interface AddonTypeInfo {
+    value: string;
+    label: string;
+    description?: string;
+    icon?: string;
+    color?: string;
+    is_stackable?: boolean;
+    is_recurring?: boolean;
+    is_one_time?: boolean;
+    has_validity?: boolean;
+}
+
+// =============================================================================
+// Dashboard Stats Types
+// =============================================================================
+
+/**
+ * Central admin dashboard statistics
+ */
+export interface CentralDashboardStats {
+    total_tenants: number;
+    total_admins: number;
+    total_addons: number;
+    total_plans: number;
+}
+
+// =============================================================================
+// Bundle Types
+// =============================================================================
+
+/**
+ * Plan summary for bundle views
+ */
+export interface BundlePlanSummary {
+    id: string;
+    name: string;
+    slug: string;
 }

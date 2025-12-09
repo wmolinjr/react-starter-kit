@@ -12,39 +12,16 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type InertiaPaginatedResponse, type AddonSubscriptionResource } from '@/types';
+import { type AddonManagementStats } from '@/types/common';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { formatPrice } from '@/lib/utils';
 
-interface AddonSubscriptionRow {
-    id: string;
-    addon_slug: string;
-    name: string;
-    quantity: number;
-    price: number;
-    status: string;
-    billing_period: string;
-    tenant: {
-        id: string;
-        name: string;
-    };
-    created_at: string;
-}
-
 interface Props {
-    addons: {
-        data: AddonSubscriptionRow[];
-        current_page: number;
-        last_page: number;
-    };
-    stats: {
-        total_addons: number;
-        active_addons: number;
-        total_revenue: number;
-        tenants_with_addons: number;
-    };
+    addons: InertiaPaginatedResponse<AddonSubscriptionResource>;
+    stats: AddonManagementStats;
 }
 
 function AdminAddonsIndex({ addons, stats }: Props) {
@@ -123,15 +100,15 @@ function AdminAddonsIndex({ addons, stats }: Props) {
                                         </TableCell>
                                         <TableCell>{addon.name}</TableCell>
                                         <TableCell>{addon.quantity}</TableCell>
-                                        <TableCell>{formatPrice(addon.price)}</TableCell>
+                                        <TableCell>{addon.formatted_price}</TableCell>
                                         <TableCell>
                                             <Badge
-                                                variant={addon.status === 'active' ? 'default' : 'secondary'}
+                                                variant={addon.is_active ? 'default' : 'secondary'}
                                             >
-                                                {addon.status}
+                                                {addon.status_label}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>{addon.billing_period}</TableCell>
+                                        <TableCell>{addon.billing_period_label}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

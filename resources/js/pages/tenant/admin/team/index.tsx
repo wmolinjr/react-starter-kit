@@ -1,8 +1,9 @@
 import { useState, type ReactElement } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
-import type { PageProps, TeamMemberResource } from '@/types';
+import type { PageProps, TeamMemberResource, UserInvitationResource } from '@/types';
+import type { TeamStats } from '@/types/common';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield } from 'lucide-react';
+import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield, Clock } from 'lucide-react';
 
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
@@ -32,28 +33,13 @@ import { Can } from '@/components/shared/auth/can';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 
-/**
- * Extended TeamMemberResource with invitation tracking fields.
- * The team index page shows both active members and pending invitations.
- */
-interface TeamMember extends Omit<TeamMemberResource, 'role'> {
-  role: TenantRole | string; // TenantRole for system roles, string for custom roles
-  invited_at: string;
-  joined_at: string | null;
-  is_pending: boolean;
-}
-
-interface TeamStats {
-  max_users: number | null;
-  current_users: number;
-}
-
 interface Props {
-  members: TeamMember[];
+  members: TeamMemberResource[];
+  pendingInvitations: UserInvitationResource[];
   teamStats: TeamStats;
 }
 
-function TeamIndex({ members, teamStats }: Props) {
+function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
   const { t } = useLaravelReactI18n();
   const { tenant: tenantData } = usePage<PageProps>().props;
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
@@ -65,7 +51,8 @@ function TeamIndex({ members, teamStats }: Props) {
 
   useSetBreadcrumbs(breadcrumbs);
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (role: string | null) => {
+    if (!role) return <Badge variant="outline">-</Badge>;
     // Use enum metadata for system roles, fallback for custom roles
     const metadata = TENANT_ROLE[role as TenantRole];
     if (metadata) {
@@ -146,71 +133,118 @@ function TeamIndex({ members, teamStats }: Props) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.length === 0 ? (
+                {members.length === 0 && pendingInvitations.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       {t('tenant.team.no_members')}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  members.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell className="font-medium">{member.name}</TableCell>
-                      <TableCell>{member.email}</TableCell>
-                      <TableCell>{getRoleBadge(member.role)}</TableCell>
-                      <TableCell>
-                        {member.is_pending ? (
-                          <Badge variant="outline" className="gap-1">
-                            <Mail className="h-3 w-3" />
-                            {t('tenant.team.pending_invite')}
-                          </Badge>
-                        ) : (
+                  <>
+                    {/* Active Members */}
+                    {members.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="font-medium">{member.name}</TableCell>
+                        <TableCell>{member.email}</TableCell>
+                        <TableCell>{getRoleBadge(member.role)}</TableCell>
+                        <TableCell>
                           <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                             {t('tenant.team.status_active')}
                           </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Can any={["team:manageRoles", "team:remove"]}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              {member.role !== 'owner' && (
-                                <>
-                                  <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'admin')}>
-                                    <Shield className="mr-2 h-4 w-4" />
-                                    {t('tenant.team.promote_to_admin')}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'member')}>
-                                    <Shield className="mr-2 h-4 w-4" />
-                                    {t('tenant.team.set_as_member')}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'guest')}>
-                                    <Shield className="mr-2 h-4 w-4" />
-                                    {t('tenant.team.set_as_guest')}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                </>
-                              )}
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => handleRemoveMember(member.id, member.name)}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t('tenant.team.remove_from_team')}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </Can>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                        <TableCell>
+                          <Can any={["team:manageRoles", "team:remove"]}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {member.role !== 'owner' && (
+                                  <>
+                                    <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'admin')}>
+                                      <Shield className="mr-2 h-4 w-4" />
+                                      {t('tenant.team.promote_to_admin')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'member')}>
+                                      <Shield className="mr-2 h-4 w-4" />
+                                      {t('tenant.team.set_as_member')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'guest')}>
+                                      <Shield className="mr-2 h-4 w-4" />
+                                      {t('tenant.team.set_as_guest')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                  </>
+                                )}
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() => handleRemoveMember(member.id, member.name)}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  {t('tenant.team.remove_from_team')}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </Can>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+
+                    {/* Pending Invitations */}
+                    {pendingInvitations.map((invitation) => (
+                      <TableRow key={`inv-${invitation.id}`} className="bg-muted/30">
+                        <TableCell className="font-medium text-muted-foreground">
+                          {t('tenant.team.pending_user')}
+                        </TableCell>
+                        <TableCell>{invitation.email}</TableCell>
+                        <TableCell>{getRoleBadge(invitation.role)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="gap-1">
+                            <Mail className="h-3 w-3" />
+                            {invitation.is_expired ? (
+                              <span className="text-destructive">{t('tenant.team.invite_expired')}</span>
+                            ) : (
+                              <>
+                                {t('tenant.team.pending_invite')}
+                                {invitation.expires_in_days !== null && (
+                                  <span className="text-muted-foreground ml-1">
+                                    ({invitation.expires_in_days}d)
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Can permission="team:invite">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                  <Mail className="mr-2 h-4 w-4" />
+                                  {t('tenant.team.resend_invite')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  {t('tenant.team.cancel_invite')}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </Can>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </>
                 )}
               </TableBody>
             </Table>

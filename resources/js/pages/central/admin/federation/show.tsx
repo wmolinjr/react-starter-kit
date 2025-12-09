@@ -23,10 +23,9 @@ import admin from '@/routes/central/admin';
 import {
     type BreadcrumbItem,
     type FederationGroupDetailResource,
-    type FederatedUserResource,
-    type FederationGroupTenant,
     type TenantSummaryResource,
 } from '@/types';
+import { type FederationGroupShowStats } from '@/types/common';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -60,22 +59,11 @@ import {
 } from '@/components/shared/layout/page';
 
 /**
- * Extended stats interface for show page
- * FederationGroupDetailResource.stats has different structure
- */
-interface ShowPageStats {
-    total_users: number;
-    active_syncs: number;
-    pending_conflicts: number;
-    failed_syncs: number;
-}
-
-/**
  * Extended group interface combining FederationGroupDetailResource
  * with show-page specific stats format
  */
 interface FederationGroupShowData extends Omit<FederationGroupDetailResource, 'stats'> {
-    stats?: ShowPageStats;
+    stats?: FederationGroupShowStats;
 }
 
 interface Props {

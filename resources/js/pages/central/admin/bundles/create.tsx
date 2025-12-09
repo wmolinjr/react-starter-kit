@@ -7,22 +7,7 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-
-interface AddonOption {
-    id: string;
-    slug: string;
-    name: string;
-    type: string;
-    type_label: string;
-    price_monthly: number;
-    price_yearly: number;
-}
-
-interface PlanOption {
-    id: string;
-    name: string;
-    slug: string;
-}
+import type { AddonOption, PlanOption } from './components/bundle-form';
 
 interface Props {
     addons: AddonOption[];

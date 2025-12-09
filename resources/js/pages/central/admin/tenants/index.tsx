@@ -11,12 +11,20 @@ import { useState, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { useImpersonation } from '@/hooks/central/use-impersonation';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem, type TenantResource, type UserSummaryResource, type DomainResource, type PlanSummaryResource } from '@/types';
+import {
+    type BreadcrumbItem,
+    type TenantResource,
+    type UserSummaryResource,
+    type DomainResource,
+    type PlanSummaryResource,
+    type InertiaPaginatedResponse,
+} from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 /**
  * Extended TenantResource with users for impersonation feature.
  * The index page receives users for quick impersonation buttons.
+ * TODO: Create TenantWithUsersResource in backend for auto-generation
  */
 interface TenantWithUsers extends Omit<TenantResource, 'domains' | 'plan'> {
     domains: DomainResource[];
@@ -24,19 +32,8 @@ interface TenantWithUsers extends Omit<TenantResource, 'domains' | 'plan'> {
     users: UserSummaryResource[];
 }
 
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
-
 interface Props {
-    tenants: {
-        data: TenantWithUsers[];
-        links: PaginationLink[];
-        current_page: number;
-        last_page: number;
-    };
+    tenants: InertiaPaginatedResponse<TenantWithUsers>;
     filters: { search?: string };
     isImpersonating?: boolean;
 }

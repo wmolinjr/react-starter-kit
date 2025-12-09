@@ -4,38 +4,13 @@ import admin from '@/routes/central/admin';
 import { AddonForm } from './components/addon-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { type FeatureDefinition, type LimitDefinition, type CategoryOption, type AddonTypeInfo } from '@/types/common';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-interface FeatureDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-    icon: string | null;
-}
-
-interface LimitDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    unit: string | null;
-    unit_label: string | null;
-    default_value: number;
-    allows_unlimited: boolean;
-    icon: string | null;
-}
-
-interface CategoryOption {
-    value: string;
-    label: string;
-}
-
 interface Props {
-    types: { value: string; label: string }[];
+    types: AddonTypeInfo[];
     plans: { id: string; name: string; slug: string }[];
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];

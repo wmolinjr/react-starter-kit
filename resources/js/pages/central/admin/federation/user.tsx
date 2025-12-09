@@ -6,8 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem } from '@/types';
-import type { FederatedUserLinkSyncStatus, FederatedUserStatus } from '@/types/enums';
+import {
+    type BreadcrumbItem,
+    type FederationGroupResource,
+    type FederatedUserDetailResource,
+} from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
@@ -32,49 +35,9 @@ import {
     PageTitle,
 } from '@/components/shared/layout/page';
 
-interface TenantLink {
-    id: string;
-    tenant_id: string;
-    tenant_name: string | null;
-    tenant_user_id: string | null;
-    sync_status: FederatedUserLinkSyncStatus;
-    sync_attempts: number;
-    last_synced_at: string | null;
-    last_sync_error: string | null;
-    is_master: boolean;
-    created_via: string;
-}
-
-interface FederatedUser {
-    id: string;
-    federation_group_id: string;
-    global_email: string;
-    status: FederatedUserStatus;
-    sync_version: number;
-    last_synced_at: string | null;
-    last_sync_source: string | null;
-    created_at: string;
-    updated_at: string;
-    synced_data: {
-        name: string | null;
-        locale: string | null;
-        two_factor_enabled: boolean;
-        password_changed_at: string | null;
-    };
-    master_tenant: { id: string; name: string; slug: string } | null;
-    links: TenantLink[];
-    links_count: number;
-}
-
-interface FederationGroup {
-    id: string;
-    name: string;
-    description: string | null;
-}
-
 interface Props {
-    group: FederationGroup;
-    user: FederatedUser;
+    group: FederationGroupResource;
+    user: FederatedUserDetailResource;
 }
 
 function FederationUserShow({ group, user }: Props) {
@@ -93,8 +56,9 @@ function FederationUserShow({ group, user }: Props) {
         router.post(admin.federation.users.sync.url({ group: group.id, user: user.id }));
     };
 
-    const syncedLinks = user.links.filter((l) => l.sync_status === 'synced').length;
-    const failedLinks = user.links.filter((l) => l.sync_status === 'sync_failed').length;
+    const links = user.links ?? [];
+    const syncedLinks = links.filter((l) => l.sync_status === 'synced').length;
+    const failedLinks = links.filter((l) => l.sync_status === 'sync_failed').length;
 
     return (
         <>
@@ -268,7 +232,7 @@ function FederationUserShow({ group, user }: Props) {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {user.links.length > 0 ? (
+                            {links.length > 0 ? (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -280,7 +244,7 @@ function FederationUserShow({ group, user }: Props) {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {user.links.map((link) => (
+                                        {links.map((link) => (
                                             <TableRow key={link.id}>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">

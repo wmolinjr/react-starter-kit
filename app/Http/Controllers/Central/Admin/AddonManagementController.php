@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Central\Admin;
 
+use App\Enums\AddonType;
 use App\Enums\CentralPermission;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\AddonSubscriptionResource;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Tenant;
 use App\Services\Central\AddonService;
@@ -43,7 +45,7 @@ class AddonManagementController extends Controller implements HasMiddleware
         ];
 
         return Inertia::render('central/admin/addons/index', [
-            'addons' => $addons,
+            'addons' => AddonSubscriptionResource::collection($addons)->response()->getData(true),
             'stats' => $stats,
         ]);
     }
@@ -61,7 +63,17 @@ class AddonManagementController extends Controller implements HasMiddleware
         $revenueByType = AddonSubscription::active()
             ->selectRaw('addon_type, SUM(price * quantity) as total')
             ->groupBy('addon_type')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $addonType = AddonType::tryFrom($item->addon_type);
+
+                return [
+                    'addon_type' => $item->addon_type,
+                    'addon_type_label' => $addonType?->label() ?? ucfirst(str_replace('_', ' ', $item->addon_type)),
+                    'total' => (int) $item->total,
+                    'formatted_total' => '$'.number_format($item->total / 100, 2),
+                ];
+            });
 
         return Inertia::render('central/admin/addons/revenue', [
             'monthly_revenue' => $monthlyRevenue,

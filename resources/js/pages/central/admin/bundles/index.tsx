@@ -16,64 +16,16 @@ import admin from '@/routes/central/admin';
 import { create, destroy, edit, sync, syncAll } from '@/routes/central/admin/bundles';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit as EditIcon, Package, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
-import { type BreadcrumbItem, type PlanSummaryResource } from '@/types';
-import type { BadgePreset } from '@/types/enums';
+import { type BreadcrumbItem, type BundleResource } from '@/types';
 import { BADGE_PRESET } from '@/lib/enum-metadata';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn, formatPrice } from '@/lib/utils';
-
-/**
- * Bundle addon item structure
- * TODO: Create BundleAddonResource in backend for auto-generation
- */
-interface BundleAddon {
-    id: string;
-    addon_id: string;
-    slug: string;
-    name: string;
-    type: string;
-    type_label: string;
-    price_monthly: number;
-    quantity: number;
-}
-
-/**
- * Bundle resource structure
- * TODO: Create BundleResource in backend for auto-generation
- */
-interface Bundle {
-    id: string;
-    slug: string;
-    name: Record<string, string>;
-    name_display: string;
-    description: Record<string, string>;
-    active: boolean;
-    discount_percent: number;
-    price_monthly: number | null;
-    price_yearly: number | null;
-    price_monthly_effective: number;
-    price_yearly_effective: number;
-    base_price_monthly: number;
-    savings_monthly: number;
-    badge: BadgePreset | null;
-    icon: string;
-    icon_color: string | null;
-    features: string[];
-    sort_order: number;
-    addon_count: number;
-    addons: BundleAddon[];
-    plan_ids: string[];
-    plans: Pick<PlanSummaryResource, 'id' | 'name' | 'slug'>[];
-    stripe_product_id: string | null;
-    stripe_price_monthly_id: string | null;
-    stripe_price_yearly_id: string | null;
-    is_synced: boolean;
-}
+import type { BadgePreset } from '@/types/enums';
 
 interface Props {
-    bundles: Bundle[];
+    bundles: BundleResource[];
 }
 
 function BundleIndex({ bundles }: Props) {
@@ -91,13 +43,13 @@ function BundleIndex({ bundles }: Props) {
 
     useSetBreadcrumbs(breadcrumbs);
 
-    const handleDelete = (bundle: Bundle) => {
+    const handleDelete = (bundle: BundleResource) => {
         if (confirm(t('admin.bundles.delete_confirm', { name: bundle.name_display }))) {
             router.delete(destroy.url(bundle.id));
         }
     };
 
-    const handleSync = (bundle: Bundle) => {
+    const handleSync = (bundle: BundleResource) => {
         router.post(sync.url(bundle.id));
     };
 

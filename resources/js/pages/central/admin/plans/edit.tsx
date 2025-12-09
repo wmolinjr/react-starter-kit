@@ -5,36 +5,10 @@ import admin from '@/routes/central/admin';
 import { PlanForm, type PlanData } from './components/plan-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem, type EnumOption } from '@/types';
+import { type FeatureDefinition, type LimitDefinition, type AddonOptionForPlan } from '@/types/common';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
-
-interface Addon {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-interface FeatureDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-    icon: string | null;
-}
-
-interface LimitDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    unit: string | null;
-    unit_label: string | null;
-    default_value: number;
-    allows_unlimited: boolean;
-    icon: string | null;
-}
 
 interface PlanEditData extends PlanData {
     id: string; // Required for edit page (overrides optional from PlanData)
@@ -43,7 +17,7 @@ interface PlanEditData extends PlanData {
 
 interface Props {
     plan: PlanEditData;
-    addons: Addon[];
+    addons: AddonOptionForPlan[];
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: EnumOption[];

@@ -17,48 +17,7 @@ import { ColorSelector } from '@/components/central/forms/color-selector';
 import { TrendingUp, Sparkles, CreditCard, Info } from 'lucide-react';
 import type { AddonType, BadgePreset } from '@/types/enums';
 import { ADDON_TYPE } from '@/lib/enum-metadata';
-
-// Feature definition from backend
-interface FeatureDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-    icon: string | null;
-}
-
-// Limit definition from backend
-interface LimitDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    unit: string | null;
-    unit_label: string | null;
-    default_value: number;
-    allows_unlimited: boolean;
-    icon: string | null;
-}
-
-// Category option
-interface CategoryOption {
-    value: string;
-    label: string;
-}
-
-// Extended type info from backend
-interface AddonTypeInfo {
-    value: string;
-    label: string;
-    description?: string;
-    icon?: string;
-    color?: string;
-    is_stackable?: boolean;
-    is_recurring?: boolean;
-    is_one_time?: boolean;
-    has_validity?: boolean;
-}
+import type { FeatureDefinition, LimitDefinition, CategoryOption, AddonTypeInfo } from '@/types/common';
 
 // Input type for addon prop
 interface AddonInput {
