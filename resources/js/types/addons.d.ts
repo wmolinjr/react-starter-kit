@@ -1,27 +1,10 @@
-export enum AddonType {
-    STORAGE = 'storage',
-    USERS = 'users',
-    PROJECTS = 'projects',
-    FEATURE = 'feature',
-    BANDWIDTH = 'bandwidth',
-    API_CALLS = 'api_calls',
-}
-
-export enum AddonStatus {
-    PENDING = 'pending',
-    ACTIVE = 'active',
-    CANCELED = 'canceled',
-    EXPIRED = 'expired',
-    FAILED = 'failed',
-}
-
-export enum BillingPeriod {
-    MONTHLY = 'monthly',
-    YEARLY = 'yearly',
-    ONE_TIME = 'one_time',
-    METERED = 'metered',
-    MANUAL = 'manual',
-}
+/**
+ * Addon Types - API Resource interfaces
+ *
+ * Enum types (AddonType, AddonStatus, BillingPeriod) are in @/types/enums
+ * Generated from PHP enums via: sail artisan enums:generate-types
+ */
+import type { AddonType } from './enums';
 
 export interface AddonSubscription {
     id: string; // UUID

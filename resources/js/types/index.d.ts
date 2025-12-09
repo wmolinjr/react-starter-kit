@@ -132,10 +132,12 @@ export interface EnumOption {
 }
 
 /**
- * Permission from API Resource (database record).
- * Used in role management pages.
+ * Permission record from API Resource (database).
+ * Used in role management pages for permission assignment.
+ *
+ * Note: Different from `Permission` type (string union for permission checking).
  */
-export interface Permission {
+export interface PermissionRecord {
     id: string;
     name: string;
     description: string | null;
@@ -148,7 +150,7 @@ export interface Permission {
  */
 export interface CategoryPermissions {
     label: string;
-    permissions: Permission[];
+    permissions: PermissionRecord[];
 }
 
 export interface PageProps extends LocaleConfig {

@@ -5,7 +5,7 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Trash2, Users, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type Permission } from '@/types';
+import { type BreadcrumbItem, type PermissionRecord } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';
@@ -31,7 +31,7 @@ interface Role {
     display_name: string;
     description: string | null;
     is_protected: boolean;
-    permissions: Permission[];
+    permissions: PermissionRecord[];
     users: User[];
     created_at: string | null;
 }
@@ -73,7 +73,7 @@ function ShowRole({ role }: Props) {
             acc[category].push(permission);
             return acc;
         },
-        {} as Record<string, Permission[]>
+        {} as Record<string, PermissionRecord[]>
     );
 
     return (
