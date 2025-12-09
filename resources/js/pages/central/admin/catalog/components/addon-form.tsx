@@ -15,9 +15,9 @@ import { BadgeSelector } from '@/components/central/forms/badge-selector';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { TrendingUp, Sparkles, CreditCard, Info } from 'lucide-react';
-import type { AddonType, BadgePreset } from '@/types/enums';
+import type { AddonType, BadgePreset, AddonTypeOption } from '@/types/enums';
 import { ADDON_TYPE } from '@/lib/enum-metadata';
-import type { FeatureDefinition, LimitDefinition, CategoryOption, AddonTypeInfo } from '@/types/common';
+import type { FeatureDefinitionResource, LimitDefinitionResource, CategoryOptionResource } from '@/types';
 
 // Input type for addon prop
 interface AddonInput {
@@ -47,11 +47,11 @@ interface AddonInput {
 
 interface Props {
     addon?: AddonInput;
-    types: AddonTypeInfo[];
+    types: AddonTypeOption[];
     plans: { id: string; name: string; slug: string }[];
-    featureDefinitions?: FeatureDefinition[];
-    limitDefinitions?: LimitDefinition[];
-    categories?: CategoryOption[];
+    featureDefinitions?: FeatureDefinitionResource[];
+    limitDefinitions?: LimitDefinitionResource[];
+    categories?: CategoryOptionResource[];
     isEdit?: boolean;
 }
 
@@ -90,7 +90,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                 acc[category].push(feature);
                 return acc;
             },
-            {} as Record<string, FeatureDefinition[]>
+            {} as Record<string, FeatureDefinitionResource[]>
         );
     }, [featureDefinitions]);
 
@@ -189,7 +189,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
     };
 
     // Find the selected limit definition for display
-    const selectedLimit = limitDefinitions.find(l => l.key === data.limit_key);
+    const selectedLimit = limitDefinitions.find(l => l.value === data.limit_key);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -383,10 +383,10 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                     <SelectContent>
                                         <SelectItem value="__none__">{t('admin.catalog.form.select_limit')}</SelectItem>
                                         {limitDefinitions.map(limit => (
-                                            <SelectItem key={limit.key} value={limit.key}>
+                                            <SelectItem key={limit.value} value={limit.value}>
                                                 <span className="flex items-center gap-2">
                                                     <DynamicIcon name={limit.icon} className="h-4 w-4" />
-                                                    {limit.name}
+                                                    {limit.label}
                                                     {limit.unit_label && (
                                                         <span className="text-muted-foreground">({limit.unit_label})</span>
                                                     )}
@@ -418,7 +418,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                 />
                                 {selectedLimit && (
                                     <p className="text-muted-foreground text-xs">
-                                        {t('admin.catalog.form.adds_to_limit', { limit: selectedLimit.name })}
+                                        {t('admin.catalog.form.adds_to_limit', { limit: selectedLimit.label })}
                                     </p>
                                 )}
                             </div>
@@ -457,23 +457,23 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                 <div className="grid grid-cols-2 gap-3">
                                     {features.map((feature) => (
                                         <div
-                                            key={feature.key}
+                                            key={feature.value}
                                             className={`flex items-start gap-3 rounded-lg border p-3 transition-colors ${
-                                                data.features[feature.key] ? 'border-purple-300 bg-purple-50 dark:border-purple-700 dark:bg-purple-950' : ''
+                                                data.features[feature.value] ? 'border-purple-300 bg-purple-50 dark:border-purple-700 dark:bg-purple-950' : ''
                                             }`}
                                         >
                                             <Switch
-                                                id={`feature-${feature.key}`}
-                                                checked={data.features[feature.key] ?? false}
-                                                onCheckedChange={() => toggleFeature(feature.key)}
+                                                id={`feature-${feature.value}`}
+                                                checked={data.features[feature.value] ?? false}
+                                                onCheckedChange={() => toggleFeature(feature.value)}
                                             />
                                             <div className="flex-1">
                                                 <Label
-                                                    htmlFor={`feature-${feature.key}`}
+                                                    htmlFor={`feature-${feature.value}`}
                                                     className="flex cursor-pointer items-center gap-2"
                                                 >
                                                     <DynamicIcon name={feature.icon} className="h-4 w-4" />
-                                                    {feature.name}
+                                                    {feature.label}
                                                 </Label>
                                                 {feature.description && (
                                                     <p className="text-muted-foreground mt-1 text-xs">

@@ -7,6 +7,10 @@ use App\Enums\CentralPermission;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\AddonOptionForPlanResource;
+use App\Http\Resources\Shared\CategoryOptionResource;
+use App\Http\Resources\Shared\FeatureDefinitionResource;
+use App\Http\Resources\Shared\LimitDefinitionResource;
 use App\Models\Central\Addon;
 use App\Models\Central\Plan;
 use App\Services\Central\StripeSyncService;
@@ -53,14 +57,10 @@ class AddonCatalogController extends Controller implements HasMiddleware
     {
         return Inertia::render('central/admin/catalog/create', [
             'types' => AddonType::toFrontendArray(),
-            'plans' => Plan::active()->ordered()->get()->map(fn ($p) => [
-                'id' => $p->id,
-                'name' => $p->trans('name'),
-                'slug' => $p->slug,
-            ]),
-            'featureDefinitions' => $this->getFeatureDefinitions(),
-            'limitDefinitions' => $this->getLimitDefinitions(),
-            'categories' => PlanFeature::categories(),
+            'plans' => AddonOptionForPlanResource::collection(Plan::active()->ordered()->get()),
+            'featureDefinitions' => FeatureDefinitionResource::collection($this->getFeatureDefinitions()),
+            'limitDefinitions' => LimitDefinitionResource::collection($this->getLimitDefinitions()),
+            'categories' => CategoryOptionResource::collection(PlanFeature::categories()),
         ]);
     }
 
@@ -116,14 +116,10 @@ class AddonCatalogController extends Controller implements HasMiddleware
         return Inertia::render('central/admin/catalog/edit', [
             'addon' => $this->transformAddon($addon),
             'types' => AddonType::toFrontendArray(),
-            'plans' => Plan::active()->ordered()->get()->map(fn ($p) => [
-                'id' => $p->id,
-                'name' => $p->trans('name'),
-                'slug' => $p->slug,
-            ]),
-            'featureDefinitions' => $this->getFeatureDefinitions(),
-            'limitDefinitions' => $this->getLimitDefinitions(),
-            'categories' => PlanFeature::categories(),
+            'plans' => AddonOptionForPlanResource::collection(Plan::active()->ordered()->get()),
+            'featureDefinitions' => FeatureDefinitionResource::collection($this->getFeatureDefinitions()),
+            'limitDefinitions' => LimitDefinitionResource::collection($this->getLimitDefinitions()),
+            'categories' => CategoryOptionResource::collection(PlanFeature::categories()),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Central\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\CentralDashboardStatsResource;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Plan;
 use App\Models\Central\Tenant;
@@ -38,12 +39,12 @@ class DashboardController extends Controller
             abort(403, 'Access denied. No admin role assigned.');
         }
 
-        $stats = [
+        $stats = new CentralDashboardStatsResource([
             'total_tenants' => Tenant::count(),
             'total_admins' => CentralUser::count(),
             'total_addons' => AddonSubscription::active()->count(),
             'total_plans' => Plan::active()->count(),
-        ];
+        ]);
 
         return Inertia::render('central/admin/dashboard', [
             'stats' => $stats,

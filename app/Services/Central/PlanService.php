@@ -5,6 +5,10 @@ namespace App\Services\Central;
 use App\Console\Commands\SyncPlanPermissions;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
+use App\Http\Resources\Central\AddonOptionForPlanResource;
+use App\Http\Resources\Shared\CategoryOptionResource;
+use App\Http\Resources\Shared\FeatureDefinitionResource;
+use App\Http\Resources\Shared\LimitDefinitionResource;
 use App\Models\Central\Addon;
 use App\Models\Central\Plan;
 use Illuminate\Support\Collection;
@@ -105,31 +109,26 @@ class PlanService
     /**
      * Get available addons for plan selection.
      *
-     * @return Collection<int, array{id: string, name: string, slug: string}>
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function getAvailableAddons(): Collection
+    public function getAvailableAddons()
     {
-        return Addon::active()
-            ->orderBy('sort_order')
-            ->get()
-            ->map(fn (Addon $addon) => [
-                'id' => $addon->id,
-                'name' => $addon->trans('name'),
-                'slug' => $addon->slug,
-            ]);
+        return AddonOptionForPlanResource::collection(
+            Addon::active()->orderBy('sort_order')->get()
+        );
     }
 
     /**
      * Get feature and limit definitions for frontend.
      *
-     * @return array{features: array, limits: array, categories: array}
+     * @return array{featureDefinitions: \Illuminate\Http\Resources\Json\AnonymousResourceCollection, limitDefinitions: \Illuminate\Http\Resources\Json\AnonymousResourceCollection, categories: \Illuminate\Http\Resources\Json\AnonymousResourceCollection}
      */
     public function getDefinitions(): array
     {
         return [
-            'featureDefinitions' => PlanFeature::toFrontendArray(),
-            'limitDefinitions' => PlanLimit::toFrontendArray(),
-            'categories' => PlanFeature::categories(),
+            'featureDefinitions' => FeatureDefinitionResource::collection(PlanFeature::toFrontendArray()),
+            'limitDefinitions' => LimitDefinitionResource::collection(PlanLimit::toFrontendArray()),
+            'categories' => CategoryOptionResource::collection(PlanFeature::categories()),
         ];
     }
 

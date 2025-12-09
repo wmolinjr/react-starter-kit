@@ -15,8 +15,7 @@ import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
 import { formatPrice } from '@/lib/utils';
-import type { EnumOption } from '@/types';
-import type { FeatureDefinition, LimitDefinition, AddonOptionForPlan } from '@/types/common';
+import type { EnumOption, FeatureDefinitionResource, LimitDefinitionResource, AddonOptionForPlanResource } from '@/types';
 
 export interface PlanData {
     id?: string;
@@ -39,25 +38,25 @@ export interface PlanData {
 
 interface Props {
     plan?: PlanData;
-    addons: AddonOptionForPlan[];
-    featureDefinitions: FeatureDefinition[];
-    limitDefinitions: LimitDefinition[];
+    addons: AddonOptionForPlanResource[];
+    featureDefinitions: FeatureDefinitionResource[];
+    limitDefinitions: LimitDefinitionResource[];
     categories: EnumOption[];
     onSubmit: (data: PlanData) => void;
     isSubmitting?: boolean;
 }
 
 // Build default values from definitions
-function buildDefaultFeatures(definitions: FeatureDefinition[]): Record<string, boolean> {
+function buildDefaultFeatures(definitions: FeatureDefinitionResource[]): Record<string, boolean> {
     return definitions.reduce(
-        (acc, def) => ({ ...acc, [def.key]: false }),
+        (acc, def) => ({ ...acc, [def.value]: false }),
         {}
     );
 }
 
-function buildDefaultLimits(definitions: LimitDefinition[]): Record<string, number> {
+function buildDefaultLimits(definitions: LimitDefinitionResource[]): Record<string, number> {
     return definitions.reduce(
-        (acc, def) => ({ ...acc, [def.key]: def.default_value }),
+        (acc, def) => ({ ...acc, [def.value]: def.default_value }),
         {}
     );
 }
@@ -125,7 +124,7 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
             acc[category].push(feature);
             return acc;
         },
-        {} as Record<string, FeatureDefinition[]>
+        {} as Record<string, FeatureDefinitionResource[]>
     );
 
     return (
@@ -221,18 +220,18 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                         {limitDefinitions.map((limit) => (
-                            <div key={limit.key} className="space-y-2">
+                            <div key={limit.value} className="space-y-2">
                                 <Label className="flex items-center gap-2">
                                     <DynamicIcon name={limit.icon} className="h-4 w-4" />
-                                    {limit.name}
+                                    {limit.label}
                                     {limit.allows_unlimited && (
                                         <span className="text-muted-foreground text-xs">(-1 = {t('common.unlimited').toLowerCase()})</span>
                                     )}
                                 </Label>
                                 <Input
                                     type="number"
-                                    value={data.limits[limit.key] ?? limit.default_value}
-                                    onChange={(e) => setLimit(limit.key, parseInt(e.target.value) || 0)}
+                                    value={data.limits[limit.value] ?? limit.default_value}
+                                    onChange={(e) => setLimit(limit.value, parseInt(e.target.value) || 0)}
                                     min={limit.allows_unlimited ? -1 : 0}
                                 />
                                 {limit.unit_label && (
@@ -257,21 +256,21 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                             <div className="grid grid-cols-2 gap-3">
                                 {features.map((feature) => (
                                     <div
-                                        key={feature.key}
+                                        key={feature.value}
                                         className="flex items-start gap-3 rounded-lg border p-3"
                                     >
                                         <Switch
-                                            id={feature.key}
-                                            checked={data.features[feature.key] ?? false}
-                                            onCheckedChange={() => toggleFeature(feature.key)}
+                                            id={feature.value}
+                                            checked={data.features[feature.value] ?? false}
+                                            onCheckedChange={() => toggleFeature(feature.value)}
                                         />
                                         <div className="flex-1">
                                             <Label
-                                                htmlFor={feature.key}
+                                                htmlFor={feature.value}
                                                 className="flex cursor-pointer items-center gap-2"
                                             >
                                                 <DynamicIcon name={feature.icon} className="h-4 w-4" />
-                                                {feature.name}
+                                                {feature.label}
                                             </Label>
                                             {feature.description && (
                                                 <p className="text-muted-foreground mt-1 text-xs">

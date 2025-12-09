@@ -4,8 +4,7 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { PlanForm, type PlanData } from './components/plan-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type EnumOption } from '@/types';
-import { type FeatureDefinition, type LimitDefinition, type AddonOptionForPlan } from '@/types/common';
+import { type BreadcrumbItem, type EnumOption, type FeatureDefinitionResource, type LimitDefinitionResource, type AddonOptionForPlanResource } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -17,9 +16,9 @@ interface PlanEditData extends PlanData {
 
 interface Props {
     plan: PlanEditData;
-    addons: AddonOptionForPlan[];
-    featureDefinitions: FeatureDefinition[];
-    limitDefinitions: LimitDefinition[];
+    addons: AddonOptionForPlanResource[];
+    featureDefinitions: FeatureDefinitionResource[];
+    limitDefinitions: LimitDefinitionResource[];
     categories: EnumOption[];
 }
 

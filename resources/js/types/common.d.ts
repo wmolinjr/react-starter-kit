@@ -282,81 +282,15 @@ export interface RevenueByType {
 }
 
 // =============================================================================
-// Plan/Addon Form Types (shared across plan and addon forms)
+// Plan/Addon Form Types - MIGRATED TO RESOURCES
 // =============================================================================
-
-/**
- * Feature definition from backend (used in plan/addon forms)
- */
-export interface FeatureDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    category: string | null;
-    icon: string | null;
-}
-
-/**
- * Limit definition from backend (used in plan/addon forms)
- */
-export interface LimitDefinition {
-    id: string;
-    key: string;
-    name: string;
-    description: string | null;
-    unit: string | null;
-    unit_label: string | null;
-    default_value: number;
-    allows_unlimited: boolean;
-    icon: string | null;
-}
-
-/**
- * Category option for feature/limit grouping
- */
-export interface CategoryOption {
-    value: string;
-    label: string;
-}
-
-/**
- * Simple addon info for plan forms
- */
-export interface AddonOptionForPlan {
-    id: string;
-    name: string;
-    slug: string;
-}
-
-/**
- * Addon type info from backend (used in addon forms)
- */
-export interface AddonTypeInfo {
-    value: string;
-    label: string;
-    description?: string;
-    icon?: string;
-    color?: string;
-    is_stackable?: boolean;
-    is_recurring?: boolean;
-    is_one_time?: boolean;
-    has_validity?: boolean;
-}
-
-// =============================================================================
-// Dashboard Stats Types
-// =============================================================================
-
-/**
- * Central admin dashboard statistics
- */
-export interface CentralDashboardStats {
-    total_tenants: number;
-    total_admins: number;
-    total_addons: number;
-    total_plans: number;
-}
+// The following types have been migrated to auto-generated Resources:
+// - FeatureDefinition → FeatureDefinitionResource (resources.d.ts)
+// - LimitDefinition → LimitDefinitionResource (resources.d.ts)
+// - CategoryOption → CategoryOptionResource (resources.d.ts)
+// - AddonOptionForPlan → AddonOptionForPlanResource (resources.d.ts)
+// - AddonTypeInfo → AddonTypeOption (enums.d.ts)
+// - CentralDashboardStats → CentralDashboardStatsResource (resources.d.ts)
 
 // =============================================================================
 // Bundle Types

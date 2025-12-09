@@ -10,15 +10,14 @@ import {
 import AdminLayout from '@/layouts/central/admin-layout';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
-import { type BreadcrumbItem } from '@/types';
-import { type CentralDashboardStats } from '@/types/common';
+import { type BreadcrumbItem, type CentralDashboardStatsResource } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Building2, CreditCard, Layers, Network, Package, Shield, Users } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type ReactElement } from 'react';
 
 interface Props {
-    stats: CentralDashboardStats;
+    stats: CentralDashboardStatsResource;
 }
 
 function AdminDashboard({ stats }: Props) {

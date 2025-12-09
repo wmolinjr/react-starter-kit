@@ -45,6 +45,12 @@ import type {
 // Shared Resources
 // =============================================================================
 
+export interface AddonOptionForPlanResource {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 export interface AddonSubscriptionResource {
     id: string;
     addon_slug: string;
@@ -111,6 +117,13 @@ export interface BundleResource {
     stripe_price_monthly_id: string | null;
     stripe_price_yearly_id: string | null;
     is_synced: boolean;
+}
+
+export interface CentralDashboardStatsResource {
+    total_tenants: number;
+    total_admins: number;
+    total_addons: number;
+    total_plans: number;
 }
 
 export interface CentralUserDetailResource {
@@ -574,6 +587,35 @@ export interface UserSummaryResource {
     id: string;
     name: string;
     email: string;
+}
+
+export interface CategoryOptionResource {
+    value: string;
+    label: string;
+}
+
+export interface FeatureDefinitionResource {
+    value: string;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    category: string;
+    permissions: string[];
+    is_customizable: boolean;
+}
+
+export interface LimitDefinitionResource {
+    value: string;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    unit: string;
+    unit_label: string;
+    default_value: number;
+    allows_unlimited: boolean;
+    is_customizable: boolean;
 }
 
 export interface PermissionResource {

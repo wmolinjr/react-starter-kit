@@ -15,8 +15,8 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
 import { CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { AddonForm } from './components/addon-form';
-import { type BreadcrumbItem } from '@/types';
-import { type FeatureDefinition, type LimitDefinition, type CategoryOption, type AddonTypeInfo } from '@/types/common';
+import { type BreadcrumbItem, type FeatureDefinitionResource, type LimitDefinitionResource, type CategoryOptionResource } from '@/types';
+import type { AddonTypeOption } from '@/types/enums';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -57,11 +57,11 @@ interface AddonEditData {
 
 interface Props {
     addon: AddonEditData;
-    types: AddonTypeInfo[];
+    types: AddonTypeOption[];
     plans: { id: string; name: string; slug: string }[];
-    featureDefinitions: FeatureDefinition[];
-    limitDefinitions: LimitDefinition[];
-    categories: CategoryOption[];
+    featureDefinitions: FeatureDefinitionResource[];
+    limitDefinitions: LimitDefinitionResource[];
+    categories: CategoryOptionResource[];
 }
 
 function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories }: Props) {
