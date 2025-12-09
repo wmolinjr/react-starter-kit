@@ -42,20 +42,22 @@ class AddonBundleSeeder extends Seeder
                 'name' => [
                     'en' => 'Power Pack',
                     'pt_BR' => 'Pacote Power',
+                    'es' => 'Paquete Power',
                 ],
                 'description' => [
                     'en' => 'Everything you need to scale: extra storage, users, and advanced reporting',
                     'pt_BR' => 'Tudo que você precisa para escalar: armazenamento extra, usuários e relatórios avançados',
+                    'es' => 'Todo lo que necesitas para escalar: almacenamiento extra, usuarios e informes avanzados',
                 ],
                 'discount_percent' => 20,
                 'badge' => 'most_popular', // BadgePreset value
                 'icon' => 'Zap',
                 'icon_color' => 'amber',
                 'features' => [
-                    ['en' => '50GB extra storage', 'pt_BR' => '50GB de armazenamento extra'],
-                    ['en' => '5 additional user seats', 'pt_BR' => '5 vagas de usuários adicionais'],
-                    ['en' => 'Advanced reporting & analytics', 'pt_BR' => 'Relatórios e análises avançadas'],
-                    ['en' => 'Priority email support', 'pt_BR' => 'Suporte prioritário por e-mail'],
+                    ['en' => '50GB extra storage', 'pt_BR' => '50GB de armazenamento extra', 'es' => '50GB de almacenamiento extra'],
+                    ['en' => '5 additional user seats', 'pt_BR' => '5 vagas de usuários adicionais', 'es' => '5 puestos de usuario adicionales'],
+                    ['en' => 'Advanced reporting & analytics', 'pt_BR' => 'Relatórios e análises avançadas', 'es' => 'Informes y análisis avanzados'],
+                    ['en' => 'Priority email support', 'pt_BR' => 'Suporte prioritário por e-mail', 'es' => 'Soporte prioritario por correo'],
                 ],
                 'addons' => [
                     ['slug' => 'storage_50gb', 'quantity' => 1],
@@ -74,19 +76,21 @@ class AddonBundleSeeder extends Seeder
                 'name' => [
                     'en' => 'Team Starter',
                     'pt_BR' => 'Equipe Iniciante',
+                    'es' => 'Equipo Inicial',
                 ],
                 'description' => [
                     'en' => 'Perfect for growing teams: add users and customize their permissions',
                     'pt_BR' => 'Perfeito para equipes em crescimento: adicione usuários e personalize suas permissões',
+                    'es' => 'Perfecto para equipos en crecimiento: añade usuarios y personaliza sus permisos',
                 ],
                 'discount_percent' => 15,
                 'badge' => 'best_for_teams', // BadgePreset value
                 'icon' => 'Users',
                 'icon_color' => 'blue',
                 'features' => [
-                    ['en' => '5 additional user seats', 'pt_BR' => '5 vagas de usuários adicionais'],
-                    ['en' => 'Custom roles & permissions', 'pt_BR' => 'Papéis e permissões personalizados'],
-                    ['en' => 'Team activity dashboard', 'pt_BR' => 'Painel de atividades da equipe'],
+                    ['en' => '5 additional user seats', 'pt_BR' => '5 vagas de usuários adicionais', 'es' => '5 puestos de usuario adicionales'],
+                    ['en' => 'Custom roles & permissions', 'pt_BR' => 'Papéis e permissões personalizados', 'es' => 'Roles y permisos personalizados'],
+                    ['en' => 'Team activity dashboard', 'pt_BR' => 'Painel de atividades da equipe', 'es' => 'Panel de actividad del equipo'],
                 ],
                 'addons' => [
                     ['slug' => 'extra_users_5', 'quantity' => 1],
@@ -104,20 +108,22 @@ class AddonBundleSeeder extends Seeder
                 'name' => [
                     'en' => 'Storage Pro',
                     'pt_BR' => 'Armazenamento Pro',
+                    'es' => 'Almacenamiento Pro',
                 ],
                 'description' => [
                     'en' => 'Maximum storage capacity for data-heavy workloads',
                     'pt_BR' => 'Capacidade máxima de armazenamento para cargas pesadas de dados',
+                    'es' => 'Capacidad máxima de almacenamiento para cargas de datos pesadas',
                 ],
                 'discount_percent' => 25,
                 'badge' => 'best_value', // BadgePreset value
                 'icon' => 'HardDrive',
                 'icon_color' => 'green',
                 'features' => [
-                    ['en' => '300GB total storage (50GB + 250GB)', 'pt_BR' => '300GB de armazenamento total (50GB + 250GB)'],
-                    ['en' => 'High-performance SSD', 'pt_BR' => 'SSD de alta performance'],
-                    ['en' => 'Automatic backups', 'pt_BR' => 'Backups automáticos'],
-                    ['en' => '99.9% uptime SLA', 'pt_BR' => 'SLA de 99.9% de uptime'],
+                    ['en' => '300GB total storage (50GB + 250GB)', 'pt_BR' => '300GB de armazenamento total (50GB + 250GB)', 'es' => '300GB de almacenamiento total (50GB + 250GB)'],
+                    ['en' => 'High-performance SSD', 'pt_BR' => 'SSD de alta performance', 'es' => 'SSD de alto rendimiento'],
+                    ['en' => 'Automatic backups', 'pt_BR' => 'Backups automáticos', 'es' => 'Copias de seguridad automáticas'],
+                    ['en' => '99.9% uptime SLA', 'pt_BR' => 'SLA de 99.9% de uptime', 'es' => 'SLA de 99.9% de disponibilidad'],
                 ],
                 'addons' => [
                     ['slug' => 'storage_50gb', 'quantity' => 1],
@@ -135,20 +141,22 @@ class AddonBundleSeeder extends Seeder
                 'name' => [
                     'en' => 'Enterprise Essentials',
                     'pt_BR' => 'Essenciais Enterprise',
+                    'es' => 'Esenciales Empresarial',
                 ],
                 'description' => [
                     'en' => 'Complete package for enterprise needs: storage, team, and all features',
                     'pt_BR' => 'Pacote completo para necessidades enterprise: armazenamento, equipe e todos os recursos',
+                    'es' => 'Paquete completo para necesidades empresariales: almacenamiento, equipo y todas las funciones',
                 ],
                 'discount_percent' => 30,
                 'badge' => 'enterprise', // BadgePreset value
                 'icon' => 'Building2',
                 'icon_color' => 'purple',
                 'features' => [
-                    ['en' => '250GB enterprise storage', 'pt_BR' => '250GB de armazenamento enterprise'],
-                    ['en' => '10 user seats (2x 5-seat packs)', 'pt_BR' => '10 vagas de usuários (2x pacotes de 5)'],
-                    ['en' => 'Advanced reports & analytics', 'pt_BR' => 'Relatórios e análises avançadas'],
-                    ['en' => 'Dedicated support', 'pt_BR' => 'Suporte dedicado'],
+                    ['en' => '250GB enterprise storage', 'pt_BR' => '250GB de armazenamento enterprise', 'es' => '250GB de almacenamiento empresarial'],
+                    ['en' => '10 user seats (2x 5-seat packs)', 'pt_BR' => '10 vagas de usuários (2x pacotes de 5)', 'es' => '10 puestos de usuario (2x paquetes de 5)'],
+                    ['en' => 'Advanced reports & analytics', 'pt_BR' => 'Relatórios e análises avançadas', 'es' => 'Informes y análisis avanzados'],
+                    ['en' => 'Dedicated support', 'pt_BR' => 'Suporte dedicado', 'es' => 'Soporte dedicado'],
                 ],
                 'addons' => [
                     ['slug' => 'storage_250gb', 'quantity' => 1],

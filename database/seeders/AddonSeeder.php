@@ -52,15 +52,17 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Storage 50GB',
                     'pt_BR' => 'Armazenamento 50GB',
+                    'es' => 'Almacenamiento 50GB',
                 ],
                 'description' => [
                     'en' => 'Add 50GB of additional storage to your plan',
                     'pt_BR' => 'Adicione 50GB de armazenamento extra ao seu plano',
+                    'es' => 'Añade 50GB de almacenamiento adicional a tu plan',
                 ],
                 'type' => AddonType::QUOTA,
                 'limit_key' => 'storage', // Which plan limit to increase
                 'unit_value' => 50000, // 50GB in MB
-                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB'],
+                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_monthly' => 4900, // $49/month
                 'price_yearly' => 49000, // $490/year
                 'available_for_plans' => ['starter', 'professional'],
@@ -81,15 +83,17 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Storage 250GB',
                     'pt_BR' => 'Armazenamento 250GB',
+                    'es' => 'Almacenamiento 250GB',
                 ],
                 'description' => [
                     'en' => 'Add 250GB of additional storage (best value)',
                     'pt_BR' => 'Adicione 250GB de armazenamento extra (melhor custo-benefício)',
+                    'es' => 'Añade 250GB de almacenamiento adicional (mejor valor)',
                 ],
                 'type' => AddonType::QUOTA,
                 'limit_key' => 'storage',
                 'unit_value' => 250000, // 250GB in MB
-                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB'],
+                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_monthly' => 19900, // $199/month
                 'price_yearly' => 199000, // $1990/year
                 'available_for_plans' => ['professional', 'enterprise'],
@@ -105,15 +109,17 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Extra Users (5 seats)',
                     'pt_BR' => 'Usuários Extras (5 vagas)',
+                    'es' => 'Usuarios Extra (5 puestos)',
                 ],
                 'description' => [
                     'en' => 'Add 5 additional user seats to your team',
                     'pt_BR' => 'Adicione 5 vagas de usuários extras à sua equipe',
+                    'es' => 'Añade 5 puestos de usuario adicionales a tu equipo',
                 ],
                 'type' => AddonType::QUOTA,
                 'limit_key' => 'users',
                 'unit_value' => 5, // 5 users per unit
-                'unit_label' => ['en' => 'seats', 'pt_BR' => 'vagas'],
+                'unit_label' => ['en' => 'seats', 'pt_BR' => 'vagas', 'es' => 'puestos'],
                 'price_monthly' => 4900, // $49/month for 5 users
                 'price_yearly' => 49000, // $490/year
                 'available_for_plans' => ['starter', 'professional'],
@@ -133,10 +139,12 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Advanced Reports',
                     'pt_BR' => 'Relatórios Avançados',
+                    'es' => 'Informes Avanzados',
                 ],
                 'description' => [
                     'en' => 'Unlock advanced reporting and analytics features',
                     'pt_BR' => 'Desbloqueie recursos avançados de relatórios e análises',
+                    'es' => 'Desbloquea funciones avanzadas de informes y análisis',
                 ],
                 'type' => AddonType::FEATURE,
                 'price_monthly' => 2900, // $29/month
@@ -163,10 +171,12 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Custom Roles',
                     'pt_BR' => 'Papéis Personalizados',
+                    'es' => 'Roles Personalizados',
                 ],
                 'description' => [
                     'en' => 'Create custom roles and permissions',
                     'pt_BR' => 'Crie papéis e permissões personalizados',
+                    'es' => 'Crea roles y permisos personalizados',
                 ],
                 'type' => AddonType::FEATURE,
                 'price_monthly' => 1900, // $19/month
@@ -190,15 +200,17 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Storage Credit 100GB',
                     'pt_BR' => 'Crédito de Armazenamento 100GB',
+                    'es' => 'Crédito de Almacenamiento 100GB',
                 ],
                 'description' => [
                     'en' => 'One-time purchase of 100GB storage (valid for 1 year)',
                     'pt_BR' => 'Compra única de 100GB de armazenamento (válido por 1 ano)',
+                    'es' => 'Compra única de 100GB de almacenamiento (válido por 1 año)',
                 ],
                 'type' => AddonType::CREDIT,
                 'limit_key' => 'storage',
                 'unit_value' => 100000, // 100GB in MB
-                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB'],
+                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_one_time' => 7900, // $79 one-time
                 'validity_months' => 12,
                 'available_for_plans' => ['starter', 'professional', 'enterprise'],
@@ -219,13 +231,15 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Storage Overage',
                     'pt_BR' => 'Excedente de Armazenamento',
+                    'es' => 'Excedente de Almacenamiento',
                 ],
                 'description' => [
                     'en' => 'Pay-as-you-go for storage exceeding plan limits',
                     'pt_BR' => 'Pague conforme o uso para armazenamento além dos limites do plano',
+                    'es' => 'Paga por uso para almacenamiento que exceda los límites del plan',
                 ],
                 'type' => AddonType::METERED,
-                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB'],
+                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_metered' => 10, // $0.10/GB
                 'free_tier' => 0, // No free tier (already in plan)
                 'available_for_plans' => ['starter', 'professional', 'enterprise'],
@@ -242,13 +256,15 @@ class AddonSeeder extends Seeder
                 'name' => [
                     'en' => 'Bandwidth Overage',
                     'pt_BR' => 'Excedente de Banda',
+                    'es' => 'Excedente de Ancho de Banda',
                 ],
                 'description' => [
                     'en' => 'Pay-as-you-go for bandwidth exceeding plan limits',
                     'pt_BR' => 'Pague conforme o uso para banda além dos limites do plano',
+                    'es' => 'Paga por uso para ancho de banda que exceda los límites del plan',
                 ],
                 'type' => AddonType::METERED,
-                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB'],
+                'unit_label' => ['en' => 'GB', 'pt_BR' => 'GB', 'es' => 'GB'],
                 'price_metered' => 5, // $0.05/GB
                 'free_tier' => 100000, // First 100GB free (in MB)
                 'available_for_plans' => ['starter', 'professional', 'enterprise'],

@@ -65,11 +65,13 @@ class PlanSeeder extends Seeder
             'name' => [
                 'en' => 'Starter',
                 'pt_BR' => 'Iniciante',
+                'es' => 'Inicial',
             ],
             'slug' => 'starter',
             'description' => [
                 'en' => 'Perfect for individuals and small projects. Get started with essential features.',
                 'pt_BR' => 'Perfeito para indivíduos e pequenos projetos. Comece com recursos essenciais.',
+                'es' => 'Perfecto para individuos y pequeños proyectos. Comienza con funciones esenciales.',
             ],
             'price' => 2900, // 29.00/month in configured currency
             'currency' => stripe_currency(),
@@ -106,11 +108,13 @@ class PlanSeeder extends Seeder
             'name' => [
                 'en' => 'Professional',
                 'pt_BR' => 'Profissional',
+                'es' => 'Profesional',
             ],
             'slug' => 'professional',
             'description' => [
                 'en' => 'For growing teams and businesses. Unlock powerful collaboration tools.',
                 'pt_BR' => 'Para equipes e empresas em crescimento. Desbloqueie ferramentas poderosas de colaboração.',
+                'es' => 'Para equipos y negocios en crecimiento. Desbloquea potentes herramientas de colaboración.',
             ],
             'price' => 9900, // 99.00/month in configured currency
             'currency' => stripe_currency(),
@@ -150,11 +154,13 @@ class PlanSeeder extends Seeder
             'name' => [
                 'en' => 'Enterprise',
                 'pt_BR' => 'Empresarial',
+                'es' => 'Empresarial',
             ],
             'slug' => 'enterprise',
             'description' => [
                 'en' => 'For large organizations with advanced security and compliance needs.',
                 'pt_BR' => 'Para grandes organizações com necessidades avançadas de segurança e conformidade.',
+                'es' => 'Para grandes organizaciones con necesidades avanzadas de seguridad y cumplimiento.',
             ],
             'price' => 0, // Custom pricing
             'currency' => stripe_currency(),
