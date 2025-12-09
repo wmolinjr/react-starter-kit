@@ -58,12 +58,12 @@ interface Tenant {
 
 interface FederatedUser {
     id: string;
-    email: string;
-    name: string;
-    is_active: boolean;
+    global_email: string;
+    name: string | null;
+    status: 'active' | 'pending' | 'suspended';
     created_at: string;
-    master_tenant: { id: string; name: string } | null;
-    linked_tenants_count: number;
+    master_tenant: { id: string; name: string; slug: string } | null;
+    links_count: number;
 }
 
 interface Stats {
@@ -460,10 +460,10 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                     <User className="h-4 w-4" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="font-medium">{user.name}</p>
+                                                                    <p className="font-medium">{user.name || user.global_email}</p>
                                                                     <p className="text-muted-foreground flex items-center gap-1 text-xs">
                                                                         <Mail className="h-3 w-3" />
-                                                                        {user.email}
+                                                                        {user.global_email}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -479,13 +479,15 @@ function FederationShow({ group, availableTenants }: Props) {
                                                             )}
                                                         </TableCell>
                                                         <TableCell>
-                                                            <Badge variant="outline">{user.linked_tenants_count}</Badge>
+                                                            <Badge variant="outline">{user.links_count}</Badge>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {user.is_active ? (
+                                                            {user.status === 'active' ? (
                                                                 <Badge variant="default">{t('common.active')}</Badge>
+                                                            ) : user.status === 'pending' ? (
+                                                                <Badge variant="secondary">{t('common.pending')}</Badge>
                                                             ) : (
-                                                                <Badge variant="secondary">{t('common.inactive')}</Badge>
+                                                                <Badge variant="destructive">{t('common.suspended')}</Badge>
                                                             )}
                                                         </TableCell>
                                                         <TableCell>
