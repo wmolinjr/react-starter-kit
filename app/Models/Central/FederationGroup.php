@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
@@ -29,7 +31,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  */
 class FederationGroup extends Model
 {
-    use CentralConnection, HasUuids;
+    use CentralConnection, HasUuids, LogsActivity;
 
     protected $fillable = [
         'name',
@@ -45,6 +47,18 @@ class FederationGroup extends Model
         'settings' => 'array',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Activity log configuration.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'description', 'master_tenant_id', 'sync_strategy', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => "Federation group {$eventName}");
+    }
 
     /**
      * Default synced fields.
@@ -102,14 +116,6 @@ class FederationGroup extends Model
     public function activeFederatedUsers(): HasMany
     {
         return $this->federatedUsers()->where('status', 'active');
-    }
-
-    /**
-     * Sync logs for this group.
-     */
-    public function syncLogs(): HasMany
-    {
-        return $this->hasMany(FederationSyncLog::class);
     }
 
     /**

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
@@ -30,19 +32,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  */
 class FederatedUser extends Model
 {
-    use CentralConnection, HasUuids, SoftDeletes;
-
-    /**
-     * Boot the model and ensure central connection is used.
-     */
-    protected static function booted(): void
-    {
-        // Ensure new query builders use the central connection
-        static::addGlobalScope('central_connection', function ($query) {
-            $centralConnection = config('tenancy.database.central_connection');
-            $query->getModel()->setConnection($centralConnection);
-        });
-    }
+    use CentralConnection, HasUuids, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'federation_group_id',
@@ -62,6 +52,18 @@ class FederatedUser extends Model
         'sync_version' => 'integer',
         'status' => FederatedUserStatus::class,
     ];
+
+    /**
+     * Activity log configuration.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['global_email', 'status', 'master_tenant_id', 'sync_version'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => "Federated user {$eventName}");
+    }
 
     /**
      * Federation group relationship.
@@ -228,15 +230,9 @@ class FederatedUser extends Model
 
     /**
      * Find by email within a group.
-     * Explicitly uses central connection to avoid issues when running in tenant context.
      */
     public static function findByEmailInGroup(string $email, string $groupId): ?self
     {
-        $centralConnection = config('tenancy.database.central_connection');
-
-        return static::on($centralConnection)
-            ->byEmail($email)
-            ->inGroup($groupId)
-            ->first();
+        return static::byEmail($email)->inGroup($groupId)->first();
     }
 }

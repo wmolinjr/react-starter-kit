@@ -11,7 +11,6 @@ use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationConflict;
 use App\Models\Central\FederationGroup;
 use App\Models\Central\FederationGroupTenant;
-use App\Models\Central\FederationSyncLog;
 use App\Models\Central\Tenant;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -31,7 +30,6 @@ use Illuminate\Support\Facades\DB;
 class FederationService
 {
     public function __construct(
-        protected FederationAuditService $auditService,
         protected FederationCacheService $cacheService
     ) {}
 
@@ -83,9 +81,6 @@ class FederationService
                 ],
             ]);
 
-            // Log the operation
-            $this->auditService->logGroupCreated($group, $masterTenant);
-
             // Clear cache
             $this->cacheService->invalidateTenant($masterTenant->id);
 
@@ -100,11 +95,7 @@ class FederationService
         FederationGroup $group,
         array $data
     ): FederationGroup {
-        $oldData = $group->only(['name', 'description', 'sync_strategy', 'settings']);
-
         $group->update($data);
-
-        $this->auditService->logGroupUpdated($group, $oldData, $data);
 
         return $group->fresh();
     }
@@ -121,9 +112,6 @@ class FederationService
         DB::transaction(function () use ($group) {
             // Get all tenant IDs for cache invalidation
             $tenantIds = $group->tenants()->pluck('tenants.id')->toArray();
-
-            // Log before deletion
-            $this->auditService->logGroupDeleted($group);
 
             // Delete all related records (cascade will handle most)
             $group->delete();
@@ -173,15 +161,12 @@ class FederationService
             // 3. Update link metadata
             $this->updateLinkMasterFlags($group, $oldMaster, $newMaster);
 
-            // 4. Log the change
-            $this->auditService->logMasterChanged($group, $oldMaster, $newMaster);
-
-            // 5. Invalidate caches
+            // 4. Invalidate caches
             $this->cacheService->invalidateGroup($group->id);
             $this->cacheService->invalidateTenant($oldMaster->id);
             $this->cacheService->invalidateTenant($newMaster->id);
 
-            // 6. Optionally trigger sync from new master
+            // 5. Optionally trigger sync from new master
             if ($triggerSync) {
                 dispatch(new \App\Jobs\Central\SyncFromNewMaster($group, $newMaster));
             }
@@ -325,9 +310,6 @@ class FederationService
                     ]);
                 }
 
-                // Log the operation
-                $this->auditService->logTenantJoined($group, $tenant);
-
                 // Clear cache
                 $this->cacheService->invalidateTenant($tenant->id);
                 $this->cacheService->invalidateGroup($group->id);
@@ -349,9 +331,6 @@ class FederationService
                     'require_approval' => false,
                 ], $settings),
             ]);
-
-            // Log the operation
-            $this->auditService->logTenantJoined($group, $tenant);
 
             // Clear cache
             $this->cacheService->invalidateTenant($tenant->id);
@@ -394,9 +373,6 @@ class FederationService
             FederatedUserLink::where('tenant_id', $tenant->id)
                 ->whereHas('federatedUser', fn($q) => $q->where('federation_group_id', $group->id))
                 ->delete();
-
-            // Log the operation
-            $this->auditService->logTenantLeft($group, $tenant);
 
             // Clear cache
             $this->cacheService->invalidateTenant($tenant->id);
@@ -470,8 +446,6 @@ class FederationService
                 ],
             ]);
 
-            $this->auditService->logUserCreated($group, $federatedUser, $masterTenant);
-
             return $federatedUser;
         });
     }
@@ -526,7 +500,6 @@ class FederationService
         Tenant $sourceTenant
     ): void {
         $group = $federatedUser->federationGroup;
-        $oldData = $federatedUser->synced_data;
 
         // Check sync strategy
         if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
@@ -542,9 +515,6 @@ class FederationService
 
         // Update the synced data
         $federatedUser->updateSyncedData($newData, $sourceTenant->id);
-
-        // Log the operation
-        $this->auditService->logUserUpdated($group, $federatedUser, $sourceTenant, $oldData, $newData);
     }
 
     // =========================================================================
@@ -567,12 +537,6 @@ class FederationService
 
             $conflict->addConflictingValue($sourceTenant->id, $value);
         }
-
-        $this->auditService->logConflictDetected(
-            $federatedUser->federationGroup,
-            $federatedUser,
-            array_keys($conflictingData)
-        );
     }
 
     /**
@@ -602,13 +566,6 @@ class FederationService
 
             // Mark conflict as resolved
             $conflict->resolve($resolvedValue, $resolverId, $resolution, $notes);
-
-            // Log
-            $this->auditService->logConflictResolved(
-                $conflict->federatedUser->federationGroup,
-                $conflict,
-                $resolverId
-            );
         });
     }
 
@@ -625,9 +582,6 @@ class FederationService
             'total_tenants' => $group->activeTenants()->count(),
             'total_federated_users' => $group->activeFederatedUsers()->count(),
             'pending_conflicts' => $this->getPendingConflicts($group)->count(),
-            'recent_syncs' => FederationSyncLog::where('federation_group_id', $group->id)
-                ->where('created_at', '>=', now()->subDay())
-                ->count(),
         ];
     }
 

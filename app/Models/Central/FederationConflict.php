@@ -6,6 +6,8 @@ use App\Enums\FederationConflictStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
@@ -26,7 +28,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  */
 class FederationConflict extends Model
 {
-    use CentralConnection, HasUuids;
+    use CentralConnection, HasUuids, LogsActivity;
 
     protected $fillable = [
         'federated_user_id',
@@ -44,6 +46,18 @@ class FederationConflict extends Model
         'values' => 'array',
         'resolved_at' => 'datetime',
     ];
+
+    /**
+     * Activity log configuration.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'resolution', 'resolved_by'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => "Federation conflict {$eventName}");
+    }
 
     /**
      * Resolution constants.

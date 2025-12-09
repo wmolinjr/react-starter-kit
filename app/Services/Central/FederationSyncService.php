@@ -25,7 +25,6 @@ class FederationSyncService
 {
     public function __construct(
         protected FederationService $federationService,
-        protected FederationAuditService $auditService,
         protected FederationCacheService $cacheService
     ) {}
 
@@ -101,15 +100,6 @@ class FederationSyncService
                     'tenant_name' => $tenant->name,
                     'error' => $e->getMessage(),
                 ];
-
-                // Log the failure
-                $this->auditService->logSyncFailed(
-                    $group,
-                    $federatedUser,
-                    $federatedUser->masterTenant,
-                    $tenant,
-                    $e->getMessage()
-                );
             }
         }
 
@@ -384,15 +374,6 @@ class FederationSyncService
                 $this->syncUserToTenant($federatedUser, $tenant);
                 $link->markAsSynced();
                 $results['success']++;
-
-                // Log retry success
-                $this->auditService->logSyncRetry(
-                    $federatedUser->federationGroup,
-                    $federatedUser,
-                    $tenant,
-                    $link->sync_attempts ?? 1
-                );
-
             } catch (\Exception $e) {
                 $link->incrementSyncAttempts();
                 $link->markAsFailed($e->getMessage());

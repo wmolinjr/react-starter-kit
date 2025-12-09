@@ -20,8 +20,9 @@ use Illuminate\Support\Facades\Schema;
  * - federation_group_tenants: Pivot for group membership
  * - federated_users: Central record of synced users
  * - federated_user_links: Links between central and tenant users
- * - federation_sync_logs: Audit trail for all sync operations
  * - federation_conflicts: Tracks unresolved data conflicts
+ *
+ * Note: Audit trail is handled by Spatie Activity Log (LogsActivity trait on models)
  */
 return new class extends Migration
 {
@@ -192,65 +193,6 @@ return new class extends Migration
             $table->index('tenant_user_id');
         });
 
-        // Federation Sync Logs (Audit trail)
-        Schema::create('federation_sync_logs', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-
-            $table->foreignUuid('federation_group_id')
-                ->constrained()
-                ->cascadeOnDelete();
-
-            $table->foreignUuid('federated_user_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
-
-            // Operation type
-            $table->enum('operation', [
-                'user_created',
-                'user_updated',
-                'user_deleted',
-                'password_changed',
-                'two_factor_changed',
-                'tenant_joined',
-                'tenant_left',
-                'conflict_detected',
-                'conflict_resolved',
-                'sync_failed',
-                'sync_retry',
-            ]);
-
-            // Source and target
-            $table->foreignUuid('source_tenant_id')
-                ->nullable()
-                ->constrained('tenants')
-                ->nullOnDelete();
-
-            $table->foreignUuid('target_tenant_id')
-                ->nullable()
-                ->constrained('tenants')
-                ->nullOnDelete();
-
-            // Data changes
-            $table->json('old_data')->nullable();
-            $table->json('new_data')->nullable();
-
-            // Status
-            $table->enum('status', ['success', 'failed', 'pending'])->default('success');
-            $table->text('error_message')->nullable();
-
-            // Actor (who triggered the operation)
-            $table->uuid('actor_id')->nullable();
-            $table->string('actor_type')->nullable(); // 'central_user', 'tenant_user', 'system'
-
-            $table->timestamps();
-
-            // Indexes
-            $table->index('operation');
-            $table->index('status');
-            $table->index('created_at');
-        });
-
         // Federation Conflicts (Unresolved conflicts)
         Schema::create('federation_conflicts', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -293,7 +235,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('federation_conflicts');
-        Schema::dropIfExists('federation_sync_logs');
         Schema::dropIfExists('federated_user_links');
         Schema::dropIfExists('federated_users');
         Schema::dropIfExists('federation_group_tenants');

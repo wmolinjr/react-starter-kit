@@ -6,6 +6,8 @@ use App\Enums\FederatedUserLinkSyncStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
@@ -26,7 +28,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  */
 class FederatedUserLink extends Model
 {
-    use CentralConnection, HasUuids;
+    use CentralConnection, HasUuids, LogsActivity;
 
     protected $fillable = [
         'federated_user_id',
@@ -45,6 +47,18 @@ class FederatedUserLink extends Model
         'sync_attempts' => 'integer',
         'metadata' => 'array',
     ];
+
+    /**
+     * Activity log configuration.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['sync_status', 'sync_attempts', 'last_sync_error'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => "Federated user link {$eventName}");
+    }
 
     /**
      * Created via constants.

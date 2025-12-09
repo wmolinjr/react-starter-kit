@@ -12,7 +12,6 @@ use App\Models\Central\FederationGroup;
 use App\Models\Central\FederationGroupTenant;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
-use App\Services\Central\FederationAuditService;
 use App\Services\Central\FederationCacheService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +29,6 @@ use Illuminate\Support\Facades\Hash;
 class FederationService
 {
     public function __construct(
-        protected FederationAuditService $auditService,
         protected FederationCacheService $cacheService
     ) {}
 
@@ -232,9 +230,6 @@ class FederationService
             // Invalidate cache
             $this->cacheService->invalidateUserByEmail($user->email, $group->id);
 
-            // Log
-            $this->auditService->logUserCreated($group, $federatedUser, $tenant);
-
             return $federatedUser;
         });
     }
@@ -341,13 +336,9 @@ class FederationService
 
         // Get updated data
         $newData = $user->toFederationSyncData();
-        $oldData = $federatedUser->synced_data;
 
         // Update federated user
         $federatedUser->updateSyncedData($newData, $tenant->id);
-
-        // Log
-        $this->auditService->logUserUpdated($group, $federatedUser, $tenant, $oldData, $newData);
 
         // Clear debounce
         $this->cacheService->syncCompleted($federatedUser->id, 'profile');
@@ -376,9 +367,6 @@ class FederationService
         // Update password in synced data
         $federatedUser->updateSyncedField('password_hash', $hashedPassword);
         $federatedUser->updateSyncedField('password_changed_at', now()->toIso8601String());
-
-        // Log
-        $this->auditService->logPasswordChanged($group, $federatedUser, $tenant);
     }
 
     /**
@@ -410,9 +398,6 @@ class FederationService
             'two_factor_recovery_codes' => $user->two_factor_recovery_codes,
             'two_factor_confirmed_at' => $user->two_factor_confirmed_at?->toIso8601String(),
         ], $tenant->id);
-
-        // Log
-        $this->auditService->logTwoFactorChanged($group, $federatedUser, $tenant, $enabled);
     }
 
     /**
@@ -538,14 +523,6 @@ class FederationService
 
         // Invalidate caches
         $this->cacheService->invalidateUserLinks($federatedUser->id);
-
-        // Log
-        $this->auditService->logUserSyncedToTenant(
-            $federatedUser->federationGroup,
-            $federatedUser,
-            $federatedUser->masterTenant,
-            $tenant
-        );
 
         return $user;
     }

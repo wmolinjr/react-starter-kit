@@ -17,6 +17,11 @@ use App\Listeners\Central\UpdateTenantLimits;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Domain;
+use App\Models\Central\FederatedUser;
+use App\Models\Central\FederatedUserLink;
+use App\Models\Central\FederationConflict;
+use App\Models\Central\FederationGroup;
+use App\Models\Central\FederationGroupTenant;
 use App\Models\Central\Tenant;
 use App\Models\Central\User as CentralUser;
 use App\Models\Tenant\Project;
@@ -65,6 +70,11 @@ class AppServiceProvider extends ServiceProvider
             'project' => Project::class,
             'addon_subscription' => AddonSubscription::class,
             'addon_purchase' => AddonPurchase::class,
+            'federation_group' => FederationGroup::class,
+            'federation_group_tenant' => FederationGroupTenant::class,
+            'federated_user' => FederatedUser::class,
+            'federated_user_link' => FederatedUserLink::class,
+            'federation_conflict' => FederationConflict::class,
         ]);
 
         // ⭐ Register observers (organized by database context)
