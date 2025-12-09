@@ -1,8 +1,12 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import type { BillingPeriod } from '@/types/enums';
+
+/** Recurring billing periods that can be toggled in the UI */
+export type RecurringBillingPeriod = Extract<BillingPeriod, 'monthly' | 'yearly'>;
 
 interface BillingPeriodToggleProps {
-    value: 'monthly' | 'yearly';
-    onChange: (value: 'monthly' | 'yearly') => void;
+    value: RecurringBillingPeriod;
+    onChange: (value: RecurringBillingPeriod) => void;
     monthlyPrice?: string;
     yearlyPrice?: string;
     disabled?: boolean;
@@ -19,7 +23,7 @@ export function BillingPeriodToggle({
         <ToggleGroup
             type="single"
             value={value}
-            onValueChange={(v) => v && onChange(v as 'monthly' | 'yearly')}
+            onValueChange={(v) => v && onChange(v as RecurringBillingPeriod)}
             disabled={disabled}
             className="justify-start"
         >

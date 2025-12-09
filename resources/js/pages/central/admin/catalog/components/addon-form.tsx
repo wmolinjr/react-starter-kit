@@ -14,8 +14,9 @@ import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
 import { BadgeSelector } from '@/components/central/forms/badge-selector';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
-import { TrendingUp, Sparkles, Activity, CreditCard, Info } from 'lucide-react';
-import type { BadgePreset } from '@/types/enums';
+import { TrendingUp, Sparkles, CreditCard, Info } from 'lucide-react';
+import type { AddonType, BadgePreset } from '@/types/enums';
+import { ADDON_TYPE } from '@/lib/enum-metadata';
 
 // Feature definition from backend
 interface FeatureDefinition {
@@ -95,20 +96,21 @@ interface Props {
     isEdit?: boolean;
 }
 
-// Type icon mapping
-const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-    quota: TrendingUp,
-    feature: Sparkles,
-    metered: Activity,
-    credit: CreditCard,
-};
-
-// Type color mapping
-const typeColors: Record<string, string> = {
-    quota: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
-    feature: 'border-purple-500 bg-purple-50 dark:bg-purple-950',
-    metered: 'border-orange-500 bg-orange-50 dark:bg-orange-950',
-    credit: 'border-green-500 bg-green-50 dark:bg-green-950',
+/**
+ * Get Tailwind border/bg classes from enum color name.
+ * Uses ADDON_TYPE metadata color as the source.
+ */
+const getTypeColorClasses = (addonType: string): string => {
+    const metadata = ADDON_TYPE[addonType as AddonType];
+    const color = metadata?.color ?? 'gray';
+    const colorMap: Record<string, string> = {
+        blue: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
+        purple: 'border-purple-500 bg-purple-50 dark:bg-purple-950',
+        orange: 'border-orange-500 bg-orange-50 dark:bg-orange-950',
+        green: 'border-green-500 bg-green-50 dark:bg-green-950',
+        gray: 'border-gray-500 bg-gray-50 dark:bg-gray-950',
+    };
+    return colorMap[color] ?? colorMap.gray;
 };
 
 export function AddonForm({ addon, types, plans, featureDefinitions = [], limitDefinitions = [], categories = [], isEdit = false }: Props) {
@@ -243,7 +245,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                 <CardContent>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                         {types.map(type => {
-                            const TypeIcon = typeIcons[type.value] || Info;
+                            const metadata = ADDON_TYPE[type.value as AddonType];
                             const isSelected = data.type === type.value;
                             return (
                                 <button
@@ -252,11 +254,14 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                     onClick={() => setData('type', type.value)}
                                     className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-all hover:shadow-md ${
                                         isSelected
-                                            ? `${typeColors[type.value]} border-current`
+                                            ? `${getTypeColorClasses(type.value)} border-current`
                                             : 'border-muted hover:border-muted-foreground/50'
                                     }`}
                                 >
-                                    <TypeIcon className={`h-8 w-8 ${isSelected ? '' : 'text-muted-foreground'}`} />
+                                    <DynamicIcon
+                                        name={metadata?.icon ?? 'Info'}
+                                        className={`h-8 w-8 ${isSelected ? '' : 'text-muted-foreground'}`}
+                                    />
                                     <span className="font-medium">{type.label}</span>
                                     {type.description && (
                                         <span className="text-xs text-muted-foreground line-clamp-2">

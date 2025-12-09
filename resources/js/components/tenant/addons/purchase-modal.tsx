@@ -10,20 +10,21 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { QuantitySelector } from './quantity-selector';
-import { BillingPeriodToggle } from './billing-period-toggle';
+import { BillingPeriodToggle, type RecurringBillingPeriod } from './billing-period-toggle';
 import type { AddonCatalogItem } from '@/types/addons';
+import type { BillingPeriod } from '@/types/enums';
 
 interface PurchaseModalProps {
     addon: AddonCatalogItem | null;
     open: boolean;
     onClose: () => void;
-    onConfirm: (slug: string, quantity: number, billingPeriod: 'monthly' | 'yearly' | 'one_time') => void;
+    onConfirm: (slug: string, quantity: number, billingPeriod: BillingPeriod) => void;
     isPurchasing: boolean;
 }
 
 export function PurchaseModal({ addon, open, onClose, onConfirm, isPurchasing }: PurchaseModalProps) {
     const [quantity, setQuantity] = useState(1);
-    const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+    const [billingPeriod, setBillingPeriod] = useState<RecurringBillingPeriod>('monthly');
 
     if (!addon) return null;
 

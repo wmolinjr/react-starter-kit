@@ -9,6 +9,8 @@ import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
+import type { TenantRole } from '@/types/enums';
+import { TENANT_ROLE } from '@/lib/enum-metadata';
 import {
   Table,
   TableBody,
@@ -34,7 +36,7 @@ interface Member {
   id: string;
   name: string;
   email: string;
-  role: 'owner' | 'admin' | 'member' | 'guest';
+  role: TenantRole | string; // TenantRole for system roles, string for custom roles
   invited_at: string;
   joined_at: string | null;
   is_pending: boolean;
@@ -63,15 +65,13 @@ function TeamIndex({ members, teamStats }: Props) {
   useSetBreadcrumbs(breadcrumbs);
 
   const getRoleBadge = (role: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; labelKey: string }> = {
-      owner: { variant: 'default', labelKey: 'tenant.team.role_owner' },
-      admin: { variant: 'secondary', labelKey: 'tenant.team.role_admin' },
-      member: { variant: 'outline', labelKey: 'tenant.team.role_member' },
-      guest: { variant: 'outline', labelKey: 'tenant.team.role_guest' },
-    };
-
-    const config = variants[role] || variants.guest;
-    return <Badge variant={config.variant}>{t(config.labelKey)}</Badge>;
+    // Use enum metadata for system roles, fallback for custom roles
+    const metadata = TENANT_ROLE[role as TenantRole];
+    if (metadata) {
+      return <Badge variant={metadata.badge_variant}>{metadata.label}</Badge>;
+    }
+    // Fallback for custom roles (e.g., 'guest' or user-created roles)
+    return <Badge variant="outline">{t(`tenant.team.role_${role}`, { default: role })}</Badge>;
   };
 
   const handleUpdateRole = (userId: string, newRole: string) => {

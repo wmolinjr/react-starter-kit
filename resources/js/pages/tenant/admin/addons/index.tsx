@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import type { AddonCatalogItem } from '@/types/addons';
+import type { BillingPeriod } from '@/types/enums';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
 
@@ -31,7 +32,7 @@ function AddonsIndex() {
     const { purchase, cancel, isPurchasing, isCanceling, error } = usePurchase();
     const [selectedAddon, setSelectedAddon] = useState<AddonCatalogItem | null>(null);
 
-    const handlePurchase = (slug: string, billingPeriod: 'monthly' | 'yearly' | 'one_time') => {
+    const handlePurchase = (slug: string, billingPeriod: BillingPeriod) => {
         const addon = catalog.find((a) => a.slug === slug);
         if (addon && addon.billing.monthly && addon.billing.yearly) {
             setSelectedAddon(addon);
@@ -40,7 +41,7 @@ function AddonsIndex() {
         }
     };
 
-    const handleModalConfirm = (slug: string, quantity: number, billingPeriod: 'monthly' | 'yearly' | 'one_time') => {
+    const handleModalConfirm = (slug: string, quantity: number, billingPeriod: BillingPeriod) => {
         purchase(slug, quantity, billingPeriod);
         setSelectedAddon(null);
     };

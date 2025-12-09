@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import { router } from '@inertiajs/react';
 import addons from '@/routes/tenant/admin/addons';
-
-type BillingPeriod = 'monthly' | 'yearly' | 'one_time';
+import type { BillingPeriod } from '@/types/enums';
 
 interface UsePurchaseReturn {
     purchase: (slug: string, quantity: number, billingPeriod: BillingPeriod) => void;

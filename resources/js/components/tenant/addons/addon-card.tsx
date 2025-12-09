@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import type { AddonCatalogItem } from '@/types/addons';
+import type { BillingPeriod } from '@/types/enums';
 
 interface AddonCardProps {
     addon: AddonCatalogItem;
-    onPurchase: (slug: string, billingPeriod: 'monthly' | 'yearly' | 'one_time') => void;
+    onPurchase: (slug: string, billingPeriod: BillingPeriod) => void;
     disabled?: boolean;
 }
 
