@@ -177,20 +177,20 @@ enum TenantRole: string
     /**
      * Get categories completely excluded for this role.
      *
-     * @return string[]
+     * @return PermissionCategory[]
      */
     public function excludedCategories(): array
     {
         return match ($this) {
             self::OWNER, self::ADMIN => [],
             self::MEMBER => [
-                'roles',
-                'billing',
-                'apiTokens',
-                'audit',
-                'sso',
-                'branding',
-                'reports',
+                PermissionCategory::ROLES,
+                PermissionCategory::BILLING,
+                PermissionCategory::API_TOKENS,
+                PermissionCategory::AUDIT,
+                PermissionCategory::SSO,
+                PermissionCategory::BRANDING,
+                PermissionCategory::REPORTS,
             ],
         };
     }
@@ -255,7 +255,7 @@ enum TenantRole: string
             }
 
             // Exclude entire apiTokens category
-            if (str_starts_with($p, 'apiTokens:')) {
+            if (PermissionCategory::API_TOKENS->matches($p)) {
                 return false;
             }
 
@@ -281,9 +281,9 @@ enum TenantRole: string
                 return true;
             }
 
-            // Check if permission is in excluded category
+            // Check if permission is in excluded category (type-safe)
             foreach ($excludedCategories as $category) {
-                if (str_starts_with($p, "{$category}:")) {
+                if ($category->matches($p)) {
                     return false;
                 }
             }

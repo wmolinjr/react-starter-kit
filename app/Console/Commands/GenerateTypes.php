@@ -11,6 +11,8 @@ use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
 use App\Enums\FederationConflictStatus;
 use App\Enums\FederationSyncStrategy;
+use App\Enums\PermissionAction;
+use App\Enums\PermissionCategory;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
 use App\Enums\TenantConfigKey;
@@ -405,6 +407,38 @@ class GenerateTypes extends Command
                 ],
                 'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
                 'translation_key' => 'permissions.tenant',
+            ],
+            'PermissionCategory' => [
+                'class' => PermissionCategory::class,
+                'interface' => [
+                    'value' => 'PermissionCategory',
+                    'label' => 'string',
+                    'icon' => 'string',
+                    'color' => 'string',
+                    'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+                ],
+                'metadata' => fn ($case) => [
+                    'value' => $case->value,
+                    'label' => $case->label('en'),
+                    'icon' => $case->icon(),
+                    'color' => $case->color(),
+                    'badge_variant' => $case->badgeVariant(),
+                ],
+                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translation_key' => 'enums.permission_category',
+            ],
+            'PermissionAction' => [
+                'class' => PermissionAction::class,
+                'interface' => [
+                    'value' => 'PermissionAction',
+                    'label' => 'string',
+                ],
+                'metadata' => fn ($case) => [
+                    'value' => $case->value,
+                    'label' => $case->label('en'),
+                ],
+                'translations' => fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en'],
+                'translation_key' => 'enums.permission_action',
             ],
             'BadgePreset' => [
                 'class' => BadgePreset::class,

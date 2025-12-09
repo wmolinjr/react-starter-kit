@@ -32,6 +32,10 @@ import type {
     CentralPermissionOption,
     TenantPermission,
     TenantPermissionOption,
+    PermissionCategory,
+    PermissionCategoryOption,
+    PermissionAction,
+    PermissionActionOption,
     BadgePreset,
     BadgePresetOption,
     TenantConfigKey,
@@ -179,29 +183,70 @@ export const TENANT_PERMISSION: Record<TenantPermission, TenantPermissionOption>
     'apiTokens:view': { value: 'apiTokens:view', label: 'API Tokens: View', description: 'View API tokens', icon: 'Key', color: 'orange', badge_variant: 'secondary', category: 'apiTokens', action: 'view' },
     'apiTokens:create': { value: 'apiTokens:create', label: 'API Tokens: Create', description: 'Create API tokens', icon: 'Key', color: 'orange', badge_variant: 'secondary', category: 'apiTokens', action: 'create' },
     'apiTokens:delete': { value: 'apiTokens:delete', label: 'API Tokens: Delete', description: 'Delete API tokens', icon: 'Key', color: 'orange', badge_variant: 'secondary', category: 'apiTokens', action: 'delete' },
-    'roles:view': { value: 'roles:view', label: 'Roles: View', description: 'View custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'view' },
-    'roles:create': { value: 'roles:create', label: 'Roles: Create', description: 'Create custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'create' },
-    'roles:edit': { value: 'roles:edit', label: 'Roles: Edit', description: 'Edit custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'edit' },
-    'roles:delete': { value: 'roles:delete', label: 'Roles: Delete', description: 'Delete custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'delete' },
+    'roles:view': { value: 'roles:view', label: 'Custom Roles: View', description: 'View custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'view' },
+    'roles:create': { value: 'roles:create', label: 'Custom Roles: Create', description: 'Create custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'create' },
+    'roles:edit': { value: 'roles:edit', label: 'Custom Roles: Edit', description: 'Edit custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'edit' },
+    'roles:delete': { value: 'roles:delete', label: 'Custom Roles: Delete', description: 'Delete custom roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive', category: 'roles', action: 'delete' },
     'reports:view': { value: 'reports:view', label: 'Reports: View', description: 'View reports', icon: 'BarChart3', color: 'cyan', badge_variant: 'outline', category: 'reports', action: 'view' },
     'reports:export': { value: 'reports:export', label: 'Reports: Export', description: 'Export reports', icon: 'BarChart3', color: 'cyan', badge_variant: 'outline', category: 'reports', action: 'export' },
     'reports:schedule': { value: 'reports:schedule', label: 'Reports: Schedule', description: 'Schedule reports', icon: 'BarChart3', color: 'cyan', badge_variant: 'outline', category: 'reports', action: 'schedule' },
     'reports:customize': { value: 'reports:customize', label: 'Reports: Customize', description: 'Customize reports', icon: 'BarChart3', color: 'cyan', badge_variant: 'outline', category: 'reports', action: 'customize' },
-    'sso:configure': { value: 'sso:configure', label: 'SSO: Configure', description: 'Configure SSO', icon: 'Lock', color: 'red', badge_variant: 'destructive', category: 'sso', action: 'configure' },
-    'sso:manage': { value: 'sso:manage', label: 'SSO: Manage', description: 'Manage SSO providers', icon: 'Lock', color: 'red', badge_variant: 'destructive', category: 'sso', action: 'manage' },
-    'sso:testConnection': { value: 'sso:testConnection', label: 'SSO: Test Connection', description: 'Test SSO connection', icon: 'Lock', color: 'red', badge_variant: 'destructive', category: 'sso', action: 'testConnection' },
+    'sso:configure': { value: 'sso:configure', label: 'Single Sign-On: Configure', description: 'Configure SSO', icon: 'Lock', color: 'red', badge_variant: 'destructive', category: 'sso', action: 'configure' },
+    'sso:manage': { value: 'sso:manage', label: 'Single Sign-On: Manage', description: 'Manage SSO providers', icon: 'Lock', color: 'red', badge_variant: 'destructive', category: 'sso', action: 'manage' },
+    'sso:testConnection': { value: 'sso:testConnection', label: 'Single Sign-On: Test Connection', description: 'Test SSO connection', icon: 'Lock', color: 'red', badge_variant: 'destructive', category: 'sso', action: 'testConnection' },
     'branding:view': { value: 'branding:view', label: 'Branding: View', description: 'View branding', icon: 'Palette', color: 'pink', badge_variant: 'outline', category: 'branding', action: 'view' },
     'branding:edit': { value: 'branding:edit', label: 'Branding: Edit', description: 'Edit branding', icon: 'Palette', color: 'pink', badge_variant: 'outline', category: 'branding', action: 'edit' },
     'branding:preview': { value: 'branding:preview', label: 'Branding: Preview', description: 'Preview branding', icon: 'Palette', color: 'pink', badge_variant: 'outline', category: 'branding', action: 'preview' },
     'branding:publish': { value: 'branding:publish', label: 'Branding: Publish', description: 'Publish branding', icon: 'Palette', color: 'pink', badge_variant: 'outline', category: 'branding', action: 'publish' },
-    'audit:view': { value: 'audit:view', label: 'Audit: View', description: 'View audit logs', icon: 'FileText', color: 'gray', badge_variant: 'outline', category: 'audit', action: 'view' },
-    'audit:export': { value: 'audit:export', label: 'Audit: Export', description: 'Export audit logs', icon: 'FileText', color: 'gray', badge_variant: 'outline', category: 'audit', action: 'export' },
+    'audit:view': { value: 'audit:view', label: 'Audit Log: View', description: 'View audit logs', icon: 'FileText', color: 'gray', badge_variant: 'outline', category: 'audit', action: 'view' },
+    'audit:export': { value: 'audit:export', label: 'Audit Log: Export', description: 'Export audit logs', icon: 'FileText', color: 'gray', badge_variant: 'outline', category: 'audit', action: 'export' },
     'locales:view': { value: 'locales:view', label: 'Languages: View', description: 'View language settings', icon: 'Globe', color: 'blue', badge_variant: 'outline', category: 'locales', action: 'view' },
     'locales:manage': { value: 'locales:manage', label: 'Languages: Manage', description: 'Manage language settings', icon: 'Globe', color: 'blue', badge_variant: 'outline', category: 'locales', action: 'manage' },
     'federation:view': { value: 'federation:view', label: 'Federation: View', description: 'View federation settings', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'view' },
     'federation:manage': { value: 'federation:manage', label: 'Federation: Manage', description: 'Manage federation settings', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'manage' },
     'federation:invite': { value: 'federation:invite', label: 'Federation: Invite', description: 'Invite tenants to federation', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'invite' },
     'federation:leave': { value: 'federation:leave', label: 'Federation: Leave', description: 'Leave federation group', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'leave' },
+};
+
+export const PERMISSION_CATEGORY: Record<PermissionCategory, PermissionCategoryOption> = {
+    'projects': { value: 'projects', label: 'Projects', icon: 'Folder', color: 'blue', badge_variant: 'default' },
+    'team': { value: 'team', label: 'Team', icon: 'Users', color: 'purple', badge_variant: 'default' },
+    'settings': { value: 'settings', label: 'Settings', icon: 'Settings', color: 'gray', badge_variant: 'outline' },
+    'billing': { value: 'billing', label: 'Billing', icon: 'CreditCard', color: 'green', badge_variant: 'secondary' },
+    'apiTokens': { value: 'apiTokens', label: 'API Tokens', icon: 'Key', color: 'orange', badge_variant: 'secondary' },
+    'roles': { value: 'roles', label: 'Custom Roles', icon: 'Shield', color: 'yellow', badge_variant: 'destructive' },
+    'reports': { value: 'reports', label: 'Reports', icon: 'BarChart3', color: 'cyan', badge_variant: 'outline' },
+    'sso': { value: 'sso', label: 'Single Sign-On', icon: 'Lock', color: 'red', badge_variant: 'destructive' },
+    'branding': { value: 'branding', label: 'Branding', icon: 'Palette', color: 'pink', badge_variant: 'outline' },
+    'audit': { value: 'audit', label: 'Audit Log', icon: 'FileText', color: 'gray', badge_variant: 'outline' },
+    'locales': { value: 'locales', label: 'Languages', icon: 'Globe', color: 'blue', badge_variant: 'outline' },
+    'federation': { value: 'federation', label: 'Federation', icon: 'Network', color: 'cyan', badge_variant: 'default' },
+};
+
+export const PERMISSION_ACTION: Record<PermissionAction, PermissionActionOption> = {
+    'view': { value: 'view', label: 'View' },
+    'create': { value: 'create', label: 'Create' },
+    'edit': { value: 'edit', label: 'Edit' },
+    'editOwn': { value: 'editOwn', label: 'Edit Own' },
+    'delete': { value: 'delete', label: 'Delete' },
+    'upload': { value: 'upload', label: 'Upload' },
+    'download': { value: 'download', label: 'Download' },
+    'archive': { value: 'archive', label: 'Archive' },
+    'invite': { value: 'invite', label: 'Invite' },
+    'remove': { value: 'remove', label: 'Remove' },
+    'manageRoles': { value: 'manageRoles', label: 'Manage Roles' },
+    'activity': { value: 'activity', label: 'Activity' },
+    'danger': { value: 'danger', label: 'Danger Zone' },
+    'manage': { value: 'manage', label: 'Manage' },
+    'invoices': { value: 'invoices', label: 'Invoices' },
+    'export': { value: 'export', label: 'Export' },
+    'schedule': { value: 'schedule', label: 'Schedule' },
+    'customize': { value: 'customize', label: 'Customize' },
+    'configure': { value: 'configure', label: 'Configure' },
+    'testConnection': { value: 'testConnection', label: 'Test Connection' },
+    'preview': { value: 'preview', label: 'Preview' },
+    'publish': { value: 'publish', label: 'Publish' },
+    'leave': { value: 'leave', label: 'Leave' },
 };
 
 export const BADGE_PRESET: Record<BadgePreset, BadgePresetOption> = {
@@ -312,6 +357,20 @@ export function getCentralPermissionMeta(permission: CentralPermission): Central
  */
 export function getTenantPermissionMeta(permission: TenantPermission): TenantPermissionOption {
     return TENANT_PERMISSION[permission];
+}
+
+/**
+ * Get metadata for a PermissionCategory value.
+ */
+export function getPermissionCategoryMeta(permission: PermissionCategory): PermissionCategoryOption {
+    return PERMISSION_CATEGORY[permission];
+}
+
+/**
+ * Get metadata for a PermissionAction value.
+ */
+export function getPermissionActionMeta(permission: PermissionAction): PermissionActionOption {
+    return PERMISSION_ACTION[permission];
 }
 
 /**

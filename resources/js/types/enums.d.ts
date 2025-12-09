@@ -17,6 +17,8 @@
  * - app/Enums/FederationSyncStrategy.php
  * - app/Enums/CentralPermission.php
  * - app/Enums/TenantPermission.php
+ * - app/Enums/PermissionCategory.php
+ * - app/Enums/PermissionAction.php
  * - app/Enums/BadgePreset.php
  * - app/Enums/TenantConfigKey.php
  */
@@ -181,6 +183,23 @@ export interface TenantPermissionOption {
     badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     category: string;
     action: string;
+}
+
+export type PermissionCategory = 'projects' | 'team' | 'settings' | 'billing' | 'apiTokens' | 'roles' | 'reports' | 'sso' | 'branding' | 'audit' | 'locales' | 'federation';
+
+export interface PermissionCategoryOption {
+    value: PermissionCategory;
+    label: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+}
+
+export type PermissionAction = 'view' | 'create' | 'edit' | 'editOwn' | 'delete' | 'upload' | 'download' | 'archive' | 'invite' | 'remove' | 'manageRoles' | 'activity' | 'danger' | 'manage' | 'invoices' | 'export' | 'schedule' | 'customize' | 'configure' | 'testConnection' | 'preview' | 'publish' | 'leave';
+
+export interface PermissionActionOption {
+    value: PermissionAction;
+    label: string;
 }
 
 export type BadgePreset = 'most_popular' | 'best_value' | 'best_for_teams' | 'enterprise' | 'one_time' | 'new' | 'limited_time' | 'recommended' | 'sale' | 'hot' | 'starter' | 'pro';

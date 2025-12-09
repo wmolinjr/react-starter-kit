@@ -88,52 +88,11 @@ enum TenantPermission: string
      */
     public function name(): array
     {
-        $category = $this->category();
+        $categoryEnum = $this->categoryEnum();
         $action = $this->action();
 
-        $categoryNames = [
-            'projects' => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
-            'team' => ['en' => 'Team', 'pt_BR' => 'Equipe'],
-            'settings' => ['en' => 'Settings', 'pt_BR' => 'Configurações'],
-            'billing' => ['en' => 'Billing', 'pt_BR' => 'Faturamento'],
-            'apiTokens' => ['en' => 'API Tokens', 'pt_BR' => 'Tokens de API'],
-            'roles' => ['en' => 'Roles', 'pt_BR' => 'Papéis'],
-            'reports' => ['en' => 'Reports', 'pt_BR' => 'Relatórios'],
-            'sso' => ['en' => 'SSO', 'pt_BR' => 'SSO'],
-            'branding' => ['en' => 'Branding', 'pt_BR' => 'Marca'],
-            'audit' => ['en' => 'Audit', 'pt_BR' => 'Auditoria'],
-            'locales' => ['en' => 'Languages', 'pt_BR' => 'Idiomas'],
-            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
-        ];
-
-        $actionNames = [
-            'view' => ['en' => 'View', 'pt_BR' => 'Visualizar'],
-            'create' => ['en' => 'Create', 'pt_BR' => 'Criar'],
-            'edit' => ['en' => 'Edit', 'pt_BR' => 'Editar'],
-            'editOwn' => ['en' => 'Edit Own', 'pt_BR' => 'Editar Próprio'],
-            'delete' => ['en' => 'Delete', 'pt_BR' => 'Excluir'],
-            'upload' => ['en' => 'Upload', 'pt_BR' => 'Enviar'],
-            'download' => ['en' => 'Download', 'pt_BR' => 'Baixar'],
-            'archive' => ['en' => 'Archive', 'pt_BR' => 'Arquivar'],
-            'invite' => ['en' => 'Invite', 'pt_BR' => 'Convidar'],
-            'remove' => ['en' => 'Remove', 'pt_BR' => 'Remover'],
-            'manageRoles' => ['en' => 'Manage Roles', 'pt_BR' => 'Gerenciar Papéis'],
-            'activity' => ['en' => 'Activity', 'pt_BR' => 'Atividade'],
-            'danger' => ['en' => 'Danger Zone', 'pt_BR' => 'Zona de Perigo'],
-            'manage' => ['en' => 'Manage', 'pt_BR' => 'Gerenciar'],
-            'invoices' => ['en' => 'Invoices', 'pt_BR' => 'Faturas'],
-            'export' => ['en' => 'Export', 'pt_BR' => 'Exportar'],
-            'schedule' => ['en' => 'Schedule', 'pt_BR' => 'Agendar'],
-            'customize' => ['en' => 'Customize', 'pt_BR' => 'Personalizar'],
-            'configure' => ['en' => 'Configure', 'pt_BR' => 'Configurar'],
-            'testConnection' => ['en' => 'Test Connection', 'pt_BR' => 'Testar Conexão'],
-            'preview' => ['en' => 'Preview', 'pt_BR' => 'Pré-visualizar'],
-            'publish' => ['en' => 'Publish', 'pt_BR' => 'Publicar'],
-            'leave' => ['en' => 'Leave', 'pt_BR' => 'Sair'],
-        ];
-
-        $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)];
-        $actName = $actionNames[$action] ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action)];
+        $catName = $categoryEnum?->name() ?? ['en' => ucfirst($this->category()), 'pt_BR' => ucfirst($this->category())];
+        $actName = PermissionAction::tryFrom($action)?->name() ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action)];
 
         return [
             'en' => "{$catName['en']}: {$actName['en']}",
@@ -233,21 +192,7 @@ enum TenantPermission: string
      */
     public function icon(): string
     {
-        return match ($this->category()) {
-            'projects' => 'Folder',
-            'team' => 'Users',
-            'settings' => 'Settings',
-            'billing' => 'CreditCard',
-            'apiTokens' => 'Key',
-            'roles' => 'Shield',
-            'reports' => 'BarChart3',
-            'sso' => 'Lock',
-            'branding' => 'Palette',
-            'audit' => 'FileText',
-            'locales' => 'Globe',
-            'federation' => 'Network',
-            default => 'Circle',
-        };
+        return $this->categoryEnum()?->icon() ?? 'Circle';
     }
 
     /**
@@ -255,21 +200,7 @@ enum TenantPermission: string
      */
     public function color(): string
     {
-        return match ($this->category()) {
-            'projects' => 'blue',
-            'team' => 'purple',
-            'settings' => 'gray',
-            'billing' => 'green',
-            'apiTokens' => 'orange',
-            'roles' => 'yellow',
-            'reports' => 'cyan',
-            'sso' => 'red',
-            'branding' => 'pink',
-            'audit' => 'gray',
-            'locales' => 'blue',
-            'federation' => 'cyan',
-            default => 'gray',
-        };
+        return $this->categoryEnum()?->color() ?? 'gray';
     }
 
     /**
@@ -277,13 +208,7 @@ enum TenantPermission: string
      */
     public function badgeVariant(): string
     {
-        return match ($this->category()) {
-            'projects', 'team' => 'default',
-            'billing', 'apiTokens' => 'secondary',
-            'roles', 'sso' => 'destructive',
-            'federation' => 'default',
-            default => 'outline',
-        };
+        return $this->categoryEnum()?->badgeVariant() ?? 'outline';
     }
 
     /**
@@ -309,11 +234,19 @@ enum TenantPermission: string
     }
 
     /**
-     * Get the category (first part before colon).
+     * Get the category string (first part before colon).
      */
     public function category(): string
     {
         return explode(':', $this->value)[0];
+    }
+
+    /**
+     * Get the category as enum (type-safe).
+     */
+    public function categoryEnum(): ?PermissionCategory
+    {
+        return PermissionCategory::fromPermission($this->value);
     }
 
     /**
@@ -323,21 +256,14 @@ enum TenantPermission: string
      */
     public static function categoryDescription(string $category): array
     {
-        return match ($category) {
-            'projects' => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
-            'team' => ['en' => 'Team', 'pt_BR' => 'Equipe'],
-            'settings' => ['en' => 'Settings', 'pt_BR' => 'Configurações'],
-            'billing' => ['en' => 'Billing', 'pt_BR' => 'Faturamento'],
-            'apiTokens' => ['en' => 'API Tokens', 'pt_BR' => 'Tokens de API'],
-            'roles' => ['en' => 'Custom Roles', 'pt_BR' => 'Papéis Personalizados'],
-            'reports' => ['en' => 'Reports', 'pt_BR' => 'Relatórios'],
-            'sso' => ['en' => 'Single Sign-On', 'pt_BR' => 'Login Único (SSO)'],
-            'branding' => ['en' => 'Branding', 'pt_BR' => 'Marca'],
-            'audit' => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria'],
-            'locales' => ['en' => 'Languages', 'pt_BR' => 'Idiomas'],
-            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
-            default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)],
-        };
+        $categoryEnum = PermissionCategory::tryFrom($category);
+
+        if ($categoryEnum) {
+            return $categoryEnum->name();
+        }
+
+        // Fallback for unknown categories
+        return ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)];
     }
 
     /**
