@@ -99,25 +99,11 @@ Route::middleware([
         }
 
         // SCENARIO 2: Impersonate specific tenant user
-        // User exists in TENANT database (already in tenant context)
-        $user = User::find($impersonationToken->user_id);
-
-        if (! $user) {
-            $impersonationToken->delete();
-            abort(403, __('User not found in this tenant.'));
-        }
-
-        // Login as the tenant user
-        Auth::guard($impersonationToken->auth_guard ?? 'tenant')->login($user);
-
-        // Set impersonation flag, ensure NOT in admin mode
-        session()->put('tenancy_impersonating', true);
+        // Use native Stancl/Tenancy makeResponse() as per best practices (Context7)
+        // This handles token validation, auth login, and session management correctly
         session()->forget('tenancy_admin_mode');
 
-        $redirectUrl = $impersonationToken->redirect_url;
-        $impersonationToken->delete();
-
-        return redirect($redirectUrl);
+        return UserImpersonation::makeResponse($token);
     })->name('impersonate.consume');
 
     // Stop impersonation and redirect back to central admin (Stancl/Tenancy v4 native)

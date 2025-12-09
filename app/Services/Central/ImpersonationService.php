@@ -76,7 +76,10 @@ class ImpersonationService
         }
 
         // Use native tenancy impersonate method
-        return tenancy()->impersonate($tenant, $userId, $redirectUrl);
+        // IMPORTANT: Must explicitly pass 'tenant' as auth_guard (4th param)
+        // Otherwise Auth::guard(null) uses default guard which may not be 'tenant'
+        // in all contexts (especially when coming from central admin context)
+        return tenancy()->impersonate($tenant, $userId, $redirectUrl, 'tenant');
     }
 
     /**
