@@ -17,7 +17,8 @@ import { create, destroy, edit, sync, syncAll } from '@/routes/central/admin/bun
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit as EditIcon, Package, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
-import type { BadgePresetOption } from '@/types/enums';
+import type { BadgePreset } from '@/types/enums';
+import { BADGE_PRESET } from '@/lib/enum-metadata';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -54,7 +55,7 @@ interface Bundle {
     price_yearly_effective: number;
     base_price_monthly: number;
     savings_monthly: number;
-    badge: string | null;
+    badge: BadgePreset | null;
     icon: string;
     icon_color: string | null;
     features: string[];
@@ -71,15 +72,14 @@ interface Bundle {
 
 interface Props {
     bundles: Bundle[];
-    badgePresets: BadgePresetOption[];
 }
 
-function BundleIndex({ bundles, badgePresets }: Props) {
+function BundleIndex({ bundles }: Props) {
     const { t } = useLaravelReactI18n();
 
-    const getBadgePreset = (value: string | null) => {
+    const getBadgePreset = (value: BadgePreset | null) => {
         if (!value) return null;
-        return badgePresets.find(p => p.value === value) ?? null;
+        return BADGE_PRESET[value] ?? null;
     };
 
     const breadcrumbs: BreadcrumbItem[] = [

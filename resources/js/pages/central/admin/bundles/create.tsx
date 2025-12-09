@@ -7,7 +7,6 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import type { BadgePresetOption } from '@/types/enums';
 
 interface AddonOption {
     id: string;
@@ -28,10 +27,9 @@ interface PlanOption {
 interface Props {
     addons: AddonOption[];
     plans: PlanOption[];
-    badgePresets: BadgePresetOption[];
 }
 
-function BundleCreate({ addons, plans, badgePresets }: Props) {
+function BundleCreate({ addons, plans }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -55,7 +53,7 @@ function BundleCreate({ addons, plans, badgePresets }: Props) {
                 </PageHeader>
 
                 <PageContent>
-                    <BundleForm addons={addons} plans={plans} badgePresets={badgePresets} />
+                    <BundleForm addons={addons} plans={plans} />
                 </PageContent>
             </Page>
         </>

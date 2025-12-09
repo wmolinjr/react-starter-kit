@@ -10,7 +10,7 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
 import { useLocales } from '@/hooks/shared/use-locales';
 import { BadgeSelector } from '@/components/central/forms/badge-selector';
-import type { BadgePresetOption } from '@/types/enums';
+import type { BadgePreset } from '@/types/enums';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
@@ -56,7 +56,7 @@ export interface PlanData {
     limits: Record<string, number | null>;
     is_active: boolean;
     is_featured: boolean;
-    badge?: string | null;
+    badge?: BadgePreset | null;
     icon?: string;
     icon_color?: string | null;
     sort_order: number;
@@ -69,7 +69,6 @@ interface Props {
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: EnumOption[];
-    badgePresets?: BadgePresetOption[];
     onSubmit: (data: PlanData) => void;
     isSubmitting?: boolean;
 }
@@ -89,7 +88,7 @@ function buildDefaultLimits(definitions: LimitDefinition[]): Record<string, numb
     );
 }
 
-export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, categories, badgePresets = [], onSubmit, isSubmitting }: Props) {
+export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, categories, onSubmit, isSubmitting }: Props) {
     const { t } = useLaravelReactI18n();
     const { ensureTranslations } = useLocales();
     const defaultFeatures = buildDefaultFeatures(featureDefinitions);
@@ -111,7 +110,7 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
         limits: plan?.limits ?? defaultLimits as Record<string, number | null>,
         is_active: plan?.is_active ?? true,
         is_featured: plan?.is_featured ?? false,
-        badge: plan?.badge ?? '',
+        badge: plan?.badge ?? null,
         icon: plan?.icon ?? 'Layers',
         icon_color: plan?.icon_color ?? null,
         sort_order: plan?.sort_order ?? 0,
@@ -347,9 +346,8 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                     {/* Badge Selector */}
                     <BadgeSelector
                         label={t('common.badge')}
-                        value={data.badge || null}
-                        onChange={(value) => setData('badge', value || '')}
-                        presets={badgePresets}
+                        value={data.badge}
+                        onChange={(value) => setData('badge', value)}
                     />
 
                     {/* Icon Selector */}

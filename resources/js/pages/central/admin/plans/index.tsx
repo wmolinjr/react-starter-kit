@@ -17,7 +17,8 @@ import { create, destroy, sync, syncAll } from '@/routes/central/admin/plans';
 import { Head, Link, router } from '@inertiajs/react';
 import { Check, Pencil, Plus, RefreshCw, Trash2, Users, X } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
-import type { BadgePresetOption } from '@/types/enums';
+import { BADGE_PRESET } from '@/lib/enum-metadata';
+import type { BadgePreset } from '@/types/enums';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { cn } from '@/lib/utils';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
@@ -37,7 +38,7 @@ interface Plan {
     limits: Record<string, number> | null;
     is_active: boolean;
     is_featured: boolean;
-    badge: string | null;
+    badge: BadgePreset | null;
     icon: string | null;
     icon_color: string | null;
     tenants_count: number;
@@ -46,15 +47,14 @@ interface Plan {
 
 interface Props {
     plans: Plan[];
-    badgePresets: BadgePresetOption[];
 }
 
-function PlansIndex({ plans, badgePresets }: Props) {
+function PlansIndex({ plans }: Props) {
     const { t } = useLaravelReactI18n();
 
-    const getBadgePreset = (value: string | null) => {
+    const getBadgePreset = (value: BadgePreset | null) => {
         if (!value) return null;
-        return badgePresets.find(p => p.value === value) ?? null;
+        return BADGE_PRESET[value] ?? null;
     };
 
     const breadcrumbs: BreadcrumbItem[] = [

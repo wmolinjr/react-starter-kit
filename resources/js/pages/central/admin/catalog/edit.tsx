@@ -19,8 +19,8 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import type { BadgePresetOption } from '@/types/enums';
 import { Translations } from '@/components/central/forms/translatable-input';
+import type { BadgePreset } from '@/types/enums';
 
 interface Addon {
     id: string;
@@ -48,7 +48,7 @@ interface Addon {
     stripe_price_one_time_id: string | null;
     icon: string;
     icon_color: string | null;
-    badge: string | null;
+    badge: BadgePreset | null;
     is_synced: boolean;
     plan_ids: string[];
     features: Record<string, boolean>;
@@ -87,10 +87,9 @@ interface Props {
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: CategoryOption[];
-    badgePresets: BadgePresetOption[];
 }
 
-function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions, categories }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -172,7 +171,6 @@ function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions
                         featureDefinitions={featureDefinitions}
                         limitDefinitions={limitDefinitions}
                         categories={categories}
-                        badgePresets={badgePresets}
                         isEdit
                     />
                 </PageContent>

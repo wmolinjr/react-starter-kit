@@ -5,7 +5,6 @@ import admin from '@/routes/central/admin';
 import { PlanForm, type PlanData } from './components/plan-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem, type EnumOption } from '@/types';
-import type { BadgePresetOption } from '@/types/enums';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -48,10 +47,9 @@ interface Props {
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: EnumOption[];
-    badgePresets: BadgePresetOption[];
 }
 
-function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categories }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -85,7 +83,6 @@ function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categori
                         featureDefinitions={featureDefinitions}
                         limitDefinitions={limitDefinitions}
                         categories={categories}
-                        badgePresets={badgePresets}
                         onSubmit={handleSubmit}
                     />
                 </PageContent>

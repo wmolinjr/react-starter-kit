@@ -10,11 +10,11 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { TranslatableInput, Translations } from '@/components/central/forms/translatable-input';
 import { useLocales } from '@/hooks/shared/use-locales';
 import { BadgeSelector } from '@/components/central/forms/badge-selector';
-import type { BadgePresetOption } from '@/types/enums';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { Plus, Trash2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
+import type { BadgePreset } from '@/types/enums';
 
 interface AddonOption {
     id: string;
@@ -46,7 +46,7 @@ interface BundleInput {
     discount_percent?: number;
     price_monthly?: number | string | null;
     price_yearly?: number | string | null;
-    badge?: string | null;
+    badge?: BadgePreset | null;
     icon?: string | null;
     icon_color?: string | null;
     features?: Translations[];
@@ -59,11 +59,10 @@ interface Props {
     bundle?: BundleInput;
     addons: AddonOption[];
     plans: PlanOption[];
-    badgePresets: BadgePresetOption[];
     isEdit?: boolean;
 }
 
-export function BundleForm({ bundle, addons, plans, badgePresets, isEdit = false }: Props) {
+export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
     const { t } = useLaravelReactI18n();
     const { ensureTranslations } = useLocales();
 
@@ -81,7 +80,7 @@ export function BundleForm({ bundle, addons, plans, badgePresets, isEdit = false
         discount_percent: bundle?.discount_percent || 0,
         price_monthly: bundle?.price_monthly?.toString() || '',
         price_yearly: bundle?.price_yearly?.toString() || '',
-        badge: bundle?.badge || '',
+        badge: bundle?.badge ?? null,
         icon: bundle?.icon || 'Package',
         icon_color: bundle?.icon_color ?? null,
         features: ensureFeaturesTranslations(bundle?.features),
@@ -382,9 +381,8 @@ export function BundleForm({ bundle, addons, plans, badgePresets, isEdit = false
                     {/* Badge Selector */}
                     <BadgeSelector
                         label={t('common.badge')}
-                        value={data.badge || null}
-                        onChange={(value) => setData('badge', value || '')}
-                        presets={badgePresets}
+                        value={data.badge}
+                        onChange={(value) => setData('badge', value)}
                     />
 
                     {/* Icon Selector */}

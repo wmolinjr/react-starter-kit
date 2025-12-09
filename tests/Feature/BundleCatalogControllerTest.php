@@ -75,7 +75,6 @@ class BundleCatalogControllerTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('central/admin/bundles/index')
             ->has('bundles')
-            ->has('badgePresets')
         );
     }
 
@@ -121,7 +120,6 @@ class BundleCatalogControllerTest extends TestCase
             ->component('central/admin/bundles/create')
             ->has('addons')
             ->has('plans')
-            ->has('badgePresets')
         );
     }
 
@@ -194,7 +192,6 @@ class BundleCatalogControllerTest extends TestCase
             ->has('bundle')
             ->has('addons')
             ->has('plans')
-            ->has('badgePresets')
         );
     }
 

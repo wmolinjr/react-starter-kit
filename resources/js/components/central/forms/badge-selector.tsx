@@ -3,19 +3,26 @@ import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
-import type { BadgePresetOption } from '@/types/enums';
+import { BADGE_PRESET } from '@/lib/enum-metadata';
+import type { BadgePreset } from '@/types/enums';
 
 interface BadgeSelectorProps {
     label?: string;
-    value: string | null;
-    onChange: (value: string | null) => void;
-    presets: BadgePresetOption[];
+    value: BadgePreset | null;
+    onChange: (value: BadgePreset | null) => void;
     className?: string;
 }
 
-export function BadgeSelector({ label, value, onChange, presets, className }: BadgeSelectorProps) {
+/**
+ * Badge preset selector component.
+ *
+ * Uses BADGE_PRESET metadata from enum-metadata.ts (single source of truth).
+ * No need to pass presets as props - data is available client-side.
+ */
+export function BadgeSelector({ label, value, onChange, className }: BadgeSelectorProps) {
     const { t } = useLaravelReactI18n();
-    const selectedPreset = presets.find(p => p.value === value);
+    const presets = Object.values(BADGE_PRESET);
+    const selectedPreset = value ? BADGE_PRESET[value] : null;
 
     return (
         <div className={cn('space-y-3', className)}>
@@ -23,7 +30,7 @@ export function BadgeSelector({ label, value, onChange, presets, className }: Ba
 
             {/* Preview */}
             <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{t('badges.preview')}:</span>
+                <span className="text-muted-foreground text-sm">{t('badges.preview')}:</span>
                 {selectedPreset ? (
                     <span
                         className={cn(
@@ -37,7 +44,7 @@ export function BadgeSelector({ label, value, onChange, presets, className }: Ba
                         {selectedPreset.label}
                     </span>
                 ) : (
-                    <span className="text-sm text-muted-foreground italic">{t('badges.none')}</span>
+                    <span className="text-muted-foreground text-sm italic">{t('badges.none')}</span>
                 )}
             </div>
 
@@ -52,11 +59,11 @@ export function BadgeSelector({ label, value, onChange, presets, className }: Ba
                         'hover:border-muted-foreground/50',
                         !value
                             ? 'border-primary bg-primary/5'
-                            : 'border-transparent bg-muted/50'
+                            : 'bg-muted/50 border-transparent'
                     )}
                 >
-                    <X className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">{t('badges.none')}</span>
+                    <X className="text-muted-foreground h-5 w-5" />
+                    <span className="text-muted-foreground text-xs">{t('badges.none')}</span>
                 </button>
 
                 {/* Badge presets */}
@@ -70,7 +77,7 @@ export function BadgeSelector({ label, value, onChange, presets, className }: Ba
                             'hover:border-muted-foreground/50',
                             value === preset.value
                                 ? 'border-primary bg-primary/5'
-                                : 'border-transparent bg-muted/50'
+                                : 'bg-muted/50 border-transparent'
                         )}
                     >
                         <span
@@ -82,7 +89,7 @@ export function BadgeSelector({ label, value, onChange, presets, className }: Ba
                         >
                             <DynamicIcon name={preset.icon} className="h-4 w-4" />
                         </span>
-                        <span className="text-xs text-center leading-tight">{preset.label}</span>
+                        <span className="text-center text-xs leading-tight">{preset.label}</span>
                     </button>
                 ))}
             </div>

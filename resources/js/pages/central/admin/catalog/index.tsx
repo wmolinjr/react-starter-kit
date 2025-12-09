@@ -17,7 +17,8 @@ import { create, destroy, sync, syncAll } from '@/routes/central/admin/catalog';
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle, Edit, Plus, RefreshCw, Trash2, XCircle } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
-import type { BadgePresetOption } from '@/types/enums';
+import type { BadgePreset } from '@/types/enums';
+import { BADGE_PRESET } from '@/lib/enum-metadata';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -36,7 +37,7 @@ interface Addon {
     price_one_time: number | null;
     icon: string;
     icon_color: string | null;
-    badge: string | null;
+    badge: BadgePreset | null;
     is_synced: boolean;
     stripe_product_id: string | null;
     plans: { id: string; name: string; slug: string }[];
@@ -45,15 +46,14 @@ interface Addon {
 interface Props {
     addons: Addon[];
     types: { value: string; label: string }[];
-    badgePresets: BadgePresetOption[];
 }
 
-function CatalogIndex({ addons, badgePresets }: Props) {
+function CatalogIndex({ addons }: Props) {
     const { t } = useLaravelReactI18n();
 
-    const getBadgePreset = (value: string | null) => {
+    const getBadgePreset = (value: BadgePreset | null) => {
         if (!value) return null;
-        return badgePresets.find(p => p.value === value) ?? null;
+        return BADGE_PRESET[value] ?? null;
     };
 
     const breadcrumbs: BreadcrumbItem[] = [

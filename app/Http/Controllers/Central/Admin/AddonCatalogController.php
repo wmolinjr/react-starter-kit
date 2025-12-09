@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\AddonType;
-use App\Enums\BadgePreset;
 use App\Enums\CentralPermission;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
@@ -47,7 +46,6 @@ class AddonCatalogController extends Controller implements HasMiddleware
         return Inertia::render('central/admin/catalog/index', [
             'addons' => $addons,
             'types' => AddonType::toFrontendArray(),
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
@@ -63,7 +61,6 @@ class AddonCatalogController extends Controller implements HasMiddleware
             'featureDefinitions' => $this->getFeatureDefinitions(),
             'limitDefinitions' => $this->getLimitDefinitions(),
             'categories' => PlanFeature::categories(),
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
@@ -127,7 +124,6 @@ class AddonCatalogController extends Controller implements HasMiddleware
             'featureDefinitions' => $this->getFeatureDefinitions(),
             'limitDefinitions' => $this->getLimitDefinitions(),
             'categories' => PlanFeature::categories(),
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 

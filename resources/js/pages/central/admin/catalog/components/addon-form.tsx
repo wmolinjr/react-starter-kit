@@ -12,10 +12,10 @@ import { useLocales } from '@/hooks/shared/use-locales';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DynamicIcon } from '@/components/shared/icons/dynamic-icon';
 import { BadgeSelector } from '@/components/central/forms/badge-selector';
-import type { BadgePresetOption } from '@/types/enums';
 import { IconSelector } from '@/components/central/forms/icon-selector';
 import { ColorSelector } from '@/components/central/forms/color-selector';
 import { TrendingUp, Sparkles, Activity, CreditCard, Info } from 'lucide-react';
+import type { BadgePreset } from '@/types/enums';
 
 // Feature definition from backend
 interface FeatureDefinition {
@@ -80,7 +80,7 @@ interface AddonInput {
     validity_months?: number | string | null;
     icon?: string | null;
     icon_color?: string | null;
-    badge?: string | null;
+    badge?: BadgePreset | null;
     plan_ids?: string[];
     features?: Record<string, boolean>;
 }
@@ -92,7 +92,6 @@ interface Props {
     featureDefinitions?: FeatureDefinition[];
     limitDefinitions?: LimitDefinition[];
     categories?: CategoryOption[];
-    badgePresets?: BadgePresetOption[];
     isEdit?: boolean;
 }
 
@@ -112,7 +111,7 @@ const typeColors: Record<string, string> = {
     credit: 'border-green-500 bg-green-50 dark:bg-green-950',
 };
 
-export function AddonForm({ addon, types, plans, featureDefinitions = [], limitDefinitions = [], categories = [], badgePresets = [], isEdit = false }: Props) {
+export function AddonForm({ addon, types, plans, featureDefinitions = [], limitDefinitions = [], categories = [], isEdit = false }: Props) {
     const { t } = useLaravelReactI18n();
     const { ensureTranslations } = useLocales();
 
@@ -153,7 +152,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
         validity_months: addon?.validity_months?.toString() || '',
         icon: addon?.icon || 'Package',
         icon_color: addon?.icon_color ?? null,
-        badge: addon?.badge || '',
+        badge: addon?.badge ?? null,
         plan_ids: addon?.plan_ids || [] as string[],
         features: addon?.features ?? {} as Record<string, boolean>,
     });
@@ -575,9 +574,8 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                     {/* Badge Selector */}
                     <BadgeSelector
                         label={t('common.badge')}
-                        value={data.badge || null}
-                        onChange={(value) => setData('badge', value || '')}
-                        presets={badgePresets}
+                        value={data.badge}
+                        onChange={(value) => setData('badge', value)}
                     />
 
                     {/* Icon Selector */}

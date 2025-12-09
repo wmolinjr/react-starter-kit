@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Central\Admin;
 
-use App\Enums\BadgePreset;
 use App\Enums\CentralPermission;
 use App\Exceptions\Central\PlanException;
 use App\Http\Controllers\Controller;
@@ -45,7 +44,6 @@ class PlanCatalogController extends Controller implements HasMiddleware
 
         return Inertia::render('central/admin/plans/index', [
             'plans' => PlanResource::collection($plans),
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
@@ -58,7 +56,6 @@ class PlanCatalogController extends Controller implements HasMiddleware
             'featureDefinitions' => $definitions['featureDefinitions'],
             'limitDefinitions' => $definitions['limitDefinitions'],
             'categories' => $definitions['categories'],
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
@@ -81,7 +78,6 @@ class PlanCatalogController extends Controller implements HasMiddleware
             'featureDefinitions' => $definitions['featureDefinitions'],
             'limitDefinitions' => $definitions['limitDefinitions'],
             'categories' => $definitions['categories'],
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 

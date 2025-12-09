@@ -7,7 +7,6 @@ import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import type { BadgePresetOption } from '@/types/enums';
 
 interface FeatureDefinition {
     id: string;
@@ -41,10 +40,9 @@ interface Props {
     featureDefinitions: FeatureDefinition[];
     limitDefinitions: LimitDefinition[];
     categories: CategoryOption[];
-    badgePresets: BadgePresetOption[];
 }
 
-function CatalogCreate({ types, plans, featureDefinitions, limitDefinitions, categories, badgePresets }: Props) {
+function CatalogCreate({ types, plans, featureDefinitions, limitDefinitions, categories }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -74,7 +72,6 @@ function CatalogCreate({ types, plans, featureDefinitions, limitDefinitions, cat
                         featureDefinitions={featureDefinitions}
                         limitDefinitions={limitDefinitions}
                         categories={categories}
-                        badgePresets={badgePresets}
                     />
                 </PageContent>
             </Page>

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Central\Admin;
 
-use App\Enums\BadgePreset;
 use App\Enums\CentralPermission;
 use App\Http\Controllers\Controller;
 use App\Models\Central\Addon;
@@ -43,7 +42,6 @@ class BundleCatalogController extends Controller implements HasMiddleware
 
         return Inertia::render('central/admin/bundles/index', [
             'bundles' => $bundles,
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
@@ -52,7 +50,6 @@ class BundleCatalogController extends Controller implements HasMiddleware
         return Inertia::render('central/admin/bundles/create', [
             'addons' => $this->getAddonsForSelect(),
             'plans' => $this->getPlansForSelect(),
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
@@ -120,7 +117,6 @@ class BundleCatalogController extends Controller implements HasMiddleware
             'bundle' => $this->transformBundle($bundle),
             'addons' => $this->getAddonsForSelect(),
             'plans' => $this->getPlansForSelect(),
-            'badgePresets' => BadgePreset::all(),
         ]);
     }
 
