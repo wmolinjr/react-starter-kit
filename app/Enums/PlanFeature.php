@@ -189,6 +189,36 @@ enum PlanFeature: string
     }
 
     /**
+     * Get color for UI display (based on category).
+     */
+    public function color(): string
+    {
+        return match ($this->category()) {
+            'modules' => 'blue',
+            'security' => 'red',
+            'integration' => 'purple',
+            'analytics' => 'orange',
+            'customization' => 'pink',
+            'support' => 'green',
+            'collaboration' => 'cyan',
+            default => 'gray',
+        };
+    }
+
+    /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this->category()) {
+            'security' => 'destructive',
+            'modules' => 'default',
+            'integration' => 'secondary',
+            default => 'outline',
+        };
+    }
+
+    /**
      * Get permissions enabled by this feature.
      *
      * @return string[]
@@ -329,6 +359,15 @@ enum PlanFeature: string
     }
 
     /**
+     * Get translated label for current locale.
+     * Alias for translatedName() to match standard enum pattern.
+     */
+    public function label(?string $locale = null): string
+    {
+        return $this->translatedName($locale);
+    }
+
+    /**
      * Get translated name for current locale.
      */
     public function translatedName(?string $locale = null): string
@@ -351,6 +390,21 @@ enum PlanFeature: string
     }
 
     /**
+     * Get all cases as options for select inputs.
+     *
+     * @return array<string, string>
+     */
+    public static function options(?string $locale = null): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label($locale);
+        }
+
+        return $options;
+    }
+
+    /**
      * Convert single feature to frontend format.
      *
      * @return array<string, mixed>
@@ -358,11 +412,13 @@ enum PlanFeature: string
     public function toFrontend(?string $locale = null): array
     {
         return [
-            'key' => $this->value,
-            'name' => $this->translatedName($locale),
+            'value' => $this->value,
+            'label' => $this->label($locale),
             'description' => $this->translatedDescription($locale),
-            'category' => $this->category(),
             'icon' => $this->icon(),
+            'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
+            'category' => $this->category(),
             'permissions' => $this->permissions(),
             'is_customizable' => $this->isCustomizable(),
         ];
@@ -388,6 +444,21 @@ enum PlanFeature: string
 
             return $f;
         }, $features);
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 
     /**

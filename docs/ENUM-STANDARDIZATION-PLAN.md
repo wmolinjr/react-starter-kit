@@ -41,26 +41,23 @@ Padronizar todos os 14 enums em `app/Enums` para seguir o padrão estabelecido, 
 - ✅ `AddonStatus` - (Fase 1 completa)
 - ✅ `AddonType` - (Fase 1 completa)
 - ✅ `BillingPeriod` - (Fase 1 completa)
+- ✅ `PlanFeature` - (Fase 2 completa)
+- ✅ `PlanLimit` - (Fase 2 completa)
+- ✅ `TenantRole` - (Fase 2 completa)
 
 ### Parcialmente Conformes (60-70%)
-- 🟡 `PlanFeature` - Falta `color()`, `badgeVariant()`, `options()`, `toFrontendMap()`
-- 🟡 `PlanLimit` - Falta `color()`, `badgeVariant()`, `options()`, `toFrontendMap()`
 - 🟡 `CentralPermission` - Falta `name()`, `icon()`, `color()`, `badgeVariant()`, métodos frontend
 - 🟡 `TenantPermission` - Falta `name()`, `icon()`, `color()`, `badgeVariant()`, métodos frontend
 
 ### Precisam Refatoração Major (30-50%)
-- 🔴 `TenantRole` - Métodos com nomes diferentes, falta vários
 - 🔴 `BadgePreset` - Padrão completamente diferente
 - 🔴 `TenantConfigKey` - Falta quase tudo
 
 ### Não estão no GenerateEnumTypes
 - `BadgePreset`
-- `TenantRole`
 - `TenantConfigKey`
 - `CentralPermission`
 - `TenantPermission`
-- `PlanFeature`
-- `PlanLimit`
 
 ---
 

@@ -9,6 +9,9 @@ use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
 use App\Enums\FederationConflictStatus;
 use App\Enums\FederationSyncStrategy;
+use App\Enums\PlanFeature;
+use App\Enums\PlanLimit;
+use App\Enums\TenantRole;
 use Illuminate\Console\Command;
 
 /**
@@ -65,6 +68,9 @@ class GenerateEnumTypes extends Command
  * - app/Enums/AddonType.php
  * - app/Enums/AddonStatus.php
  * - app/Enums/BillingPeriod.php
+ * - app/Enums/PlanFeature.php
+ * - app/Enums/PlanLimit.php
+ * - app/Enums/TenantRole.php
  * - app/Enums/FederatedUserStatus.php
  * - app/Enums/FederatedUserLinkSyncStatus.php
  * - app/Enums/FederationConflictStatus.php
@@ -114,6 +120,48 @@ TS;
             'color' => 'string',
             'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
             'is_recurring' => 'boolean',
+        ]);
+
+        // PlanFeature
+        $output .= $this->generateEnumType('PlanFeature', PlanFeature::cases());
+        $output .= $this->generateEnumInterface('PlanFeatureOption', [
+            'value' => 'PlanFeature',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'category' => 'string',
+            'permissions' => 'string[]',
+            'is_customizable' => 'boolean',
+        ]);
+
+        // PlanLimit
+        $output .= $this->generateEnumType('PlanLimit', PlanLimit::cases());
+        $output .= $this->generateEnumInterface('PlanLimitOption', [
+            'value' => 'PlanLimit',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'unit' => 'string',
+            'unit_label' => 'string',
+            'default_value' => 'number',
+            'allows_unlimited' => 'boolean',
+            'is_customizable' => 'boolean',
+        ]);
+
+        // TenantRole
+        $output .= $this->generateEnumType('TenantRole', TenantRole::cases());
+        $output .= $this->generateEnumInterface('TenantRoleOption', [
+            'value' => 'TenantRole',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'is_system' => 'boolean',
         ]);
 
         // FederatedUserStatus
@@ -208,6 +256,9 @@ TS;
                 ['AddonType', count(AddonType::cases()), 'AddonTypeOption'],
                 ['AddonStatus', count(AddonStatus::cases()), 'AddonStatusOption'],
                 ['BillingPeriod', count(BillingPeriod::cases()), 'BillingPeriodOption'],
+                ['PlanFeature', count(PlanFeature::cases()), 'PlanFeatureOption'],
+                ['PlanLimit', count(PlanLimit::cases()), 'PlanLimitOption'],
+                ['TenantRole', count(TenantRole::cases()), 'TenantRoleOption'],
                 ['FederatedUserStatus', count(FederatedUserStatus::cases()), 'FederatedUserStatusOption'],
                 ['FederatedUserLinkSyncStatus', count(FederatedUserLinkSyncStatus::cases()), 'FederatedUserLinkSyncStatusOption'],
                 ['FederationConflictStatus', count(FederationConflictStatus::cases()), 'FederationConflictStatusOption'],
@@ -238,6 +289,12 @@ import type {
     AddonStatusOption,
     BillingPeriod,
     BillingPeriodOption,
+    PlanFeature,
+    PlanFeatureOption,
+    PlanLimit,
+    PlanLimitOption,
+    TenantRole,
+    TenantRoleOption,
     FederatedUserStatus,
     FederatedUserStatusOption,
     FederatedUserLinkSyncStatus,
@@ -305,6 +362,63 @@ TS;
                 'color' => $case->color(),
                 'badge_variant' => $case->badgeVariant(),
                 'is_recurring' => $case->isRecurring(),
+            ]
+        );
+
+        // PlanFeature metadata
+        $output .= $this->generateEnumMetadataMap(
+            'PLAN_FEATURE',
+            'PlanFeature',
+            'PlanFeatureOption',
+            PlanFeature::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->name()['en'],
+                'description' => $case->description()['en'],
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'category' => $case->category(),
+                'permissions' => $case->permissions(),
+                'is_customizable' => $case->isCustomizable(),
+            ]
+        );
+
+        // PlanLimit metadata
+        $output .= $this->generateEnumMetadataMap(
+            'PLAN_LIMIT',
+            'PlanLimit',
+            'PlanLimitOption',
+            PlanLimit::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->name()['en'],
+                'description' => $case->description()['en'],
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'unit' => $case->unit(),
+                'unit_label' => $case->unitLabel()['en'],
+                'default_value' => $case->defaultValue(),
+                'allows_unlimited' => $case->allowsUnlimited(),
+                'is_customizable' => $case->isCustomizable(),
+            ]
+        );
+
+        // TenantRole metadata
+        $output .= $this->generateEnumMetadataMap(
+            'TENANT_ROLE',
+            'TenantRole',
+            'TenantRoleOption',
+            TenantRole::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->name()['en'],
+                'description' => $case->description()['en'],
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'is_system' => $case->isSystemRole(),
             ]
         );
 
@@ -405,6 +519,27 @@ export function getBillingPeriodMeta(period: BillingPeriod): BillingPeriodOption
 }
 
 /**
+ * Get metadata for a PlanFeature value.
+ */
+export function getPlanFeatureMeta(feature: PlanFeature): PlanFeatureOption {
+    return PLAN_FEATURE[feature];
+}
+
+/**
+ * Get metadata for a PlanLimit value.
+ */
+export function getPlanLimitMeta(limit: PlanLimit): PlanLimitOption {
+    return PLAN_LIMIT[limit];
+}
+
+/**
+ * Get metadata for a TenantRole value.
+ */
+export function getTenantRoleMeta(role: TenantRole): TenantRoleOption {
+    return TENANT_ROLE[role];
+}
+
+/**
  * Get metadata for a FederatedUserStatus value.
  */
 export function getFederatedUserStatusMeta(status: FederatedUserStatus): FederatedUserStatusOption {
@@ -461,25 +596,43 @@ TS;
     }
 
     /**
-     * Convert PHP array to TypeScript object literal.
+     * Convert PHP array to TypeScript literal (object or array).
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string|int, mixed>  $data
      */
     protected function phpToTypescript(array $data): string
     {
+        // Check if it's a list (sequential numeric keys starting from 0)
+        if (array_is_list($data)) {
+            $items = [];
+            foreach ($data as $value) {
+                $items[] = $this->valueToTypescript($value);
+            }
+
+            return '['.implode(', ', $items).']';
+        }
+
+        // It's an associative array - convert to object
         $pairs = [];
         foreach ($data as $key => $value) {
-            $tsValue = match (true) {
-                is_bool($value) => $value ? 'true' : 'false',
-                is_null($value) => 'null',
-                is_string($value) => "'{$value}'",
-                is_array($value) => $this->phpToTypescript($value),
-                default => (string) $value,
-            };
-            $pairs[] = "{$key}: {$tsValue}";
+            $pairs[] = "{$key}: ".$this->valueToTypescript($value);
         }
 
         return '{ '.implode(', ', $pairs).' }';
+    }
+
+    /**
+     * Convert a single PHP value to TypeScript literal.
+     */
+    protected function valueToTypescript(mixed $value): string
+    {
+        return match (true) {
+            is_bool($value) => $value ? 'true' : 'false',
+            is_null($value) => 'null',
+            is_string($value) => "'{$value}'",
+            is_array($value) => $this->phpToTypescript($value),
+            default => (string) $value,
+        };
     }
 
     /**
@@ -505,6 +658,19 @@ TS;
             ),
             'enums.billing_period' => $this->getEnumTranslations(
                 BillingPeriod::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            // Phase 2 enums
+            'enums.plan_feature' => $this->getEnumTranslations(
+                PlanFeature::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'enums.plan_limit' => $this->getEnumTranslations(
+                PlanLimit::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'enums.tenant_role' => $this->getEnumTranslations(
+                TenantRole::cases(),
                 fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
             ),
             // Federation enums

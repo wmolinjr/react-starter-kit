@@ -8,6 +8,9 @@
  * - app/Enums/AddonType.php
  * - app/Enums/AddonStatus.php
  * - app/Enums/BillingPeriod.php
+ * - app/Enums/PlanFeature.php
+ * - app/Enums/PlanLimit.php
+ * - app/Enums/TenantRole.php
  * - app/Enums/FederatedUserStatus.php
  * - app/Enums/FederatedUserLinkSyncStatus.php
  * - app/Enums/FederationConflictStatus.php
@@ -54,6 +57,48 @@ export interface BillingPeriodOption {
     color: string;
     badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     is_recurring: boolean;
+}
+
+export type PlanFeature = 'base' | 'projects' | 'customRoles' | 'apiAccess' | 'advancedReports' | 'sso' | 'whiteLabel' | 'auditLog' | 'prioritySupport' | 'multiLanguage' | 'federation';
+
+export interface PlanFeatureOption {
+    value: PlanFeature;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    category: string;
+    permissions: string[];
+    is_customizable: boolean;
+}
+
+export type PlanLimit = 'users' | 'projects' | 'storage' | 'apiCalls' | 'logRetention' | 'fileUploadSize' | 'customRoles' | 'locales';
+
+export interface PlanLimitOption {
+    value: PlanLimit;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    unit: string;
+    unit_label: string;
+    default_value: number;
+    allows_unlimited: boolean;
+    is_customizable: boolean;
+}
+
+export type TenantRole = 'owner' | 'admin' | 'member';
+
+export interface TenantRoleOption {
+    value: TenantRole;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    is_system: boolean;
 }
 
 export type FederatedUserStatus = 'active' | 'suspended' | 'pending_review' | 'pending_master_sync';

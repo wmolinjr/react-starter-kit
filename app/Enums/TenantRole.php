@@ -20,11 +20,11 @@ enum TenantRole: string
     case MEMBER = 'member';
 
     /**
-     * Get translatable display name.
+     * Get translatable name.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array<string, string>
      */
-    public function displayName(): array
+    public function name(): array
     {
         return match ($this) {
             self::OWNER => ['en' => 'Owner', 'pt_BR' => 'Proprietário'],
@@ -34,9 +34,21 @@ enum TenantRole: string
     }
 
     /**
+     * Get translatable display name (alias for name()).
+     *
+     * @return array<string, string>
+     *
+     * @deprecated Use name() instead
+     */
+    public function displayName(): array
+    {
+        return $this->name();
+    }
+
+    /**
      * Get translatable description.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array<string, string>
      */
     public function description(): array
     {
@@ -57,12 +69,56 @@ enum TenantRole: string
     }
 
     /**
+     * Get Lucide icon name.
+     */
+    public function icon(): string
+    {
+        return match ($this) {
+            self::OWNER => 'Crown',
+            self::ADMIN => 'ShieldCheck',
+            self::MEMBER => 'User',
+        };
+    }
+
+    /**
+     * Get color for UI display.
+     */
+    public function color(): string
+    {
+        return match ($this) {
+            self::OWNER => 'yellow',
+            self::ADMIN => 'blue',
+            self::MEMBER => 'gray',
+        };
+    }
+
+    /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::OWNER => 'default',
+            self::ADMIN => 'secondary',
+            self::MEMBER => 'outline',
+        };
+    }
+
+    /**
+     * Get translated label for current locale.
+     */
+    public function label(?string $locale = null): string
+    {
+        return $this->translatedName($locale);
+    }
+
+    /**
      * Get translated display name for current locale.
      */
     public function translatedName(?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
-        $names = $this->displayName();
+        $names = $this->name();
 
         return $names[$locale] ?? $names['en'];
     }
@@ -272,20 +328,48 @@ enum TenantRole: string
     }
 
     /**
+     * Get all cases as options for select inputs.
+     *
+     * @return array<string, string>
+     */
+    public static function options(?string $locale = null): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label($locale);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Convert single role to frontend format.
+     *
+     * @return array<string, mixed>
+     */
+    public function toFrontend(?string $locale = null): array
+    {
+        return [
+            'value' => $this->value,
+            'label' => $this->label($locale),
+            'description' => $this->translatedDescription($locale),
+            'icon' => $this->icon(),
+            'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
+            'is_system' => $this->isSystemRole(),
+        ];
+    }
+
+    /**
      * Convert all roles to frontend array format.
+     * Sorted by sortOrder.
      *
      * @return array<int, array<string, mixed>>
      */
     public static function toFrontendArray(?string $locale = null): array
     {
         $roles = array_map(
-            fn (self $role) => [
-                'value' => $role->value,
-                'name' => $role->translatedName($locale),
-                'description' => $role->translatedDescription($locale),
-                'is_system' => $role->isSystemRole(),
-                'sort_order' => $role->sortOrder(),
-            ],
+            fn (self $role) => $role->toFrontend($locale) + ['sort_order' => $role->sortOrder()],
             self::cases()
         );
 
@@ -296,5 +380,20 @@ enum TenantRole: string
 
             return $r;
         }, $roles);
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 }

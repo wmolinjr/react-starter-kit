@@ -167,6 +167,35 @@ enum PlanLimit: string
     }
 
     /**
+     * Get color for UI display.
+     */
+    public function color(): string
+    {
+        return match ($this) {
+            self::USERS => 'blue',
+            self::PROJECTS => 'green',
+            self::STORAGE => 'purple',
+            self::API_CALLS => 'orange',
+            self::LOG_RETENTION => 'gray',
+            self::FILE_UPLOAD_SIZE => 'cyan',
+            self::CUSTOM_ROLES => 'red',
+            self::LOCALES => 'pink',
+        };
+    }
+
+    /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::USERS, self::PROJECTS => 'default',
+            self::STORAGE, self::API_CALLS => 'secondary',
+            default => 'outline',
+        };
+    }
+
+    /**
      * Whether this limit can be customized by tenants.
      */
     public function isCustomizable(): bool
@@ -259,6 +288,15 @@ enum PlanLimit: string
     }
 
     /**
+     * Get translated label for current locale.
+     * Alias for translatedName() to match standard enum pattern.
+     */
+    public function label(?string $locale = null): string
+    {
+        return $this->translatedName($locale);
+    }
+
+    /**
      * Get translated name for current locale.
      */
     public function translatedName(?string $locale = null): string
@@ -292,6 +330,21 @@ enum PlanLimit: string
     }
 
     /**
+     * Get all cases as options for select inputs.
+     *
+     * @return array<string, string>
+     */
+    public static function options(?string $locale = null): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label($locale);
+        }
+
+        return $options;
+    }
+
+    /**
      * Convert single limit to frontend format.
      *
      * @return array<string, mixed>
@@ -299,14 +352,16 @@ enum PlanLimit: string
     public function toFrontend(?string $locale = null): array
     {
         return [
-            'key' => $this->value,
-            'name' => $this->translatedName($locale),
+            'value' => $this->value,
+            'label' => $this->label($locale),
             'description' => $this->translatedDescription($locale),
+            'icon' => $this->icon(),
+            'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
             'unit' => $this->unit(),
             'unit_label' => $this->translatedUnitLabel($locale),
             'default_value' => $this->defaultValue(),
             'allows_unlimited' => $this->allowsUnlimited(),
-            'icon' => $this->icon(),
             'is_customizable' => $this->isCustomizable(),
         ];
     }
@@ -331,6 +386,21 @@ enum PlanLimit: string
 
             return $l;
         }, $limits);
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 
     /**
