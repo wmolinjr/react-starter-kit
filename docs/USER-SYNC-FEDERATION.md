@@ -833,7 +833,7 @@ database/migrations/tenant/
 
 - [USER-SYNC-FEDERATION-PLAN.md](archive/USER-SYNC-FEDERATION-PLAN.md) - Documento de arquitetura original
 - [USER-SYNC-FEDERATION-IMPLEMENTATION-LOG.md](archive/USER-SYNC-FEDERATION-IMPLEMENTATION-LOG.md) - Log de implementação
-- [FEDERATION-BULK-IMPROVEMENTS-PLAN.md](./FEDERATION-BULK-IMPROVEMENTS-PLAN.md) - Plano de melhorias v1.1.0
+- [FEDERATION-BULK-IMPROVEMENTS-PLAN.md](archive/FEDERATION-BULK-IMPROVEMENTS-PLAN.md) - Plano de melhorias v1.1.0
 - [MULTI-DATABASE-MIGRATION-PLAN.md](./MULTI-DATABASE-MIGRATION-PLAN.md) - Arquitetura multi-database
 - [PERMISSIONS.md](./PERMISSIONS.md) - Sistema de permissions
 - [SESSION-SECURITY.md](./SESSION-SECURITY.md) - Segurança de sessão multi-tenant

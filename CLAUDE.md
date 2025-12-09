@@ -347,7 +347,7 @@ app/Http/Controllers/
 - `Features::twoFactorAuthentication()` for feature flag checks
 - Routes disabled via `Fortify::ignoreRoutes()` in AppServiceProvider
 
-**See**: [docs/FORTIFY-REMOVAL-PLAN.md](docs/FORTIFY-REMOVAL-PLAN.md) for migration details.
+**See**: [docs/FORTIFY-REMOVAL-PLAN.md](docs/archive/FORTIFY-REMOVAL-PLAN.md) for migration details.
 
 ### Models Structure
 
@@ -934,5 +934,5 @@ For in-depth technical documentation, see:
 - **[docs/I18N.md](docs/I18N.md)** - Internationalization guide
 - **[docs/ADDONS.md](docs/ADDONS.md)** - Add-ons system
 - **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources for data transformation
-- **[docs/FORTIFY-REMOVAL-PLAN.md](docs/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
+- **[docs/FORTIFY-REMOVAL-PLAN.md](docs/archive/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
 - **[docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md)** - User sync across tenants (multi-branch companies)
