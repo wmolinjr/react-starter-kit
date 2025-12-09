@@ -13,7 +13,6 @@ import {
     PageTitle,
 } from '@/components/shared/layout/page';
 import { type BreadcrumbItem, type TenantSummaryResource } from '@/types';
-import type { FederationSyncStrategy } from '@/types/enums';
 import { FederationGroupForm, type FederationGroupFormData } from './components/federation-group-form';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';

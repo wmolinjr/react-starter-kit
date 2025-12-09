@@ -3,7 +3,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import type { PageProps, TeamMemberResource, UserInvitationResource } from '@/types';
 import type { TeamStats } from '@/types/common';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield, Clock } from 'lucide-react';
+import { Users, UserPlus, Mail, MoreVertical, Trash2, Shield } from 'lucide-react';
 
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';

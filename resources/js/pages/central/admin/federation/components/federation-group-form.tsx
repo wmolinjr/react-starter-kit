@@ -1,6 +1,5 @@
 import { useForm } from '@inertiajs/react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,9 +8,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import type { FormDataConvertible } from '@inertiajs/core';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { AlertCircle, Crown, Info, RefreshCw } from 'lucide-react';
+import { AlertCircle, Crown, RefreshCw } from 'lucide-react';
 import type { FederationSyncStrategy } from '@/types/enums';
 import type { TenantSummaryResource } from '@/types';
 

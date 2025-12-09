@@ -22,7 +22,7 @@ import {
     type FederationGroupResource,
     type FederationConflictResource,
 } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     AlertTriangle,
@@ -38,7 +38,6 @@ import {
     PageContent,
     PageDescription,
     PageHeader,
-    PageHeaderActions,
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';

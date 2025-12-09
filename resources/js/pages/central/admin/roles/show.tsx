@@ -5,7 +5,7 @@ import AdminLayout from '@/layouts/central/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Trash2, Users, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type RoleDetailResource, type PermissionResource, type UserSummaryResource } from '@/types';
+import { type BreadcrumbItem, type RoleDetailResource, type PermissionResource } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import admin from '@/routes/central/admin';

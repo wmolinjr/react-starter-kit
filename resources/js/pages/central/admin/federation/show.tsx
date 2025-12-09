@@ -82,7 +82,6 @@ function FederationShow({ group, availableTenants }: Props) {
     }
 
     const {
-        processingId,
         addTenant,
         removeTenant,
         rejoinTenant,
