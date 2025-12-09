@@ -98,6 +98,20 @@ enum AddonStatus: string
     }
 
     /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::PENDING => 'secondary',
+            self::ACTIVE => 'default',
+            self::CANCELED => 'outline',
+            self::EXPIRED => 'outline',
+            self::FAILED => 'destructive',
+        };
+    }
+
+    /**
      * Check if status allows addon usage.
      */
     public function isUsable(): bool
@@ -176,6 +190,7 @@ enum AddonStatus: string
             'description' => $this->translatedDescription($locale),
             'icon' => $this->icon(),
             'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
             'is_usable' => $this->isUsable(),
             'is_terminal' => $this->isTerminal(),
         ];
@@ -192,5 +207,20 @@ enum AddonStatus: string
             fn (self $case) => $case->toFrontend($locale),
             self::cases()
         );
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 }

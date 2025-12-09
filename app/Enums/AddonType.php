@@ -85,6 +85,19 @@ enum AddonType: string
     }
 
     /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::QUOTA => 'default',
+            self::FEATURE => 'secondary',
+            self::METERED => 'outline',
+            self::CREDIT => 'default',
+        };
+    }
+
+    /**
      * Get default unit label (can be overridden per addon).
      */
     public function unitLabel(): array
@@ -221,6 +234,7 @@ enum AddonType: string
             'description' => $this->translatedDescription($locale),
             'icon' => $this->icon(),
             'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
             'category' => $this->category(),
             'unit_label' => $this->translatedUnitLabel($locale),
             'is_metered' => $this->isMetered(),
@@ -240,5 +254,20 @@ enum AddonType: string
             fn (self $case) => $case->toFrontend($locale),
             self::cases()
         );
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 }

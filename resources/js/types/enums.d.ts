@@ -21,13 +21,14 @@ export interface AddonTypeOption {
     description: string;
     icon: string;
     color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     category: string;
-    unit: string;
     unit_label: string;
     is_metered: boolean;
     is_stackable: boolean;
-    limit_key: string | null;
-    increases_limit: boolean;
+    is_recurring: boolean;
+    is_one_time: boolean;
+    has_validity: boolean;
 }
 
 export type AddonStatus = 'pending' | 'active' | 'canceled' | 'expired' | 'failed';
@@ -38,6 +39,7 @@ export interface AddonStatusOption {
     description: string;
     icon: string;
     color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     is_usable: boolean;
     is_terminal: boolean;
 }
@@ -50,6 +52,7 @@ export interface BillingPeriodOption {
     description: string;
     icon: string;
     color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     is_recurring: boolean;
 }
 
@@ -100,6 +103,7 @@ export interface FederationSyncStrategyOption {
     description: string;
     icon: string;
     color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     creates_conflicts: boolean;
     auto_resolves: boolean;
 }

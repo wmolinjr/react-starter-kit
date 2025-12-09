@@ -82,6 +82,18 @@ enum FederationSyncStrategy: string
     }
 
     /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::MASTER_WINS => 'default',
+            self::LAST_WRITE_WINS => 'secondary',
+            self::MANUAL_REVIEW => 'outline',
+        };
+    }
+
+    /**
      * Check if strategy creates conflicts for manual resolution.
      */
     public function createsConflicts(): bool
@@ -160,6 +172,7 @@ enum FederationSyncStrategy: string
             'description' => $this->translatedDescription($locale),
             'icon' => $this->icon(),
             'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
             'creates_conflicts' => $this->createsConflicts(),
             'auto_resolves' => $this->autoResolves(),
         ];

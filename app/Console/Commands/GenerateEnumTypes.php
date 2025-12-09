@@ -81,13 +81,14 @@ TS;
             'description' => 'string',
             'icon' => 'string',
             'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
             'category' => 'string',
-            'unit' => 'string',
             'unit_label' => 'string',
             'is_metered' => 'boolean',
             'is_stackable' => 'boolean',
-            'limit_key' => 'string | null',
-            'increases_limit' => 'boolean',
+            'is_recurring' => 'boolean',
+            'is_one_time' => 'boolean',
+            'has_validity' => 'boolean',
         ]);
 
         // AddonStatus
@@ -98,6 +99,7 @@ TS;
             'description' => 'string',
             'icon' => 'string',
             'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
             'is_usable' => 'boolean',
             'is_terminal' => 'boolean',
         ]);
@@ -110,6 +112,7 @@ TS;
             'description' => 'string',
             'icon' => 'string',
             'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
             'is_recurring' => 'boolean',
         ]);
 
@@ -160,6 +163,7 @@ TS;
             'description' => 'string',
             'icon' => 'string',
             'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
             'creates_conflicts' => 'boolean',
             'auto_resolves' => 'boolean',
         ]);
@@ -228,6 +232,12 @@ TS;
  */
 
 import type {
+    AddonType,
+    AddonTypeOption,
+    AddonStatus,
+    AddonStatusOption,
+    BillingPeriod,
+    BillingPeriodOption,
     FederatedUserStatus,
     FederatedUserStatusOption,
     FederatedUserLinkSyncStatus,
@@ -239,6 +249,64 @@ import type {
 } from '@/types/enums';
 
 TS;
+
+        // AddonType metadata
+        $output .= $this->generateEnumMetadataMap(
+            'ADDON_TYPE',
+            'AddonType',
+            'AddonTypeOption',
+            AddonType::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->name()['en'],
+                'description' => $case->description()['en'],
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'category' => $case->category(),
+                'unit_label' => $case->unitLabel()['en'],
+                'is_metered' => $case->isMetered(),
+                'is_stackable' => $case->isStackable(),
+                'is_recurring' => $case->isRecurring(),
+                'is_one_time' => $case->isOneTime(),
+                'has_validity' => $case->hasValidity(),
+            ]
+        );
+
+        // AddonStatus metadata
+        $output .= $this->generateEnumMetadataMap(
+            'ADDON_STATUS',
+            'AddonStatus',
+            'AddonStatusOption',
+            AddonStatus::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->name()['en'],
+                'description' => $case->description()['en'],
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'is_usable' => $case->isUsable(),
+                'is_terminal' => $case->isTerminal(),
+            ]
+        );
+
+        // BillingPeriod metadata
+        $output .= $this->generateEnumMetadataMap(
+            'BILLING_PERIOD',
+            'BillingPeriod',
+            'BillingPeriodOption',
+            BillingPeriod::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->name()['en'],
+                'description' => $case->description()['en'],
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'is_recurring' => $case->isRecurring(),
+            ]
+        );
 
         // FederatedUserStatus metadata
         $output .= $this->generateEnumMetadataMap(
@@ -306,6 +374,7 @@ TS;
                 'description' => $case->description()['en'],
                 'icon' => $case->icon(),
                 'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
                 'creates_conflicts' => $case->createsConflicts(),
                 'auto_resolves' => $case->autoResolves(),
             ]
@@ -313,6 +382,27 @@ TS;
 
         // Helper functions
         $output .= <<<'TS'
+
+/**
+ * Get metadata for an AddonType value.
+ */
+export function getAddonTypeMeta(type: AddonType): AddonTypeOption {
+    return ADDON_TYPE[type];
+}
+
+/**
+ * Get metadata for an AddonStatus value.
+ */
+export function getAddonStatusMeta(status: AddonStatus): AddonStatusOption {
+    return ADDON_STATUS[status];
+}
+
+/**
+ * Get metadata for a BillingPeriod value.
+ */
+export function getBillingPeriodMeta(period: BillingPeriod): BillingPeriodOption {
+    return BILLING_PERIOD[period];
+}
 
 /**
  * Get metadata for a FederatedUserStatus value.
@@ -338,8 +428,8 @@ export function getFederationConflictStatusMeta(status: FederationConflictStatus
 /**
  * Get metadata for a FederationSyncStrategy value.
  */
-export function getFederationSyncStrategyMeta(status: FederationSyncStrategy): FederationSyncStrategyOption {
-    return FEDERATION_SYNC_STRATEGY[status];
+export function getFederationSyncStrategyMeta(strategy: FederationSyncStrategy): FederationSyncStrategyOption {
+    return FEDERATION_SYNC_STRATEGY[strategy];
 }
 TS;
 
@@ -404,6 +494,20 @@ TS;
 
         // Define enum translations to generate
         $enumTranslations = [
+            // Phase 1 enums
+            'enums.addon_type' => $this->getEnumTranslations(
+                AddonType::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'enums.addon_status' => $this->getEnumTranslations(
+                AddonStatus::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'enums.billing_period' => $this->getEnumTranslations(
+                BillingPeriod::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            // Federation enums
             'admin.federation.user_status' => $this->getEnumTranslations(
                 FederatedUserStatus::cases(),
                 fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']

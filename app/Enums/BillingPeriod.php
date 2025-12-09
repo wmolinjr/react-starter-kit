@@ -98,6 +98,20 @@ enum BillingPeriod: string
     }
 
     /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::MONTHLY => 'default',
+            self::YEARLY => 'default',
+            self::ONE_TIME => 'secondary',
+            self::METERED => 'outline',
+            self::MANUAL => 'outline',
+        };
+    }
+
+    /**
      * Get Stripe interval name.
      */
     public function interval(): ?string
@@ -180,6 +194,7 @@ enum BillingPeriod: string
             'description' => $this->translatedDescription($locale),
             'icon' => $this->icon(),
             'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
             'is_recurring' => $this->isRecurring(),
         ];
     }
@@ -195,5 +210,20 @@ enum BillingPeriod: string
             fn (self $case) => $case->toFrontend($locale),
             self::cases()
         );
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 }
