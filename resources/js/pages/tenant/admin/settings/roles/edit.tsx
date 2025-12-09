@@ -3,35 +3,38 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { RoleForm } from './components/role-form';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type CategoryPermissions } from '@/types';
+import { type BreadcrumbItem, type CategoryPermissions, type RoleEditResource, type Translations } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Shield } from 'lucide-react';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Role {
-    id: string;
-    name: string;
-    display_name: string;
-    description: string | null;
-    is_protected: boolean;
-    permission_ids: string[];
+interface Props {
+    role: RoleEditResource;
+    permissions: Record<string, CategoryPermissions>;
 }
 
-interface Props {
-    role: Role;
-    permissions: Record<string, CategoryPermissions>;
+/**
+ * Get translation value for current locale from Translations object
+ */
+function getTranslation(translations: Translations | null | undefined, fallback: string = ''): string {
+    if (!translations) return fallback;
+    // Try current locale first, then English, then first available
+    return translations.pt_BR || translations.en || Object.values(translations)[0] || fallback;
 }
 
 function EditRole({ role, permissions }: Props) {
     const { t } = useLaravelReactI18n();
 
+    // Use display_name_display for breadcrumbs (translated string)
+    const displayName = role.display_name_display;
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
         { title: t('breadcrumbs.settings'), href: admin.settings.index.url() },
         { title: t('breadcrumbs.custom_roles'), href: admin.settings.roles.index.url() },
-        { title: role.display_name, href: admin.settings.roles.edit.url(role.id) },
+        { title: displayName, href: admin.settings.roles.edit.url(role.id) },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -42,13 +45,13 @@ function EditRole({ role, permissions }: Props) {
 
     return (
         <>
-            <Head title={`${t('roles.edit_title')} ${role.display_name}`} />
+            <Head title={`${t('roles.edit_title')} ${displayName}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle icon={Shield}>{t('roles.edit_title')}</PageTitle>
-                        <PageDescription>{t('roles.edit_description', { name: role.display_name })}</PageDescription>
+                        <PageDescription>{t('roles.edit_description', { name: displayName })}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -57,9 +60,10 @@ function EditRole({ role, permissions }: Props) {
                         role={{
                             id: role.id,
                             name: role.name,
-                            display_name: role.display_name,
-                            description: role.description ?? '',
-                            permissions: role.permission_ids,
+                            // Convert Translations to string for form display
+                            display_name: getTranslation(role.display_name),
+                            description: getTranslation(role.description),
+                            permissions: role.permission_ids ?? [],
                             is_protected: role.is_protected,
                         }}
                         permissions={permissions}

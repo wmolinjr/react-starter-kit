@@ -6,7 +6,7 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Trash2, Users, Shield } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type PermissionRecord } from '@/types';
+import { type BreadcrumbItem, type RoleDetailResource, type PermissionResource } from '@/types';
 import {
     Table,
     TableBody,
@@ -20,29 +20,16 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-}
-
-interface Role {
-    id: string;
-    name: string;
-    display_name: string;
-    description: string | null;
-    is_protected: boolean;
-    permissions: PermissionRecord[];
-    users: User[];
-    created_at: string | null;
-}
-
 interface Props {
-    role: Role;
+    role: RoleDetailResource;
 }
 
 function ShowRole({ role }: Props) {
     const { t } = useLaravelReactI18n();
+
+    // Provide defaults for optional arrays
+    const users = role.users ?? [];
+    const permissions = role.permissions ?? [];
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -58,7 +45,7 @@ function ShowRole({ role }: Props) {
             alert(t('roles.delete_protected_error'));
             return;
         }
-        if (role.users.length > 0) {
+        if (users.length > 0) {
             alert(t('roles.delete_has_users_error'));
             return;
         }
@@ -68,14 +55,14 @@ function ShowRole({ role }: Props) {
     };
 
     // Group permissions by category
-    const permissionsByCategory = role.permissions.reduce(
+    const permissionsByCategory = permissions.reduce(
         (acc, permission) => {
             const category = permission.category || 'other';
             if (!acc[category]) acc[category] = [];
             acc[category].push(permission);
             return acc;
         },
-        {} as Record<string, PermissionRecord[]>
+        {} as Record<string, PermissionResource[]>
     );
 
     return (
@@ -106,7 +93,7 @@ function ShowRole({ role }: Props) {
                         <Button
                             variant="destructive"
                             onClick={handleDelete}
-                            disabled={role.is_protected || role.users.length > 0}
+                            disabled={role.is_protected || users.length > 0}
                         >
                             <Trash2 className="mr-2 h-4 w-4" />
                             {t('common.delete')}
@@ -122,7 +109,7 @@ function ShowRole({ role }: Props) {
                                 <CardTitle className="flex items-center gap-2">
                                     <Shield className="h-5 w-5" />
                                     {t('roles.permissions_title')}
-                                    <Badge variant="outline">{role.permissions.length}</Badge>
+                                    <Badge variant="outline">{permissions.length}</Badge>
                                 </CardTitle>
                                 <CardDescription>
                                     {t('roles.permissions_description')}
@@ -165,14 +152,14 @@ function ShowRole({ role }: Props) {
                                 <CardTitle className="flex items-center gap-2">
                                     <Users className="h-5 w-5" />
                                     {t('roles.users_title')}
-                                    <Badge variant="outline">{role.users.length}</Badge>
+                                    <Badge variant="outline">{users.length}</Badge>
                                 </CardTitle>
                                 <CardDescription>
                                     {t('roles.users_description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                {role.users.length > 0 ? (
+                                {users.length > 0 ? (
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -181,7 +168,7 @@ function ShowRole({ role }: Props) {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {role.users.map((user) => (
+                                            {users.map((user) => (
                                                 <TableRow key={user.id}>
                                                     <TableCell className="font-medium">
                                                         {user.name}

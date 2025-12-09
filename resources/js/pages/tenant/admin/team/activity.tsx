@@ -9,7 +9,13 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type ActivityResource,
+    type UserSummaryResource,
+    type TenantSummaryResource,
+    type InertiaPaginatedResponse,
+} from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import {
     Table,
@@ -46,48 +52,12 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 
-interface ActivityItem {
-    id: string;
-    description: string;
-    event: string;
-    subject_type: string | null;
-    subject_id: string | null;
-    subject_name: string | null;
-    causer: {
-        id: string;
-        name: string;
-        email: string;
-    } | null;
-    properties: Record<string, unknown> | null;
-    created_at: string;
-    created_at_human: string;
-}
-
-interface TeamMember {
-    id: string;
-    name: string;
-    email: string;
-}
-
 interface SubjectType {
     value: string;
     label: string;
 }
 
-interface PaginatedActivities {
-    data: ActivityItem[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    links: Array<{
-        url: string | null;
-        label: string;
-        active: boolean;
-    }>;
-}
-
-interface Filters {
+interface ActivityFilters {
     user_id: string | null;
     event: string | null;
     subject_type: string | null;
@@ -95,18 +65,13 @@ interface Filters {
     date_to: string | null;
 }
 
-interface Tenant {
-    id: string;
-    name: string;
-}
-
 interface Props {
-    activities: PaginatedActivities;
-    teamMembers: TeamMember[];
+    activities: InertiaPaginatedResponse<ActivityResource>;
+    teamMembers: UserSummaryResource[];
     eventTypes: string[];
     subjectTypes: SubjectType[];
-    filters: Filters;
-    tenant: Tenant;
+    filters: ActivityFilters;
+    tenant: TenantSummaryResource;
 }
 
 function TeamActivity({
@@ -118,7 +83,7 @@ function TeamActivity({
     tenant: tenantData,
 }: Props) {
     const { t, currentLocale } = useLaravelReactI18n();
-    const [localFilters, setLocalFilters] = useState<Filters>(filters);
+    const [localFilters, setLocalFilters] = useState<ActivityFilters>(filters);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -147,7 +112,7 @@ function TeamActivity({
         );
     };
 
-    const handleFilterChange = (key: keyof Filters, value: string | null) => {
+    const handleFilterChange = (key: keyof ActivityFilters, value: string | null) => {
         const newFilters = { ...localFilters, [key]: value === '__all__' ? null : value };
         setLocalFilters(newFilters);
     };
@@ -163,7 +128,7 @@ function TeamActivity({
     };
 
     const clearFilters = () => {
-        const emptyFilters: Filters = {
+        const emptyFilters: ActivityFilters = {
             user_id: null,
             event: null,
             subject_type: null,

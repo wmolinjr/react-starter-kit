@@ -35,21 +35,14 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Globe, Plus, Trash2 } from 'lucide-react';
 import { FormEvent } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type DomainResource, type TenantSummaryResource } from '@/types';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Domain {
-    id: string;
-    domain: string;
-    is_primary: boolean;
-    created_at: string;
-}
-
 interface Props {
-    tenant: { id: string; name: string };
-    domains: Domain[];
+    tenant: TenantSummaryResource;
+    domains: DomainResource[];
     hasCustomDomainFeature: boolean;
 }
 

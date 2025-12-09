@@ -22,7 +22,12 @@ import {
     Shield,
 } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type TenantSummaryResource,
+    type DomainResource,
+    type PlanFeatures,
+} from '@/types';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { usePermissions } from '@/hooks/shared/use-permissions';
@@ -30,24 +35,11 @@ import { usePlan } from '@/hooks/tenant/use-plan';
 import { type ReactElement } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import type { Permission } from '@/types/permissions';
-import type { PlanFeatures } from '@/types';
-
-interface Domain {
-    id: string;
-    domain: string;
-    is_primary: boolean;
-}
-
-interface Tenant {
-    id: string;
-    name: string;
-    slug: string;
-}
 
 interface Props {
-    tenant: Tenant;
+    tenant: TenantSummaryResource;
     settings: Record<string, unknown>;
-    domains: Domain[];
+    domains: DomainResource[];
 }
 
 interface SettingsLink {
