@@ -29,7 +29,8 @@ import {
     Users,
     XCircle,
 } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { useImpersonation } from '@/hooks/central/use-impersonation';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type ReactElement } from 'react';
@@ -71,6 +72,7 @@ interface Props {
 
 function TenantShow({ tenant, availableFederationGroups }: Props) {
     const { t } = useLaravelReactI18n();
+    const { impersonatingId, impersonateTenant, impersonateAsUser } = useImpersonation();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -107,6 +109,15 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                         <PageTitle>{tenant.name}</PageTitle>
                         <PageDescription>ID: {tenant.id}</PageDescription>
                     </PageHeaderContent>
+                    <PageHeaderActions>
+                        <Button
+                            variant="outline"
+                            onClick={() => impersonateTenant(tenant.id)}
+                        >
+                            <LogIn className="mr-2 h-4 w-4" />
+                            {t('admin.tenants.impersonate')}
+                        </Button>
+                    </PageHeaderActions>
                 </PageHeader>
 
                 <PageContent>
@@ -179,8 +190,15 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                                                 <p className="font-medium">{user.name}</p>
                                                 <p className="text-muted-foreground text-xs">{user.email}</p>
                                             </div>
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/admin/users/${user.id}`}>{t('common.view')}</Link>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => impersonateAsUser(tenant.id, user.id)}
+                                                disabled={impersonatingId === user.id}
+                                                title={t('admin.tenants.impersonate_as', { name: user.name })}
+                                            >
+                                                <LogIn className="mr-1 h-3 w-3" />
+                                                {impersonatingId === user.id ? '...' : t('admin.tenants.impersonate')}
                                             </Button>
                                         </div>
                                     ))}

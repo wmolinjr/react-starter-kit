@@ -404,6 +404,7 @@
   "admin.tenants.no_tenants": "Nenhuma contratação encontrada",
   "admin.tenants.no_plan": "Sem plano",
   "admin.tenants.impersonate": "Impersonar",
+  "admin.tenants.impersonate_as": "Impersonar como :name",
   "admin.tenants.currently_impersonating": "Impersonando",
   "admin.tenants.edit_tenant": "Editar Contratação",
   "admin.tenants.tenant_details": "Detalhes da Contratação",

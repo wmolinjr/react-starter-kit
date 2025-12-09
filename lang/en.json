@@ -404,6 +404,7 @@
   "admin.tenants.no_tenants": "No tenants found",
   "admin.tenants.no_plan": "No plan",
   "admin.tenants.impersonate": "Impersonate",
+  "admin.tenants.impersonate_as": "Impersonate as :name",
   "admin.tenants.currently_impersonating": "Impersonating",
   "admin.tenants.edit_tenant": "Edit Tenant",
   "admin.tenants.tenant_details": "Tenant Details",

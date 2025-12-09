@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/central/admin-layout';
 import admin from '@/routes/central/admin';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { KeyRound, Shield, User, Users } from 'lucide-react';
-import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { useImpersonation } from '@/hooks/central/use-impersonation';
 import { type BreadcrumbItem } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { useState } from 'react';
 
 interface TenantUser {
     id: string;
@@ -35,7 +35,7 @@ interface Props {
 
 function ImpersonateTenant({ tenant, users }: Props) {
     const { t } = useLaravelReactI18n();
-    const [loading, setLoading] = useState<string | null>(null);
+    const { impersonatingId, isImpersonating, impersonateAsUser, impersonateAdminMode } = useImpersonation();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: admin.dashboard.url() },
@@ -45,28 +45,6 @@ function ImpersonateTenant({ tenant, users }: Props) {
     ];
 
     useSetBreadcrumbs(breadcrumbs);
-
-    const handleAdminMode = () => {
-        setLoading('admin-mode');
-        router.post(
-            admin.tenants.impersonate.adminMode.url(tenant.id),
-            {},
-            {
-                onFinish: () => setLoading(null),
-            }
-        );
-    };
-
-    const handleImpersonateUser = (userId: string) => {
-        setLoading(userId);
-        router.post(
-            admin.tenants.impersonate.asUser.url({ tenant: tenant.id, userId }),
-            {},
-            {
-                onFinish: () => setLoading(null),
-            }
-        );
-    };
 
     const getInitials = (name: string) => {
         return name
@@ -117,13 +95,13 @@ function ImpersonateTenant({ tenant, users }: Props) {
                             </CardHeader>
                             <CardContent>
                                 <Button
-                                    onClick={handleAdminMode}
-                                    disabled={loading !== null}
+                                    onClick={() => impersonateAdminMode(tenant.id)}
+                                    disabled={isImpersonating}
                                     className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
                                     data-admin-mode
                                 >
                                     <KeyRound className="mr-2 h-4 w-4" />
-                                    {loading === 'admin-mode'
+                                    {impersonatingId === tenant.id
                                         ? t('impersonation.entering')
                                         : t('impersonation.enter_admin_mode')}
                                 </Button>
@@ -174,12 +152,12 @@ function ImpersonateTenant({ tenant, users }: Props) {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => handleImpersonateUser(user.id)}
-                                                        disabled={loading !== null}
+                                                        onClick={() => impersonateAsUser(tenant.id, user.id)}
+                                                        disabled={isImpersonating}
                                                         data-impersonate-user={user.email}
                                                     >
                                                         <User className="mr-2 h-4 w-4" />
-                                                        {loading === user.id
+                                                        {impersonatingId === user.id
                                                             ? t('impersonation.entering')
                                                             : t('impersonation.impersonate')}
                                                     </Button>

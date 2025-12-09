@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, Pencil, Search, Users, Globe, LogIn } from 'lucide-react';
 import { useState, type ReactElement } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { useImpersonation } from '@/hooks/central/use-impersonation';
 import admin from '@/routes/central/admin';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -44,7 +45,7 @@ interface Props {
 function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
     const { t } = useLaravelReactI18n();
     const [search, setSearch] = useState(filters.search || '');
-    const [impersonating, setImpersonating] = useState<string | null>(null);
+    const { impersonatingId, impersonateTenant, impersonateAsUser } = useImpersonation();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -60,21 +61,6 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
     const handleDelete = (tenantId: string) => {
         if (confirm(t('common.confirm_delete'))) {
             router.delete(admin.tenants.destroy.url(tenantId));
-        }
-    };
-
-    const handleImpersonate = (tenantId: string, userId?: string) => {
-        if (userId) {
-            // Direct impersonation as specific user
-            setImpersonating(tenantId);
-            router.post(
-                admin.tenants.impersonate.asUser.url({ tenant: tenantId, userId }),
-                {},
-                { onFinish: () => setImpersonating(null) }
-            );
-        } else {
-            // Navigate to impersonation selection page
-            router.visit(admin.tenants.impersonate.index.url(tenantId));
         }
     };
 
@@ -158,23 +144,22 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => handleImpersonate(tenant.id)}
-                                                    disabled={impersonating === tenant.id}
+                                                    onClick={() => impersonateTenant(tenant.id)}
                                                 >
                                                     <LogIn className="mr-1 h-3 w-3" />
-                                                    {impersonating === tenant.id ? '...' : t('admin.tenants.impersonate')}
+                                                    {t('admin.tenants.impersonate')}
                                                 </Button>
                                                 {tenant.users?.slice(0, 2).map((user) => (
                                                     <Button
                                                         key={user.id}
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handleImpersonate(tenant.id, user.id)}
-                                                        disabled={impersonating === tenant.id}
-                                                        title={`${t('admin.tenants.impersonate')} ${user.name}`}
+                                                        onClick={() => impersonateAsUser(tenant.id, user.id)}
+                                                        disabled={impersonatingId === user.id}
+                                                        title={t('admin.tenants.impersonate_as', { name: user.name })}
                                                     >
                                                         <LogIn className="mr-1 h-3 w-3" />
-                                                        {user.name.split(' ')[0]}
+                                                        {impersonatingId === user.id ? '...' : user.name.split(' ')[0]}
                                                     </Button>
                                                 ))}
                                                 <Button variant="ghost" size="icon" asChild>
