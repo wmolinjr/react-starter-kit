@@ -3,7 +3,7 @@
 > **Status**: ✅ Completo (Todas as 6 fases implementadas)
 > **Iniciado**: 2025-12-08
 > **Branch**: `tenant-multi-db-user`
-> **Documento de Arquitetura**: [USER-SYNC-FEDERATION-PLAN.md](./USER-SYNC-FEDERATION-PLAN.md)
+> **Documento de Arquitetura**: [USER-SYNC-FEDERATION-PLAN.md](USER-SYNC-FEDERATION-PLAN.md)
 
 ---
 

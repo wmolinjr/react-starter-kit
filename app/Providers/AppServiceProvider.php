@@ -135,5 +135,11 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(FederatedUserPasswordChanged::class, PropagatePasswordChange::class);
         Event::listen(FederatedUserTwoFactorChanged::class, PropagateTwoFactorChange::class);
         Event::listen(TenantJoinedFederation::class, SyncUsersToNewTenant::class);
+
+        // Tenant User Event Listeners
+        Event::listen(
+            \App\Events\Tenant\UserCreated::class,
+            \App\Listeners\Tenant\AutoFederateNewUser::class
+        );
     }
 }

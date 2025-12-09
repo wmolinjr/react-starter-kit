@@ -35,6 +35,7 @@ interface GroupData {
         sync_profile: boolean;
         sync_two_factor: boolean;
         sync_roles: boolean;
+        auto_federate_new_users: boolean;
     };
 }
 

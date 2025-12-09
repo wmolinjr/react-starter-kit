@@ -1462,5 +1462,17 @@
   "flash.federation.retry_sync_queued": "Retry de sincronização adicionado à fila.",
   "flash.federation.sync_enabled": "Sincronização habilitada para :tenant.",
   "flash.federation.sync_disabled": "Sincronização desabilitada para :tenant.",
-  "flash.federation.tenant_not_in_group": "Tenant não está neste grupo de federação."
+  "flash.federation.tenant_not_in_group": "Tenant não está neste grupo de federação.",
+  "flash.federation.bulk_federated": ":count usuários federados com sucesso.",
+  "flash.federation.bulk_federated_partial": ":success usuários federados com sucesso, :failed falharam.",
+  "flash.federation.no_local_users": "Não há usuários locais disponíveis para federar.",
+  "flash.federation.no_users_selected": "Nenhum usuário selecionado para federação.",
+
+  "admin.federation.settings.auto_federate_new_users": "Auto-Federar Novos Usuários",
+  "admin.federation.settings.auto_federate_new_users_description": "Federar automaticamente novos usuários quando criados em tenants membros",
+
+  "tenant.federation.federate_all": "Federar Todos",
+  "tenant.federation.federate_selected": "Federar Selecionados (:count)",
+  "tenant.federation.federate_all_confirm": "Tem certeza que deseja federar todos os :count usuários locais?",
+  "tenant.federation.federate_selected_confirm": "Tem certeza que deseja federar os :count usuários selecionados?"
 }

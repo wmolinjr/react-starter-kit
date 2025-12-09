@@ -2,7 +2,7 @@
 
 namespace App\Services\Tenant;
 
-use App\Exceptions\Tenant\FederationException;
+use App\Exceptions\Central\FederationException;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
@@ -140,6 +140,29 @@ class FederationService
     // =========================================================================
     // User Federation
     // =========================================================================
+
+    /**
+     * Federate multiple users at once.
+     *
+     * @param  Collection<int, User>  $users
+     * @return array{success: int, failed: int, errors: array<string, string>}
+     */
+    public function federateUsers(Collection $users): array
+    {
+        $results = ['success' => 0, 'failed' => 0, 'errors' => []];
+
+        foreach ($users as $user) {
+            try {
+                $this->federateUser($user);
+                $results['success']++;
+            } catch (FederationException $e) {
+                $results['failed']++;
+                $results['errors'][$user->email] = $e->getMessage();
+            }
+        }
+
+        return $results;
+    }
 
     /**
      * Federate an existing local user.

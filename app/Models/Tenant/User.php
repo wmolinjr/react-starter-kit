@@ -61,6 +61,16 @@ class User extends Authenticatable implements MustVerifyEmail
     // NOTE: No CentralConnection trait - User is tenant-only
 
     /**
+     * Boot the model.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (User $user) {
+            event(new \App\Events\Tenant\UserCreated($user));
+        });
+    }
+
+    /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory(): \Database\Factories\UserFactory

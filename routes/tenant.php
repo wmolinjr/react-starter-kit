@@ -360,6 +360,8 @@ Route::middleware([
                     Route::get('/', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'index'])->name('index');
                     Route::get('/users/{user}', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'show'])->name('show');
                     Route::post('/users/federate', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'federateUser'])->name('users.federate');
+                    Route::post('/users/federate-all', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'federateAll'])->name('users.federate-all');
+                    Route::post('/users/federate-bulk', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'federateBulk'])->name('users.federate-bulk');
                     Route::delete('/users/{user}/unfederate', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'unfederateUser'])->name('users.unfederate');
                     Route::post('/users/{user}/sync', [\App\Http\Controllers\Tenant\Admin\FederationController::class, 'syncUser'])->name('users.sync');
                 });

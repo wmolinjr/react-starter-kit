@@ -587,4 +587,275 @@ class TenantFederationTest extends TenantTestCase
         // Name should be updated from local user
         $this->assertEquals('Updated Name', $federatedUser->getSyncedField('name'));
     }
+
+    // =========================================================================
+    // Bulk Federation Tests
+    // =========================================================================
+
+    public function test_federate_users_federates_multiple_users(): void
+    {
+        // Ensure auto-federate is disabled
+        $this->group->settings = array_merge($this->group->settings ?? [], [
+            'auto_federate_new_users' => false,
+        ]);
+        $this->group->save();
+
+        $uniqueId = uniqid();
+        $users = collect([
+            User::factory()->create(['email' => "bulk1-{$uniqueId}@example.com"]),
+            User::factory()->create(['email' => "bulk2-{$uniqueId}@example.com"]),
+            User::factory()->create(['email' => "bulk3-{$uniqueId}@example.com"]),
+        ]);
+
+        $results = $this->tenantFederationService->federateUsers($users);
+
+        $this->assertEquals(3, $results['success']);
+        $this->assertEquals(0, $results['failed']);
+        $this->assertEmpty($results['errors']);
+
+        foreach ($users as $user) {
+            $user->refresh();
+            $this->assertNotNull($user->federated_user_id);
+        }
+    }
+
+    public function test_federate_users_handles_partial_failures(): void
+    {
+        // Ensure auto-federate is disabled
+        $this->group->settings = array_merge($this->group->settings ?? [], [
+            'auto_federate_new_users' => false,
+        ]);
+        $this->group->save();
+
+        $uniqueId = uniqid();
+
+        // Create one valid user
+        $validUser = User::factory()->create(['email' => "valid-{$uniqueId}@example.com"]);
+
+        // Create one user that's already federated
+        $alreadyFederatedEmail = "already-{$uniqueId}@example.com";
+        $alreadyFederatedUser = User::factory()->create(['email' => $alreadyFederatedEmail]);
+        $federatedUser = FederatedUser::create([
+            'federation_group_id' => $this->group->id,
+            'global_email' => $alreadyFederatedEmail,
+            'synced_data' => ['name' => 'Test'],
+            'master_tenant_id' => $this->tenant->id,
+            'master_tenant_user_id' => $alreadyFederatedUser->id,
+            'status' => FederatedUser::STATUS_ACTIVE,
+            'sync_version' => 1,
+        ]);
+        $alreadyFederatedUser->forceFill(['federated_user_id' => $federatedUser->id])->save();
+
+        $users = collect([$validUser, $alreadyFederatedUser]);
+
+        $results = $this->tenantFederationService->federateUsers($users);
+
+        $this->assertEquals(1, $results['success']);
+        $this->assertEquals(1, $results['failed']);
+        $this->assertArrayHasKey($alreadyFederatedEmail, $results['errors']);
+
+        // Valid user should be federated
+        $validUser->refresh();
+        $this->assertNotNull($validUser->federated_user_id);
+    }
+
+    public function test_federate_users_returns_zero_for_empty_collection(): void
+    {
+        $results = $this->tenantFederationService->federateUsers(collect());
+
+        $this->assertEquals(0, $results['success']);
+        $this->assertEquals(0, $results['failed']);
+        $this->assertEmpty($results['errors']);
+    }
+
+    // =========================================================================
+    // Federate All Controller Tests
+    // =========================================================================
+
+    public function test_federate_all_federates_all_local_users(): void
+    {
+        $localUsers = User::factory()->count(3)->create();
+
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-all'));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        foreach ($localUsers as $user) {
+            $user->refresh();
+            $this->assertNotNull($user->federated_user_id);
+        }
+    }
+
+    public function test_federate_all_returns_info_when_no_local_users(): void
+    {
+        // Federate all existing local users first
+        $localUsers = $this->tenantFederationService->getLocalOnlyUsers();
+        $this->tenantFederationService->federateUsers($localUsers);
+
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-all'));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('info');
+    }
+
+    public function test_federate_all_requires_federation_manage_permission(): void
+    {
+        $viewOnlyUser = $this->createTenantUser('member');
+        $viewOnlyUser->givePermissionTo(TenantPermission::FEDERATION_VIEW->value);
+
+        $response = $this->actingAs($viewOnlyUser)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-all'));
+
+        $response->assertForbidden();
+    }
+
+    // =========================================================================
+    // Federate Bulk Controller Tests
+    // =========================================================================
+
+    public function test_federate_bulk_federates_selected_users(): void
+    {
+        $users = User::factory()->count(5)->create();
+        $selectedUsers = $users->take(3);
+
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), [
+                'user_ids' => $selectedUsers->pluck('id')->toArray(),
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        // Selected users should be federated
+        foreach ($selectedUsers as $user) {
+            $user->refresh();
+            $this->assertNotNull($user->federated_user_id);
+        }
+
+        // Non-selected users should NOT be federated
+        foreach ($users->skip(3) as $user) {
+            $user->refresh();
+            $this->assertNull($user->federated_user_id);
+        }
+    }
+
+    public function test_federate_bulk_validates_user_ids_required(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), []);
+
+        $response->assertSessionHasErrors(['user_ids']);
+    }
+
+    public function test_federate_bulk_validates_user_ids_must_be_array(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), [
+                'user_ids' => 'not-an-array',
+            ]);
+
+        $response->assertSessionHasErrors(['user_ids']);
+    }
+
+    public function test_federate_bulk_validates_user_ids_must_exist(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), [
+                'user_ids' => ['00000000-0000-0000-0000-000000000000'],
+            ]);
+
+        $response->assertSessionHasErrors(['user_ids.0']);
+    }
+
+    public function test_federate_bulk_skips_already_federated_users(): void
+    {
+        // Ensure auto-federate is disabled
+        $this->group->settings = array_merge($this->group->settings ?? [], [
+            'auto_federate_new_users' => false,
+        ]);
+        $this->group->save();
+
+        $uniqueId = uniqid();
+
+        // Create and federate one user
+        $federatedEmail = "federated-skip-{$uniqueId}@example.com";
+        $federatedLocal = User::factory()->create(['email' => $federatedEmail]);
+        $federatedUser = FederatedUser::create([
+            'federation_group_id' => $this->group->id,
+            'global_email' => $federatedEmail,
+            'synced_data' => ['name' => 'Test'],
+            'master_tenant_id' => $this->tenant->id,
+            'master_tenant_user_id' => $federatedLocal->id,
+            'status' => FederatedUser::STATUS_ACTIVE,
+            'sync_version' => 1,
+        ]);
+        $federatedLocal->forceFill(['federated_user_id' => $federatedUser->id])->save();
+
+        // Create local-only user
+        $localUser = User::factory()->create(['email' => "local-skip-{$uniqueId}@example.com"]);
+
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), [
+                'user_ids' => [$federatedLocal->id, $localUser->id],
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        // Only local user should have been processed
+        $localUser->refresh();
+        $this->assertNotNull($localUser->federated_user_id);
+    }
+
+    public function test_federate_bulk_returns_error_when_no_valid_users(): void
+    {
+        $uniqueId = uniqid();
+
+        // Create and federate a user
+        $federatedEmail = "federated-novalid-{$uniqueId}@example.com";
+        $federatedLocal = User::factory()->create(['email' => $federatedEmail]);
+        $federatedUser = FederatedUser::create([
+            'federation_group_id' => $this->group->id,
+            'global_email' => $federatedEmail,
+            'synced_data' => ['name' => 'Test'],
+            'master_tenant_id' => $this->tenant->id,
+            'master_tenant_user_id' => $federatedLocal->id,
+            'status' => FederatedUser::STATUS_ACTIVE,
+            'sync_version' => 1,
+        ]);
+
+        // Use forceFill to bypass guarded attributes and ensure the value is set
+        $federatedLocal->forceFill(['federated_user_id' => $federatedUser->id])->save();
+        $federatedLocal->refresh();
+
+        // Verify user is federated
+        $this->assertNotNull($federatedLocal->federated_user_id);
+
+        // Only pass the already federated user
+        $response = $this->actingAs($this->user)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), [
+                'user_ids' => [$federatedLocal->id],
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+    }
+
+    public function test_federate_bulk_requires_federation_manage_permission(): void
+    {
+        $viewOnlyUser = $this->createTenantUser('member');
+        $viewOnlyUser->givePermissionTo(TenantPermission::FEDERATION_VIEW->value);
+
+        $localUser = User::factory()->create();
+
+        $response = $this->actingAs($viewOnlyUser)
+            ->post($this->tenantRoute('tenant.admin.settings.federation.users.federate-bulk'), [
+                'user_ids' => [$localUser->id],
+            ]);
+
+        $response->assertForbidden();
+    }
 }

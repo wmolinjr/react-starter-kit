@@ -151,6 +151,14 @@ class FederationGroup extends Model
     }
 
     /**
+     * Check if new users should be automatically federated.
+     */
+    public function shouldAutoFederateNewUsers(): bool
+    {
+        return $this->getSetting('auto_federate_new_users', false);
+    }
+
+    /**
      * Check if a tenant is the master.
      */
     public function isMaster(Tenant|string $tenant): bool

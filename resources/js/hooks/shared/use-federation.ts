@@ -31,6 +31,9 @@ interface TenantFederationReturn {
     federateUser: (userId: string) => void;
     unfederateUser: (userId: string) => void;
     syncUser: (userId: string) => void;
+    // Bulk operations
+    federateAll: () => void;
+    federateBulk: (userIds: string[]) => void;
 }
 
 type UseFederationReturn = CentralFederationReturn | TenantFederationReturn;
@@ -66,7 +69,7 @@ export function useFederation(options: UseFederationOptions = {}): UseFederation
         id: string,
         method: 'post' | 'delete',
         url: string,
-        data?: Record<string, string>
+        data?: Record<string, string | string[]>
     ) => {
         setProcessingId(id);
 
@@ -121,6 +124,12 @@ export function useFederation(options: UseFederationOptions = {}): UseFederation
         },
         syncUser: (userId: string) => {
             handleRequest(userId, 'post', tenantAdmin.settings.federation.users.sync.url(userId));
+        },
+        federateAll: () => {
+            handleRequest('federate-all', 'post', tenantAdmin.settings.federation.users.federateAll.url());
+        },
+        federateBulk: (userIds: string[]) => {
+            handleRequest('federate-bulk', 'post', tenantAdmin.settings.federation.users.federateBulk.url(), { user_ids: userIds });
         },
     }), [handleRequest]);
 

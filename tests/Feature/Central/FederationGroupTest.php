@@ -676,4 +676,164 @@ class FederationGroupTest extends TestCase
         $this->assertCount(1, $activeGroups);
         $this->assertEquals('Active Group', $activeGroups->first()->name);
     }
+
+    // =========================================================================
+    // Auto-Federate New Users Tests
+    // =========================================================================
+
+    public function test_should_auto_federate_new_users_returns_true_when_enabled(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Auto Federate Group',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'settings' => [
+                'auto_federate_new_users' => true,
+            ],
+            'is_active' => true,
+        ]);
+
+        $this->assertTrue($group->shouldAutoFederateNewUsers());
+    }
+
+    public function test_should_auto_federate_new_users_returns_false_when_disabled(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Manual Federate Group',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'settings' => [
+                'auto_federate_new_users' => false,
+            ],
+            'is_active' => true,
+        ]);
+
+        $this->assertFalse($group->shouldAutoFederateNewUsers());
+    }
+
+    public function test_should_auto_federate_new_users_defaults_to_false(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Default Group',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'is_active' => true,
+        ]);
+
+        // Should default to false when not set
+        $this->assertFalse($group->shouldAutoFederateNewUsers());
+    }
+
+    public function test_should_auto_federate_new_users_with_null_settings(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Null Settings Group',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'settings' => null,
+            'is_active' => true,
+        ]);
+
+        $this->assertFalse($group->shouldAutoFederateNewUsers());
+    }
+
+    public function test_auto_federate_setting_can_be_updated(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Updatable Group',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'settings' => [
+                'auto_federate_new_users' => false,
+            ],
+            'is_active' => true,
+        ]);
+
+        $this->assertFalse($group->shouldAutoFederateNewUsers());
+
+        // Update the setting
+        $group->settings = array_merge($group->settings ?? [], [
+            'auto_federate_new_users' => true,
+        ]);
+        $group->save();
+
+        $this->assertTrue($group->fresh()->shouldAutoFederateNewUsers());
+    }
+
+    public function test_auto_federate_setting_persists_other_settings(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Multi Settings Group',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'settings' => [
+                'sync_fields' => ['name', 'email', 'password'],
+                'auto_create_on_login' => true,
+                'auto_federate_new_users' => true,
+            ],
+            'is_active' => true,
+        ]);
+
+        $this->assertTrue($group->shouldAutoFederateNewUsers());
+        $this->assertTrue($group->shouldAutoCreateOnLogin());
+        $this->assertEquals(['name', 'email', 'password'], $group->getSyncFields());
+    }
+
+    // =========================================================================
+    // Auto-Federate Controller Tests
+    // =========================================================================
+
+    public function test_update_federation_group_with_auto_federate_setting(): void
+    {
+        $group = FederationGroup::create([
+            'name' => 'Original Name',
+            'master_tenant_id' => $this->masterTenant->id,
+            'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->admin, 'central')
+            ->put(route('central.admin.federation.update', $group), [
+                'name' => 'Updated Name',
+                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'is_active' => true,
+                'settings' => [
+                    'sync_password' => true,
+                    'sync_profile' => true,
+                    'sync_two_factor' => false,
+                    'sync_roles' => false,
+                    'auto_federate_new_users' => true,
+                ],
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $group->refresh();
+        $this->assertTrue($group->shouldAutoFederateNewUsers());
+    }
+
+    public function test_create_federation_group_with_auto_federate_enabled(): void
+    {
+        $response = $this->actingAs($this->admin, 'central')
+            ->post(route('central.admin.federation.store'), [
+                'name' => 'Auto Federate Group',
+                'master_tenant_id' => $this->masterTenant->id,
+                'sync_strategy' => FederationGroup::STRATEGY_MASTER_WINS,
+                'settings' => [
+                    'sync_password' => true,
+                    'sync_profile' => true,
+                    'sync_two_factor' => false,
+                    'sync_roles' => false,
+                    'auto_federate_new_users' => true,
+                ],
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $group = FederationGroup::where('name', 'Auto Federate Group')->first();
+        $this->assertNotNull($group);
+        $this->assertTrue($group->shouldAutoFederateNewUsers());
+    }
 }

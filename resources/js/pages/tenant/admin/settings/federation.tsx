@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -89,6 +90,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
     const { t } = useLaravelReactI18n();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
+    const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
     const federation = useFederation();
 
     // Type guard ensures we have tenant operations
@@ -96,7 +98,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
         throw new Error('FederationSettings must be used in tenant context');
     }
 
-    const { processingId, federateUser, unfederateUser, syncUser } = federation;
+    const { processingId, federateUser, unfederateUser, syncUser, federateAll, federateBulk } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -121,6 +123,39 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
 
     const handleSyncUser = (userId: string) => {
         syncUser(userId);
+    };
+
+    const handleFederateAll = () => {
+        if (confirm(t('tenant.federation.federate_all_confirm', { count: localOnlyUsers.length }))) {
+            federateAll();
+            setSelectedUsers(new Set());
+        }
+    };
+
+    const handleFederateBulk = () => {
+        if (selectedUsers.size === 0) return;
+        if (confirm(t('tenant.federation.federate_selected_confirm', { count: selectedUsers.size }))) {
+            federateBulk(Array.from(selectedUsers));
+            setSelectedUsers(new Set());
+        }
+    };
+
+    const toggleUserSelection = (userId: string, checked: boolean) => {
+        const newSelection = new Set(selectedUsers);
+        if (checked) {
+            newSelection.add(userId);
+        } else {
+            newSelection.delete(userId);
+        }
+        setSelectedUsers(newSelection);
+    };
+
+    const toggleSelectAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedUsers(new Set(localOnlyUsers.map((u) => u.id)));
+        } else {
+            setSelectedUsers(new Set());
+        }
     };
 
     const getSyncStrategyLabel = (strategy: string) => {
@@ -443,15 +478,44 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                             {localOnlyUsers.length > 0 && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>{t('tenant.federation.local_only_users')}</CardTitle>
-                                        <CardDescription>
-                                            {t('tenant.federation.local_only_users_description')}
-                                        </CardDescription>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <CardTitle>{t('tenant.federation.local_only_users')}</CardTitle>
+                                                <CardDescription>
+                                                    {t('tenant.federation.local_only_users_description')}
+                                                </CardDescription>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                {selectedUsers.size > 0 && (
+                                                    <Button
+                                                        variant="secondary"
+                                                        onClick={handleFederateBulk}
+                                                        disabled={processingId === 'federate-bulk'}
+                                                    >
+                                                        <LinkIcon className="mr-2 h-4 w-4" />
+                                                        {t('tenant.federation.federate_selected', { count: selectedUsers.size })}
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    onClick={handleFederateAll}
+                                                    disabled={processingId === 'federate-all'}
+                                                >
+                                                    <Users className="mr-2 h-4 w-4" />
+                                                    {t('tenant.federation.federate_all')}
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </CardHeader>
                                     <CardContent>
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
+                                                    <TableHead className="w-12">
+                                                        <Checkbox
+                                                            checked={selectedUsers.size === localOnlyUsers.length && localOnlyUsers.length > 0}
+                                                            onCheckedChange={(checked) => toggleSelectAll(checked === true)}
+                                                        />
+                                                    </TableHead>
                                                     <TableHead>{t('common.user')}</TableHead>
                                                     <TableHead>{t('common.role')}</TableHead>
                                                     <TableHead>{t('common.status')}</TableHead>
@@ -460,6 +524,12 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                             <TableBody>
                                                 {localOnlyUsers.map((user) => (
                                                     <TableRow key={user.id}>
+                                                        <TableCell>
+                                                            <Checkbox
+                                                                checked={selectedUsers.has(user.id)}
+                                                                onCheckedChange={(checked) => toggleUserSelection(user.id, checked === true)}
+                                                            />
+                                                        </TableCell>
                                                         <TableCell>
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">

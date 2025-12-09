@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Enums\TenantPermission;
 use App\Exceptions\Tenant\FederationException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tenant\FederateBulkUsersRequest;
 use App\Http\Requests\Tenant\FederateUserRequest;
 use App\Http\Resources\Tenant\TeamMemberResource;
 use App\Models\Tenant\User;
@@ -34,7 +35,7 @@ class FederationController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:' . TenantPermission::FEDERATION_VIEW->value, only: ['index', 'show']),
-            new Middleware('permission:' . TenantPermission::FEDERATION_MANAGE->value, only: ['federateUser', 'unfederateUser']),
+            new Middleware('permission:' . TenantPermission::FEDERATION_MANAGE->value, only: ['federateUser', 'unfederateUser', 'federateAll', 'federateBulk']),
         ];
     }
 
@@ -127,6 +128,58 @@ class FederationController extends Controller implements HasMiddleware
         $this->federationService->applyFederationDataToUser($user);
 
         return back()->with('success', __('flash.federation.user_synced'));
+    }
+
+    /**
+     * Federate all local users at once.
+     */
+    public function federateAll(): RedirectResponse
+    {
+        $localUsers = $this->federationService->getLocalOnlyUsers();
+
+        if ($localUsers->isEmpty()) {
+            return back()->with('info', __('flash.federation.no_local_users'));
+        }
+
+        $results = $this->federationService->federateUsers($localUsers);
+
+        if ($results['failed'] > 0) {
+            return back()->with('warning', __('flash.federation.bulk_federated_partial', [
+                'success' => $results['success'],
+                'failed' => $results['failed'],
+            ]));
+        }
+
+        return back()->with('success', __('flash.federation.bulk_federated', [
+            'count' => $results['success'],
+        ]));
+    }
+
+    /**
+     * Federate selected users.
+     */
+    public function federateBulk(FederateBulkUsersRequest $request): RedirectResponse
+    {
+        $users = User::whereIn('id', $request->validated()['user_ids'])
+            ->whereNull('federated_user_id')
+            ->get();
+
+        if ($users->isEmpty()) {
+            return back()->with('error', __('flash.federation.no_users_selected'));
+        }
+
+        $results = $this->federationService->federateUsers($users);
+
+        if ($results['failed'] > 0) {
+            return back()->with('warning', __('flash.federation.bulk_federated_partial', [
+                'success' => $results['success'],
+                'failed' => $results['failed'],
+            ]));
+        }
+
+        return back()->with('success', __('flash.federation.bulk_federated', [
+            'count' => $results['success'],
+        ]));
     }
 
     /**
