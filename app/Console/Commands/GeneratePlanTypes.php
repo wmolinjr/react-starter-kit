@@ -77,13 +77,18 @@ TS;
         }
         $output .= "}\n\n";
 
-        // Feature keys type
-        $featureKeys = implode("' | '", $features);
-        $output .= "export type PlanFeatureKey = '{$featureKeys}';\n\n";
+        // Documentation note about union types in enums.d.ts
+        $output .= <<<'TS'
+/**
+ * Note: For union types with all enum values (including 'base'),
+ * use PlanFeature and PlanLimit from '@/types/enums'.
+ *
+ * The interfaces above (PlanFeatures, PlanLimits, PlanUsage) represent
+ * the actual data structure returned by the API, where 'base' is always true
+ * and thus excluded from the interface.
+ */
 
-        // Limit keys type
-        $limitKeys = implode("' | '", $limits);
-        $output .= "export type PlanLimitKey = '{$limitKeys}';\n";
+TS;
 
         return $output;
     }

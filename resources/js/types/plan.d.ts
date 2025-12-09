@@ -41,6 +41,11 @@ export interface PlanUsage {
     locales: number;
 }
 
-export type PlanFeatureKey = 'projects' | 'customRoles' | 'apiAccess' | 'advancedReports' | 'sso' | 'whiteLabel' | 'auditLog' | 'prioritySupport' | 'multiLanguage' | 'federation';
-
-export type PlanLimitKey = 'users' | 'projects' | 'storage' | 'apiCalls' | 'logRetention' | 'fileUploadSize' | 'customRoles' | 'locales';
+/**
+ * Note: For union types with all enum values (including 'base'),
+ * use PlanFeature and PlanLimit from '@/types/enums'.
+ *
+ * The interfaces above (PlanFeatures, PlanLimits, PlanUsage) represent
+ * the actual data structure returned by the API, where 'base' is always true
+ * and thus excluded from the interface.
+ */
