@@ -124,3 +124,63 @@ With PostgreSQL and UUID v7:
 - 16 bytes vs 8 bytes for bigint (acceptable trade-off)
 - Slightly larger indexes, but excellent query performance
 - No practical performance impact for most applications
+
+## Timezone: UTC Everywhere
+
+All timestamps are stored in **UTC** regardless of server configuration. This is enforced through multiple layers:
+
+### 1. PostgreSQL Connection (`config/database.php`)
+
+All PostgreSQL connections have `'timezone' => 'UTC'`:
+
+```php
+'central' => [
+    'driver' => 'pgsql',
+    // ...
+    'timezone' => 'UTC',
+],
+```
+
+### 2. PHP Default (`AppServiceProvider`)
+
+PHP timezone is explicitly set to UTC:
+
+```php
+date_default_timezone_set('UTC');
+```
+
+### 3. Connection Event Listener (`SetDatabaseTimezone`)
+
+Every database connection runs `SET TIMEZONE TO 'UTC'` to catch dynamically created tenant connections:
+
+```php
+Event::listen(ConnectionEstablished::class, SetDatabaseTimezone::class);
+```
+
+### Why UTC?
+
+- **Consistency**: All timestamps use the same reference point
+- **Multi-region**: Works correctly across different server locations
+- **Multi-tenant**: Tenants can have different display timezones without data inconsistency
+- **APIs**: ISO 8601 dates with UTC are the standard for APIs
+- **Debugging**: Easier to correlate events across systems
+
+### Display vs Storage
+
+- **Storage**: Always UTC in database
+- **Display**: Convert to user's timezone in frontend (using `locale` and `timezone` tenant settings)
+
+```typescript
+// Frontend: Convert UTC to user's timezone
+const userDate = new Date(utcTimestamp).toLocaleString('pt-BR', {
+  timeZone: 'America/Sao_Paulo'
+});
+```
+
+### Testing
+
+Run timezone tests to verify enforcement:
+
+```bash
+sail artisan test --filter=TimezoneEnforcementTest
+```

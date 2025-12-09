@@ -69,8 +69,9 @@ class ParallelTestingServiceProvider extends ServiceProvider
         $centralDb = "testing_{$token}";
         $tenantDb = "testing_tenant_{$token}";
 
-        // Connect to postgres database to create new databases
-        $pdo = DB::connection('pgsql')->getPdo();
+        // Connect to central database to create new databases
+        // Using 'central' connection (not legacy 'pgsql' alias)
+        $pdo = DB::connection('central')->getPdo();
 
         // Create central testing database if not exists
         $this->createDatabaseIfNotExists($pdo, $centralDb);

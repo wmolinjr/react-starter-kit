@@ -14,6 +14,7 @@ use App\Listeners\Central\Federation\SyncUpdatedFederatedUser;
 use App\Listeners\Central\Federation\SyncUsersToNewTenant;
 use App\Listeners\Central\SyncPermissionsOnSubscriptionChange;
 use App\Listeners\Central\UpdateTenantLimits;
+use App\Listeners\Shared\SetDatabaseTimezone;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Domain;
@@ -33,7 +34,9 @@ use App\Observers\Tenant\ProjectObserver;
 use App\Observers\Tenant\UserObserver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -57,6 +60,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // ⭐ TIMEZONE ENFORCEMENT: Ensure all timestamps are stored in UTC
+        // This is a multi-layered defense:
+        // 1. config/database.php: timezone => 'UTC' on all PostgreSQL connections
+        // 2. This: date_default_timezone_set('UTC') for PHP
+        // 3. SetDatabaseTimezone listener: SET TIMEZONE on connection establishment
+        date_default_timezone_set('UTC');
+
+        // Listen for database connections to enforce UTC at connection level
+        // This catches dynamically created tenant connections
+        Event::listen(ConnectionEstablished::class, SetDatabaseTimezone::class);
+
         // ⭐ Disable 'data' wrapping for API Resources (Inertia compatibility)
         JsonResource::withoutWrapping();
 
