@@ -295,6 +295,208 @@ public function getTeamMembers(): Collection
 'members' => TeamMemberResource::collection($this->teamService->getTeamMembers()),
 ```
 
+## TypeScript Type Generation
+
+Resources can automatically generate TypeScript types using the `HasTypescriptType` trait. Run `sail artisan types:generate` to regenerate types.
+
+### Basic Usage
+
+```php
+use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
+
+class ProjectResource extends BaseResource
+{
+    use HasTypescriptType;
+
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'description' => 'string | null',
+            'status' => 'ProjectStatus',  // Reference to enum
+            'created_at' => 'string',
+        ];
+    }
+}
+```
+
+Generated TypeScript (`resources/js/types/resources.d.ts`):
+```typescript
+export interface ProjectResource {
+    id: string;
+    name: string;
+    description: string | null;
+    status: ProjectStatus;
+    created_at: string;
+}
+```
+
+### Nested Types Pattern
+
+When a Resource contains complex nested objects that aren't full Resources themselves, use the **Nested Types Pattern**.
+
+#### Problem
+
+The type generator only processes `typescriptSchema()`. Complex Resources with inline object structures need auxiliary types that the generator doesn't automatically create.
+
+#### Solution
+
+1. **Define nested types in the Resource** using `typescriptAdditionalTypes()` (for documentation purposes)
+2. **Manually add the types to `common.d.ts`** (the generator doesn't process `typescriptAdditionalTypes()`)
+3. **Reference the nested types in `typescriptSchema()`**
+
+#### Example: UserFederationInfoResource
+
+**Step 1: Define the Resource with nested type references**
+
+```php
+// app/Http/Resources/Tenant/UserFederationInfoResource.php
+class UserFederationInfoResource extends BaseResource
+{
+    use HasTypescriptType;
+
+    public static function typescriptSchema(): array
+    {
+        return [
+            'is_federated' => 'boolean',
+            'federation_id' => 'string | null',
+            'is_master_user' => 'boolean',
+            // Reference types defined in common.d.ts
+            'federated_user' => 'UserFederationInfoFederatedUser | null',
+            'link' => 'UserFederationInfoLink | null',
+            'group' => 'UserFederationInfoGroup | null',
+        ];
+    }
+
+    // Document nested types (not auto-processed, but useful for reference)
+    public static function typescriptAdditionalTypes(): array
+    {
+        return [
+            'UserFederationInfoFederatedUser' => [
+                'id' => 'string',
+                'email' => 'string',
+                'synced_data' => 'Record<string, unknown>',
+                'last_synced_at' => 'string | null',
+                'created_at' => 'string',
+            ],
+            'UserFederationInfoLink' => [
+                'id' => 'string',
+                'status' => 'string',
+                'sync_enabled' => 'boolean',
+                'last_synced_at' => 'string | null',
+                'linked_at' => 'string',
+            ],
+            'UserFederationInfoGroup' => [
+                'id' => 'string',
+                'name' => 'string',
+                'sync_strategy' => 'FederationSyncStrategy',
+            ],
+        ];
+    }
+}
+```
+
+**Step 2: Add nested types to common.d.ts**
+
+```typescript
+// resources/js/types/common.d.ts
+
+// =============================================================================
+// User Federation Info Types (for UserFederationInfoResource)
+// =============================================================================
+
+/**
+ * Federated user info in user federation detail view
+ */
+export interface UserFederationInfoFederatedUser {
+    id: string;
+    email: string;
+    synced_data: Record<string, unknown>;
+    last_synced_at: string | null;
+    created_at: string;
+}
+
+/**
+ * Federation link info in user federation detail view
+ */
+export interface UserFederationInfoLink {
+    id: string;
+    status: string;
+    sync_enabled: boolean;
+    last_synced_at: string | null;
+    linked_at: string;
+}
+
+/**
+ * Federation group info in user federation detail view
+ */
+export interface UserFederationInfoGroup {
+    id: string;
+    name: string;
+    sync_strategy: FederationSyncStrategy;
+}
+```
+
+**Step 3: Use in Frontend**
+
+```typescript
+// resources/js/pages/tenant/admin/team/federation-info.tsx
+import {
+    type TeamMemberResource,
+    type UserFederationInfoResource,
+} from '@/types';
+
+interface Props {
+    user: TeamMemberResource;
+    federationInfo: UserFederationInfoResource;
+}
+
+function FederationInfoPage({ user, federationInfo }: Props) {
+    // TypeScript knows the nested structure
+    if (federationInfo.is_federated && federationInfo.link) {
+        console.log(federationInfo.link.status);      // ✅ Type-safe
+        console.log(federationInfo.group?.name);      // ✅ Type-safe
+    }
+}
+```
+
+### Naming Convention for Nested Types
+
+Follow this pattern: `{ParentResource}{PropertyName}`
+
+| Parent Resource | Property | Nested Type Name |
+|-----------------|----------|------------------|
+| `UserFederationInfoResource` | `federated_user` | `UserFederationInfoFederatedUser` |
+| `UserFederationInfoResource` | `link` | `UserFederationInfoLink` |
+| `UserFederationInfoResource` | `group` | `UserFederationInfoGroup` |
+| `TenantDetailResource` | `users` | `TenantUser` |
+| `ActivityResource` | `causer` | `ActivityCauser` |
+
+### When to Use Nested Types vs. Separate Resources
+
+| Scenario | Approach |
+|----------|----------|
+| Object used in multiple Resources | Create a separate Resource |
+| Object specific to one Resource | Use nested type in `common.d.ts` |
+| Object is a simplified view of a model | Consider `SummaryResource` |
+| Object is computed/aggregated data | Use nested type in `common.d.ts` |
+
+### Type Files Organization
+
+```
+resources/js/types/
+├── index.d.ts       # Re-exports all types
+├── resources.d.ts   # Auto-generated from Resources (DO NOT EDIT)
+├── enums.d.ts       # Auto-generated from Enums (DO NOT EDIT)
+├── plan.d.ts        # Auto-generated plan types (DO NOT EDIT)
+├── common.d.ts      # Manually maintained nested/shared types
+└── global.d.ts      # Global type declarations
+```
+
+**Important**: Only edit `common.d.ts` and `global.d.ts` manually. The other files are auto-generated by `sail artisan types:generate`.
+
 ## Reference
 
 | Resource | Model | Purpose |
@@ -317,7 +519,13 @@ public function getTeamMembers(): Collection
 | `ActivityResource` | `Activity` | Audit log entry |
 | `MediaResource` | `Media` | Media file info |
 | `UserInvitationResource` | `UserInvitation` | Pending team invitation |
+| `ApiTokenResource` | `PersonalAccessToken` | API token info |
 | `RoleResource` | `Role` | List with counts |
 | `RoleDetailResource` | `Role` | With permissions/users |
 | `RoleEditResource` | `Role` | Edit form |
 | `PermissionResource` | `Permission` | Permission info |
+| `ImpersonationTenantResource` | `Tenant` | Tenant for impersonation page |
+| `ImpersonationUserResource` | `User` | User for impersonation selection |
+| `FederationGroupForTenantResource` | `FederationGroup` | Group from tenant perspective |
+| `TenantFederationMembershipResource` | `FederationGroupTenant` | Membership pivot data |
+| `UserFederationInfoResource` | Array | User federation info (nested types) |

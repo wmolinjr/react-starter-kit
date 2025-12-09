@@ -494,7 +494,14 @@ public function getTeamMembers(): Collection
 }
 ```
 
-**See**: [docs/API-RESOURCES.md](docs/API-RESOURCES.md) for complete guide.
+**TypeScript Generation**:
+```bash
+sail artisan types:generate   # Generates resources.d.ts, enums.d.ts, plan.d.ts
+```
+
+Resources with `HasTypescriptType` trait auto-generate TypeScript interfaces. For nested types, add them manually to `common.d.ts`.
+
+**See**: [docs/API-RESOURCES.md](docs/API-RESOURCES.md) for complete guide including the **Nested Types Pattern**.
 
 ### Type Safety
 
@@ -1041,7 +1048,7 @@ For in-depth technical documentation, see:
 - **[docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md)** - MCP tools workflow
 - **[docs/I18N.md](docs/I18N.md)** - Internationalization guide
 - **[docs/ADDONS.md](docs/ADDONS.md)** - Add-ons system
-- **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources for data transformation
+- **[docs/API-RESOURCES.md](docs/API-RESOURCES.md)** - API Resources, TypeScript generation, and nested types pattern
 - **[docs/FRONTEND-TYPES-MIGRATION-PLAN.md](docs/FRONTEND-TYPES-MIGRATION-PLAN.md)** - Frontend TypeScript types migration guide
 - **[docs/FORTIFY-REMOVAL-PLAN.md](docs/archive/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
 - **[docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md)** - User sync across tenants (multi-branch companies)
