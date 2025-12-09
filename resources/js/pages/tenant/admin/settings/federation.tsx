@@ -222,7 +222,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                             {/* Stats */}
                             <div className="grid gap-4 md:grid-cols-4">
                                 <Card>
-                                    <CardContent className="pt-6">
+                                    <CardContent>
                                         <div className="flex items-center gap-4">
                                             <div className="bg-primary/10 rounded-full p-3">
                                                 <Users className="text-primary h-5 w-5" />
@@ -237,7 +237,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                     </CardContent>
                                 </Card>
                                 <Card>
-                                    <CardContent className="pt-6">
+                                    <CardContent>
                                         <div className="flex items-center gap-4">
                                             <div className="rounded-full bg-green-100 p-3 dark:bg-green-900">
                                                 <LinkIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -252,7 +252,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                     </CardContent>
                                 </Card>
                                 <Card>
-                                    <CardContent className="pt-6">
+                                    <CardContent>
                                         <div className="flex items-center gap-4">
                                             <div className="bg-muted rounded-full p-3">
                                                 <User className="text-muted-foreground h-5 w-5" />
@@ -268,7 +268,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                 </Card>
                                 {stats.pending_syncs > 0 && (
                                     <Card className="border-yellow-500">
-                                        <CardContent className="pt-6">
+                                        <CardContent>
                                             <div className="flex items-center gap-4">
                                                 <div className="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900">
                                                     <RefreshCw className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
