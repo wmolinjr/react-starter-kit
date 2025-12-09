@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,21 @@ use Illuminate\Http\Request;
  */
 class PermissionResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'description' => 'string | null',
+            'category' => 'string',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

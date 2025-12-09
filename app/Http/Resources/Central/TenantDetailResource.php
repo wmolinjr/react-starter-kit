@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -13,6 +14,35 @@ use Illuminate\Http\Request;
  */
 class TenantDetailResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'slug' => 'string',
+            'settings' => 'Record<string, unknown>',
+            'created_at' => 'string',
+            'updated_at' => 'string',
+            'domains' => 'DomainResource[] | undefined',
+            'plan' => 'TenantPlanSummary | undefined',
+            'addons' => 'AddonSummary[] | undefined',
+            'users' => 'TenantUser[]',
+            'users_count' => 'number',
+            'plan_features_override' => 'Partial<PlanFeatures> | null',
+            'plan_limits_override' => 'Partial<PlanLimits> | null',
+            'current_usage' => 'PlanUsage | null',
+            'trial_ends_at' => 'string | null',
+            'is_on_trial' => 'boolean',
+            'federation_groups' => 'TenantFederationGroup[] | undefined',
+            'federation_groups_count' => 'number | undefined',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

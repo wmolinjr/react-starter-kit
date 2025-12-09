@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Tenant;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,30 @@ use Illuminate\Http\Request;
  */
 class MediaResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'uuid' => 'string',
+            'name' => 'string',
+            'file_name' => 'string',
+            'mime_type' => 'string',
+            'size' => 'number',
+            'human_readable_size' => 'string',
+            'collection_name' => 'string',
+            'disk' => 'string',
+            'created_at' => 'string',
+            'url' => 'string',
+            'thumb_url' => 'string | undefined',
+            'custom_properties' => 'Record<string, unknown>',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

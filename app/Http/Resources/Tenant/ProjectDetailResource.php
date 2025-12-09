@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Tenant;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,26 @@ use Illuminate\Http\Request;
  */
 class ProjectDetailResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'description' => 'string | null',
+            'status' => 'string',
+            'created_at' => 'string',
+            'updated_at' => 'string',
+            'user' => 'UserSummaryResource | null',
+            'attachments' => 'ProjectAttachment[]',
+            'images' => 'ProjectImage[]',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

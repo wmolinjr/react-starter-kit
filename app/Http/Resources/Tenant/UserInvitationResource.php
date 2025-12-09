@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Tenant;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -16,6 +17,25 @@ use Illuminate\Http\Request;
  */
 class UserInvitationResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'email' => 'string',
+            'role' => 'TenantRole',
+            'invited_at' => 'string',
+            'expires_at' => 'string',
+            'is_expired' => 'boolean',
+            'expires_in_days' => 'number | null',
+            'invited_by' => 'InvitedByUser | undefined',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

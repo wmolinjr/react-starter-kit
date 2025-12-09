@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use App\Http\Resources\Tenant\UserSummaryResource;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,25 @@ use Illuminate\Http\Request;
  */
 class RoleDetailResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'display_name' => 'string',
+            'description' => 'string | null',
+            'is_protected' => 'boolean',
+            'permissions' => 'PermissionResource[] | undefined',
+            'users' => 'UserSummaryResource[] | undefined',
+            'created_at' => 'string',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Tenant;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,25 @@ use Illuminate\Http\Request;
  */
 class FederationInfoResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'is_federated' => 'boolean',
+            'is_master' => 'boolean',
+            'group_name' => 'string | null',
+            'group_id' => 'string | null',
+            'sync_strategy' => 'FederationSyncStrategy | null',
+            'federated_users_count' => 'number',
+            'local_users_count' => 'number',
+            'total_group_tenants' => 'number',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

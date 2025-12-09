@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,25 @@ use Illuminate\Http\Request;
  */
 class RoleResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'display_name' => 'string',
+            'description' => 'string | null',
+            'users_count' => 'number',
+            'permissions_count' => 'number',
+            'is_protected' => 'boolean',
+            'created_at' => 'string',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

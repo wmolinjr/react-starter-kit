@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,21 @@ use Illuminate\Http\Request;
  */
 class DomainResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'domain' => 'string',
+            'is_primary' => 'boolean',
+            'created_at' => 'string',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

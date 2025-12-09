@@ -1,0 +1,193 @@
+/**
+ * Common Types - Shared interfaces used across Resources
+ *
+ * These types are referenced by auto-generated Resource types
+ * but represent inline/anonymous structures that aren't full Resources.
+ *
+ * NOTE: Types for enums (BillingPeriod, TenantRole, etc.) are in enums.d.ts
+ * NOTE: Types for plans (PlanFeatures, PlanLimits, PlanUsage) are in plan.d.ts
+ */
+
+import type {
+    TenantRole,
+    FederationSyncStrategy,
+    FederatedUserLinkSyncStatus,
+} from './enums';
+
+// =============================================================================
+// Translation Types
+// =============================================================================
+
+/**
+ * Translations object for translatable fields
+ * Keys are locale codes (en, pt_BR, etc.)
+ */
+export interface Translations {
+    en?: string;
+    pt_BR?: string;
+    [key: string]: string | undefined;
+}
+
+// =============================================================================
+// Project Related Types
+// =============================================================================
+
+/**
+ * Project attachment (file)
+ */
+export interface ProjectAttachment {
+    id: string;
+    name: string;
+    size: string;
+    mime_type: string;
+    url: string;
+}
+
+/**
+ * Project image with thumbnail
+ */
+export interface ProjectImage {
+    id: string;
+    name: string;
+    size: string;
+    url: string;
+    thumb_url: string;
+}
+
+// =============================================================================
+// Activity Log Types
+// =============================================================================
+
+/**
+ * Causer info in activity log
+ */
+export interface ActivityCauser {
+    id: string;
+    name: string;
+    email: string;
+}
+
+/**
+ * Activity properties (changes)
+ */
+export interface ActivityProperties {
+    old: Record<string, unknown> | null;
+    new: Record<string, unknown> | null;
+    extra: Record<string, unknown>;
+}
+
+// =============================================================================
+// Tenant Related Types
+// =============================================================================
+
+/**
+ * Simple plan info for tenant views
+ */
+export interface TenantPlanSummary {
+    id: string;
+    name: string;
+}
+
+/**
+ * User info in tenant detail view
+ */
+export interface TenantUser {
+    id: string;
+    name: string;
+    email: string;
+    role: TenantRole | null;
+}
+
+/**
+ * Invitation inviter info
+ */
+export interface InvitedByUser {
+    id: string;
+    name: string;
+}
+
+// =============================================================================
+// Addon Types
+// =============================================================================
+
+/**
+ * Simple addon info for plan/tenant views
+ */
+export interface AddonSummary {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+// =============================================================================
+// Federation Types
+// =============================================================================
+
+/**
+ * Tenant in federation group
+ */
+export interface FederationGroupTenant {
+    id: string;
+    name: string;
+    slug: string;
+    is_master: boolean;
+    sync_enabled: boolean;
+    joined_at: string | null;
+    left_at: string | null;
+    settings: Record<string, unknown>;
+}
+
+/**
+ * Tenant's view of a federation group
+ */
+export interface TenantFederationGroup {
+    id: string;
+    name: string;
+    description: string | null;
+    sync_strategy: FederationSyncStrategy;
+    is_active: boolean;
+    federated_users_count: number;
+    master_tenant_id: string | null;
+    is_master: boolean;
+    master_tenant: { id: string; name: string } | null;
+    sync_enabled: boolean;
+    joined_at: string | null;
+    left_at: string | null;
+}
+
+/**
+ * Federation group statistics
+ */
+export interface FederationGroupStats {
+    total_users: number;
+    synced_users: number;
+    pending_users: number;
+    conflicts_count: number;
+    last_sync_at: string | null;
+}
+
+/**
+ * Federated user synced data
+ */
+export interface FederatedUserSyncedData {
+    name: string | null;
+    locale: string | null;
+    two_factor_enabled: boolean;
+    password_changed_at: string | null;
+}
+
+/**
+ * Link between federated user and tenant user
+ */
+export interface FederatedUserLink {
+    id: string;
+    tenant_id: string;
+    tenant_name: string | null;
+    tenant_user_id: string | null;
+    sync_status: FederatedUserLinkSyncStatus;
+    sync_attempts: number;
+    last_synced_at: string | null;
+    last_sync_error: string | null;
+    is_master: boolean;
+    created_via: string;
+}

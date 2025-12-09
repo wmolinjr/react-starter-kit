@@ -1,0 +1,427 @@
+/**
+ * API Resource Types - Auto-generated from PHP Resources
+ *
+ * DO NOT EDIT MANUALLY!
+ * Run: sail artisan types:generate
+ *
+ * Resources using the HasTypescriptType trait are automatically discovered
+ * and their TypeScript interfaces are generated here.
+ *
+ * Source of truth: app/Http/Resources/ (with HasTypescriptType trait)
+ */
+
+// Import enums
+import type {
+    BillingPeriod,
+    BadgePreset,
+    TenantRole,
+    FederationSyncStrategy,
+    FederatedUserStatus,
+    FederationConflictStatus,
+} from './enums';
+
+// Import plan types
+import type { PlanFeatures, PlanLimits, PlanUsage } from './plan';
+
+// Import common types
+import type {
+    Translations,
+    ProjectAttachment,
+    ProjectImage,
+    ActivityCauser,
+    ActivityProperties,
+    TenantPlanSummary,
+    TenantUser,
+    InvitedByUser,
+    AddonSummary,
+    FederationGroupTenant,
+    TenantFederationGroup,
+    FederationGroupStats,
+    FederatedUserSyncedData,
+    FederatedUserLink,
+} from './common';
+
+// =============================================================================
+// Shared Resources
+// =============================================================================
+
+export interface DomainResource {
+    id: string;
+    domain: string;
+    is_primary: boolean;
+    created_at: string;
+}
+
+export interface FederatedUserDetailResource {
+    id: string;
+    federation_group_id: string;
+    global_email: string;
+    status: FederatedUserStatus;
+    sync_version: number;
+    last_synced_at: string | null;
+    last_sync_source: string | null;
+    created_at: string;
+    updated_at: string;
+    synced_data: FederatedUserSyncedData;
+    master_tenant: TenantSummaryResource | undefined;
+    federation_group: FederationGroupResource | undefined;
+    links: FederatedUserLink[] | undefined;
+    links_count: number;
+}
+
+export interface FederatedUserResource {
+    id: string;
+    global_email: string;
+    name: string | null;
+    status: FederatedUserStatus;
+    sync_version: number;
+    last_synced_at: string | null;
+    created_at: string;
+    master_tenant: TenantSummaryResource | undefined;
+    links_count: number;
+    two_factor_enabled: boolean;
+}
+
+export interface FederationConflictResource {
+    id: string;
+    federated_user_id: string;
+    field: string;
+    conflicting_values: Record<string, unknown>[];
+    status: FederationConflictStatus;
+    resolved_value: unknown | null;
+    resolution: string | null;
+    resolved_by: string | null;
+    resolved_at: string | null;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+    federated_user: FederatedUserResource | undefined;
+}
+
+export interface FederationGroupDetailResource {
+    id: string;
+    name: string;
+    description: string | null;
+    sync_strategy: FederationSyncStrategy;
+    master_tenant_id: string | null;
+    settings: Record<string, unknown>;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    master_tenant: TenantSummaryResource | undefined;
+    tenants: FederationGroupTenant[] | undefined;
+    federated_users: FederatedUserResource[] | undefined;
+    tenants_count: number;
+    federated_users_count: number;
+    stats: FederationGroupStats | undefined;
+}
+
+export interface FederationGroupResource {
+    id: string;
+    name: string;
+    description: string | null;
+    sync_strategy: FederationSyncStrategy;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    master_tenant: TenantSummaryResource | undefined;
+    tenants_count: number;
+    federated_users_count: number;
+}
+
+export interface PlanDetailResource {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    price: number;
+    formatted_price: string;
+    currency: string;
+    billing_period: BillingPeriod;
+    stripe_product_id: string | null;
+    stripe_price_id: string | null;
+    features: PlanFeatures;
+    limits: PlanLimits;
+    permission_map: Record<string, string[]>;
+    is_active: boolean;
+    is_featured: boolean;
+    badge: BadgePreset | null;
+    icon: string;
+    icon_color: string;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
+    tenants_count: number;
+    addons: AddonSummary[] | undefined;
+}
+
+export interface PlanEditResource {
+    id: string;
+    name: Translations;
+    name_display: string;
+    slug: string;
+    description: Translations;
+    price: number;
+    currency: string;
+    billing_period: BillingPeriod;
+    stripe_price_id: string | null;
+    stripe_product_id: string | null;
+    features: PlanFeatures;
+    limits: PlanLimits;
+    permission_map: Record<string, string[]>;
+    is_active: boolean;
+    is_featured: boolean;
+    badge: BadgePreset | null;
+    icon: string;
+    icon_color: string;
+    sort_order: number;
+    addon_ids: string[];
+}
+
+export interface PlanResource {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    price: number;
+    formatted_price: string;
+    currency: string;
+    billing_period: BillingPeriod;
+    stripe_price_id: string | null;
+    features: PlanFeatures;
+    limits: PlanLimits;
+    is_active: boolean;
+    is_featured: boolean;
+    badge: BadgePreset | null;
+    icon: string | null;
+    icon_color: string | null;
+    sort_order: number;
+    tenants_count: number;
+    addons_count: number;
+}
+
+export interface PlanSummaryResource {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    formatted_price: string;
+    currency: string;
+    billing_period: BillingPeriod;
+    is_featured: boolean;
+}
+
+export interface TenantDetailResource {
+    id: string;
+    name: string;
+    slug: string;
+    settings: Record<string, unknown>;
+    created_at: string;
+    updated_at: string;
+    domains: DomainResource[] | undefined;
+    plan: TenantPlanSummary | undefined;
+    addons: AddonSummary[] | undefined;
+    users: TenantUser[];
+    users_count: number;
+    plan_features_override: Partial<PlanFeatures> | null;
+    plan_limits_override: Partial<PlanLimits> | null;
+    current_usage: PlanUsage | null;
+    trial_ends_at: string | null;
+    is_on_trial: boolean;
+    federation_groups: TenantFederationGroup[] | undefined;
+    federation_groups_count: number | undefined;
+}
+
+export interface TenantEditResource {
+    id: string;
+    name: string;
+    slug: string;
+    settings: Record<string, unknown>;
+    domains: DomainResource[] | undefined;
+    plan: TenantPlanSummary | undefined;
+    plan_id: string | null;
+    plan_features_override: Partial<PlanFeatures>;
+    plan_limits_override: Partial<PlanLimits>;
+}
+
+export interface TenantResource {
+    id: string;
+    name: string;
+    slug: string;
+    created_at: string;
+    updated_at: string;
+    domains: DomainResource[] | undefined;
+    plan: PlanSummaryResource | undefined;
+    primary_domain: string | undefined;
+    users_count: number;
+    settings: Record<string, unknown> | undefined;
+}
+
+export interface TenantSummaryResource {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+export interface ActivityResource {
+    id: string;
+    description: string;
+    event: string;
+    log_name: string;
+    subject_type: string | null;
+    subject_id: string | null;
+    subject_name: string | null;
+    causer: ActivityCauser | undefined;
+    created_at: string;
+    created_at_human: string;
+    created_at_formatted: string;
+    properties: ActivityProperties;
+}
+
+export interface FederationInfoResource {
+    is_federated: boolean;
+    is_master: boolean;
+    group_name: string | null;
+    group_id: string | null;
+    sync_strategy: FederationSyncStrategy | null;
+    federated_users_count: number;
+    local_users_count: number;
+    total_group_tenants: number;
+}
+
+export interface MediaResource {
+    id: string;
+    uuid: string;
+    name: string;
+    file_name: string;
+    mime_type: string;
+    size: number;
+    human_readable_size: string;
+    collection_name: string;
+    disk: string;
+    created_at: string;
+    url: string;
+    thumb_url: string | undefined;
+    custom_properties: Record<string, unknown>;
+}
+
+export interface ProjectDetailResource {
+    id: string;
+    name: string;
+    description: string | null;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    user: UserSummaryResource | null;
+    attachments: ProjectAttachment[];
+    images: ProjectImage[];
+}
+
+export interface ProjectEditResource {
+    id: string;
+    name: string;
+    description: string | null;
+    status: string;
+    user_id: string | null;
+}
+
+export interface ProjectResource {
+    id: string;
+    name: string;
+    description: string | null;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    user: UserSummaryResource | null;
+    user_id: string | null;
+    attachments_count: number | undefined;
+    images_count: number | undefined;
+}
+
+export interface TeamMemberResource {
+    id: string;
+    name: string;
+    email: string;
+    role: TenantRole | null;
+    permissions: string[];
+    created_at: string;
+    email_verified_at: string | null;
+    is_owner: boolean;
+    is_admin: boolean;
+}
+
+export interface UserInvitationResource {
+    id: string;
+    email: string;
+    role: TenantRole;
+    invited_at: string;
+    expires_at: string;
+    is_expired: boolean;
+    expires_in_days: number | null;
+    invited_by: InvitedByUser | undefined;
+}
+
+export interface UserResource {
+    id: string;
+    name: string;
+    email: string;
+    locale: string | null;
+    department: string | null;
+    employee_id: string | null;
+    email_verified_at: string | null;
+    two_factor_confirmed_at: string | null;
+    created_at: string;
+    updated_at: string;
+    role: TenantRole | null;
+    roles: string[] | undefined;
+    permissions: string[] | undefined;
+    is_owner: boolean;
+    is_admin: boolean;
+    has_2fa: boolean;
+}
+
+export interface UserSummaryResource {
+    id: string;
+    name: string;
+    email: string;
+}
+
+export interface PermissionResource {
+    id: string;
+    name: string;
+    description: string | null;
+    category: string;
+}
+
+export interface RoleDetailResource {
+    id: string;
+    name: string;
+    display_name: string;
+    description: string | null;
+    is_protected: boolean;
+    permissions: PermissionResource[] | undefined;
+    users: UserSummaryResource[] | undefined;
+    created_at: string;
+}
+
+export interface RoleEditResource {
+    id: string;
+    name: string;
+    display_name: Translations;
+    display_name_display: string;
+    description: Translations;
+    is_protected: boolean;
+    permission_ids: string[] | undefined;
+}
+
+export interface RoleResource {
+    id: string;
+    name: string;
+    display_name: string;
+    description: string | null;
+    users_count: number;
+    permissions_count: number;
+    is_protected: boolean;
+    created_at: string;
+}
+

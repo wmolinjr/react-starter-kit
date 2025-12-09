@@ -18,8 +18,10 @@ use App\Enums\PlanLimit;
 use App\Enums\TenantConfigKey;
 use App\Enums\TenantPermission;
 use App\Enums\TenantRole;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use ReflectionClass;
 
 /**
  * Generate TypeScript types from PHP Enums (Single Source of Truth).
@@ -40,6 +42,7 @@ use Illuminate\Support\Facades\File;
  *   - resources/js/types/enums.d.ts          # Union types + Option interfaces
  *   - resources/js/types/permissions.d.ts   # Permission type + Auth interface
  *   - resources/js/types/plan.d.ts          # Plan data interfaces
+ *   - resources/js/types/resources.d.ts     # API Resource interfaces
  *   - resources/js/lib/enum-metadata.ts     # Runtime metadata maps
  *   - lang/{locale}.json                    # Translations (updated)
  */
@@ -80,6 +83,7 @@ class GenerateTypes extends Command
         $this->generateEnumMetadata();
         $this->generatePermissionTypes();
         $this->generatePlanTypes();
+        $this->generateResourceTypes();
         $this->generateTranslations();
 
         $this->newLine();
@@ -504,6 +508,7 @@ class GenerateTypes extends Command
             resource_path('js/types/enums.d.ts'),
             resource_path('js/types/permissions.d.ts'),
             resource_path('js/types/plan.d.ts'),
+            resource_path('js/types/resources.d.ts'),
             resource_path('js/lib/enum-metadata.ts'),
         ];
 
@@ -901,6 +906,211 @@ TS;
     }
 
     // =========================================================================
+    // RESOURCE TYPES (resources.d.ts)
+    // =========================================================================
+
+    protected function generateResourceTypes(): void
+    {
+        $resources = $this->discoverResources();
+
+        if (empty($resources)) {
+            $this->info('  ⚠ No Resources with HasTypescriptType trait found');
+
+            return;
+        }
+
+        $output = $this->getResourceTypesHeader();
+
+        // Group resources by context
+        $grouped = [
+            'central' => [],
+            'tenant' => [],
+            'shared' => [],
+        ];
+
+        foreach ($resources as $resource) {
+            $context = $resource['context'] ?? 'shared';
+            $grouped[$context][] = $resource;
+        }
+
+        // Generate interfaces for each context
+        foreach ($grouped as $context => $contextResources) {
+            if (empty($contextResources)) {
+                continue;
+            }
+
+            $contextLabel = ucfirst($context);
+            $output .= "// =============================================================================\n";
+            $output .= "// {$contextLabel} Resources\n";
+            $output .= "// =============================================================================\n\n";
+
+            foreach ($contextResources as $resource) {
+                $output .= $this->generateResourceInterface($resource);
+            }
+        }
+
+        $path = resource_path('js/types/resources.d.ts');
+        File::put($path, $output);
+        $this->info('  ✓ Generated: resources/js/types/resources.d.ts ('.count($resources).' interfaces)');
+    }
+
+    /**
+     * Discover all Resources that use HasTypescriptType trait.
+     */
+    protected function discoverResources(): array
+    {
+        $resources = [];
+        $directories = [
+            app_path('Http/Resources/Central'),
+            app_path('Http/Resources/Tenant'),
+            app_path('Http/Resources/Shared'),
+            app_path('Http/Resources'), // For base/misc resources
+        ];
+
+        foreach ($directories as $directory) {
+            if (! File::isDirectory($directory)) {
+                continue;
+            }
+
+            $files = File::glob($directory.'/*.php');
+
+            foreach ($files as $file) {
+                $className = $this->getClassNameFromFile($file);
+
+                if ($className === null) {
+                    continue;
+                }
+
+                // Check if class uses HasTypescriptType trait
+                if (! $this->usesTypescriptTrait($className)) {
+                    continue;
+                }
+
+                $resources[] = [
+                    'class' => $className,
+                    'name' => $className::typescriptName(),
+                    'schema' => $className::typescriptSchema(),
+                    'context' => $className::typescriptContext(),
+                ];
+            }
+        }
+
+        return $resources;
+    }
+
+    /**
+     * Get fully qualified class name from file path.
+     */
+    protected function getClassNameFromFile(string $filePath): ?string
+    {
+        $content = File::get($filePath);
+
+        // Extract namespace
+        if (! preg_match('/namespace\s+([^;]+);/', $content, $namespaceMatch)) {
+            return null;
+        }
+
+        // Extract class name
+        if (! preg_match('/class\s+(\w+)/', $content, $classMatch)) {
+            return null;
+        }
+
+        return $namespaceMatch[1].'\\'.$classMatch[1];
+    }
+
+    /**
+     * Check if a class uses the HasTypescriptType trait.
+     */
+    protected function usesTypescriptTrait(string $className): bool
+    {
+        if (! class_exists($className)) {
+            return false;
+        }
+
+        $reflection = new ReflectionClass($className);
+
+        // Check if class is abstract
+        if ($reflection->isAbstract()) {
+            return false;
+        }
+
+        // Check for trait usage (including parent classes)
+        return in_array(HasTypescriptType::class, class_uses_recursive($className), true);
+    }
+
+    /**
+     * Generate TypeScript interface for a Resource.
+     */
+    protected function generateResourceInterface(array $resource): string
+    {
+        $name = $resource['name'];
+        $schema = $resource['schema'];
+
+        $output = "export interface {$name} {\n";
+
+        foreach ($schema as $property => $type) {
+            $output .= "    {$property}: {$type};\n";
+        }
+
+        $output .= "}\n\n";
+
+        return $output;
+    }
+
+    /**
+     * Get header for resources.d.ts file.
+     */
+    protected function getResourceTypesHeader(): string
+    {
+        return <<<'TS'
+/**
+ * API Resource Types - Auto-generated from PHP Resources
+ *
+ * DO NOT EDIT MANUALLY!
+ * Run: sail artisan types:generate
+ *
+ * Resources using the HasTypescriptType trait are automatically discovered
+ * and their TypeScript interfaces are generated here.
+ *
+ * Source of truth: app/Http/Resources/ (with HasTypescriptType trait)
+ */
+
+// Import enums
+import type {
+    BillingPeriod,
+    BadgePreset,
+    TenantRole,
+    FederationSyncStrategy,
+    FederatedUserStatus,
+    FederationConflictStatus,
+} from './enums';
+
+// Import plan types
+import type { PlanFeatures, PlanLimits, PlanUsage } from './plan';
+
+// Import common types
+import type {
+    Translations,
+    ProjectAttachment,
+    ProjectImage,
+    ActivityCauser,
+    ActivityProperties,
+    TenantPlanSummary,
+    TenantUser,
+    InvitedByUser,
+    AddonSummary,
+    FederationGroupTenant,
+    TenantFederationGroup,
+    FederationGroupStats,
+    FederatedUserSyncedData,
+    FederatedUserLink,
+} from './common';
+
+
+TS;
+    }
+
+    // =========================================================================
     // TRANSLATIONS
     // =========================================================================
 
@@ -1001,6 +1211,7 @@ TS;
         $this->line('    • resources/js/types/enums.d.ts');
         $this->line('    • resources/js/types/permissions.d.ts');
         $this->line('    • resources/js/types/plan.d.ts');
+        $this->line('    • resources/js/types/resources.d.ts');
         $this->line('    • resources/js/lib/enum-metadata.ts');
         $this->line('    • lang/en.json (updated)');
         $this->line('    • lang/pt_BR.json (updated)');

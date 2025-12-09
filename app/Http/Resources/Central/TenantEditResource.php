@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,26 @@ use Illuminate\Http\Request;
  */
 class TenantEditResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'slug' => 'string',
+            'settings' => 'Record<string, unknown>',
+            'domains' => 'DomainResource[] | undefined',
+            'plan' => 'TenantPlanSummary | undefined',
+            'plan_id' => 'string | null',
+            'plan_features_override' => 'Partial<PlanFeatures>',
+            'plan_limits_override' => 'Partial<PlanLimits>',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,30 @@ use Illuminate\Http\Request;
  */
 class FederationConflictResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'federated_user_id' => 'string',
+            'field' => 'string',
+            'conflicting_values' => 'Record<string, unknown>[]',
+            'status' => 'FederationConflictStatus',
+            'resolved_value' => 'unknown | null',
+            'resolution' => 'string | null',
+            'resolved_by' => 'string | null',
+            'resolved_at' => 'string | null',
+            'notes' => 'string | null',
+            'created_at' => 'string',
+            'updated_at' => 'string',
+            'federated_user' => 'FederatedUserResource | undefined',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

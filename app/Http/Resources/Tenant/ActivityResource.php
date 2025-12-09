@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Tenant;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,29 @@ use Illuminate\Http\Request;
  */
 class ActivityResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'description' => 'string',
+            'event' => 'string',
+            'log_name' => 'string',
+            'subject_type' => 'string | null',
+            'subject_id' => 'string | null',
+            'subject_name' => 'string | null',
+            'causer' => 'ActivityCauser | undefined',
+            'created_at' => 'string',
+            'created_at_human' => 'string',
+            'created_at_formatted' => 'string',
+            'properties' => 'ActivityProperties',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

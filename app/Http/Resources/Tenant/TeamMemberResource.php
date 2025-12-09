@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Tenant;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,26 @@ use Illuminate\Http\Request;
  */
 class TeamMemberResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'email' => 'string',
+            'role' => 'TenantRole | null',
+            'permissions' => 'string[]',
+            'created_at' => 'string',
+            'email_verified_at' => 'string | null',
+            'is_owner' => 'boolean',
+            'is_admin' => 'boolean',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

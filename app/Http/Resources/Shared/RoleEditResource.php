@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Shared;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,24 @@ use Illuminate\Http\Request;
  */
 class RoleEditResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'display_name' => 'Translations',
+            'display_name_display' => 'string',
+            'description' => 'Translations',
+            'is_protected' => 'boolean',
+            'permission_ids' => 'string[] | undefined',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

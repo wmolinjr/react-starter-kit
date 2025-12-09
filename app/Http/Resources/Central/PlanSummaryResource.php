@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,25 @@ use Illuminate\Http\Request;
  */
 class PlanSummaryResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'slug' => 'string',
+            'price' => 'number',
+            'formatted_price' => 'string',
+            'currency' => 'string',
+            'billing_period' => 'BillingPeriod',
+            'is_featured' => 'boolean',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

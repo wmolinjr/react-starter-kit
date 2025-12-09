@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,31 @@ use Illuminate\Http\Request;
  */
 class FederatedUserDetailResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'federation_group_id' => 'string',
+            'global_email' => 'string',
+            'status' => 'FederatedUserStatus',
+            'sync_version' => 'number',
+            'last_synced_at' => 'string | null',
+            'last_sync_source' => 'string | null',
+            'created_at' => 'string',
+            'updated_at' => 'string',
+            'synced_data' => 'FederatedUserSyncedData',
+            'master_tenant' => 'TenantSummaryResource | undefined',
+            'federation_group' => 'FederationGroupResource | undefined',
+            'links' => 'FederatedUserLink[] | undefined',
+            'links_count' => 'number',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *

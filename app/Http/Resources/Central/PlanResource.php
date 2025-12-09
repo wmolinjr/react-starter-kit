@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Central;
 
 use App\Http\Resources\BaseResource;
+use App\Http\Resources\Concerns\HasTypescriptType;
 use Illuminate\Http\Request;
 
 /**
@@ -12,6 +13,36 @@ use Illuminate\Http\Request;
  */
 class PlanResource extends BaseResource
 {
+    use HasTypescriptType;
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function typescriptSchema(): array
+    {
+        return [
+            'id' => 'string',
+            'name' => 'string',
+            'slug' => 'string',
+            'description' => 'string | null',
+            'price' => 'number',
+            'formatted_price' => 'string',
+            'currency' => 'string',
+            'billing_period' => 'BillingPeriod',
+            'stripe_price_id' => 'string | null',
+            'features' => 'PlanFeatures',
+            'limits' => 'PlanLimits',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'badge' => 'BadgePreset | null',
+            'icon' => 'string | null',
+            'icon_color' => 'string | null',
+            'sort_order' => 'number',
+            'tenants_count' => 'number',
+            'addons_count' => 'number',
+        ];
+    }
+
     /**
      * Transform the resource into an array.
      *
