@@ -215,7 +215,7 @@ class BundleCatalogController extends Controller implements HasMiddleware
             ->map(fn ($addon) => [
                 'id' => $addon->id,
                 'slug' => $addon->slug,
-                'name' => $addon->trans('name'),
+                'name' => $addon->name,
                 'type' => $addon->type->value,
                 'type_label' => $addon->type->label(),
                 'price_monthly' => $addon->price_monthly,
@@ -231,7 +231,7 @@ class BundleCatalogController extends Controller implements HasMiddleware
             ->get()
             ->map(fn ($p) => [
                 'id' => $p->id,
-                'name' => $p->trans('name'),
+                'name' => $p->name,
                 'slug' => $p->slug,
             ])
             ->toArray();

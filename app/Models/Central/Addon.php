@@ -3,18 +3,18 @@
 namespace App\Models\Central;
 
 use App\Enums\AddonType;
-use App\Traits\HasTenantTranslations;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Translatable\HasTranslations;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
  * Addon Model
  *
  * Represents purchasable add-ons for plans.
- * Supports multi-language translations with tenant customization.
+ * Supports multi-language translations via Spatie Translatable.
  *
  * @property string $id
  * @property string $slug
@@ -28,8 +28,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  */
 class Addon extends Model
 {
-    use CentralConnection, HasFactory, HasUuids;
-    use HasTenantTranslations;
+    use CentralConnection, HasFactory, HasTranslations, HasUuids;
 
     /**
      * Create a new factory instance for the model.
@@ -303,33 +302,5 @@ class Addon extends Model
     public function getCategoryAttribute(): string
     {
         return $this->type?->category() ?? 'general';
-    }
-
-    /**
-     * Get addon data for API/frontend with translations.
-     */
-    public function toTranslatedArray(?int $tenantId = null): array
-    {
-        return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'name' => $this->trans('name'),
-            'description' => $this->trans('description'),
-            'unit_label' => $this->trans('unit_label'),
-            'type' => $this->type,
-            'category' => $this->category,
-            'active' => $this->active,
-            'sort_order' => $this->sort_order,
-            'limit_key' => $this->limit_key,
-            'unit_value' => $this->unit_value,
-            'min_quantity' => $this->min_quantity,
-            'max_quantity' => $this->max_quantity,
-            'stackable' => $this->stackable,
-            'price_monthly' => $this->price_monthly,
-            'price_yearly' => $this->price_yearly,
-            'price_one_time' => $this->price_one_time,
-            'badge' => $this->badge,
-            'has_override' => $tenantId ? $this->hasTenantOverride('name', $tenantId) : false,
-        ];
     }
 }

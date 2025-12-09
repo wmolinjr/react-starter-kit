@@ -397,8 +397,8 @@ class HandleInertiaRequests extends Middleware
 
             return [
                 'slug' => $addon->slug,
-                'name' => $addon->trans('name'),
-                'description' => $addon->trans('description') ?? '',
+                'name' => $addon->name,
+                'description' => $addon->description ?? '',
                 'type' => $addon->type->value,
                 'billing' => $this->formatBillingFromDatabase($addon),
                 'min_quantity' => $addon->min_quantity,

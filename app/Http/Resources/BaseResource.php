@@ -21,15 +21,14 @@ abstract class BaseResource extends JsonResource
     public static $wrap = null;
 
     /**
-     * Get translated value with fallback.
+     * Get translated value for current locale.
      *
-     * Works with models that use Spatie\Translatable\HasTranslations
-     * or our custom HasTenantTranslations trait.
+     * Works with models that use Spatie\Translatable\HasTranslations.
      */
     protected function trans(string $key): ?string
     {
-        if (method_exists($this->resource, 'trans')) {
-            return $this->resource->trans($key);
+        if (method_exists($this->resource, 'getTranslation')) {
+            return $this->resource->getTranslation($key, app()->getLocale());
         }
 
         return $this->resource->{$key} ?? null;

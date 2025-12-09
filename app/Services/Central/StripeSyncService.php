@@ -152,15 +152,14 @@ class StripeSyncService
     }
 
     /**
-     * Get translated value from model using trans() method
+     * Get translated value from model using getTranslation() method
      */
     protected function getTranslatedValue(Addon $addon, string $field, string $locale): ?string
     {
-        // Use the model's trans() method which handles fallbacks
-        $value = $addon->trans($field, $locale);
+        // Use the model's getTranslation() method
+        $value = $addon->getTranslation($field, $locale, false);
 
-        // If trans returns the same as the key (no translation), return null
-        return $value !== $field ? $value : null;
+        return $value ?: null;
     }
 
     /**

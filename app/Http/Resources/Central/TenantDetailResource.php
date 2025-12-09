@@ -64,7 +64,7 @@ class TenantDetailResource extends BaseResource
                 $this->relationLoaded('plan') && $this->plan,
                 fn () => [
                     'id' => $this->plan->id,
-                    'name' => $this->plan->trans('name'),
+                    'name' => $this->plan->name,
                     'slug' => $this->plan->slug,
                 ]
             ),
@@ -72,7 +72,7 @@ class TenantDetailResource extends BaseResource
                 $this->relationLoaded('addons'),
                 fn () => $this->addons->map(fn ($addon) => [
                     'id' => $addon->id,
-                    'name' => $addon->trans('name'),
+                    'name' => $addon->name,
                     'slug' => $addon->slug,
                 ])
             ),

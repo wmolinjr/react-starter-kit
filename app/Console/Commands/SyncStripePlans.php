@@ -99,7 +99,7 @@ class SyncStripePlans extends Command
         $plan = $syncService->importFromStripe($productId);
 
         if ($plan) {
-            $name = $plan->trans('name');
+            $name = $plan->name;
             $this->info("Imported: {$name} ({$plan->slug})");
 
             return self::SUCCESS;

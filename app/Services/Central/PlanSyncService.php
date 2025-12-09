@@ -239,13 +239,13 @@ class PlanSyncService
     }
 
     /**
-     * Get translated value from model using trans() method
+     * Get translated value from model using getTranslation() method
      */
     protected function getTranslatedValue(Plan $plan, string $field, string $locale): ?string
     {
-        $value = $plan->trans($field, $locale);
+        $value = $plan->getTranslation($field, $locale, false);
 
-        return $value !== $field ? $value : null;
+        return $value ?: null;
     }
 
     /**

@@ -95,7 +95,7 @@ class BundleResource extends BaseResource
                 $this->relationLoaded('plans'),
                 fn () => $this->plans->map(fn ($p) => [
                     'id' => $p->id,
-                    'name' => $p->trans('name'),
+                    'name' => $p->name,
                     'slug' => $p->slug,
                 ])
             ),

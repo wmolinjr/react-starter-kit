@@ -53,9 +53,9 @@ class PlanService
     {
         return [
             'id' => $plan->id,
-            'name' => $plan->trans('name'),
+            'name' => $plan->name,
             'slug' => $plan->slug,
-            'description' => $plan->trans('description'),
+            'description' => $plan->description,
             'price' => $plan->price,
             'formatted_price' => $plan->formatted_price,
             'currency' => $plan->currency,
@@ -85,7 +85,7 @@ class PlanService
         return [
             'id' => $plan->id,
             'name' => $plan->getTranslations('name'),
-            'name_display' => $plan->trans('name'),
+            'name_display' => $plan->name,
             'slug' => $plan->slug,
             'description' => $plan->getTranslations('description'),
             'price' => $plan->price,
@@ -220,13 +220,13 @@ class PlanService
             // Create or update Stripe product
             if ($plan->stripe_product_id) {
                 $this->stripe->products->update($plan->stripe_product_id, [
-                    'name' => $plan->trans('name'),
-                    'description' => $plan->trans('description'),
+                    'name' => $plan->name,
+                    'description' => $plan->description,
                 ]);
             } else {
                 $product = $this->stripe->products->create([
-                    'name' => $plan->trans('name'),
-                    'description' => $plan->trans('description'),
+                    'name' => $plan->name,
+                    'description' => $plan->description,
                     'metadata' => ['plan_slug' => $plan->slug],
                 ]);
                 $plan->stripe_product_id = $product->id;

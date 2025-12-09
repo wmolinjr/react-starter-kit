@@ -909,7 +909,6 @@ app/Models/
 │   ├── Activity.php
 │   ├── Media.php
 │   ├── Project.php
-│   ├── TenantTranslationOverride.php
 │   ├── User.php       # Usuarios do tenant (owner, admin, member)
 │   └── UserInvitation.php  # Team invitations (isolated per tenant)
 └── Shared/         # Funcionam em ambos contextos
@@ -924,7 +923,7 @@ app/Models/
 | `CentralConnection` | Central models | Forca conexao com banco central |
 | `HasUuids` | Todos os models | UUID v7 como primary key |
 | `BelongsToTenant` | Tenant models | Scope automatico por tenant |
-| `HasTenantTranslations` | Role, Permission | Suporte a traducoes |
+| `HasTranslations` | Role, Plan, Addon | Suporte a traducoes (Spatie) |
 
 ---
 

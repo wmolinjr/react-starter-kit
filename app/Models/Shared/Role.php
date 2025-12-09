@@ -2,11 +2,11 @@
 
 namespace App\Models\Shared;
 
-use App\Traits\HasTenantTranslations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Spatie\Permission\Guard;
 use Spatie\Permission\Models\Role as SpatieRole;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Role Model
@@ -20,7 +20,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
  */
 class Role extends SpatieRole
 {
-    use HasTenantTranslations, HasUuids;
+    use HasTranslations, HasUuids;
 
     /**
      * The attributes that are translatable.

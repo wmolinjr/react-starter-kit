@@ -83,7 +83,7 @@ class PlanDetailResource extends BaseResource
                 $this->relationLoaded('addons'),
                 fn () => $this->addons->map(fn ($addon) => [
                     'id' => $addon->id,
-                    'name' => $addon->trans('name'),
+                    'name' => $addon->name,
                     'slug' => $addon->slug,
                 ])
             ),

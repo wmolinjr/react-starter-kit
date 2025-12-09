@@ -228,7 +228,7 @@ class SyncPermissions extends Command
         foreach (Role::where('guard_name', 'central')->get() as $role) {
             $rolesData[] = [
                 $role->name,
-                $role->trans('display_name') ?: '-',
+                $role->display_name ?: '-',
                 $role->permissions()->count(),
             ];
         }

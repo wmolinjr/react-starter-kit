@@ -42,7 +42,7 @@ class BillingService
             ->get()
             ->map(fn (Plan $plan) => [
                 'slug' => $plan->slug,
-                'name' => $plan->trans('name'),
+                'name' => $plan->name,
                 'price' => $plan->formatted_price,
                 'price_id' => $plan->stripe_price_id,
                 'interval' => $plan->billing_period,

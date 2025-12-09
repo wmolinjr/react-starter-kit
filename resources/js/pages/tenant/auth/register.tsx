@@ -16,10 +16,10 @@ export default function Register() {
 
     return (
         <AuthLayout
-            title={t('Create an account')}
-            description={t('Enter your details below to create your account')}
+            title={t('auth.create_an_account')}
+            description={t('auth.enter_details')}
         >
-            <Head title={t('Register')} />
+            <Head title={t('auth.register')} />
             <Form
                 {...store()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -30,7 +30,7 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{t('Name')}</Label>
+                                <Label htmlFor="name">{t('auth.name')}</Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -39,7 +39,7 @@ export default function Register() {
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
-                                    placeholder={t('Full name')}
+                                    placeholder={t('auth.full_name')}
                                 />
                                 <InputError
                                     message={errors?.name}
@@ -49,7 +49,7 @@ export default function Register() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('Email address')}
+                                    {t('auth.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -64,7 +64,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">{t('Password')}</Label>
+                                <Label htmlFor="password">{t('auth.password')}</Label>
                                 <Input
                                     id="password"
                                     type="password"
@@ -72,14 +72,14 @@ export default function Register() {
                                     tabIndex={3}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder={t('Password')}
+                                    placeholder={t('auth.password')}
                                 />
                                 <InputError message={errors?.password} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password_confirmation">
-                                    {t('Confirm password')}
+                                    {t('auth.confirm_password')}
                                 </Label>
                                 <Input
                                     id="password_confirmation"
@@ -88,7 +88,7 @@ export default function Register() {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder={t('Confirm password')}
+                                    placeholder={t('auth.confirm_password')}
                                 />
                                 <InputError
                                     message={errors?.password_confirmation}
@@ -102,14 +102,14 @@ export default function Register() {
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
-                                {t('Create account')}
+                                {t('auth.create_account')}
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-muted-foreground">
-                            {t('Already have an account?')}{' '}
+                            {t('auth.already_have_account')}{' '}
                             <TextLink href={login()} tabIndex={6}>
-                                {t('Log in')}
+                                {t('auth.log_in')}
                             </TextLink>
                         </div>
                     </>

@@ -35,7 +35,7 @@ class PlanSeeder extends Seeder
                 'permission_map' => SyncPlanPermissions::generatePermissionMap($plan),
             ]);
 
-            $this->command->info("  ✓ {$plan->trans('name')} - {$plan->formatted_price}");
+            $this->command->info("  ✓ {$plan->name} - {$plan->formatted_price}");
             $this->showPlanDetails($plan);
         }
 
@@ -235,7 +235,7 @@ class PlanSeeder extends Seeder
         $this->command->table(
             ['Plan', 'Price', 'Features', 'Permissions', 'Users', 'Projects', 'Storage'],
             Plan::ordered()->get()->map(fn ($plan) => [
-                $plan->trans('name'),
+                $plan->name,
                 $plan->formatted_price,
                 count(array_filter($plan->features ?? [])),
                 count($plan->getAllEnabledPermissions()),

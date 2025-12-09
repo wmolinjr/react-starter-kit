@@ -20,11 +20,10 @@ app/Models/
 │   ├── Tenant.php              # Tenant model (Stancl)
 │   └── User.php                # Central admin users
 │
-├── Tenant/                     # Tenant Database Models (6 files)
+├── Tenant/                     # Tenant Database Models (5 files)
 │   ├── Activity.php            # Spatie Activity Log
 │   ├── Media.php               # Spatie MediaLibrary
 │   ├── Project.php             # Tenant projects
-│   ├── TenantTranslationOverride.php # White-label translations
 │   ├── User.php                # Tenant users
 │   └── UserInvitation.php      # Team invitations (isolated per tenant)
 │
@@ -60,7 +59,6 @@ Models stored in each tenant's database (`tenant_{id}`). No `CentralConnection` 
 | `Project` | Tenant projects | `HasUuids`, `HasMedia` |
 | `Activity` | Activity log | Spatie Activity Log |
 | `Media` | Media files | Spatie MediaLibrary |
-| `TenantTranslationOverride` | White-label translations | `HasUuids` |
 | `UserInvitation` | Team invitations | `HasUuids` |
 
 ### Shared Models (`App\Models\Shared\`)
@@ -69,7 +67,7 @@ Models that exist in both central and tenant databases with identical structure.
 
 | Model | Purpose | Key Traits |
 |-------|---------|------------|
-| `Role` | User roles | `HasUuids`, `HasTenantTranslations` |
+| `Role` | User roles | `HasUuids`, `HasTranslations` |
 | `Permission` | User permissions | `HasUuids` |
 
 ---
@@ -143,21 +141,6 @@ class Plan extends Model
     use HasTranslations;
 
     public $translatable = ['name', 'description'];
-}
-```
-
-### HasTenantTranslations (Custom)
-
-Extension of HasTranslations with tenant override support.
-
-```php
-use App\Traits\HasTenantTranslations;
-
-class Role extends SpatieRole
-{
-    use HasTenantTranslations;
-
-    public array $translatable = ['display_name', 'description'];
 }
 ```
 
@@ -350,7 +333,7 @@ namespace App\Models\Shared;
 
 class Role extends SpatieRole
 {
-    use HasTenantTranslations, HasUuids;
+    use HasTranslations, HasUuids;
 
     public array $translatable = ['display_name', 'description'];
 

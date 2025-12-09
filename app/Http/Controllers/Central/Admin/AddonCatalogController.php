@@ -230,7 +230,7 @@ class AddonCatalogController extends Controller implements HasMiddleware
             'plan_ids' => $addon->plans->pluck('id')->toArray(),
             'plans' => $addon->plans->map(fn ($p) => [
                 'id' => $p->id,
-                'name' => $p->trans('name'),
+                'name' => $p->name,
                 'slug' => $p->slug,
             ]),
         ];

@@ -67,7 +67,7 @@ class CheckoutService
             'valid_from' => now(),
             'valid_until' => now()->addMonths($addon->validity_months ?? 12),
             'metadata' => [
-                'addon_name' => $addon->trans('name'),
+                'addon_name' => $addon->name,
                 'unit_value' => $addon->unit_value,
             ],
         ]);
@@ -99,8 +99,8 @@ class CheckoutService
                     'price_data' => [
                         'currency' => config('cashier.currency', 'usd'),
                         'product_data' => [
-                            'name' => $addon->trans('name'),
-                            'description' => $addon->trans('description'),
+                            'name' => $addon->name,
+                            'description' => $addon->description,
                         ],
                         'unit_amount' => $addon->price_one_time,
                     ],
@@ -202,8 +202,8 @@ class CheckoutService
                     'price_data' => [
                         'currency' => config('cashier.currency', 'usd'),
                         'product_data' => [
-                            'name' => $addon->trans('name'),
-                            'description' => $addon->trans('description'),
+                            'name' => $addon->name,
+                            'description' => $addon->description,
                             'metadata' => [
                                 'addon_slug' => $addon->slug,
                                 'addon_type' => $addon->type->value,

@@ -63,7 +63,7 @@ class RoleManagementController extends Controller implements HasMiddleware
         $role = $this->roleService->createRole($request->validated());
 
         return redirect()->route('central.admin.roles.index')
-            ->with('success', __('flash.role.created', ['name' => $role->trans('display_name')]));
+            ->with('success', __('flash.role.created', ['name' => $role->display_name]));
     }
 
     public function show(Role $role): Response
@@ -89,7 +89,7 @@ class RoleManagementController extends Controller implements HasMiddleware
             $role = $this->roleService->updateRole($role, $request->validated());
 
             return redirect()->route('central.admin.roles.index')
-                ->with('success', __('flash.role.updated', ['name' => $role->trans('display_name')]));
+                ->with('success', __('flash.role.updated', ['name' => $role->display_name]));
         } catch (RoleException $e) {
             return back()->withErrors(['name' => $e->getMessage()]);
         }
@@ -98,7 +98,7 @@ class RoleManagementController extends Controller implements HasMiddleware
     public function destroy(Role $role): RedirectResponse
     {
         try {
-            $name = $role->trans('display_name');
+            $name = $role->display_name;
             $this->roleService->deleteRole($role);
 
             return redirect()->route('central.admin.roles.index')

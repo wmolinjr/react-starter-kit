@@ -23,14 +23,14 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
 
     return (
         <AuthLayout
-            title={t('Admin Login')}
-            description={t('Sign in to the administration panel')}
+            title={t('auth.admin_login')}
+            description={t('auth.sign_in_admin')}
         >
-            <Head title={t('Admin Login')} />
+            <Head title={t('auth.admin_login')} />
 
             <div className="mb-4 flex items-center justify-center gap-2 text-muted-foreground">
                 <Shield className="h-5 w-5" />
-                <span className="text-sm font-medium">{t('Central Administration')}</span>
+                <span className="text-sm font-medium">{t('navigation.central_admin')}</span>
             </div>
 
             <Form
@@ -43,7 +43,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('Email address')}
+                                    {t('auth.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -61,7 +61,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">
-                                        {t('Password')}
+                                        {t('auth.password')}
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
@@ -69,7 +69,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            {t('Forgot your password?')}
+                                            {t('auth.forgot_password_question')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -80,7 +80,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder={t('Password')}
+                                    placeholder={t('auth.password')}
                                 />
                                 <InputError message={errors?.password} />
                             </div>
@@ -92,7 +92,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
                                     tabIndex={3}
                                 />
                                 <Label htmlFor="remember">
-                                    {t('Remember me')}
+                                    {t('auth.remember_me')}
                                 </Label>
                             </div>
 
@@ -104,7 +104,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
                                 data-test="admin-login-button"
                             >
                                 {processing && <Spinner />}
-                                {t('Sign in')}
+                                {t('auth.sign_in')}
                             </Button>
                         </div>
                     </>

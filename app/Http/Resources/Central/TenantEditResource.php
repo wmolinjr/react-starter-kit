@@ -52,7 +52,7 @@ class TenantEditResource extends BaseResource
                 $this->relationLoaded('plan') && $this->plan,
                 fn () => [
                     'id' => $this->plan->id,
-                    'name' => $this->plan->trans('name'),
+                    'name' => $this->plan->name,
                 ]
             ),
             'plan_id' => $this->plan_id,

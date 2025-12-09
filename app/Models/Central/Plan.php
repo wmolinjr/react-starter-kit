@@ -3,19 +3,19 @@
 namespace App\Models\Central;
 
 use App\Models\Shared\Permission;
-use App\Traits\HasTenantTranslations;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 
 /**
  * Plan Model
  *
  * Represents subscription plans with features and limits.
- * Supports multi-language translations with tenant customization.
+ * Supports multi-language translations via Spatie Translatable.
  *
  * @property string $id
  * @property array $name
@@ -33,8 +33,7 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  */
 class Plan extends Model
 {
-    use CentralConnection, HasFactory, HasUuids;
-    use HasTenantTranslations;
+    use CentralConnection, HasFactory, HasTranslations, HasUuids;
 
     /**
      * Create a new factory instance for the model.
@@ -209,28 +208,5 @@ class Plan extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
-    }
-
-    /**
-     * Get plan data for API/frontend with translations.
-     */
-    public function toTranslatedArray(?int $tenantId = null): array
-    {
-        return [
-            'id' => $this->id,
-            'slug' => $this->slug,
-            'name' => $this->trans('name'),
-            'description' => $this->trans('description'),
-            'price' => $this->price,
-            'formatted_price' => $this->formatted_price,
-            'currency' => $this->currency,
-            'billing_period' => $this->billing_period,
-            'features' => $this->features,
-            'limits' => $this->limits,
-            'is_active' => $this->is_active,
-            'is_featured' => $this->is_featured,
-            'sort_order' => $this->sort_order,
-            'has_override' => $tenantId ? $this->hasTenantOverride('name', $tenantId) : false,
-        ];
     }
 }

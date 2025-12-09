@@ -348,8 +348,8 @@ class AddonService
             'tenant_id' => $tenant->id,
             'addon_slug' => $addon->slug,
             'addon_type' => $addon->type,
-            'name' => $addon->trans('name'),
-            'description' => $addon->trans('description'),
+            'name' => $addon->name,
+            'description' => $addon->description,
             'quantity' => $quantity,
             'price' => $price ?? 0,
             'billing_period' => $billingPeriod,
@@ -614,7 +614,7 @@ class AddonService
             // But check quantity limits
             if ($addon->max_quantity && $quantity > $addon->max_quantity) {
                 throw new AddonLimitExceededException(
-                    "Bundle contains {$addon->trans('name')} with quantity {$quantity}, ".
+                    "Bundle contains {$addon->name} with quantity {$quantity}, ".
                     "but maximum is {$addon->max_quantity}"
                 );
             }
@@ -622,7 +622,7 @@ class AddonService
             // Check for duplicate FEATURE addons
             if ($addon->type === AddonType::FEATURE && $tenant->hasActiveAddon($addon->slug)) {
                 throw new AddonException(
-                    "You already have '{$addon->trans('name')}' active. ".
+                    "You already have '{$addon->name}' active. ".
                     'Cannot purchase bundle with duplicate feature.'
                 );
             }
@@ -656,8 +656,8 @@ class AddonService
             'tenant_id' => $tenant->id,
             'addon_slug' => $addon->slug,
             'addon_type' => $addon->type,
-            'name' => $addon->trans('name'),
-            'description' => $addon->trans('description'),
+            'name' => $addon->name,
+            'description' => $addon->description,
             'quantity' => $quantity,
             'price' => $discountedPrice,
             'billing_period' => $billingPeriod,

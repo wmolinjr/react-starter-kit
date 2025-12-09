@@ -99,7 +99,7 @@ class SyncStripeProducts extends Command
         $addon = $syncService->importFromStripe($productId);
 
         if ($addon) {
-            $name = $addon->trans('name');
+            $name = $addon->name;
             $this->info("Imported: {$name} ({$addon->slug})");
 
             return self::SUCCESS;

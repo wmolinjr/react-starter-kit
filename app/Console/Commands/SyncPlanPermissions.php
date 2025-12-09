@@ -62,7 +62,7 @@ class SyncPlanPermissions extends Command
      */
     protected function syncPlan(Plan $plan, array $features): void
     {
-        $this->line("Processing plan: {$plan->trans('name')}");
+        $this->line("Processing plan: {$plan->name}");
 
         $permissionMap = [];
 
@@ -83,7 +83,7 @@ class SyncPlanPermissions extends Command
         $plan->update(['permission_map' => $permissionMap]);
 
         $totalPermissions = empty($permissionMap) ? 0 : count(array_merge(...array_values($permissionMap)));
-        $this->info("  ✓ {$plan->trans('name')}: {$totalPermissions} permissions mapped");
+        $this->info("  ✓ {$plan->name}: {$totalPermissions} permissions mapped");
     }
 
     /**

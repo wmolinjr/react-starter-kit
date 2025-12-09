@@ -49,7 +49,8 @@ use ReflectionClass;
 class GenerateTypes extends Command
 {
     protected $signature = 'types:generate
-                            {--fresh : Clean generated files before regenerating}';
+                            {--fresh : Clean generated files before regenerating}
+                            {--force : Force write even if translations would be lost}';
 
     protected $description = 'Generate TypeScript types from PHP Enums (single source of truth)';
 
@@ -1128,13 +1129,21 @@ TS;
         $filePath = lang_path("{$locale}.json");
 
         // Read existing translations
-        $translations = [];
+        $existingTranslations = [];
         if (File::exists($filePath)) {
             $content = File::get($filePath);
-            $translations = json_decode($content, true) ?? [];
+            $existingTranslations = json_decode($content, true) ?? [];
         }
 
-        // Update enum translations
+        $existingCount = count($existingTranslations);
+
+        // Start with existing translations (preserves all hardcoded keys)
+        $translations = $existingTranslations;
+
+        // Collect all enum translation keys that will be generated
+        $enumKeys = [];
+
+        // Update enum translations (only overwrites enum-generated keys)
         foreach ($this->enums as $name => $config) {
             $cases = $config['class']::cases();
             $getter = $config['translations'];
@@ -1142,6 +1151,7 @@ TS;
 
             foreach ($cases as $case) {
                 $key = "{$prefix}.{$case->value}";
+                $enumKeys[] = $key;
                 $translations[$key] = $getter($case, $locale);
             }
         }
@@ -1149,11 +1159,37 @@ TS;
         // Sort translations
         ksort($translations);
 
+        $newCount = count($translations);
+
+        // Safety check: ABORT if significant translation loss detected
+        // This happens when translations were accidentally deleted before running this command
+        $minimumExpected = [
+            'en' => 1200,     // English should have at least 1200 keys
+            'pt_BR' => 1200,  // Portuguese should have at least 1200 keys
+        ];
+
+        $minExpected = $minimumExpected[$locale] ?? 200;
+
+        if ($newCount < $minExpected && ! $this->option('force')) {
+            $this->error("  ✗ ABORTED: lang/{$locale}.json has only {$newCount} translations (expected at least {$minExpected})");
+            $this->error("    This indicates missing hardcoded translations!");
+            $this->error("    The file was NOT modified to prevent data loss.");
+            $this->error("");
+            $this->error("    To fix this, restore translations from git:");
+            $this->error("      git checkout HEAD -- lang/{$locale}.json");
+            $this->error("");
+            $this->error("    Or use --force to write anyway (NOT RECOMMENDED):");
+            $this->error("      sail artisan types:generate --force");
+            $this->newLine();
+
+            return; // Do NOT write the file
+        }
+
         // Write back
         $json = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         File::put($filePath, $json."\n");
 
-        $this->info("  ✓ Updated translations: lang/{$locale}.json");
+        $this->info("  ✓ Updated translations: lang/{$locale}.json ({$newCount} keys, " . count($enumKeys) . " enum-generated)");
     }
 
     // =========================================================================

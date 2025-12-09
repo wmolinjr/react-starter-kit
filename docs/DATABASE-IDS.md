@@ -81,7 +81,6 @@ $table->uuidMorphs('model'); // For MediaLibrary, Activity Log, etc.
 | `Project` | UUID | Tenant projects |
 | `Activity` | UUID | Spatie Activity Log |
 | `Media` | UUID | Spatie MediaLibrary |
-| `TenantTranslationOverride` | UUID | White-label translations |
 | `UserInvitation` | UUID | Team invitations (isolated per tenant) |
 
 ### Shared (`App\Models\Shared\`)
