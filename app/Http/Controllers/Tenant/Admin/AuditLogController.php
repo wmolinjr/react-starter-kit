@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Tenant\ActivityResource;
 use App\Http\Resources\Tenant\UserSummaryResource;
 use App\Models\Tenant\Activity;
+use App\Models\Tenant\User;
 use App\Services\Tenant\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -38,8 +39,6 @@ class AuditLogController extends Controller implements HasMiddleware
      */
     public function index(Request $request): Response
     {
-        $tenant = tenant();
-
         $filters = [
             'user_id' => $request->input('user_id'),
             'event' => $request->input('event'),
@@ -53,9 +52,9 @@ class AuditLogController extends Controller implements HasMiddleware
         $activities = $this->auditLogService->getActivities($filters);
         $filterOptions = $this->auditLogService->getFilterOptions();
 
-        // Get team members for filter dropdown
-        $teamMembers = $tenant->users()
-            ->select('users.id', 'users.name', 'users.email')
+        // Get team members for filter dropdown (Option C: query tenant database directly)
+        $teamMembers = User::select('id', 'name', 'email')
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('tenant/admin/audit/index', [
