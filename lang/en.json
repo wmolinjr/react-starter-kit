@@ -1253,9 +1253,9 @@
     "tenant.projects.type": "Type",
     "tenant.projects.update_project_data": "Update project data",
     "tenant.projects.upload_file": "Upload File",
-    "tenant.projects.upload_files_limit": "Upload files up to 10MB",
+    "tenant.projects.upload_files_limit": "Upload files up to :limitMB",
     "tenant.projects.upload_image": "Upload Image",
-    "tenant.projects.upload_images_limit": "Upload images up to 10MB",
+    "tenant.projects.upload_images_limit": "Upload images up to :limitMB",
     "tenant.projects.uploading": "Uploading...",
     "tenant.roles.custom_roles_not_available": "Custom roles are not available in your current plan.",
     "tenant.roles.description": "Manage custom roles and permissions",
@@ -1389,5 +1389,6 @@
     "user_menu.logout": "Log out",
     "user_menu.settings": "Settings",
     "validation.federation.already_master": "The selected tenant is already the master tenant.",
-    "validation.federation.tenant_not_in_group": "The selected tenant is not a member of this federation group."
+    "validation.federation.tenant_not_in_group": "The selected tenant is not a member of this federation group.",
+    "validation.file_too_large": "The file is too large. Maximum allowed size is :limitMB."
 }

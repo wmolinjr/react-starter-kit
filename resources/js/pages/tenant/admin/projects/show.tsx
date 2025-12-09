@@ -1,10 +1,10 @@
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Button } from '@/components/ui/button';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem, type ProjectDetailResource } from '@/types';
+import { type BreadcrumbItem, type ProjectDetailResource, type PageProps } from '@/types';
 import {
   Card,
   CardContent,
@@ -32,6 +32,10 @@ interface ProjectShowProps {
 
 function ProjectShow({ project }: ProjectShowProps) {
   const { t } = useLaravelReactI18n();
+  const { tenant } = usePage<PageProps>().props;
+
+  // Get file upload limit from plan (in MB), fallback to 10MB
+  const fileUploadLimit = tenant?.plan?.limits?.fileUploadSize ?? 10;
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -127,7 +131,7 @@ function ProjectShow({ project }: ProjectShowProps) {
                   <Paperclip className="h-5 w-5" />
                   {t('tenant.projects.attachments')} ({project.attachments.length})
                 </CardTitle>
-                <CardDescription>{t('tenant.projects.upload_files_limit')}</CardDescription>
+                <CardDescription>{t('tenant.projects.upload_files_limit', { limit: fileUploadLimit })}</CardDescription>
               </div>
               <form onSubmit={(e) => handleFileUpload(e, 'attachments')}>
                 <Input
@@ -202,7 +206,7 @@ function ProjectShow({ project }: ProjectShowProps) {
                   <ImageIcon className="h-5 w-5" />
                   {t('tenant.projects.images')} ({project.images.length})
                 </CardTitle>
-                <CardDescription>{t('tenant.projects.upload_images_limit')}</CardDescription>
+                <CardDescription>{t('tenant.projects.upload_images_limit', { limit: fileUploadLimit })}</CardDescription>
               </div>
               <form onSubmit={(e) => handleFileUpload(e, 'images')}>
                 <Input

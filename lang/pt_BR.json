@@ -1253,9 +1253,9 @@
     "tenant.projects.type": "Tipo",
     "tenant.projects.update_project_data": "Atualize os dados do projeto",
     "tenant.projects.upload_file": "Enviar Arquivo",
-    "tenant.projects.upload_files_limit": "Upload de arquivos até 10MB",
+    "tenant.projects.upload_files_limit": "Upload de arquivos até :limitMB",
     "tenant.projects.upload_image": "Enviar Imagem",
-    "tenant.projects.upload_images_limit": "Upload de imagens até 10MB",
+    "tenant.projects.upload_images_limit": "Upload de imagens até :limitMB",
     "tenant.projects.uploading": "Enviando...",
     "tenant.roles.custom_roles_not_available": "Funções personalizadas não estão disponíveis no seu plano atual.",
     "tenant.roles.description": "Gerencie funções personalizadas e permissões",
@@ -1389,5 +1389,6 @@
     "user_menu.logout": "Sair",
     "user_menu.settings": "Configurações",
     "validation.federation.already_master": "O tenant selecionado já é o tenant mestre.",
-    "validation.federation.tenant_not_in_group": "O tenant selecionado não é membro deste grupo de federação."
+    "validation.federation.tenant_not_in_group": "O tenant selecionado não é membro deste grupo de federação.",
+    "validation.file_too_large": "O arquivo é muito grande. O tamanho máximo permitido é :limitMB."
 }
