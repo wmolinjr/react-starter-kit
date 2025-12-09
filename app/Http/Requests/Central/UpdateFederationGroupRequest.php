@@ -31,7 +31,12 @@ class UpdateFederationGroupRequest extends FormRequest
             'settings' => 'nullable|array',
             'settings.sync_fields' => 'nullable|array',
             'settings.sync_fields.*' => 'string',
+            'settings.sync_password' => 'nullable|boolean',
+            'settings.sync_profile' => 'nullable|boolean',
+            'settings.sync_two_factor' => 'nullable|boolean',
+            'settings.sync_roles' => 'nullable|boolean',
             'settings.auto_create_on_login' => 'nullable|boolean',
+            'settings.auto_federate_new_users' => 'nullable|boolean',
             'settings.require_email_verification' => 'nullable|boolean',
             'is_active' => 'boolean',
         ];

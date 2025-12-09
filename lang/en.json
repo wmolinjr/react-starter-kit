@@ -1118,6 +1118,8 @@
   "admin.federation.settings.sync_two_factor_description": "Synchronize 2FA settings and recovery codes",
   "admin.federation.settings.sync_roles": "Sync Roles",
   "admin.federation.settings.sync_roles_description": "Synchronize role assignments (use with caution)",
+  "admin.federation.settings.auto_create_on_login": "Auto-Create on Login",
+  "admin.federation.settings.auto_create_on_login_description": "Automatically create local user when a federated user logs into a branch tenant for the first time",
   "admin.federation.settings.auto_federate_new_users": "Auto-Federate New Users",
   "admin.federation.settings.auto_federate_new_users_description": "Automatically federate new users when they are created in member tenants",
 

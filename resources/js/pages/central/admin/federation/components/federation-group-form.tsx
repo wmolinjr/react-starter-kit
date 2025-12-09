@@ -31,6 +31,7 @@ interface GroupData {
         sync_profile: boolean;
         sync_two_factor: boolean;
         sync_roles: boolean;
+        auto_create_on_login: boolean;
         auto_federate_new_users: boolean;
     };
 }
@@ -54,6 +55,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
             sync_profile: group?.settings?.sync_profile ?? true,
             sync_two_factor: group?.settings?.sync_two_factor ?? true,
             sync_roles: group?.settings?.sync_roles ?? false,
+            auto_create_on_login: group?.settings?.auto_create_on_login ?? true,
             auto_federate_new_users: group?.settings?.auto_federate_new_users ?? false,
         },
     });
@@ -258,6 +260,19 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                             <Switch
                                 checked={data.settings.sync_roles}
                                 onCheckedChange={(checked) => updateSettings('sync_roles', checked)}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between rounded-lg border p-4 md:col-span-2">
+                            <div>
+                                <Label className="font-medium">{t('admin.federation.settings.auto_create_on_login')}</Label>
+                                <p className="text-muted-foreground text-sm">
+                                    {t('admin.federation.settings.auto_create_on_login_description')}
+                                </p>
+                            </div>
+                            <Switch
+                                checked={data.settings.auto_create_on_login}
+                                onCheckedChange={(checked) => updateSettings('auto_create_on_login', checked)}
                             />
                         </div>
 

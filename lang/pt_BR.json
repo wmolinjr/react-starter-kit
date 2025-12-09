@@ -1468,6 +1468,8 @@
   "flash.federation.no_local_users": "Não há usuários locais disponíveis para federar.",
   "flash.federation.no_users_selected": "Nenhum usuário selecionado para federação.",
 
+  "admin.federation.settings.auto_create_on_login": "Auto-Criar no Login",
+  "admin.federation.settings.auto_create_on_login_description": "Criar automaticamente usuário local quando um usuário federado faz login em um tenant filial pela primeira vez",
   "admin.federation.settings.auto_federate_new_users": "Auto-Federar Novos Usuários",
   "admin.federation.settings.auto_federate_new_users_description": "Federar automaticamente novos usuários quando criados em tenants membros",
 
