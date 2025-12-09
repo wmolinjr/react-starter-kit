@@ -44,20 +44,12 @@ Padronizar todos os 14 enums em `app/Enums` para seguir o padrão estabelecido, 
 - ✅ `PlanFeature` - (Fase 2 completa)
 - ✅ `PlanLimit` - (Fase 2 completa)
 - ✅ `TenantRole` - (Fase 2 completa)
+- ✅ `CentralPermission` - (Fase 3 completa)
+- ✅ `TenantPermission` - (Fase 3 completa)
+- ✅ `BadgePreset` - (Fase 3 completa)
+- ✅ `TenantConfigKey` - (Fase 3 completa)
 
-### Parcialmente Conformes (60-70%)
-- 🟡 `CentralPermission` - Falta `name()`, `icon()`, `color()`, `badgeVariant()`, métodos frontend
-- 🟡 `TenantPermission` - Falta `name()`, `icon()`, `color()`, `badgeVariant()`, métodos frontend
-
-### Precisam Refatoração Major (30-50%)
-- 🔴 `BadgePreset` - Padrão completamente diferente
-- 🔴 `TenantConfigKey` - Falta quase tudo
-
-### Não estão no GenerateEnumTypes
-- `BadgePreset`
-- `TenantConfigKey`
-- `CentralPermission`
-- `TenantPermission`
+### Todos os 14 enums estão agora padronizados!
 
 ---
 

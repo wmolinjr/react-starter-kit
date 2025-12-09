@@ -66,9 +66,54 @@ enum CentralPermission: string
     case FEDERATION_MANAGE_CONFLICTS = 'federation:manageConflicts';
 
     /**
+     * Get translatable name.
+     *
+     * @return array<string, string>
+     */
+    public function name(): array
+    {
+        $category = $this->category();
+        $action = $this->action();
+
+        $categoryNames = [
+            'tenants' => ['en' => 'Tenants', 'pt_BR' => 'Tenants'],
+            'users' => ['en' => 'Users', 'pt_BR' => 'Usuários'],
+            'plans' => ['en' => 'Plans', 'pt_BR' => 'Planos'],
+            'catalog' => ['en' => 'Catalog', 'pt_BR' => 'Catálogo'],
+            'addons' => ['en' => 'Addons', 'pt_BR' => 'Add-ons'],
+            'roles' => ['en' => 'Roles', 'pt_BR' => 'Papéis'],
+            'system' => ['en' => 'System', 'pt_BR' => 'Sistema'],
+            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
+        ];
+
+        $actionNames = [
+            'view' => ['en' => 'View', 'pt_BR' => 'Visualizar'],
+            'show' => ['en' => 'Show Details', 'pt_BR' => 'Ver Detalhes'],
+            'create' => ['en' => 'Create', 'pt_BR' => 'Criar'],
+            'edit' => ['en' => 'Edit', 'pt_BR' => 'Editar'],
+            'delete' => ['en' => 'Delete', 'pt_BR' => 'Excluir'],
+            'sync' => ['en' => 'Sync', 'pt_BR' => 'Sincronizar'],
+            'impersonate' => ['en' => 'Impersonate', 'pt_BR' => 'Personificar'],
+            'logs' => ['en' => 'Logs', 'pt_BR' => 'Logs'],
+            'revenue' => ['en' => 'Revenue', 'pt_BR' => 'Receita'],
+            'grant' => ['en' => 'Grant', 'pt_BR' => 'Conceder'],
+            'revoke' => ['en' => 'Revoke', 'pt_BR' => 'Revogar'],
+            'manageConflicts' => ['en' => 'Manage Conflicts', 'pt_BR' => 'Gerenciar Conflitos'],
+        ];
+
+        $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)];
+        $actName = $actionNames[$action] ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action)];
+
+        return [
+            'en' => "{$catName['en']}: {$actName['en']}",
+            'pt_BR' => "{$catName['pt_BR']}: {$actName['pt_BR']}",
+        ];
+    }
+
+    /**
      * Get the description for this permission.
      *
-     * @return array{en: string, pt_BR: string}
+     * @return array<string, string>
      */
     public function description(): array
     {
@@ -127,9 +172,78 @@ enum CentralPermission: string
     }
 
     /**
+     * Get Lucide icon name (based on category).
+     */
+    public function icon(): string
+    {
+        return match ($this->category()) {
+            'tenants' => 'Building2',
+            'users' => 'Users',
+            'plans' => 'CreditCard',
+            'catalog' => 'Package',
+            'addons' => 'Puzzle',
+            'roles' => 'Shield',
+            'system' => 'Settings',
+            'federation' => 'Network',
+            default => 'Circle',
+        };
+    }
+
+    /**
+     * Get color for UI display (based on category).
+     */
+    public function color(): string
+    {
+        return match ($this->category()) {
+            'tenants' => 'blue',
+            'users' => 'purple',
+            'plans' => 'green',
+            'catalog' => 'orange',
+            'addons' => 'pink',
+            'roles' => 'yellow',
+            'system' => 'gray',
+            'federation' => 'cyan',
+            default => 'gray',
+        };
+    }
+
+    /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this->category()) {
+            'tenants', 'users' => 'default',
+            'plans', 'catalog', 'addons' => 'secondary',
+            'roles', 'system' => 'outline',
+            'federation' => 'default',
+            default => 'outline',
+        };
+    }
+
+    /**
+     * Get translated label for current locale.
+     */
+    public function label(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $names = $this->name();
+
+        return $names[$locale] ?? $names['en'] ?? $this->value;
+    }
+
+    /**
      * Get translated description.
      */
     public function trans(?string $locale = null): string
+    {
+        return $this->translatedDescription($locale);
+    }
+
+    /**
+     * Get translated description for current locale.
+     */
+    public function translatedDescription(?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
         $descriptions = $this->description();
@@ -266,5 +380,67 @@ enum CentralPermission: string
     public static function extractCategory(string $permission): string
     {
         return explode(':', $permission)[0];
+    }
+
+    /**
+     * Get all cases as options for select inputs.
+     *
+     * @return array<string, string>
+     */
+    public static function options(?string $locale = null): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label($locale);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Convert single permission to frontend format.
+     *
+     * @return array<string, mixed>
+     */
+    public function toFrontend(?string $locale = null): array
+    {
+        return [
+            'value' => $this->value,
+            'label' => $this->label($locale),
+            'description' => $this->translatedDescription($locale),
+            'icon' => $this->icon(),
+            'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
+            'category' => $this->category(),
+            'action' => $this->action(),
+        ];
+    }
+
+    /**
+     * Convert all permissions to frontend array format.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function toFrontendArray(?string $locale = null): array
+    {
+        return array_map(
+            fn (self $permission) => $permission->toFrontend($locale),
+            self::cases()
+        );
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 }

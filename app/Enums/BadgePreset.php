@@ -5,6 +5,7 @@ namespace App\Enums;
 /**
  * Predefined badge presets for Addons and Bundles
  *
+ * Single source of truth for all badge metadata including translations.
  * Each badge has an icon, color scheme, and translated label.
  * Used for marketing display in pricing pages.
  */
@@ -24,7 +25,53 @@ enum BadgePreset: string
     case PRO = 'pro';
 
     /**
-     * Get the Lucide icon name for this badge
+     * Get translatable name.
+     *
+     * @return array<string, string>
+     */
+    public function name(): array
+    {
+        return match ($this) {
+            self::MOST_POPULAR => ['en' => 'Most Popular', 'pt_BR' => 'Mais Popular'],
+            self::BEST_VALUE => ['en' => 'Best Value', 'pt_BR' => 'Melhor Custo-Benefício'],
+            self::BEST_FOR_TEAMS => ['en' => 'Best for Teams', 'pt_BR' => 'Melhor para Equipes'],
+            self::ENTERPRISE => ['en' => 'Enterprise', 'pt_BR' => 'Empresarial'],
+            self::ONE_TIME => ['en' => 'One Time', 'pt_BR' => 'Pagamento Único'],
+            self::NEW => ['en' => 'New', 'pt_BR' => 'Novo'],
+            self::LIMITED_TIME => ['en' => 'Limited Time', 'pt_BR' => 'Tempo Limitado'],
+            self::RECOMMENDED => ['en' => 'Recommended', 'pt_BR' => 'Recomendado'],
+            self::SALE => ['en' => 'Sale', 'pt_BR' => 'Promoção'],
+            self::HOT => ['en' => 'Hot', 'pt_BR' => 'Em Alta'],
+            self::STARTER => ['en' => 'Starter', 'pt_BR' => 'Iniciante'],
+            self::PRO => ['en' => 'Pro', 'pt_BR' => 'Profissional'],
+        };
+    }
+
+    /**
+     * Get translatable description.
+     *
+     * @return array<string, string>
+     */
+    public function description(): array
+    {
+        return match ($this) {
+            self::MOST_POPULAR => ['en' => 'Our most popular choice', 'pt_BR' => 'Nossa escolha mais popular'],
+            self::BEST_VALUE => ['en' => 'Best value for money', 'pt_BR' => 'Melhor custo-benefício'],
+            self::BEST_FOR_TEAMS => ['en' => 'Ideal for team collaboration', 'pt_BR' => 'Ideal para colaboração em equipe'],
+            self::ENTERPRISE => ['en' => 'For large organizations', 'pt_BR' => 'Para grandes organizações'],
+            self::ONE_TIME => ['en' => 'Pay once, use forever', 'pt_BR' => 'Pague uma vez, use para sempre'],
+            self::NEW => ['en' => 'Recently added feature', 'pt_BR' => 'Recurso adicionado recentemente'],
+            self::LIMITED_TIME => ['en' => 'Available for a limited time', 'pt_BR' => 'Disponível por tempo limitado'],
+            self::RECOMMENDED => ['en' => 'Recommended by our team', 'pt_BR' => 'Recomendado pela nossa equipe'],
+            self::SALE => ['en' => 'Special promotional price', 'pt_BR' => 'Preço promocional especial'],
+            self::HOT => ['en' => 'Trending right now', 'pt_BR' => 'Em alta agora'],
+            self::STARTER => ['en' => 'Perfect for getting started', 'pt_BR' => 'Perfeito para começar'],
+            self::PRO => ['en' => 'For professionals', 'pt_BR' => 'Para profissionais'],
+        };
+    }
+
+    /**
+     * Get the Lucide icon name for this badge.
      */
     public function icon(): string
     {
@@ -45,116 +92,170 @@ enum BadgePreset: string
     }
 
     /**
-     * Get the color scheme for this badge (Tailwind classes)
-     * Returns [background, text, border] colors
+     * Get base color for UI display (semantic color name).
      */
-    public function colors(): array
+    public function color(): string
     {
         return match ($this) {
-            self::MOST_POPULAR => [
-                'bg' => 'bg-amber-100 dark:bg-amber-900/30',
-                'text' => 'text-amber-700 dark:text-amber-300',
-                'border' => 'border-amber-300 dark:border-amber-700',
-            ],
-            self::BEST_VALUE => [
-                'bg' => 'bg-green-100 dark:bg-green-900/30',
-                'text' => 'text-green-700 dark:text-green-300',
-                'border' => 'border-green-300 dark:border-green-700',
-            ],
-            self::BEST_FOR_TEAMS => [
-                'bg' => 'bg-blue-100 dark:bg-blue-900/30',
-                'text' => 'text-blue-700 dark:text-blue-300',
-                'border' => 'border-blue-300 dark:border-blue-700',
-            ],
-            self::ENTERPRISE => [
-                'bg' => 'bg-purple-100 dark:bg-purple-900/30',
-                'text' => 'text-purple-700 dark:text-purple-300',
-                'border' => 'border-purple-300 dark:border-purple-700',
-            ],
-            self::ONE_TIME => [
-                'bg' => 'bg-teal-100 dark:bg-teal-900/30',
-                'text' => 'text-teal-700 dark:text-teal-300',
-                'border' => 'border-teal-300 dark:border-teal-700',
-            ],
-            self::NEW => [
-                'bg' => 'bg-cyan-100 dark:bg-cyan-900/30',
-                'text' => 'text-cyan-700 dark:text-cyan-300',
-                'border' => 'border-cyan-300 dark:border-cyan-700',
-            ],
-            self::LIMITED_TIME => [
-                'bg' => 'bg-orange-100 dark:bg-orange-900/30',
-                'text' => 'text-orange-700 dark:text-orange-300',
-                'border' => 'border-orange-300 dark:border-orange-700',
-            ],
-            self::RECOMMENDED => [
-                'bg' => 'bg-indigo-100 dark:bg-indigo-900/30',
-                'text' => 'text-indigo-700 dark:text-indigo-300',
-                'border' => 'border-indigo-300 dark:border-indigo-700',
-            ],
-            self::SALE => [
-                'bg' => 'bg-red-100 dark:bg-red-900/30',
-                'text' => 'text-red-700 dark:text-red-300',
-                'border' => 'border-red-300 dark:border-red-700',
-            ],
-            self::HOT => [
-                'bg' => 'bg-rose-100 dark:bg-rose-900/30',
-                'text' => 'text-rose-700 dark:text-rose-300',
-                'border' => 'border-rose-300 dark:border-rose-700',
-            ],
-            self::STARTER => [
-                'bg' => 'bg-sky-100 dark:bg-sky-900/30',
-                'text' => 'text-sky-700 dark:text-sky-300',
-                'border' => 'border-sky-300 dark:border-sky-700',
-            ],
-            self::PRO => [
-                'bg' => 'bg-violet-100 dark:bg-violet-900/30',
-                'text' => 'text-violet-700 dark:text-violet-300',
-                'border' => 'border-violet-300 dark:border-violet-700',
-            ],
+            self::MOST_POPULAR => 'amber',
+            self::BEST_VALUE => 'green',
+            self::BEST_FOR_TEAMS => 'blue',
+            self::ENTERPRISE => 'purple',
+            self::ONE_TIME => 'teal',
+            self::NEW => 'cyan',
+            self::LIMITED_TIME => 'orange',
+            self::RECOMMENDED => 'indigo',
+            self::SALE => 'red',
+            self::HOT => 'rose',
+            self::STARTER => 'sky',
+            self::PRO => 'violet',
         };
     }
 
     /**
-     * Get the translation key for this badge label
+     * Get the Tailwind color classes for this badge.
+     * Returns [bg, text, border] with dark mode variants.
+     *
+     * @return array{bg: string, text: string, border: string}
      */
-    public function translationKey(): string
+    public function colorClasses(): array
     {
-        return "badges.{$this->value}";
-    }
-
-    /**
-     * Get translated label for this badge
-     */
-    public function label(): string
-    {
-        return __($this->translationKey());
-    }
-
-    /**
-     * Convert to array for frontend
-     */
-    public function toArray(): array
-    {
-        $colors = $this->colors();
+        $color = $this->color();
 
         return [
-            'value' => $this->value,
-            'label' => $this->label(),
-            'icon' => $this->icon(),
-            'bg' => $colors['bg'],
-            'text' => $colors['text'],
-            'border' => $colors['border'],
+            'bg' => "bg-{$color}-100 dark:bg-{$color}-900/30",
+            'text' => "text-{$color}-700 dark:text-{$color}-300",
+            'border' => "border-{$color}-300 dark:border-{$color}-700",
         ];
     }
 
     /**
-     * Get all badges as array for frontend
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::MOST_POPULAR, self::HOT => 'default',
+            self::SALE, self::LIMITED_TIME => 'destructive',
+            self::NEW, self::RECOMMENDED => 'secondary',
+            default => 'outline',
+        };
+    }
+
+    /**
+     * Get translated label for current locale.
+     */
+    public function label(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $names = $this->name();
+
+        return $names[$locale] ?? $names['en'] ?? $this->value;
+    }
+
+    /**
+     * Get translated description for current locale.
+     */
+    public function translatedDescription(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $descriptions = $this->description();
+
+        return $descriptions[$locale] ?? $descriptions['en'];
+    }
+
+    /**
+     * Get all badge values as strings.
+     *
+     * @return string[]
+     */
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+
+    /**
+     * Get all cases as options for select inputs.
+     *
+     * @return array<string, string>
+     */
+    public static function options(?string $locale = null): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label($locale);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Convert single badge to frontend format.
+     *
+     * @return array<string, mixed>
+     */
+    public function toFrontend(?string $locale = null): array
+    {
+        $colorClasses = $this->colorClasses();
+
+        return [
+            'value' => $this->value,
+            'label' => $this->label($locale),
+            'description' => $this->translatedDescription($locale),
+            'icon' => $this->icon(),
+            'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
+            'bg' => $colorClasses['bg'],
+            'text' => $colorClasses['text'],
+            'border' => $colorClasses['border'],
+        ];
+    }
+
+    /**
+     * Convert all badges to frontend array format.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function toFrontendArray(?string $locale = null): array
+    {
+        return array_map(
+            fn (self $badge) => $badge->toFrontend($locale),
+            self::cases()
+        );
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
+    }
+
+    /**
+     * Convert to array for frontend (alias for toFrontend).
+     *
+     * @deprecated Use toFrontend() instead
+     */
+    public function toArray(): array
+    {
+        return $this->toFrontend();
+    }
+
+    /**
+     * Get all badges as array for frontend (alias for toFrontendArray).
+     *
+     * @deprecated Use toFrontendArray() instead
      */
     public static function all(): array
     {
-        return array_map(
-            fn (self $badge) => $badge->toArray(),
-            self::cases()
-        );
+        return self::toFrontendArray();
     }
 }

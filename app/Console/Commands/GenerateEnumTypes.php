@@ -4,13 +4,17 @@ namespace App\Console\Commands;
 
 use App\Enums\AddonStatus;
 use App\Enums\AddonType;
+use App\Enums\BadgePreset;
 use App\Enums\BillingPeriod;
+use App\Enums\CentralPermission;
 use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
 use App\Enums\FederationConflictStatus;
 use App\Enums\FederationSyncStrategy;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
+use App\Enums\TenantConfigKey;
+use App\Enums\TenantPermission;
 use App\Enums\TenantRole;
 use Illuminate\Console\Command;
 
@@ -75,6 +79,10 @@ class GenerateEnumTypes extends Command
  * - app/Enums/FederatedUserLinkSyncStatus.php
  * - app/Enums/FederationConflictStatus.php
  * - app/Enums/FederationSyncStrategy.php
+ * - app/Enums/CentralPermission.php
+ * - app/Enums/TenantPermission.php
+ * - app/Enums/BadgePreset.php
+ * - app/Enums/TenantConfigKey.php
  */
 
 TS;
@@ -216,6 +224,59 @@ TS;
             'auto_resolves' => 'boolean',
         ]);
 
+        // CentralPermission
+        $output .= $this->generateEnumType('CentralPermission', CentralPermission::cases());
+        $output .= $this->generateEnumInterface('CentralPermissionOption', [
+            'value' => 'CentralPermission',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'category' => 'string',
+            'action' => 'string',
+        ]);
+
+        // TenantPermission
+        $output .= $this->generateEnumType('TenantPermission', TenantPermission::cases());
+        $output .= $this->generateEnumInterface('TenantPermissionOption', [
+            'value' => 'TenantPermission',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'category' => 'string',
+            'action' => 'string',
+        ]);
+
+        // BadgePreset
+        $output .= $this->generateEnumType('BadgePreset', BadgePreset::cases());
+        $output .= $this->generateEnumInterface('BadgePresetOption', [
+            'value' => 'BadgePreset',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'bg' => 'string',
+            'text' => 'string',
+            'border' => 'string',
+        ]);
+
+        // TenantConfigKey
+        $output .= $this->generateEnumType('TenantConfigKey', TenantConfigKey::cases());
+        $output .= $this->generateEnumInterface('TenantConfigKeyOption', [
+            'value' => 'TenantConfigKey',
+            'label' => 'string',
+            'description' => 'string',
+            'icon' => 'string',
+            'color' => 'string',
+            'badge_variant' => "'default' | 'destructive' | 'secondary' | 'outline'",
+            'category' => 'string',
+            'default_value' => 'string | number | null',
+        ]);
+
         return $output;
     }
 
@@ -263,6 +324,10 @@ TS;
                 ['FederatedUserLinkSyncStatus', count(FederatedUserLinkSyncStatus::cases()), 'FederatedUserLinkSyncStatusOption'],
                 ['FederationConflictStatus', count(FederationConflictStatus::cases()), 'FederationConflictStatusOption'],
                 ['FederationSyncStrategy', count(FederationSyncStrategy::cases()), 'FederationSyncStrategyOption'],
+                ['CentralPermission', count(CentralPermission::cases()), 'CentralPermissionOption'],
+                ['TenantPermission', count(TenantPermission::cases()), 'TenantPermissionOption'],
+                ['BadgePreset', count(BadgePreset::cases()), 'BadgePresetOption'],
+                ['TenantConfigKey', count(TenantConfigKey::cases()), 'TenantConfigKeyOption'],
             ]
         );
     }
@@ -303,6 +368,14 @@ import type {
     FederationConflictStatusOption,
     FederationSyncStrategy,
     FederationSyncStrategyOption,
+    CentralPermission,
+    CentralPermissionOption,
+    TenantPermission,
+    TenantPermissionOption,
+    BadgePreset,
+    BadgePresetOption,
+    TenantConfigKey,
+    TenantConfigKeyOption,
 } from '@/types/enums';
 
 TS;
@@ -494,6 +567,79 @@ TS;
             ]
         );
 
+        // CentralPermission metadata
+        $output .= $this->generateEnumMetadataMap(
+            'CENTRAL_PERMISSION',
+            'CentralPermission',
+            'CentralPermissionOption',
+            CentralPermission::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->label('en'),
+                'description' => $case->translatedDescription('en'),
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'category' => $case->category(),
+                'action' => $case->action(),
+            ]
+        );
+
+        // TenantPermission metadata
+        $output .= $this->generateEnumMetadataMap(
+            'TENANT_PERMISSION',
+            'TenantPermission',
+            'TenantPermissionOption',
+            TenantPermission::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->label('en'),
+                'description' => $case->translatedDescription('en'),
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'category' => $case->category(),
+                'action' => $case->action(),
+            ]
+        );
+
+        // BadgePreset metadata
+        $output .= $this->generateEnumMetadataMap(
+            'BADGE_PRESET',
+            'BadgePreset',
+            'BadgePresetOption',
+            BadgePreset::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->label('en'),
+                'description' => $case->translatedDescription('en'),
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'bg' => $case->colorClasses()['bg'],
+                'text' => $case->colorClasses()['text'],
+                'border' => $case->colorClasses()['border'],
+            ]
+        );
+
+        // TenantConfigKey metadata
+        $output .= $this->generateEnumMetadataMap(
+            'TENANT_CONFIG_KEY',
+            'TenantConfigKey',
+            'TenantConfigKeyOption',
+            TenantConfigKey::cases(),
+            fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->label('en'),
+                'description' => $case->translatedDescription('en'),
+                'icon' => $case->icon(),
+                'color' => $case->color(),
+                'badge_variant' => $case->badgeVariant(),
+                'category' => $case->category(),
+                'default_value' => $case->defaultValue(),
+            ]
+        );
+
         // Helper functions
         $output .= <<<'TS'
 
@@ -565,6 +711,34 @@ export function getFederationConflictStatusMeta(status: FederationConflictStatus
  */
 export function getFederationSyncStrategyMeta(strategy: FederationSyncStrategy): FederationSyncStrategyOption {
     return FEDERATION_SYNC_STRATEGY[strategy];
+}
+
+/**
+ * Get metadata for a CentralPermission value.
+ */
+export function getCentralPermissionMeta(permission: CentralPermission): CentralPermissionOption {
+    return CENTRAL_PERMISSION[permission];
+}
+
+/**
+ * Get metadata for a TenantPermission value.
+ */
+export function getTenantPermissionMeta(permission: TenantPermission): TenantPermissionOption {
+    return TENANT_PERMISSION[permission];
+}
+
+/**
+ * Get metadata for a BadgePreset value.
+ */
+export function getBadgePresetMeta(preset: BadgePreset): BadgePresetOption {
+    return BADGE_PRESET[preset];
+}
+
+/**
+ * Get metadata for a TenantConfigKey value.
+ */
+export function getTenantConfigKeyMeta(key: TenantConfigKey): TenantConfigKeyOption {
+    return TENANT_CONFIG_KEY[key];
 }
 TS;
 
@@ -688,6 +862,23 @@ TS;
             ),
             'admin.federation.sync_strategy' => $this->getEnumTranslations(
                 FederationSyncStrategy::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            // Phase 3 enums
+            'permissions.central' => $this->getEnumTranslations(
+                CentralPermission::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'permissions.tenant' => $this->getEnumTranslations(
+                TenantPermission::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'enums.badge_preset' => $this->getEnumTranslations(
+                BadgePreset::cases(),
+                fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
+            ),
+            'enums.tenant_config_key' => $this->getEnumTranslations(
+                TenantConfigKey::cases(),
                 fn ($case, $locale) => $case->name()[$locale] ?? $case->name()['en']
             ),
         ];

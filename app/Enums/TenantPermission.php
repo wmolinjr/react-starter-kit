@@ -82,6 +82,66 @@ enum TenantPermission: string
     case FEDERATION_LEAVE = 'federation:leave';
 
     /**
+     * Get translatable name.
+     *
+     * @return array<string, string>
+     */
+    public function name(): array
+    {
+        $category = $this->category();
+        $action = $this->action();
+
+        $categoryNames = [
+            'projects' => ['en' => 'Projects', 'pt_BR' => 'Projetos'],
+            'team' => ['en' => 'Team', 'pt_BR' => 'Equipe'],
+            'settings' => ['en' => 'Settings', 'pt_BR' => 'Configurações'],
+            'billing' => ['en' => 'Billing', 'pt_BR' => 'Faturamento'],
+            'apiTokens' => ['en' => 'API Tokens', 'pt_BR' => 'Tokens de API'],
+            'roles' => ['en' => 'Roles', 'pt_BR' => 'Papéis'],
+            'reports' => ['en' => 'Reports', 'pt_BR' => 'Relatórios'],
+            'sso' => ['en' => 'SSO', 'pt_BR' => 'SSO'],
+            'branding' => ['en' => 'Branding', 'pt_BR' => 'Marca'],
+            'audit' => ['en' => 'Audit', 'pt_BR' => 'Auditoria'],
+            'locales' => ['en' => 'Languages', 'pt_BR' => 'Idiomas'],
+            'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação'],
+        ];
+
+        $actionNames = [
+            'view' => ['en' => 'View', 'pt_BR' => 'Visualizar'],
+            'create' => ['en' => 'Create', 'pt_BR' => 'Criar'],
+            'edit' => ['en' => 'Edit', 'pt_BR' => 'Editar'],
+            'editOwn' => ['en' => 'Edit Own', 'pt_BR' => 'Editar Próprio'],
+            'delete' => ['en' => 'Delete', 'pt_BR' => 'Excluir'],
+            'upload' => ['en' => 'Upload', 'pt_BR' => 'Enviar'],
+            'download' => ['en' => 'Download', 'pt_BR' => 'Baixar'],
+            'archive' => ['en' => 'Archive', 'pt_BR' => 'Arquivar'],
+            'invite' => ['en' => 'Invite', 'pt_BR' => 'Convidar'],
+            'remove' => ['en' => 'Remove', 'pt_BR' => 'Remover'],
+            'manageRoles' => ['en' => 'Manage Roles', 'pt_BR' => 'Gerenciar Papéis'],
+            'activity' => ['en' => 'Activity', 'pt_BR' => 'Atividade'],
+            'danger' => ['en' => 'Danger Zone', 'pt_BR' => 'Zona de Perigo'],
+            'manage' => ['en' => 'Manage', 'pt_BR' => 'Gerenciar'],
+            'invoices' => ['en' => 'Invoices', 'pt_BR' => 'Faturas'],
+            'export' => ['en' => 'Export', 'pt_BR' => 'Exportar'],
+            'schedule' => ['en' => 'Schedule', 'pt_BR' => 'Agendar'],
+            'customize' => ['en' => 'Customize', 'pt_BR' => 'Personalizar'],
+            'configure' => ['en' => 'Configure', 'pt_BR' => 'Configurar'],
+            'testConnection' => ['en' => 'Test Connection', 'pt_BR' => 'Testar Conexão'],
+            'preview' => ['en' => 'Preview', 'pt_BR' => 'Pré-visualizar'],
+            'publish' => ['en' => 'Publish', 'pt_BR' => 'Publicar'],
+            'leave' => ['en' => 'Leave', 'pt_BR' => 'Sair'],
+        ];
+
+        $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category)];
+        $actName = $actionNames[$action] ?? ['en' => ucfirst($action), 'pt_BR' => ucfirst($action)];
+
+        return [
+            'en' => "{$catName['en']}: {$actName['en']}",
+            'pt_BR' => "{$catName['pt_BR']}: {$actName['pt_BR']}",
+        ];
+    }
+
+    /**
      * Get the description for this permission.
      *
      * @return array{en: string, pt_BR: string}
@@ -164,6 +224,83 @@ enum TenantPermission: string
      * Get translated description.
      */
     public function trans(?string $locale = null): string
+    {
+        return $this->translatedDescription($locale);
+    }
+
+    /**
+     * Get Lucide icon name (based on category).
+     */
+    public function icon(): string
+    {
+        return match ($this->category()) {
+            'projects' => 'Folder',
+            'team' => 'Users',
+            'settings' => 'Settings',
+            'billing' => 'CreditCard',
+            'apiTokens' => 'Key',
+            'roles' => 'Shield',
+            'reports' => 'BarChart3',
+            'sso' => 'Lock',
+            'branding' => 'Palette',
+            'audit' => 'FileText',
+            'locales' => 'Globe',
+            'federation' => 'Network',
+            default => 'Circle',
+        };
+    }
+
+    /**
+     * Get color for UI display (based on category).
+     */
+    public function color(): string
+    {
+        return match ($this->category()) {
+            'projects' => 'blue',
+            'team' => 'purple',
+            'settings' => 'gray',
+            'billing' => 'green',
+            'apiTokens' => 'orange',
+            'roles' => 'yellow',
+            'reports' => 'cyan',
+            'sso' => 'red',
+            'branding' => 'pink',
+            'audit' => 'gray',
+            'locales' => 'blue',
+            'federation' => 'cyan',
+            default => 'gray',
+        };
+    }
+
+    /**
+     * Get badge variant for UI display.
+     */
+    public function badgeVariant(): string
+    {
+        return match ($this->category()) {
+            'projects', 'team' => 'default',
+            'billing', 'apiTokens' => 'secondary',
+            'roles', 'sso' => 'destructive',
+            'federation' => 'default',
+            default => 'outline',
+        };
+    }
+
+    /**
+     * Get translated label for current locale.
+     */
+    public function label(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $names = $this->name();
+
+        return $names[$locale] ?? $names['en'] ?? $this->value;
+    }
+
+    /**
+     * Get translated description for current locale.
+     */
+    public function translatedDescription(?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
         $descriptions = $this->description();
@@ -327,5 +464,67 @@ enum TenantPermission: string
     public static function extractCategory(string $permission): string
     {
         return explode(':', $permission)[0];
+    }
+
+    /**
+     * Get all cases as options for select inputs.
+     *
+     * @return array<string, string>
+     */
+    public static function options(?string $locale = null): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->label($locale);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Convert single permission to frontend format.
+     *
+     * @return array<string, mixed>
+     */
+    public function toFrontend(?string $locale = null): array
+    {
+        return [
+            'value' => $this->value,
+            'label' => $this->label($locale),
+            'description' => $this->translatedDescription($locale),
+            'icon' => $this->icon(),
+            'color' => $this->color(),
+            'badge_variant' => $this->badgeVariant(),
+            'category' => $this->category(),
+            'action' => $this->action(),
+        ];
+    }
+
+    /**
+     * Convert all permissions to frontend array format.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function toFrontendArray(?string $locale = null): array
+    {
+        return array_map(
+            fn (self $permission) => $permission->toFrontend($locale),
+            self::cases()
+        );
+    }
+
+    /**
+     * Convert all cases to frontend map format (keyed by value).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public static function toFrontendMap(?string $locale = null): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->toFrontend($locale);
+        }
+
+        return $map;
     }
 }

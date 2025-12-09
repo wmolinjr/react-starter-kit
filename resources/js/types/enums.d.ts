@@ -15,6 +15,10 @@
  * - app/Enums/FederatedUserLinkSyncStatus.php
  * - app/Enums/FederationConflictStatus.php
  * - app/Enums/FederationSyncStrategy.php
+ * - app/Enums/CentralPermission.php
+ * - app/Enums/TenantPermission.php
+ * - app/Enums/BadgePreset.php
+ * - app/Enums/TenantConfigKey.php
  */
 export type AddonType = 'quota' | 'feature' | 'metered' | 'credit';
 
@@ -151,5 +155,58 @@ export interface FederationSyncStrategyOption {
     badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
     creates_conflicts: boolean;
     auto_resolves: boolean;
+}
+
+export type CentralPermission = 'tenants:view' | 'tenants:show' | 'tenants:edit' | 'tenants:delete' | 'tenants:impersonate' | 'users:view' | 'users:show' | 'users:edit' | 'users:delete' | 'plans:view' | 'plans:create' | 'plans:edit' | 'plans:delete' | 'plans:sync' | 'catalog:view' | 'catalog:create' | 'catalog:edit' | 'catalog:delete' | 'catalog:sync' | 'addons:view' | 'addons:revenue' | 'addons:grant' | 'addons:revoke' | 'roles:view' | 'roles:create' | 'roles:edit' | 'roles:delete' | 'system:view' | 'system:edit' | 'system:logs' | 'federation:view' | 'federation:create' | 'federation:edit' | 'federation:delete' | 'federation:manageConflicts';
+
+export interface CentralPermissionOption {
+    value: CentralPermission;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    category: string;
+    action: string;
+}
+
+export type TenantPermission = 'projects:view' | 'projects:create' | 'projects:edit' | 'projects:editOwn' | 'projects:delete' | 'projects:upload' | 'projects:download' | 'projects:archive' | 'team:view' | 'team:invite' | 'team:remove' | 'team:manageRoles' | 'team:activity' | 'settings:view' | 'settings:edit' | 'settings:danger' | 'billing:view' | 'billing:manage' | 'billing:invoices' | 'apiTokens:view' | 'apiTokens:create' | 'apiTokens:delete' | 'roles:view' | 'roles:create' | 'roles:edit' | 'roles:delete' | 'reports:view' | 'reports:export' | 'reports:schedule' | 'reports:customize' | 'sso:configure' | 'sso:manage' | 'sso:testConnection' | 'branding:view' | 'branding:edit' | 'branding:preview' | 'branding:publish' | 'audit:view' | 'audit:export' | 'locales:view' | 'locales:manage' | 'federation:view' | 'federation:manage' | 'federation:invite' | 'federation:leave';
+
+export interface TenantPermissionOption {
+    value: TenantPermission;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    category: string;
+    action: string;
+}
+
+export type BadgePreset = 'most_popular' | 'best_value' | 'best_for_teams' | 'enterprise' | 'one_time' | 'new' | 'limited_time' | 'recommended' | 'sale' | 'hot' | 'starter' | 'pro';
+
+export interface BadgePresetOption {
+    value: BadgePreset;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    bg: string;
+    text: string;
+    border: string;
+}
+
+export type TenantConfigKey = 'app_name' | 'locale' | 'timezone' | 'mail_from_address' | 'mail_from_name' | 'currency' | 'currency_locale';
+
+export interface TenantConfigKeyOption {
+    value: TenantConfigKey;
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badge_variant: 'default' | 'destructive' | 'secondary' | 'outline';
+    category: string;
+    default_value: string | number | null;
 }
 
