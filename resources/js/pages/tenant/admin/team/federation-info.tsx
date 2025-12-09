@@ -6,13 +6,12 @@ import {
     PageContent,
     PageDescription,
     PageHeader,
-    PageHeaderActions,
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     Calendar,
@@ -23,49 +22,18 @@ import {
     Unlink,
     User,
 } from 'lucide-react';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type TeamMemberResource,
+    type UserFederationInfoResource,
+} from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface TeamMember {
-    id: string;
-    name: string;
-    email: string;
-    is_federated: boolean;
-    federation_id: string | null;
-    roles: { name: string }[];
-    created_at: string;
-}
-
-interface FederationInfo {
-    is_federated: boolean;
-    federation_id: string | null;
-    is_master_user: boolean;
-    federated_user: {
-        id: string;
-        email: string;
-        synced_data: Record<string, unknown>;
-        last_synced_at: string | null;
-        created_at: string;
-    } | null;
-    link: {
-        id: string;
-        status: string;
-        sync_enabled: boolean;
-        last_synced_at: string | null;
-        linked_at: string;
-    } | null;
-    group: {
-        id: string;
-        name: string;
-        sync_strategy: string;
-    } | null;
-}
-
 interface Props {
-    user: TeamMember;
-    federationInfo: FederationInfo;
+    user: TeamMemberResource;
+    federationInfo: UserFederationInfoResource;
     canFederate: boolean;
     canUnfederate: boolean;
 }
@@ -143,11 +111,11 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                 <div>
                                     <p className="text-muted-foreground text-sm">{t('common.role')}</p>
                                     <div className="mt-1">
-                                        {user.roles?.map((role) => (
-                                            <Badge key={role.name} variant="outline" className="mr-1">
-                                                {role.name}
+                                        {user.role && (
+                                            <Badge variant="outline">
+                                                {user.role}
                                             </Badge>
-                                        ))}
+                                        )}
                                     </div>
                                 </div>
                                 <div>

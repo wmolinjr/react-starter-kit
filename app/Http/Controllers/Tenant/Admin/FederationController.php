@@ -7,7 +7,10 @@ use App\Exceptions\Tenant\FederationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\FederateBulkUsersRequest;
 use App\Http\Requests\Tenant\FederateUserRequest;
+use App\Http\Resources\Tenant\FederationGroupForTenantResource;
 use App\Http\Resources\Tenant\TeamMemberResource;
+use App\Http\Resources\Tenant\TenantFederationMembershipResource;
+use App\Http\Resources\Tenant\UserFederationInfoResource;
 use App\Models\Tenant\User;
 use App\Services\Tenant\FederationService;
 use Illuminate\Http\RedirectResponse;
@@ -46,18 +49,15 @@ class FederationController extends Controller implements HasMiddleware
     {
         $stats = $this->federationService->getStats();
         $group = $this->federationService->getCurrentGroup();
+        $membership = $this->federationService->getMembership();
 
         return Inertia::render('tenant/admin/settings/federation', [
             'stats' => $stats,
-            'group' => $group ? [
-                'id' => $group->id,
-                'name' => $group->name,
-                'description' => $group->description,
-                'sync_strategy' => $group->sync_strategy,
-                'is_master' => $this->federationService->isMaster(),
-                'settings' => $group->settings,
-            ] : null,
-            'membership' => $this->getMembershipInfo(),
+            'group' => $group
+                ? (new FederationGroupForTenantResource($group))
+                    ->additional(['is_master' => $this->federationService->isMaster()])
+                : null,
+            'membership' => $membership ? new TenantFederationMembershipResource($membership) : null,
             'federatedUsers' => TeamMemberResource::collection($this->federationService->getFederatedUsers()),
             'localOnlyUsers' => TeamMemberResource::collection($this->federationService->getLocalOnlyUsers()),
         ]);
@@ -72,7 +72,7 @@ class FederationController extends Controller implements HasMiddleware
 
         return Inertia::render('tenant/admin/team/federation-info', [
             'user' => new TeamMemberResource($user),
-            'federationInfo' => $federationInfo,
+            'federationInfo' => new UserFederationInfoResource($federationInfo),
             'canFederate' => $this->federationService->isFederated() && !$user->isFederated(),
             'canUnfederate' => $user->isFederated() && !$user->isMasterUser(),
         ]);
@@ -182,22 +182,4 @@ class FederationController extends Controller implements HasMiddleware
         ]));
     }
 
-    /**
-     * Get membership info for current tenant.
-     */
-    protected function getMembershipInfo(): ?array
-    {
-        $membership = $this->federationService->getMembership();
-
-        if (!$membership) {
-            return null;
-        }
-
-        return [
-            'sync_enabled' => $membership->sync_enabled,
-            'joined_at' => $membership->joined_at?->toIso8601String(),
-            'settings' => $membership->settings,
-            'default_role' => $membership->getDefaultRole(),
-        ];
-    }
 }

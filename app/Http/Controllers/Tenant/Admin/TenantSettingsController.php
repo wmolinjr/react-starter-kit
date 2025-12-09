@@ -7,6 +7,7 @@ use App\Exceptions\Tenant\SettingsException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\AddDomainRequest;
 use App\Http\Requests\Tenant\UpdateBrandingRequest;
+use App\Http\Resources\Tenant\ApiTokenResource;
 use App\Services\Tenant\TenantSettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -161,13 +162,7 @@ class TenantSettingsController extends Controller implements HasMiddleware
         $user = auth()->user();
 
         return Inertia::render('tenant/admin/settings/api-tokens', [
-            'tokens' => $user->tokens->map(fn ($token) => [
-                'id' => $token->id,
-                'name' => $token->name,
-                'abilities' => $token->abilities,
-                'last_used_at' => $token->last_used_at,
-                'created_at' => $token->created_at,
-            ]),
+            'tokens' => ApiTokenResource::collection($user->tokens),
         ]);
     }
 

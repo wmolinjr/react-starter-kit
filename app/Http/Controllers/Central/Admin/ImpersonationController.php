@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Central\Admin;
 
 use App\Enums\CentralPermission;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\ImpersonationTenantResource;
+use App\Http\Resources\Central\ImpersonationUserResource;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
 use App\Services\Central\ImpersonationService;
@@ -59,8 +61,8 @@ class ImpersonationController extends Controller implements HasMiddleware
         $users = $this->impersonationService->getTenantUsers($tenant);
 
         return Inertia::render('central/admin/tenants/impersonate', [
-            'tenant' => $this->impersonationService->formatTenantForDisplay($tenant),
-            'users' => $users,
+            'tenant' => new ImpersonationTenantResource($tenant),
+            'users' => ImpersonationUserResource::collection($users),
         ]);
     }
 

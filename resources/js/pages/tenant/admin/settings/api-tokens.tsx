@@ -35,21 +35,13 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Copy, Key, Plus, Trash2 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type ApiTokenResource } from '@/types';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Token {
-    id: string;
-    name: string;
-    abilities: string[];
-    last_used_at: string | null;
-    created_at: string;
-}
-
 interface Props {
-    tokens: Token[];
+    tokens: ApiTokenResource[];
     newToken?: string;
 }
 

@@ -8,29 +8,18 @@ import { Head } from '@inertiajs/react';
 import { KeyRound, Shield, User, Users } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { useImpersonation } from '@/hooks/central/use-impersonation';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type ImpersonationTenantResource,
+    type ImpersonationUserResource,
+} from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-interface TenantUser {
-    id: string;
-    name: string;
-    email: string;
-    created_at: string | null;
-    roles: string[];
-}
-
-interface TenantInfo {
-    id: string;
-    name: string;
-    slug: string;
-    domain: string | null;
-}
-
 interface Props {
-    tenant: TenantInfo;
-    users: TenantUser[];
+    tenant: ImpersonationTenantResource;
+    users: ImpersonationUserResource[];
 }
 
 function ImpersonateTenant({ tenant, users }: Props) {

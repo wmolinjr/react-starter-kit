@@ -163,6 +163,21 @@ export interface FederationGroupResource {
     federated_users_count: number;
 }
 
+export interface ImpersonationTenantResource {
+    id: string;
+    name: string;
+    slug: string;
+    domain: string | null;
+}
+
+export interface ImpersonationUserResource {
+    id: string;
+    name: string;
+    email: string;
+    created_at: string | null;
+    roles: string[];
+}
+
 export interface PlanDetailResource {
     id: string;
     name: string;
@@ -312,6 +327,14 @@ export interface ActivityResource {
     properties: ActivityProperties;
 }
 
+export interface ApiTokenResource {
+    id: string;
+    name: string;
+    abilities: string[];
+    last_used_at: string | null;
+    created_at: string;
+}
+
 export interface BillingPlanResource {
     slug: string;
     name: string;
@@ -320,6 +343,15 @@ export interface BillingPlanResource {
     interval: string;
     features: string[];
     limits: { max_users: number | null; max_projects: number | null; storage_mb: number };
+}
+
+export interface FederationGroupForTenantResource {
+    id: string;
+    name: string;
+    description: string | null;
+    sync_strategy: FederationSyncStrategy;
+    is_master: boolean;
+    settings: Record<string, unknown>;
 }
 
 export interface FederationInfoResource {
@@ -422,6 +454,22 @@ export interface TeamMemberResource {
     email_verified_at: string | null;
     is_owner: boolean;
     is_admin: boolean;
+}
+
+export interface TenantFederationMembershipResource {
+    sync_enabled: boolean;
+    joined_at: string | null;
+    settings: Record<string, unknown>;
+    default_role: string | null;
+}
+
+export interface UserFederationInfoResource {
+    is_federated: boolean;
+    federation_id: string | null;
+    is_master_user: boolean;
+    federated_user: UserFederationInfoFederatedUser | null;
+    link: UserFederationInfoLink | null;
+    group: UserFederationInfoGroup | null;
 }
 
 export interface UserInvitationResource {

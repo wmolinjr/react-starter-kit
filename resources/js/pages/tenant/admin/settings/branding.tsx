@@ -16,12 +16,12 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Palette, Upload } from 'lucide-react';
 import { FormEvent, useRef } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type TenantSummaryResource } from '@/types';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface Branding {
+interface BrandingData {
     logo_url?: string;
     primary_color?: string;
     secondary_color?: string;
@@ -29,11 +29,11 @@ interface Branding {
 }
 
 interface Props {
-    tenant: { id: string; name: string };
-    branding: Branding;
+    tenant: TenantSummaryResource;
+    branding: BrandingData;
 }
 
-function BrandingSettings({ tenant: tenantData, branding }: Props) {
+function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
     const { t } = useLaravelReactI18n();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -255,6 +255,6 @@ function BrandingSettings({ tenant: tenantData, branding }: Props) {
     );
 }
 
-BrandingSettings.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
+BrandingSettingsPage.layout = (page: ReactElement) => <AdminLayout>{page}</AdminLayout>;
 
-export default BrandingSettings;
+export default BrandingSettingsPage;

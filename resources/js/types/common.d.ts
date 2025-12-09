@@ -191,3 +191,38 @@ export interface FederatedUserLink {
     is_master: boolean;
     created_via: string;
 }
+
+// =============================================================================
+// User Federation Info Types (for UserFederationInfoResource)
+// =============================================================================
+
+/**
+ * Federated user info in user federation detail view
+ */
+export interface UserFederationInfoFederatedUser {
+    id: string;
+    email: string;
+    synced_data: Record<string, unknown>;
+    last_synced_at: string | null;
+    created_at: string;
+}
+
+/**
+ * Federation link info in user federation detail view
+ */
+export interface UserFederationInfoLink {
+    id: string;
+    status: string;
+    sync_enabled: boolean;
+    last_synced_at: string | null;
+    linked_at: string;
+}
+
+/**
+ * Federation group info in user federation detail view
+ */
+export interface UserFederationInfoGroup {
+    id: string;
+    name: string;
+    sync_strategy: FederationSyncStrategy;
+}

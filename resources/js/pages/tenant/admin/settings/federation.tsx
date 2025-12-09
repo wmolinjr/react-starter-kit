@@ -48,50 +48,24 @@ import {
     PageHeaderContent,
     PageTitle,
 } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type FederationInfoResource,
+    type TeamMemberResource,
+    type FederationGroupForTenantResource,
+    type TenantFederationMembershipResource,
+} from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
-interface FederationGroup {
-    id: string;
-    name: string;
-    description: string | null;
-    sync_strategy: string;
-    is_master: boolean;
-    settings: Record<string, unknown>;
-}
-
-interface Membership {
-    sync_enabled: boolean;
-    joined_at: string | null;
-    settings: Record<string, unknown>;
-    default_role: string | null;
-}
-
-interface Stats {
-    federated_users: number;
-    local_only_users: number;
-    total_users: number;
-    pending_syncs: number;
-}
-
-interface TeamMember {
-    id: string;
-    name: string;
-    email: string;
-    is_federated: boolean;
-    federation_id: string | null;
-    roles: { name: string }[];
-}
-
 interface Props {
-    stats: Stats;
-    group: FederationGroup | null;
-    membership: Membership | null;
-    federatedUsers: TeamMember[];
-    localOnlyUsers: TeamMember[];
+    stats: FederationInfoResource;
+    group: FederationGroupForTenantResource | null;
+    membership: TenantFederationMembershipResource | null;
+    federatedUsers: TeamMemberResource[];
+    localOnlyUsers: TeamMemberResource[];
 }
 
 function FederationSettings({ stats, group, membership, federatedUsers, localOnlyUsers }: Props) {
@@ -279,7 +253,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                             </Card>
 
                             {/* Stats */}
-                            <div className="grid gap-4 md:grid-cols-4">
+                            <div className="grid gap-4 md:grid-cols-3">
                                 <Card>
                                     <CardContent>
                                         <div className="flex items-center gap-4">
@@ -288,9 +262,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground text-sm">
-                                                    {t('tenant.federation.total_users')}
+                                                    {t('tenant.federation.total_tenants')}
                                                 </p>
-                                                <p className="text-2xl font-bold">{stats.total_users}</p>
+                                                <p className="text-2xl font-bold">{stats.total_group_tenants}</p>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -305,7 +279,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                 <p className="text-muted-foreground text-sm">
                                                     {t('tenant.federation.federated_users')}
                                                 </p>
-                                                <p className="text-2xl font-bold">{stats.federated_users}</p>
+                                                <p className="text-2xl font-bold">{stats.federated_users_count}</p>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -320,28 +294,11 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                 <p className="text-muted-foreground text-sm">
                                                     {t('tenant.federation.local_only')}
                                                 </p>
-                                                <p className="text-2xl font-bold">{stats.local_only_users}</p>
+                                                <p className="text-2xl font-bold">{stats.local_users_count}</p>
                                             </div>
                                         </div>
                                     </CardContent>
                                 </Card>
-                                {stats.pending_syncs > 0 && (
-                                    <Card className="border-yellow-500">
-                                        <CardContent>
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900">
-                                                    <RefreshCw className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-muted-foreground text-sm">
-                                                        {t('tenant.federation.pending_syncs')}
-                                                    </p>
-                                                    <p className="text-2xl font-bold">{stats.pending_syncs}</p>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                )}
                             </div>
 
                             {/* Master Tenant Info */}
@@ -449,11 +406,11 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {user.roles?.map((role) => (
-                                                                <Badge key={role.name} variant="outline" className="mr-1">
-                                                                    {role.name}
+                                                            {user.role && (
+                                                                <Badge variant="outline">
+                                                                    {user.role}
                                                                 </Badge>
-                                                            ))}
+                                                            )}
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge variant="default">
@@ -568,11 +525,11 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {user.roles?.map((role) => (
-                                                                <Badge key={role.name} variant="outline" className="mr-1">
-                                                                    {role.name}
+                                                            {user.role && (
+                                                                <Badge variant="outline">
+                                                                    {user.role}
                                                                 </Badge>
-                                                            ))}
+                                                            )}
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge variant="secondary">

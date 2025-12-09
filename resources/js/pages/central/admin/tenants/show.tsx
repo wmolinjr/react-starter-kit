@@ -32,43 +32,17 @@ import {
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { useFederation, isCentralFederation } from '@/hooks/shared/use-federation';
 import { useImpersonation } from '@/hooks/central/use-impersonation';
-import { type BreadcrumbItem } from '@/types';
+import {
+    type BreadcrumbItem,
+    type TenantDetailResource,
+    type FederationGroupResource,
+} from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type ReactElement } from 'react';
 
-interface FederationGroup {
-    id: string;
-    name: string;
-    description: string | null;
-    sync_strategy: string;
-    is_active: boolean;
-    federated_users_count: number;
-    master_tenant_id: string | null;
-    is_master: boolean;
-    master_tenant: { id: string; name: string } | null;
-    sync_enabled: boolean;
-    joined_at: string | null;
-    left_at: string | null;
-}
-
-interface AvailableFederationGroup {
-    id: string;
-    name: string;
-}
-
 interface Props {
-    tenant: {
-        id: string;
-        name: string;
-        slug: string;
-        created_at: string;
-        plan: { id: string; name: string } | null;
-        domains: { id: string; domain: string; is_primary: boolean }[];
-        users: { id: string; name: string; email: string }[];
-        addons: { id: string; name: string; status: string }[];
-        federation_groups?: FederationGroup[];
-    };
-    availableFederationGroups: AvailableFederationGroup[];
+    tenant: TenantDetailResource;
+    availableFederationGroups: Pick<FederationGroupResource, 'id' | 'name'>[];
 }
 
 function TenantShow({ tenant, availableFederationGroups }: Props) {
@@ -81,7 +55,12 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
         throw new Error('TenantShow must be used in central context');
     }
 
-    const { processingId: federationProcessingId, addTenant, rejoinTenant, toggleTenantSync } = federation;
+    const { addTenant, rejoinTenant, toggleTenantSync } = federation;
+
+    // Provide defaults for optional arrays from TenantDetailResource
+    const domains = tenant.domains ?? [];
+    const users = tenant.users ?? [];
+    const addons = tenant.addons ?? [];
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -139,9 +118,9 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {tenant.domains.length > 0 ? (
+                            {domains.length > 0 ? (
                                 <div className="space-y-2">
-                                    {tenant.domains.map((domain) => (
+                                    {domains.map((domain) => (
                                         <div
                                             key={domain.id}
                                             className="flex items-center justify-between rounded-lg border p-3"
@@ -184,13 +163,13 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Users className="h-5 w-5" />
-                                Users ({tenant.users.length})
+                                Users ({users.length})
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {tenant.users.length > 0 ? (
+                            {users.length > 0 ? (
                                 <div className="space-y-2">
-                                    {tenant.users.slice(0, 5).map((user) => (
+                                    {users.slice(0, 5).map((user) => (
                                         <div
                                             key={user.id}
                                             className="flex items-center justify-between rounded-lg border p-3"
@@ -211,9 +190,9 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                                             </Button>
                                         </div>
                                     ))}
-                                    {tenant.users.length > 5 && (
+                                    {users.length > 5 && (
                                         <p className="text-muted-foreground text-center text-sm">
-                                            +{tenant.users.length - 5} {t('admin.tenants.more_users')}
+                                            +{users.length - 5} {t('admin.tenants.more_users')}
                                         </p>
                                     )}
                                 </div>
@@ -227,23 +206,19 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Package className="h-5 w-5" />
-                                Add-ons ({tenant.addons.length})
+                                Add-ons ({addons.length})
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {tenant.addons.length > 0 ? (
+                            {addons.length > 0 ? (
                                 <div className="space-y-2">
-                                    {tenant.addons.map((addon: { id: string; name: string; status: string }) => (
+                                    {addons.map((addon) => (
                                         <div
                                             key={addon.id}
                                             className="flex items-center justify-between rounded-lg border p-3"
                                         >
                                             <span>{addon.name}</span>
-                                            <Badge
-                                                variant={addon.status === 'active' ? 'default' : 'secondary'}
-                                            >
-                                                {addon.status}
-                                            </Badge>
+                                            <Badge variant="outline">{addon.slug}</Badge>
                                         </div>
                                     ))}
                                 </div>
