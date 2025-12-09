@@ -2,7 +2,7 @@
  * Enum Metadata - Auto-generated from PHP Enums
  *
  * DO NOT EDIT MANUALLY!
- * Run: sail artisan enums:generate-types
+ * Run: sail artisan types:generate
  *
  * Contains the actual metadata (icon, color, label, etc.) for each enum value.
  */
@@ -231,14 +231,14 @@ export const TENANT_CONFIG_KEY: Record<TenantConfigKey, TenantConfigKeyOption> =
 
 
 /**
- * Get metadata for an AddonType value.
+ * Get metadata for a AddonType value.
  */
 export function getAddonTypeMeta(type: AddonType): AddonTypeOption {
     return ADDON_TYPE[type];
 }
 
 /**
- * Get metadata for an AddonStatus value.
+ * Get metadata for a AddonStatus value.
  */
 export function getAddonStatusMeta(status: AddonStatus): AddonStatusOption {
     return ADDON_STATUS[status];

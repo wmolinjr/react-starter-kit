@@ -2,9 +2,9 @@
  * Plan Types - Auto-generated from PlanFeature and PlanLimit enums
  *
  * DO NOT EDIT MANUALLY!
- * Run: sail artisan plans:generate-types
+ * Run: sail artisan types:generate
  *
- * Source of truth: app/Plans/Enums/PlanFeature.php, PlanLimit.php
+ * Source of truth: app/Enums/PlanFeature.php, PlanLimit.php
  */
 export interface PlanFeatures {
     projects: boolean;

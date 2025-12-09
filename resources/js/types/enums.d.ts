@@ -2,7 +2,7 @@
  * Enum Types - Auto-generated from PHP Enums
  *
  * DO NOT EDIT MANUALLY!
- * Run: sail artisan enums:generate-types
+ * Run: sail artisan types:generate
  *
  * Source of truth:
  * - app/Enums/AddonType.php

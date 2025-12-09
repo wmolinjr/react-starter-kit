@@ -670,8 +670,8 @@ sail artisan permission:cache-reset
 
 ```bash
 sail artisan permissions:sync
-# ou
-sail artisan permissions:generate-types
+# ou apenas os tipos
+sail artisan types:generate
 ```
 
 ### Verificar enum

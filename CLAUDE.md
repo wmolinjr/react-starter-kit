@@ -924,6 +924,7 @@ TELESCOPE_MCP_PATH=telescope-mcp
 For in-depth technical documentation, see:
 
 - **[docs/PERMISSIONS.md](docs/PERMISSIONS.md)** - Permissions system (enums, roles, usage)
+- **[docs/ENUMS-SINGLE-SOURCE-OF-TRUTH.md](docs/ENUMS-SINGLE-SOURCE-OF-TRUTH.md)** - Enum system architecture and TypeScript generation
 - **[docs/SYSTEM-ARCHITECTURE.md](docs/SYSTEM-ARCHITECTURE.md)** - Plans, features, limits, addons
 - **[docs/DATABASE-IDS.md](docs/DATABASE-IDS.md)** - UUID architecture decision
 - **[docs/STANCL-FEATURES.md](docs/STANCL-FEATURES.md)** - Multi-tenancy features

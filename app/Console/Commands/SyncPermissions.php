@@ -96,7 +96,7 @@ class SyncPermissions extends Command
 
         // Generate TypeScript types
         $this->info('📝 Generating TypeScript types...');
-        Artisan::call('permissions:generate-types');
+        Artisan::call('types:generate');
         $this->info('✅ TypeScript types generated.');
         $this->newLine();
 
