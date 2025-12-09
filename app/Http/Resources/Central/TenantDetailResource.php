@@ -84,6 +84,7 @@ class TenantDetailResource extends BaseResource
                     // Pivot data
                     'sync_enabled' => $group->pivot->sync_enabled,
                     'joined_at' => $this->formatIso($group->pivot->joined_at),
+                    'left_at' => $this->formatIso($group->pivot->left_at),
                 ])
             ),
             'federation_groups_count' => $this->whenCounted('federationGroups', fn () => $this->federation_groups_count ?? $this->federationGroups->count()),

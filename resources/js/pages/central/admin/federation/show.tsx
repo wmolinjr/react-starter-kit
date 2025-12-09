@@ -27,6 +27,7 @@ import {
     CirclePlay,
     CircleStop,
     Crown,
+    LogIn,
     Mail,
     Network,
     Pencil,
@@ -54,6 +55,7 @@ interface Tenant {
     is_master: boolean;
     sync_enabled: boolean;
     joined_at: string;
+    left_at: string | null;
     settings: Record<string, unknown>;
 }
 
@@ -142,6 +144,10 @@ function FederationShow({ group, availableTenants }: Props) {
 
     const handleRemoveTenant = (tenantId: string) => {
         router.delete(admin.federation.tenants.remove.url({ group: group.id, tenant: tenantId }));
+    };
+
+    const handleRejoinTenant = (tenantId: string) => {
+        router.post(admin.federation.tenants.add.url(group.id), { tenant_id: tenantId });
     };
 
     return (
@@ -325,7 +331,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                             </TableHeader>
                                             <TableBody>
                                                 {group.tenants.map((tenant) => (
-                                                    <TableRow key={tenant.id}>
+                                                    <TableRow key={tenant.id} className={tenant.left_at ? 'opacity-60' : ''}>
                                                         <TableCell>
                                                             <div className="flex items-center gap-2">
                                                                 {tenant.is_master && (
@@ -340,7 +346,12 @@ function FederationShow({ group, availableTenants }: Props) {
                                                             </code>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {tenant.sync_enabled ? (
+                                                            {tenant.left_at ? (
+                                                                <Badge variant="outline">
+                                                                    <XCircle className="mr-1 h-3 w-3" />
+                                                                    {t('admin.federation.left')}
+                                                                </Badge>
+                                                            ) : tenant.sync_enabled ? (
                                                                 <Badge variant="default">
                                                                     <CheckCircle className="mr-1 h-3 w-3" />
                                                                     {t('admin.federation.sync_enabled')}
@@ -353,13 +364,50 @@ function FederationShow({ group, availableTenants }: Props) {
                                                             )}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {tenant.joined_at
-                                                                ? new Date(tenant.joined_at).toLocaleDateString()
-                                                                : '-'}
+                                                            {tenant.left_at
+                                                                ? new Date(tenant.left_at).toLocaleDateString()
+                                                                : tenant.joined_at
+                                                                    ? new Date(tenant.joined_at).toLocaleDateString()
+                                                                    : '-'}
                                                         </TableCell>
                                                         <TableCell>
                                                             <div className="flex gap-1">
-                                                                {!tenant.is_master && (
+                                                                {/* Tenant que saiu: mostrar botão de Rejoin */}
+                                                                {tenant.left_at && !tenant.is_master && (
+                                                                    <AlertDialog>
+                                                                        <AlertDialogTrigger asChild>
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                title={t('admin.federation.rejoin')}
+                                                                            >
+                                                                                <LogIn className="h-4 w-4 text-green-600" />
+                                                                            </Button>
+                                                                        </AlertDialogTrigger>
+                                                                        <AlertDialogContent>
+                                                                            <AlertDialogHeader>
+                                                                                <AlertDialogTitle>
+                                                                                    {t('admin.federation.rejoin_title')}
+                                                                                </AlertDialogTitle>
+                                                                                <AlertDialogDescription>
+                                                                                    {t('admin.federation.rejoin_confirm', { name: tenant.name })}
+                                                                                </AlertDialogDescription>
+                                                                            </AlertDialogHeader>
+                                                                            <AlertDialogFooter>
+                                                                                <AlertDialogCancel>
+                                                                                    {t('common.cancel')}
+                                                                                </AlertDialogCancel>
+                                                                                <AlertDialogAction
+                                                                                    onClick={() => handleRejoinTenant(tenant.id)}
+                                                                                >
+                                                                                    {t('admin.federation.rejoin')}
+                                                                                </AlertDialogAction>
+                                                                            </AlertDialogFooter>
+                                                                        </AlertDialogContent>
+                                                                    </AlertDialog>
+                                                                )}
+                                                                {/* Tenant ativo: toggle sync */}
+                                                                {!tenant.left_at && !tenant.is_master && (
                                                                     <AlertDialog>
                                                                         <AlertDialogTrigger asChild>
                                                                             <Button
@@ -410,7 +458,8 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                         <Building2 className="h-4 w-4" />
                                                                     </Link>
                                                                 </Button>
-                                                                {!tenant.is_master && (
+                                                                {/* Tenant ativo: remover */}
+                                                                {!tenant.left_at && !tenant.is_master && (
                                                                     <AlertDialog>
                                                                         <AlertDialogTrigger asChild>
                                                                             <Button

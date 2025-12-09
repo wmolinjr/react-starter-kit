@@ -21,6 +21,7 @@ import {
     CreditCard,
     Crown,
     Globe,
+    LogIn,
     Network,
     Package,
     Play,
@@ -45,6 +46,7 @@ interface FederationGroup {
     master_tenant: { id: string; name: string } | null;
     sync_enabled: boolean;
     joined_at: string | null;
+    left_at: string | null;
 }
 
 interface AvailableFederationGroup {
@@ -85,9 +87,15 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
         router.post(admin.federation.tenants.add.url(groupId), { tenant_id: tenant.id });
     };
 
+    const handleRejoinGroup = (groupId: string) => {
+        router.post(admin.federation.tenants.add.url(groupId), { tenant_id: tenant.id });
+    };
+
     const federationGroups = tenant.federation_groups || [];
-    const activeSyncs = federationGroups.filter((g) => g.sync_enabled).length;
-    const totalFederatedUsers = federationGroups.reduce((acc, g) => acc + g.federated_users_count, 0);
+    const activeGroups = federationGroups.filter((g) => !g.left_at);
+    const leftGroups = federationGroups.filter((g) => g.left_at);
+    const activeSyncs = activeGroups.filter((g) => g.sync_enabled).length;
+    const totalFederatedUsers = activeGroups.reduce((acc, g) => acc + g.federated_users_count, 0);
 
     return (
         <>
@@ -229,9 +237,16 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                                         {t('admin.tenants.federation_groups')} ({federationGroups.length})
                                     </CardTitle>
                                     <CardDescription>
-                                        {federationGroups.length > 0 ? (
+                                        {activeGroups.length > 0 ? (
                                             <>
                                                 {activeSyncs} {t('admin.tenants.active_syncs')} · {totalFederatedUsers} {t('admin.tenants.federated_users')}
+                                                {leftGroups.length > 0 && (
+                                                    <> · {leftGroups.length} {t('admin.federation.left').toLowerCase()}</>
+                                                )}
+                                            </>
+                                        ) : leftGroups.length > 0 ? (
+                                            <>
+                                                {leftGroups.length} {t('admin.federation.left').toLowerCase()}
                                             </>
                                         ) : (
                                             t('admin.tenants.federation_groups_description')
@@ -260,7 +275,7 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                                     {federationGroups.map((group) => (
                                         <div
                                             key={group.id}
-                                            className="flex items-center justify-between rounded-lg border p-4"
+                                            className={`flex items-center justify-between rounded-lg border p-4 ${group.left_at ? 'opacity-60' : ''}`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="bg-primary/10 rounded-full p-2">
@@ -282,76 +297,129 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
                                                                 ? t('admin.tenants.master_tenant')
                                                                 : t('admin.tenants.member_tenant')}
                                                         </span>
-                                                        {group.joined_at && (
+                                                        {group.left_at ? (
+                                                            <>
+                                                                <span>·</span>
+                                                                <span>
+                                                                    {t('admin.federation.left')}: {new Date(group.left_at).toLocaleDateString()}
+                                                                </span>
+                                                            </>
+                                                        ) : group.joined_at ? (
                                                             <>
                                                                 <span>·</span>
                                                                 <span>
                                                                     {t('admin.tenants.joined')}: {new Date(group.joined_at).toLocaleDateString()}
                                                                 </span>
                                                             </>
+                                                        ) : null}
+                                                        {!group.left_at && (
+                                                            <>
+                                                                <span>·</span>
+                                                                <span>{group.federated_users_count} {t('admin.tenants.users')}</span>
+                                                            </>
                                                         )}
-                                                        <span>·</span>
-                                                        <span>{group.federated_users_count} {t('admin.tenants.users')}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {group.sync_enabled ? (
-                                                    <Badge variant="default">
-                                                        <CheckCircle className="mr-1 h-3 w-3" />
-                                                        {t('admin.federation.sync_enabled')}
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge variant="secondary">
-                                                        <XCircle className="mr-1 h-3 w-3" />
-                                                        {t('admin.federation.sync_disabled')}
-                                                    </Badge>
-                                                )}
-                                                {!group.is_master && (
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                title={group.sync_enabled
-                                                                    ? t('admin.federation.disable_sync')
-                                                                    : t('admin.federation.enable_sync')
-                                                                }
-                                                            >
-                                                                {group.sync_enabled ? (
-                                                                    <StopCircle className="h-4 w-4 text-destructive" />
-                                                                ) : (
-                                                                    <Play className="h-4 w-4 text-green-600" />
-                                                                )}
-                                                            </Button>
-                                                        </AlertDialogTrigger>
-                                                        <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle>
-                                                                    {group.sync_enabled
-                                                                        ? t('admin.federation.disable_sync_title')
-                                                                        : t('admin.federation.enable_sync_title')
-                                                                    }
-                                                                </AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    {group.sync_enabled
-                                                                        ? t('admin.federation.disable_sync_confirm', { name: tenant.name })
-                                                                        : t('admin.federation.enable_sync_confirm', { name: tenant.name })
-                                                                    }
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>
-                                                                    {t('common.cancel')}
-                                                                </AlertDialogCancel>
-                                                                <AlertDialogAction
-                                                                    onClick={() => handleToggleFederationSync(group.id)}
+                                                {group.left_at ? (
+                                                    <>
+                                                        <Badge variant="outline">
+                                                            <XCircle className="mr-1 h-3 w-3" />
+                                                            {t('admin.federation.left')}
+                                                        </Badge>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    title={t('admin.federation.rejoin')}
                                                                 >
-                                                                    {t('common.confirm')}
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
+                                                                    <LogIn className="h-4 w-4 text-green-600" />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>
+                                                                        {t('admin.federation.rejoin_title')}
+                                                                    </AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        {t('admin.federation.rejoin_confirm', { name: tenant.name })}
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>
+                                                                        {t('common.cancel')}
+                                                                    </AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => handleRejoinGroup(group.id)}
+                                                                    >
+                                                                        {t('admin.federation.rejoin')}
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {group.sync_enabled ? (
+                                                            <Badge variant="default">
+                                                                <CheckCircle className="mr-1 h-3 w-3" />
+                                                                {t('admin.federation.sync_enabled')}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge variant="secondary">
+                                                                <XCircle className="mr-1 h-3 w-3" />
+                                                                {t('admin.federation.sync_disabled')}
+                                                            </Badge>
+                                                        )}
+                                                        {!group.is_master && (
+                                                            <AlertDialog>
+                                                                <AlertDialogTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        title={group.sync_enabled
+                                                                            ? t('admin.federation.disable_sync')
+                                                                            : t('admin.federation.enable_sync')
+                                                                        }
+                                                                    >
+                                                                        {group.sync_enabled ? (
+                                                                            <StopCircle className="h-4 w-4 text-destructive" />
+                                                                        ) : (
+                                                                            <Play className="h-4 w-4 text-green-600" />
+                                                                        )}
+                                                                    </Button>
+                                                                </AlertDialogTrigger>
+                                                                <AlertDialogContent>
+                                                                    <AlertDialogHeader>
+                                                                        <AlertDialogTitle>
+                                                                            {group.sync_enabled
+                                                                                ? t('admin.federation.disable_sync_title')
+                                                                                : t('admin.federation.enable_sync_title')
+                                                                            }
+                                                                        </AlertDialogTitle>
+                                                                        <AlertDialogDescription>
+                                                                            {group.sync_enabled
+                                                                                ? t('admin.federation.disable_sync_confirm', { name: tenant.name })
+                                                                                : t('admin.federation.enable_sync_confirm', { name: tenant.name })
+                                                                            }
+                                                                        </AlertDialogDescription>
+                                                                    </AlertDialogHeader>
+                                                                    <AlertDialogFooter>
+                                                                        <AlertDialogCancel>
+                                                                            {t('common.cancel')}
+                                                                        </AlertDialogCancel>
+                                                                        <AlertDialogAction
+                                                                            onClick={() => handleToggleFederationSync(group.id)}
+                                                                        >
+                                                                            {t('common.confirm')}
+                                                                        </AlertDialogAction>
+                                                                    </AlertDialogFooter>
+                                                                </AlertDialogContent>
+                                                            </AlertDialog>
+                                                        )}
+                                                    </>
                                                 )}
                                                 <Button variant="ghost" size="sm" asChild>
                                                     <Link href={admin.federation.show.url(group.id)}>

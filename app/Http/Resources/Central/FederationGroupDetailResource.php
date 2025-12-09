@@ -45,6 +45,7 @@ class FederationGroupDetailResource extends BaseResource
                     'is_master' => $tenant->id === $this->master_tenant_id,
                     'sync_enabled' => $tenant->pivot->sync_enabled ?? true,
                     'joined_at' => $this->formatIso($tenant->pivot->joined_at),
+                    'left_at' => $this->formatIso($tenant->pivot->left_at),
                     'settings' => $tenant->pivot->settings ?? [],
                 ])
             ),
