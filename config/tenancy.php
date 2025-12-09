@@ -141,6 +141,10 @@ return [
 
         // Spatie Permission: Limpa cache ao trocar de tenant
         App\Bootstrappers\SpatiePermissionsBootstrapper::class,
+
+        // MediaLibrary: Override max_file_size based on tenant's plan limit (FILE_UPLOAD_SIZE)
+        // Converts plan limit (MB) to bytes for config('media-library.max_file_size')
+        App\Bootstrappers\MediaLibraryConfigBootstrapper::class,
     ],
 
     /**
