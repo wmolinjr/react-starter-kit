@@ -14,8 +14,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AdminLayout from '@/layouts/tenant/admin-layout';
+import { useFederation, isTenantFederation } from '@/hooks/shared/use-federation';
 import admin from '@/routes/tenant/admin';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     AlertCircle,
@@ -86,8 +87,16 @@ interface Props {
 
 function FederationSettings({ stats, group, membership, federatedUsers, localOnlyUsers }: Props) {
     const { t } = useLaravelReactI18n();
-    const [federatingUser, setFederatingUser] = useState<string | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
+    const federation = useFederation();
+
+    // Type guard ensures we have tenant operations
+    if (!isTenantFederation(federation)) {
+        throw new Error('FederationSettings must be used in tenant context');
+    }
+
+    const { processingId, federateUser, unfederateUser, syncUser } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -99,26 +108,19 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
 
     const handleFederateUser = () => {
         if (!selectedUserId) return;
-        router.post(
-            admin.settings.federation.users.federate.url(),
-            { user_id: selectedUserId },
-            {
-                onSuccess: () => {
-                    setFederatingUser(null);
-                    setSelectedUserId('');
-                },
-            },
-        );
+        federateUser(selectedUserId);
+        setDialogOpen(false);
+        setSelectedUserId('');
     };
 
     const handleUnfederateUser = (userId: string, userName: string) => {
         if (confirm(t('tenant.federation.unfederate_confirm', { name: userName }))) {
-            router.delete(admin.settings.federation.users.unfederate.url(userId));
+            unfederateUser(userId);
         }
     };
 
     const handleSyncUser = (userId: string) => {
-        router.post(admin.settings.federation.users.sync.url(userId));
+        syncUser(userId);
     };
 
     const getSyncStrategyLabel = (strategy: string) => {
@@ -305,9 +307,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                             </CardDescription>
                                         </div>
                                         {localOnlyUsers.length > 0 && (
-                                            <Dialog open={federatingUser !== null} onOpenChange={(open) => !open && setFederatingUser(null)}>
+                                            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                                                 <DialogTrigger asChild>
-                                                    <Button onClick={() => setFederatingUser('dialog')}>
+                                                    <Button>
                                                         <LinkIcon className="mr-2 h-4 w-4" />
                                                         {t('tenant.federation.federate_user')}
                                                     </Button>
@@ -348,11 +350,11 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                         </Alert>
                                                     </div>
                                                     <DialogFooter>
-                                                        <Button variant="outline" onClick={() => setFederatingUser(null)}>
+                                                        <Button variant="outline" onClick={() => setDialogOpen(false)}>
                                                             {t('common.cancel')}
                                                         </Button>
-                                                        <Button onClick={handleFederateUser} disabled={!selectedUserId}>
-                                                            {t('tenant.federation.federate')}
+                                                        <Button onClick={handleFederateUser} disabled={!selectedUserId || processingId === selectedUserId}>
+                                                            {processingId === selectedUserId ? '...' : t('tenant.federation.federate')}
                                                         </Button>
                                                     </DialogFooter>
                                                 </DialogContent>

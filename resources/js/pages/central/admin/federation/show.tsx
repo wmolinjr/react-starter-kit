@@ -15,8 +15,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AdminLayout from '@/layouts/central/admin-layout';
+import { useFederation, isCentralFederation } from '@/hooks/shared/use-federation';
 import admin from '@/routes/central/admin';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -106,6 +107,22 @@ interface Props {
 
 function FederationShow({ group, availableTenants }: Props) {
     const { t } = useLaravelReactI18n();
+    const federation = useFederation();
+
+    // Type guard ensures we have central operations
+    if (!isCentralFederation(federation)) {
+        throw new Error('FederationShow must be used in central context');
+    }
+
+    const {
+        processingId,
+        addTenant,
+        removeTenant,
+        rejoinTenant,
+        toggleTenantSync,
+        syncUser,
+        retryAllSync,
+    } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -125,29 +142,29 @@ function FederationShow({ group, availableTenants }: Props) {
     };
 
     const handleAddTenant = (tenantId: string) => {
-        router.post(admin.federation.tenants.add.url(group.id), { tenant_id: tenantId });
+        addTenant(group.id, tenantId);
     };
 
     const handleSyncUser = (userId: string) => {
-        router.post(admin.federation.users.sync.url({ group: group.id, user: userId }));
+        syncUser(group.id, userId);
     };
 
     const handleRetryAllSync = () => {
         if (confirm(t('admin.federation.retry_sync_confirm'))) {
-            router.post(admin.federation.retrySync.url(group.id));
+            retryAllSync(group.id);
         }
     };
 
     const handleToggleTenantSync = (tenantId: string) => {
-        router.post(admin.federation.tenants.toggleSync.url({ group: group.id, tenant: tenantId }));
+        toggleTenantSync(group.id, tenantId);
     };
 
     const handleRemoveTenant = (tenantId: string) => {
-        router.delete(admin.federation.tenants.remove.url({ group: group.id, tenant: tenantId }));
+        removeTenant(group.id, tenantId);
     };
 
     const handleRejoinTenant = (tenantId: string) => {
-        router.post(admin.federation.tenants.add.url(group.id), { tenant_id: tenantId });
+        rejoinTenant(group.id, tenantId);
     };
 
     return (

@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AdminLayout from '@/layouts/central/admin-layout';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import admin from '@/routes/central/admin';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     CheckCircle,
     CreditCard,
@@ -30,6 +30,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import { Page, PageHeader, PageHeaderContent, PageHeaderActions, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
+import { useFederation, isCentralFederation } from '@/hooks/shared/use-federation';
 import { useImpersonation } from '@/hooks/central/use-impersonation';
 import { type BreadcrumbItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -73,6 +74,14 @@ interface Props {
 function TenantShow({ tenant, availableFederationGroups }: Props) {
     const { t } = useLaravelReactI18n();
     const { impersonatingId, impersonateTenant, impersonateAsUser } = useImpersonation();
+    const federation = useFederation();
+
+    // Type guard ensures we have central operations
+    if (!isCentralFederation(federation)) {
+        throw new Error('TenantShow must be used in central context');
+    }
+
+    const { processingId: federationProcessingId, addTenant, rejoinTenant, toggleTenantSync } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -82,15 +91,15 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
     useSetBreadcrumbs(breadcrumbs);
 
     const handleToggleFederationSync = (groupId: string) => {
-        router.post(admin.federation.tenants.toggleSync.url({ group: groupId, tenant: tenant.id }));
+        toggleTenantSync(groupId, tenant.id);
     };
 
     const handleAddToFederationGroup = (groupId: string) => {
-        router.post(admin.federation.tenants.add.url(groupId), { tenant_id: tenant.id });
+        addTenant(groupId, tenant.id);
     };
 
     const handleRejoinGroup = (groupId: string) => {
-        router.post(admin.federation.tenants.add.url(groupId), { tenant_id: tenant.id });
+        rejoinTenant(groupId, tenant.id);
     };
 
     const federationGroups = tenant.federation_groups || [];
