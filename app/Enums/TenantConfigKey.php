@@ -19,6 +19,9 @@ enum TenantConfigKey: string
     // Localization
     case LOCALE = 'locale';
     case TIMEZONE = 'timezone';
+    case DATE_FORMAT = 'date_format';
+    case TIME_FORMAT = 'time_format';
+    case WEEK_STARTS_ON = 'week_starts_on';
 
     // Email
     case MAIL_FROM_ADDRESS = 'mail_from_address';
@@ -39,6 +42,9 @@ enum TenantConfigKey: string
             self::APP_NAME => ['en' => 'Application Name', 'pt_BR' => 'Nome da Aplicação', 'es' => 'Nombre de la Aplicación'],
             self::LOCALE => ['en' => 'Language', 'pt_BR' => 'Idioma', 'es' => 'Idioma'],
             self::TIMEZONE => ['en' => 'Timezone', 'pt_BR' => 'Fuso Horário', 'es' => 'Zona Horaria'],
+            self::DATE_FORMAT => ['en' => 'Date Format', 'pt_BR' => 'Formato de Data', 'es' => 'Formato de Fecha'],
+            self::TIME_FORMAT => ['en' => 'Time Format', 'pt_BR' => 'Formato de Hora', 'es' => 'Formato de Hora'],
+            self::WEEK_STARTS_ON => ['en' => 'Week Starts On', 'pt_BR' => 'Semana Começa em', 'es' => 'Semana Comienza en'],
             self::MAIL_FROM_ADDRESS => ['en' => 'From Email', 'pt_BR' => 'E-mail de Origem', 'es' => 'Correo de Origen'],
             self::MAIL_FROM_NAME => ['en' => 'From Name', 'pt_BR' => 'Nome de Origem', 'es' => 'Nombre de Origen'],
             self::CURRENCY => ['en' => 'Currency', 'pt_BR' => 'Moeda', 'es' => 'Moneda'],
@@ -68,6 +74,21 @@ enum TenantConfigKey: string
                 'en' => 'Timezone for dates and times',
                 'pt_BR' => 'Fuso horário para datas e horas',
                 'es' => 'Zona horaria para fechas y horas',
+            ],
+            self::DATE_FORMAT => [
+                'en' => 'How dates are displayed throughout the application',
+                'pt_BR' => 'Como as datas são exibidas em toda a aplicação',
+                'es' => 'Cómo se muestran las fechas en toda la aplicación',
+            ],
+            self::TIME_FORMAT => [
+                'en' => 'How times are displayed (12-hour or 24-hour)',
+                'pt_BR' => 'Como os horários são exibidos (12 ou 24 horas)',
+                'es' => 'Cómo se muestran las horas (12 o 24 horas)',
+            ],
+            self::WEEK_STARTS_ON => [
+                'en' => 'First day of the week in calendars',
+                'pt_BR' => 'Primeiro dia da semana nos calendários',
+                'es' => 'Primer día de la semana en los calendarios',
             ],
             self::MAIL_FROM_ADDRESS => [
                 'en' => 'Email address used for sending notifications',
@@ -101,6 +122,9 @@ enum TenantConfigKey: string
             self::APP_NAME => 'Type',
             self::LOCALE => 'Globe',
             self::TIMEZONE => 'Clock',
+            self::DATE_FORMAT => 'Calendar',
+            self::TIME_FORMAT => 'Clock3',
+            self::WEEK_STARTS_ON => 'CalendarDays',
             self::MAIL_FROM_ADDRESS => 'Mail',
             self::MAIL_FROM_NAME => 'User',
             self::CURRENCY => 'DollarSign',
@@ -143,7 +167,7 @@ enum TenantConfigKey: string
     {
         return match ($this) {
             self::APP_NAME => 'branding',
-            self::LOCALE, self::TIMEZONE => 'localization',
+            self::LOCALE, self::TIMEZONE, self::DATE_FORMAT, self::TIME_FORMAT, self::WEEK_STARTS_ON => 'localization',
             self::MAIL_FROM_ADDRESS, self::MAIL_FROM_NAME => 'email',
             self::CURRENCY, self::CURRENCY_LOCALE => 'payments',
         };
@@ -182,6 +206,9 @@ enum TenantConfigKey: string
             self::APP_NAME => ['app.name'],
             self::LOCALE => ['app.locale'],
             self::TIMEZONE => ['app.timezone'],
+            self::DATE_FORMAT => ['app.date_format'],
+            self::TIME_FORMAT => ['app.time_format'],
+            self::WEEK_STARTS_ON => ['app.week_starts_on'],
             self::MAIL_FROM_ADDRESS => ['mail.from.address'],
             self::MAIL_FROM_NAME => ['mail.from.name'],
             self::CURRENCY => ['cashier.currency'],
@@ -207,6 +234,9 @@ enum TenantConfigKey: string
             self::APP_NAME => null, // Falls back to config('app.name')
             self::LOCALE => 'en',
             self::TIMEZONE => 'UTC',
+            self::DATE_FORMAT => 'dd/MM/yyyy',
+            self::TIME_FORMAT => '24h',
+            self::WEEK_STARTS_ON => 0, // 0 = Sunday, 1 = Monday, etc.
             self::MAIL_FROM_ADDRESS => null,
             self::MAIL_FROM_NAME => null,
             self::CURRENCY => 'usd',
@@ -225,6 +255,9 @@ enum TenantConfigKey: string
             self::APP_NAME => ['nullable', 'string', 'max:100'],
             self::LOCALE => ['string', 'in:'.implode(',', config('app.locales', ['en']))],
             self::TIMEZONE => ['string', 'timezone'],
+            self::DATE_FORMAT => ['string', 'in:'.implode(',', array_keys(self::availableDateFormats()))],
+            self::TIME_FORMAT => ['string', 'in:12h,24h'],
+            self::WEEK_STARTS_ON => ['integer', 'min:0', 'max:6'],
             self::MAIL_FROM_ADDRESS => ['nullable', 'email', 'max:255'],
             self::MAIL_FROM_NAME => ['nullable', 'string', 'max:100'],
             self::CURRENCY => ['string', 'size:3', 'lowercase'],
@@ -372,5 +405,144 @@ enum TenantConfigKey: string
             'inr' => 'Indian Rupee (INR)',
             'mxn' => 'Mexican Peso (MXN)',
         ];
+    }
+
+    /**
+     * Get all available date formats with examples.
+     *
+     * Format keys use date-fns format tokens.
+     *
+     * @return array<string, array{label: array<string, string>, example: string}>
+     */
+    public static function availableDateFormats(): array
+    {
+        return [
+            'dd/MM/yyyy' => [
+                'label' => ['en' => 'Day/Month/Year', 'pt_BR' => 'Dia/Mês/Ano', 'es' => 'Día/Mes/Año'],
+                'example' => ['en' => '31/12/2024', 'pt_BR' => '31/12/2024', 'es' => '31/12/2024'],
+            ],
+            'MM/dd/yyyy' => [
+                'label' => ['en' => 'Month/Day/Year', 'pt_BR' => 'Mês/Dia/Ano', 'es' => 'Mes/Día/Año'],
+                'example' => ['en' => '12/31/2024', 'pt_BR' => '12/31/2024', 'es' => '12/31/2024'],
+            ],
+            'yyyy-MM-dd' => [
+                'label' => ['en' => 'Year-Month-Day (ISO)', 'pt_BR' => 'Ano-Mês-Dia (ISO)', 'es' => 'Año-Mes-Día (ISO)'],
+                'example' => ['en' => '2024-12-31', 'pt_BR' => '2024-12-31', 'es' => '2024-12-31'],
+            ],
+            'dd-MM-yyyy' => [
+                'label' => ['en' => 'Day-Month-Year', 'pt_BR' => 'Dia-Mês-Ano', 'es' => 'Día-Mes-Año'],
+                'example' => ['en' => '31-12-2024', 'pt_BR' => '31-12-2024', 'es' => '31-12-2024'],
+            ],
+            'dd.MM.yyyy' => [
+                'label' => ['en' => 'Day.Month.Year', 'pt_BR' => 'Dia.Mês.Ano', 'es' => 'Día.Mes.Año'],
+                'example' => ['en' => '31.12.2024', 'pt_BR' => '31.12.2024', 'es' => '31.12.2024'],
+            ],
+            'MMM dd, yyyy' => [
+                'label' => ['en' => 'Abbrev. Month Day, Year', 'pt_BR' => 'Mês Abrev. Dia, Ano', 'es' => 'Mes Abrev. Día, Año'],
+                'example' => ['en' => 'Dec 31, 2024', 'pt_BR' => 'dez 31, 2024', 'es' => 'dic 31, 2024'],
+            ],
+            'dd MMM yyyy' => [
+                'label' => ['en' => 'Day Abbrev. Month Year', 'pt_BR' => 'Dia Mês Abrev. Ano', 'es' => 'Día Mes Abrev. Año'],
+                'example' => ['en' => '31 Dec 2024', 'pt_BR' => '31 dez 2024', 'es' => '31 dic 2024'],
+            ],
+            "d 'de' MMMM 'de' yyyy" => [
+                'label' => ['en' => 'Day of Month of Year', 'pt_BR' => 'Dia de Mês de Ano', 'es' => 'Día de Mes de Año'],
+                'example' => ['en' => '31 of December of 2024', 'pt_BR' => '31 de dezembro de 2024', 'es' => '31 de diciembre de 2024'],
+            ],
+            'MMMM d, yyyy' => [
+                'label' => ['en' => 'Full Month Day, Year', 'pt_BR' => 'Mês Completo Dia, Ano', 'es' => 'Mes Completo Día, Año'],
+                'example' => ['en' => 'December 31, 2024', 'pt_BR' => 'dezembro 31, 2024', 'es' => 'diciembre 31, 2024'],
+            ],
+            'd MMMM yyyy' => [
+                'label' => ['en' => 'Day Full Month Year', 'pt_BR' => 'Dia Mês Completo Ano', 'es' => 'Día Mes Completo Año'],
+                'example' => ['en' => '31 December 2024', 'pt_BR' => '31 dezembro 2024', 'es' => '31 diciembre 2024'],
+            ],
+        ];
+    }
+
+    /**
+     * Get date formats for frontend select.
+     *
+     * @return array<string, string>
+     */
+    public static function dateFormatOptions(?string $locale = null): array
+    {
+        $locale = $locale ?? app()->getLocale();
+        $options = [];
+
+        foreach (self::availableDateFormats() as $format => $data) {
+            $label = $data['label'][$locale] ?? $data['label']['en'];
+            $example = is_array($data['example'])
+                ? ($data['example'][$locale] ?? $data['example']['en'])
+                : $data['example'];
+            $options[$format] = $label.' ('.$example.')';
+        }
+
+        return $options;
+    }
+
+    /**
+     * Get all available time formats.
+     *
+     * @return array<string, array<string, string>>
+     */
+    public static function availableTimeFormats(): array
+    {
+        return [
+            '24h' => ['en' => '24-hour (14:30)', 'pt_BR' => '24 horas (14:30)', 'es' => '24 horas (14:30)'],
+            '12h' => ['en' => '12-hour (2:30 PM)', 'pt_BR' => '12 horas (2:30 PM)', 'es' => '12 horas (2:30 PM)'],
+        ];
+    }
+
+    /**
+     * Get time formats for frontend select.
+     *
+     * @return array<string, string>
+     */
+    public static function timeFormatOptions(?string $locale = null): array
+    {
+        $locale = $locale ?? app()->getLocale();
+        $options = [];
+
+        foreach (self::availableTimeFormats() as $format => $labels) {
+            $options[$format] = $labels[$locale] ?? $labels['en'];
+        }
+
+        return $options;
+    }
+
+    /**
+     * Get weekday names for week starts on selector.
+     *
+     * @return array<int, array<string, string>>
+     */
+    public static function availableWeekdays(): array
+    {
+        return [
+            0 => ['en' => 'Sunday', 'pt_BR' => 'Domingo', 'es' => 'Domingo'],
+            1 => ['en' => 'Monday', 'pt_BR' => 'Segunda-feira', 'es' => 'Lunes'],
+            2 => ['en' => 'Tuesday', 'pt_BR' => 'Terça-feira', 'es' => 'Martes'],
+            3 => ['en' => 'Wednesday', 'pt_BR' => 'Quarta-feira', 'es' => 'Miércoles'],
+            4 => ['en' => 'Thursday', 'pt_BR' => 'Quinta-feira', 'es' => 'Jueves'],
+            5 => ['en' => 'Friday', 'pt_BR' => 'Sexta-feira', 'es' => 'Viernes'],
+            6 => ['en' => 'Saturday', 'pt_BR' => 'Sábado', 'es' => 'Sábado'],
+        ];
+    }
+
+    /**
+     * Get weekdays for frontend select.
+     *
+     * @return array<int, string>
+     */
+    public static function weekdayOptions(?string $locale = null): array
+    {
+        $locale = $locale ?? app()->getLocale();
+        $options = [];
+
+        foreach (self::availableWeekdays() as $day => $labels) {
+            $options[$day] = $labels[$locale] ?? $labels['en'];
+        }
+
+        return $options;
     }
 }

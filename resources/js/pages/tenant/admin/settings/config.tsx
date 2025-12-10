@@ -19,7 +19,7 @@ import {
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Building2, Check, Clock, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
+import { Building2, Calendar, CalendarDays, Check, Clock, Clock3, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
@@ -33,6 +33,9 @@ interface Props {
         app_name: string | null;
         locale: string;
         timezone: string;
+        date_format: string;
+        time_format: string;
+        week_starts_on: number;
         mail_from_address: string | null;
         mail_from_name: string | null;
         currency: string;
@@ -42,6 +45,9 @@ interface Props {
     localeLabels: Record<string, string>;
     availableTimezones: string[];
     availableCurrencies: Record<string, string>;
+    availableDateFormats: Record<string, string>;
+    availableTimeFormats: Record<string, string>;
+    availableWeekdays: Record<number, string>;
 }
 
 function ConfigSettings({
@@ -51,6 +57,9 @@ function ConfigSettings({
     localeLabels,
     availableTimezones,
     availableCurrencies,
+    availableDateFormats,
+    availableTimeFormats,
+    availableWeekdays,
 }: Props) {
     const { t } = useLaravelReactI18n();
     const [timezoneSearch, setTimezoneSearch] = useState('');
@@ -67,6 +76,9 @@ function ConfigSettings({
         app_name: config.app_name ?? '',
         locale: config.locale,
         timezone: config.timezone,
+        date_format: config.date_format,
+        time_format: config.time_format,
+        week_starts_on: config.week_starts_on,
         mail_from_address: config.mail_from_address ?? '',
         mail_from_name: config.mail_from_name ?? '',
         currency: config.currency,
@@ -236,6 +248,98 @@ function ConfigSettings({
                                     </Select>
                                     {errors.timezone && (
                                         <p className="text-sm text-destructive">{errors.timezone}</p>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Date & Time Format Section */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Calendar className="h-5 w-5" />
+                                    {t('tenant.config.date_time_settings')}
+                                </CardTitle>
+                                <CardDescription>
+                                    {t('tenant.config.date_time_description')}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-6 md:grid-cols-3">
+                                {/* Date Format */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="date_format" className="flex items-center gap-2">
+                                        <Calendar className="h-4 w-4" />
+                                        {t('tenant.config.date_format')}
+                                    </Label>
+                                    <Select
+                                        value={data.date_format}
+                                        onValueChange={(value) => setData('date_format', value)}
+                                    >
+                                        <SelectTrigger id="date_format">
+                                            <SelectValue placeholder={t('tenant.config.select_date_format')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(availableDateFormats).map(([format, label]) => (
+                                                <SelectItem key={format} value={format}>
+                                                    {label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.date_format && (
+                                        <p className="text-sm text-destructive">{errors.date_format}</p>
+                                    )}
+                                </div>
+
+                                {/* Time Format */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="time_format" className="flex items-center gap-2">
+                                        <Clock3 className="h-4 w-4" />
+                                        {t('tenant.config.time_format')}
+                                    </Label>
+                                    <Select
+                                        value={data.time_format}
+                                        onValueChange={(value) => setData('time_format', value)}
+                                    >
+                                        <SelectTrigger id="time_format">
+                                            <SelectValue placeholder={t('tenant.config.select_time_format')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(availableTimeFormats).map(([format, label]) => (
+                                                <SelectItem key={format} value={format}>
+                                                    {label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.time_format && (
+                                        <p className="text-sm text-destructive">{errors.time_format}</p>
+                                    )}
+                                </div>
+
+                                {/* Week Starts On */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="week_starts_on" className="flex items-center gap-2">
+                                        <CalendarDays className="h-4 w-4" />
+                                        {t('tenant.config.week_starts_on')}
+                                    </Label>
+                                    <Select
+                                        value={String(data.week_starts_on)}
+                                        onValueChange={(value) => setData('week_starts_on', parseInt(value, 10))}
+                                    >
+                                        <SelectTrigger id="week_starts_on">
+                                            <SelectValue placeholder={t('tenant.config.select_week_start')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(availableWeekdays).map(([day, label]) => (
+                                                <SelectItem key={day} value={day}>
+                                                    {label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.week_starts_on && (
+                                        <p className="text-sm text-destructive">{errors.week_starts_on}</p>
                                     )}
                                 </div>
                             </CardContent>

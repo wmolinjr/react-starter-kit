@@ -254,6 +254,9 @@ class TenantSettingsService
                 ->toArray(),
             'availableTimezones' => $this->getGroupedTimezones(),
             'availableCurrencies' => TenantConfigKey::availableCurrencies(),
+            'availableDateFormats' => TenantConfigKey::dateFormatOptions(),
+            'availableTimeFormats' => TenantConfigKey::timeFormatOptions(),
+            'availableWeekdays' => TenantConfigKey::weekdayOptions(),
         ];
     }
 
