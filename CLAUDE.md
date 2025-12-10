@@ -318,6 +318,13 @@ app/Http/Controllers/
 │   ├── ResetPasswordController.php
 │   ├── TwoFactorChallengeController.php
 │   └── ConfirmPasswordController.php
+├── Customer/Auth/          # Customer billing portal authentication
+│   ├── LoginController.php
+│   ├── LogoutController.php
+│   ├── RegisterController.php
+│   ├── ForgotPasswordController.php
+│   ├── ResetPasswordController.php
+│   └── VerifyEmailController.php
 └── Tenant/Auth/            # Tenant user authentication
     ├── LoginController.php
     ├── LogoutController.php
@@ -331,11 +338,13 @@ app/Http/Controllers/
 
 **Authentication Routes**:
 - **Central**: `central.admin.auth.*` (login, logout, password reset, 2FA)
+- **Customer**: `customer.*` (login, register, password reset, email verification) at `/account/*`
 - **Tenant**: `tenant.auth.*` (login, logout, register, password reset, 2FA, email verification)
 
 **Guards**:
-- `central`: Central administrators (Central\\User)
-- `tenant`: Tenant users (Tenant\\User)
+- `central`: Central administrators (Central\\User) at `app.test/admin/login`
+- `customer`: Customers/billing entities (Central\\Customer) at `app.test/account/login`
+- `tenant`: Tenant users (Tenant\\User) at `{tenant}.test/login`
 
 **Password Confirmation Middleware**:
 - `central.password.confirm`: For central admin routes
@@ -357,7 +366,8 @@ Models are organized by database context:
 app/Models/
 ├── Central/           # Banco central (dados globais)
 │   ├── Addon.php, AddonBundle.php, AddonPurchase.php, AddonSubscription.php
-│   ├── Domain.php, Plan.php, Tenant.php
+│   ├── Customer.php   # Billing entity (Billable + CentralConnection)
+│   ├── Domain.php, Plan.php, Tenant.php, TenantTransfer.php
 │   └── User.php       # Admins centrais (Super Admin, Central Admin)
 ├── Tenant/            # Banco do tenant (dados isolados)
 │   ├── Activity.php, Media.php, Project.php, TenantTranslationOverride.php
@@ -907,12 +917,14 @@ sail artisan migrate:fresh --seed          # Reset database and seed test users
 |------|-------|----------|--------|-------|-------|
 | Super Admin | `admin@setor3.app` | `password` | app.test/admin/login | `central` | Central\\User |
 | Support Admin | `support@setor3.app` | `password` | app.test/admin/login | `central` | Central\\User |
+| Customer | `customer@example.com` | `password` | app.test/account/login | `customer` | Central\\Customer |
 | Tenant 1 Owner | `john@acme.com` | `password` | tenant1.test | `tenant` | Tenant\\User |
 | Tenant 2 Owner | `jane@startup.com` | `password` | tenant2.test | `tenant` | Tenant\\User |
 | Tenant 3 Owner | `mike@enterprise.com` | `password` | tenant3.test | `tenant` | Tenant\\User |
 
-**Authentication Guards (Option C)**:
+**Authentication Guards**:
 - `central` guard: Central administrators (Central\\User) at `app.test/admin/login`
+- `customer` guard: Billing customers (Central\\Customer) at `app.test/account/login`
 - `tenant` guard: Tenant users (Tenant\\User) at `{tenant}.test/login`
 
 **See**: [docs/MCP-WORKFLOW.md](docs/MCP-WORKFLOW.md#usuários-de-teste-seeders) for detailed test scenarios.
@@ -1037,6 +1049,7 @@ TELESCOPE_MCP_PATH=telescope-mcp
 
 For in-depth technical documentation, see:
 
+- **[docs/CUSTOMER-PORTAL.md](docs/CUSTOMER-PORTAL.md)** - Customer Billing Portal (authentication, routes, controllers)
 - **[docs/PERMISSIONS.md](docs/PERMISSIONS.md)** - Permissions system (enums, roles, usage)
 - **[docs/ENUMS-SINGLE-SOURCE-OF-TRUTH.md](docs/ENUMS-SINGLE-SOURCE-OF-TRUTH.md)** - Enum system architecture and TypeScript generation
 - **[docs/SYSTEM-ARCHITECTURE.md](docs/SYSTEM-ARCHITECTURE.md)** - Plans, features, limits, addons

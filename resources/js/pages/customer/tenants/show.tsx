@@ -6,12 +6,24 @@ import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Building2, Globe, Users, CreditCard, ArrowRightLeft, ExternalLink } from 'lucide-react';
 
+interface Domain {
+    id: string;
+    domain: string;
+    is_primary: boolean;
+}
+
+interface TenantPlan {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 interface TenantDetail {
     id: string;
     name: string;
     slug: string;
-    domain: string;
-    plan_name: string | null;
+    domains: Domain[];
+    plan: TenantPlan | null;
     created_at: string;
 }
 
@@ -23,14 +35,13 @@ interface Subscription {
 }
 
 interface TenantShowProps {
-    tenant: { data: TenantDetail };
+    tenant: TenantDetail;
     subscription: Subscription | null;
     users_count: number;
 }
 
 export default function TenantShow({ tenant, subscription, users_count }: TenantShowProps) {
     const { t } = useLaravelReactI18n();
-    const data = tenant.data;
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -52,25 +63,25 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
             breadcrumbs={[
                 { title: t('customer.dashboard'), href: '/account' },
                 { title: t('customer.workspaces'), href: '/account/tenants' },
-                { title: data.name, href: `/account/tenants/${data.id}` },
+                { title: tenant.name, href: `/account/tenants/${tenant.id}` },
             ]}
         >
-            <Head title={data.name} />
+            <Head title={tenant.name} />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
                             <Building2 className="h-6 w-6" />
-                            {data.name}
+                            {tenant.name}
                         </h1>
                         <p className="text-muted-foreground flex items-center gap-1">
                             <Globe className="h-4 w-4" />
-                            {data.domain}
+                            {tenant.domains[0]?.domain}
                         </p>
                     </div>
                     <Button asChild variant="outline">
-                        <a href={`https://${data.domain}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://${tenant.domains[0]?.domain}`} target="_blank" rel="noopener noreferrer">
                             {t('customer.open_workspace')}
                             <ExternalLink className="ml-2 h-4 w-4" />
                         </a>
@@ -88,7 +99,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {data.plan_name || t('customer.no_plan')}
+                                {tenant.plan?.name || t('customer.no_plan')}
                             </div>
                             {subscription && (
                                 <div className="flex items-center gap-2 mt-2">
@@ -129,7 +140,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                         </CardHeader>
                         <CardContent>
                             <Button asChild variant="outline" size="sm" className="w-full">
-                                <Link href={`/account/tenants/${data.id}/transfer`}>
+                                <Link href={`/account/tenants/${tenant.id}/transfer`}>
                                     {t('customer.transfer_ownership')}
                                 </Link>
                             </Button>
@@ -164,7 +175,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                                 </div>
                                 <div className="flex gap-2">
                                     <Button asChild variant="outline">
-                                        <Link href={`/account/tenants/${data.id}/billing`}>
+                                        <Link href={`/account/tenants/${tenant.id}/billing`}>
                                             {t('customer.manage_billing')}
                                         </Link>
                                     </Button>
@@ -177,7 +188,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                                     {t('customer.no_active_subscription')}
                                 </p>
                                 <Button asChild>
-                                    <a href={`https://${data.domain}/admin/billing`}>
+                                    <a href={`https://${tenant.domains[0]?.domain}/admin/billing`}>
                                         {t('customer.choose_plan')}
                                     </a>
                                 </Button>
