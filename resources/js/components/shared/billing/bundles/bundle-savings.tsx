@@ -181,8 +181,6 @@ export function BundleSavingsCompact({
     size = 'md',
     className,
 }: BundleSavingsCompactProps) {
-    const { t } = useLaravelReactI18n();
-
     if (percent <= 0) return null;
 
     return (

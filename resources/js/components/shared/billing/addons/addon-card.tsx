@@ -6,7 +6,6 @@ import {
     ShoppingCart,
     Loader2,
     Plus,
-    Minus,
 } from 'lucide-react';
 import {
     Card,
@@ -97,7 +96,7 @@ export function AddonCard({
     // Features list from addon (FeatureItem expects 'text' not 'label')
     const features = addon.features
         ? Object.entries(addon.features)
-            .filter(([_, enabled]) => enabled)
+            .filter(([, enabled]) => enabled)
             .map(([key]) => ({
                 text: key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
                 included: true,
@@ -290,10 +289,12 @@ export interface ActiveAddonCardProps {
 export function ActiveAddonCard({
     addon,
     onCancel,
-    onUpdateQuantity,
+    onUpdateQuantity: _onUpdateQuantity,
     isLoading = false,
     className,
 }: ActiveAddonCardProps) {
+    // TODO: Implement quantity update functionality
+    void _onUpdateQuantity;
     const { t } = useLaravelReactI18n();
 
     const periodLabel = addon.billingPeriod === 'yearly'

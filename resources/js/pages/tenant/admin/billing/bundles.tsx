@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Package, CheckCircle2, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Package, CheckCircle2 } from 'lucide-react';
 import {
     BundleCard,
     PricingToggle,
@@ -46,7 +46,6 @@ function BundlesPageContent({
     bundles,
     activeBundles,
     activeAddonSlugs,
-    currentPlan,
 }: BundlesPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();

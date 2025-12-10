@@ -9,9 +9,8 @@ import {
     Globe,
     Activity,
     AlertTriangle,
-    CheckCircle2,
     TrendingUp,
-    Infinity,
+    Infinity as InfinityIcon,
 } from 'lucide-react';
 import {
     Card,
@@ -100,7 +99,7 @@ export function UsageDashboard({
         if (metric.isUnlimited) {
             return (
                 <Badge variant="outline" className="gap-1 text-xs">
-                    <Infinity className="h-3 w-3" />
+                    <InfinityIcon className="h-3 w-3" />
                     {t('billing.unlimited', { default: 'Unlimited' })}
                 </Badge>
             );
@@ -241,7 +240,7 @@ function UsageMetricItem({
                     </div>
                     <span className="text-muted-foreground shrink-0 text-xs">
                         {metric.isUnlimited ? (
-                            <Infinity className="h-3 w-3" />
+                            <InfinityIcon className="h-3 w-3" />
                         ) : (
                             `${metric.formattedUsed}/${metric.formattedLimit}`
                         )}
@@ -280,7 +279,7 @@ function UsageMetricItem({
                             {metric.isUnlimited ? (
                                 <span className="flex items-center gap-1">
                                     {metric.formattedUsed}
-                                    <Infinity className="h-3 w-3" />
+                                    <InfinityIcon className="h-3 w-3" />
                                 </span>
                             ) : (
                                 `${metric.formattedUsed} / ${metric.formattedLimit}`

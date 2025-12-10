@@ -2,7 +2,6 @@ import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CreditCard, Tag, ArrowRight, RefreshCw, Calendar } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 import type { CheckoutItem, PlanChangeInfo } from '@/types/billing';
 import type { BillingPeriod } from '@/types/enums';
 

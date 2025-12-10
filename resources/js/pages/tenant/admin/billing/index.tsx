@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/table';
 import { ArrowRight, Download, FileText, Package, Puzzle, Settings } from 'lucide-react';
 import {
-    SubscriptionOverviewWidget,
     CurrentPlanBanner,
     UsageDashboard,
     CostBreakdownWidget,
@@ -63,12 +62,14 @@ function BillingDashboard({
     subscription,
     usage,
     costs,
-    nextInvoice,
+    nextInvoice: _nextInvoice,
     activeAddons,
     activeBundles,
     recentInvoices,
     trialEndsAt,
 }: BillingDashboardProps) {
+    // TODO: Display next invoice preview
+    void _nextInvoice;
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -97,42 +98,6 @@ function BillingDashboard({
     const handleViewBundles = () => {
         router.visit('/admin/billing/bundles');
     };
-
-    // Build overview object for SubscriptionOverviewWidget
-    const overview = plan
-        ? {
-              plan: {
-                  ...plan,
-                  type: 'plan' as const,
-                  pricing: {
-                      monthly: {
-                          price: plan.price,
-                          formattedPrice: plan.formatted_price,
-                      },
-                  },
-                  limits: plan.limits,
-                  features: Object.entries(plan.features)
-                      .filter(([_, value]) => value === true)
-                      .map(([key]) => key),
-              },
-              subscription,
-              addons: activeAddons,
-              bundles: activeBundles,
-              usage,
-              costs: costs || {
-                  planCost: plan.price,
-                  addonsCost: 0,
-                  bundlesCost: 0,
-                  totalMonthlyCost: plan.price,
-                  formattedPlanCost: plan.formatted_price,
-                  formattedAddonsCost: '$0',
-                  formattedBundlesCost: '$0',
-                  formattedTotal: plan.formatted_price,
-                  currency: plan.currency,
-              },
-              nextInvoice,
-          }
-        : null;
 
     return (
         <BillingPeriodProvider>

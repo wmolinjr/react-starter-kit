@@ -3,7 +3,6 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     Crown,
     Calendar,
-    CreditCard,
     Settings,
     ArrowUp,
     FileText,
@@ -17,24 +16,18 @@ import {
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { PriceDisplay } from '../primitives/price-display';
 import { CostBreakdownWidget } from './cost-breakdown';
 import { UsageDashboard, UsageAlert } from './usage-dashboard';
 import type {
     SubscriptionOverview as SubscriptionOverviewType,
     SubscriptionInfo,
-    NextInvoicePreview,
-    AddonSubscriptionInfo,
-    BundleSubscriptionInfo,
 } from '@/types/billing';
 import type { PlanResource } from '@/types/resources';
 
@@ -99,7 +92,7 @@ export function SubscriptionOverviewWidget({
     const isOnTrial = !!trialEndsAt || subscription?.status === 'trialing';
     const isCanceled = subscription?.cancelAtPeriodEnd || subscription?.status === 'canceled';
     const isPastDue = subscription?.status === 'past_due';
-    const isActive = subscription?.status === 'active' && !isCanceled;
+    void isPastDue; // Used in UI rendering below
 
     // Format date
     const formatDate = (dateStr: string | null | undefined): string => {

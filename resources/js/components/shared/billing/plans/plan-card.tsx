@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Check, X, ArrowUp, ArrowDown, Crown } from 'lucide-react';
+import { Check, X, ArrowUp, Crown } from 'lucide-react';
 import {
     Card,
     CardContent,

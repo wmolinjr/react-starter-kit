@@ -28,7 +28,6 @@ import {
 import {
     AddonCard,
     ActiveAddonCard,
-    AddonCardSkeleton,
     BundleCard,
     PricingToggle,
 } from '@/components/shared/billing';
@@ -78,7 +77,6 @@ function AddonsPageContent({
     activeAddons,
     availableBundles,
     activeBundles,
-    monthlyCost,
     formattedMonthlyCost,
     activeAddonSlugs,
 }: AddonsPageProps) {

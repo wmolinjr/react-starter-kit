@@ -42,8 +42,6 @@ export function CurrentPlanBadge({
     compact = false,
     className,
 }: CurrentPlanBadgeProps) {
-    const { t } = useLaravelReactI18n();
-
     if (compact) {
         return (
             <Badge variant="secondary" className={cn('gap-1', className)}>

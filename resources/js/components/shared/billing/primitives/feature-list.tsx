@@ -30,10 +30,12 @@ export function FeatureList({
     features,
     columns = 1,
     maxVisible,
-    variant = 'compact',
+    variant: _variant = 'compact',
     showMore = false,
     className,
 }: FeatureListProps) {
+    // TODO: Implement variant styling
+    void _variant;
     const { t } = useLaravelReactI18n();
     const [expanded, setExpanded] = useState(false);
 
@@ -55,7 +57,6 @@ export function FeatureList({
                     <FeatureListItem
                         key={index}
                         feature={feature}
-                        variant={variant}
                     />
                 ))}
             </ul>
@@ -89,10 +90,9 @@ export function FeatureList({
 
 interface FeatureListItemProps {
     feature: FeatureItem;
-    variant: 'compact' | 'detailed';
 }
 
-function FeatureListItem({ feature, variant }: FeatureListItemProps) {
+function FeatureListItem({ feature }: FeatureListItemProps) {
     const content = (
         <li className="flex items-start gap-2">
             {feature.included ? (

@@ -2,7 +2,6 @@ import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     ShoppingCart,
-    X,
     Trash2,
     CreditCard,
     Loader2,
@@ -20,7 +19,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { PricingToggle } from '../primitives/pricing-toggle';
 import { CheckoutLineItem } from './checkout-line-item';
 import { CheckoutSummary } from './checkout-summary';
