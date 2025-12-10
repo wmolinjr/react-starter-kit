@@ -2,10 +2,13 @@
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\Models\Central\Customer;
 use App\Models\Central\Tenant;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -14,10 +17,13 @@ use Illuminate\Support\Str;
  * Manages Customer (billing entity) lifecycle including:
  * - Registration and tenant creation
  * - Customer-Tenant linking (Resource Syncing)
- * - Billing operations via Cashier
+ * - Billing operations via Payment Gateway
  */
 class CustomerService
 {
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {}
     /**
      * Register a new customer and create their first tenant.
      *
@@ -227,10 +233,10 @@ class CustomerService
     public function deleteCustomer(Customer $customer): void
     {
         DB::transaction(function () use ($customer) {
-            // Cancel all subscriptions
+            // Cancel all active subscriptions via gateway
             foreach ($customer->subscriptions as $subscription) {
-                if ($subscription->active()) {
-                    $subscription->cancel();
+                if ($subscription->isActive()) {
+                    $this->cancelSubscription($subscription);
                 }
             }
 
@@ -240,6 +246,52 @@ class CustomerService
             // Soft delete customer (triggers Resource Syncing cascade)
             $customer->delete();
         });
+    }
+
+    /**
+     * Cancel a subscription via payment gateway.
+     */
+    public function cancelSubscription(
+        \App\Models\Central\Subscription $subscription,
+        bool $immediately = false
+    ): void {
+        $gateway = $this->getGateway($subscription->provider);
+
+        if ($gateway) {
+            try {
+                $result = $gateway->cancelSubscription($subscription, $immediately);
+
+                if ($result->success) {
+                    $subscription->markAsCanceled($result->endsAt);
+                } else {
+                    Log::error('Failed to cancel subscription via gateway', [
+                        'subscription_id' => $subscription->id,
+                        'error' => $result->failureMessage,
+                    ]);
+                    // Still mark as canceled locally
+                    $subscription->markAsCanceled();
+                }
+            } catch (\Exception $e) {
+                Log::error('Exception canceling subscription', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+                $subscription->markAsCanceled();
+            }
+        } else {
+            // No gateway, just mark as canceled locally
+            $subscription->markAsCanceled();
+        }
+    }
+
+    /**
+     * Get the subscription gateway for a provider.
+     */
+    protected function getGateway(string $provider): ?SubscriptionGatewayInterface
+    {
+        $gateway = $this->gatewayManager->driver($provider);
+
+        return $gateway instanceof SubscriptionGatewayInterface ? $gateway : null;
     }
 
     /**
@@ -284,18 +336,8 @@ class CustomerService
         ]);
 
         // Sync to Stripe if customer exists there
-        if ($customer->hasStripeId()) {
-            $customer->updateStripeCustomer([
-                'address' => [
-                    'line1' => $billingAddress['line1'] ?? null,
-                    'line2' => $billingAddress['line2'] ?? null,
-                    'city' => $billingAddress['city'] ?? null,
-                    'state' => $billingAddress['state'] ?? null,
-                    'postal_code' => $billingAddress['postal_code'] ?? null,
-                    'country' => $billingAddress['country'] ?? null,
-                ],
-            ]);
-        }
+        // Note: Provider address sync handled by webhooks if needed
+        // Future: Add gateway->updateCustomer() method for address sync
 
         return $customer->fresh();
     }

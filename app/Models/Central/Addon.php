@@ -257,10 +257,15 @@ class Addon extends Model
     }
 
     /**
-     * Get Stripe price ID for billing period
+     * Get provider price ID for billing period.
+     *
+     * Note: Currently uses Stripe-specific columns. For multi-provider support,
+     * consider a provider_prices JSON column or separate price_ids table.
      */
-    public function getStripePriceId(string $billingPeriod): ?string
+    public function getProviderPriceId(string $billingPeriod, string $provider = 'stripe'): ?string
     {
+        // Currently only Stripe is supported for addons
+        // Future: support other providers via provider_prices JSON or separate table
         return match ($billingPeriod) {
             'monthly' => $this->stripe_price_monthly_id,
             'yearly' => $this->stripe_price_yearly_id,
@@ -268,6 +273,14 @@ class Addon extends Model
             'metered' => $this->stripe_price_metered_id,
             default => null,
         };
+    }
+
+    /**
+     * @deprecated Use getProviderPriceId() instead
+     */
+    public function getStripePriceId(string $billingPeriod): ?string
+    {
+        return $this->getProviderPriceId($billingPeriod, 'stripe');
     }
 
     /**

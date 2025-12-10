@@ -2,6 +2,7 @@
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\Enums\AddonStatus;
 use App\Enums\AddonType;
 use App\Enums\BillingPeriod;
@@ -11,12 +12,33 @@ use App\Models\Central\Addon;
 use App\Models\Central\AddonBundle;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Tenant;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AddonService
 {
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {}
+
+    /**
+     * Get the subscription gateway for a tenant.
+     */
+    protected function getGateway(Tenant $tenant): ?SubscriptionGatewayInterface
+    {
+        $customer = $tenant->customer;
+        if (! $customer) {
+            return null;
+        }
+
+        $provider = $customer->getDefaultProvider() ?? config('payment.default', 'stripe');
+        $gateway = $this->gatewayManager->driver($provider);
+
+        return $gateway instanceof SubscriptionGatewayInterface ? $gateway : null;
+    }
+
     /**
      * Get addon from database by slug
      */
@@ -64,9 +86,9 @@ class AddonService
             // Create addon record
             $tenantAddon = $this->createAddonSubscription($tenant, $addon, $quantity, $billingPeriod);
 
-            // Add to Stripe if subscription exists
-            if ($this->shouldAddToStripe($tenant, $billingPeriod)) {
-                $this->addToStripeSubscription($tenant, $tenantAddon, $addon, $billingPeriod);
+            // Add to subscription if active
+            if ($this->shouldAddToSubscription($tenant, $billingPeriod)) {
+                $this->addToSubscription($tenant, $tenantAddon, $addon, $billingPeriod);
             }
 
             // Sync limits
@@ -107,9 +129,9 @@ class AddonService
         return DB::transaction(function () use ($tenantAddon, $newQuantity) {
             $oldQuantity = $tenantAddon->quantity;
 
-            // Update Stripe if linked
-            if ($tenantAddon->stripe_subscription_item_id) {
-                $this->updateStripeQuantity($tenantAddon, $newQuantity);
+            // Update subscription if linked
+            if ($tenantAddon->provider_item_id) {
+                $this->updateSubscriptionQuantity($tenantAddon, $newQuantity);
             }
 
             // Update local record
@@ -135,9 +157,9 @@ class AddonService
     public function cancel(AddonSubscription $tenantAddon, ?string $reason = null): void
     {
         DB::transaction(function () use ($tenantAddon, $reason) {
-            // Remove from Stripe if linked
-            if ($tenantAddon->stripe_subscription_item_id) {
-                $this->removeFromStripeSubscription($tenantAddon);
+            // Remove from subscription if linked
+            if ($tenantAddon->provider_item_id) {
+                $this->removeFromSubscription($tenantAddon);
             }
 
             // Mark as canceled
@@ -170,9 +192,9 @@ class AddonService
             // Reactivate locally
             $tenantAddon->activate();
 
-            // Re-add to Stripe if needed
-            if ($addon && $this->shouldAddToStripe($tenantAddon->tenant, $tenantAddon->billing_period)) {
-                $this->addToStripeSubscription($tenantAddon->tenant, $tenantAddon, $addon, $tenantAddon->billing_period);
+            // Re-add to subscription if needed
+            if ($addon && $this->shouldAddToSubscription($tenantAddon->tenant, $tenantAddon->billing_period)) {
+                $this->addToSubscription($tenantAddon->tenant, $tenantAddon, $addon, $tenantAddon->billing_period);
             }
 
             // Resync limits
@@ -195,19 +217,19 @@ class AddonService
     }
 
     /**
-     * Add addon to Stripe subscription
+     * Add addon to subscription via payment gateway
      */
-    protected function addToStripeSubscription(
+    protected function addToSubscription(
         Tenant $tenant,
         AddonSubscription $tenantAddon,
         Addon $addon,
         BillingPeriod $billingPeriod
     ): void {
         try {
-            $stripePriceId = $addon->getStripePriceId($billingPeriod->value);
+            $providerPriceId = $addon->getProviderPriceId($billingPeriod->value);
 
-            if (! $stripePriceId) {
-                Log::warning('No Stripe price ID configured for addon', [
+            if (! $providerPriceId) {
+                Log::warning('No provider price ID configured for addon', [
                     'addon_slug' => $addon->slug,
                     'billing_period' => $billingPeriod->value,
                 ]);
@@ -225,15 +247,25 @@ class AddonService
                 return;
             }
 
-            $subscriptionItem = $subscription->addPrice($stripePriceId, $tenantAddon->quantity);
+            $gateway = $this->getGateway($tenant);
+
+            if (! $gateway) {
+                Log::warning('No payment gateway available for tenant', [
+                    'tenant_id' => $tenant->id,
+                ]);
+
+                return;
+            }
+
+            $result = $gateway->addSubscriptionItem($subscription, $providerPriceId, $tenantAddon->quantity);
 
             $tenantAddon->update([
-                'stripe_subscription_item_id' => $subscriptionItem->stripe_id,
-                'stripe_price_id' => $stripePriceId,
+                'provider_item_id' => $result['provider_item_id'],
+                'provider_price_id' => $providerPriceId,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to add addon to Stripe', [
+            Log::error('Failed to add addon to subscription', [
                 'tenant_id' => $tenant->id,
                 'addon_id' => $tenantAddon->id,
                 'error' => $e->getMessage(),
@@ -243,43 +275,55 @@ class AddonService
     }
 
     /**
-     * Update quantity in Stripe
+     * Update quantity in subscription via payment gateway
      */
-    protected function updateStripeQuantity(AddonSubscription $tenantAddon, int $newQuantity): void
+    protected function updateSubscriptionQuantity(AddonSubscription $tenantAddon, int $newQuantity): void
     {
         try {
-            $subscription = $tenantAddon->tenant->subscription('default');
+            $tenant = $tenantAddon->tenant;
+            $subscription = $tenant->subscription('default');
 
-            if ($subscription) {
-                $subscription->updateQuantity($newQuantity, $tenantAddon->stripe_price_id);
+            if (! $subscription || ! $tenantAddon->provider_price_id) {
+                return;
+            }
+
+            $gateway = $this->getGateway($tenant);
+
+            if ($gateway) {
+                $gateway->updateSubscriptionItem($subscription, $tenantAddon->provider_price_id, $newQuantity);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to update Stripe quantity', [
+            Log::error('Failed to update subscription quantity', [
                 'addon_id' => $tenantAddon->id,
                 'error' => $e->getMessage(),
             ]);
-            throw new AddonException('Failed to update quantity in Stripe: '.$e->getMessage());
+            throw new AddonException('Failed to update quantity: '.$e->getMessage());
         }
     }
 
     /**
-     * Remove addon from Stripe subscription
+     * Remove addon from subscription via payment gateway
      */
-    protected function removeFromStripeSubscription(AddonSubscription $tenantAddon): void
+    protected function removeFromSubscription(AddonSubscription $tenantAddon): void
     {
         try {
-            $subscription = $tenantAddon->tenant->subscription('default');
+            $tenant = $tenantAddon->tenant;
+            $subscription = $tenant->subscription('default');
 
-            if ($subscription && $tenantAddon->stripe_price_id) {
-                $subscription->removePrice($tenantAddon->stripe_price_id);
+            if ($subscription && $tenantAddon->provider_price_id) {
+                $gateway = $this->getGateway($tenant);
+
+                if ($gateway) {
+                    $gateway->removeSubscriptionItem($subscription, $tenantAddon->provider_price_id);
+                }
             }
 
             $tenantAddon->update([
-                'stripe_subscription_item_id' => null,
-                'stripe_price_id' => null,
+                'provider_item_id' => null,
+                'provider_price_id' => null,
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to remove addon from Stripe', [
+            Log::error('Failed to remove addon from subscription', [
                 'addon_id' => $tenantAddon->id,
                 'error' => $e->getMessage(),
             ]);
@@ -358,9 +402,9 @@ class AddonService
     }
 
     /**
-     * Check if should add to Stripe
+     * Check if should add to subscription
      */
-    protected function shouldAddToStripe(Tenant $tenant, BillingPeriod $billingPeriod): bool
+    protected function shouldAddToSubscription(Tenant $tenant, BillingPeriod $billingPeriod): bool
     {
         return $tenant->subscribed('default')
             && in_array($billingPeriod, [BillingPeriod::MONTHLY, BillingPeriod::YEARLY]);
@@ -483,9 +527,9 @@ class AddonService
                     $purchaseId
                 );
 
-                // Add to Stripe if subscription exists
-                if ($this->shouldAddToStripe($tenant, $billingPeriod)) {
-                    $this->addToStripeSubscription($tenant, $tenantAddon, $addon, $billingPeriod);
+                // Add to subscription if active
+                if ($this->shouldAddToSubscription($tenant, $billingPeriod)) {
+                    $this->addToSubscription($tenant, $tenantAddon, $addon, $billingPeriod);
                 }
 
                 $createdAddons->push($tenantAddon);

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\Http\Controllers\Controller;
 use App\Services\Central\CustomerService;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +16,8 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     public function __construct(
-        protected CustomerService $customerService
+        protected CustomerService $customerService,
+        protected PaymentGatewayManager $gatewayManager
     ) {}
 
     /**
@@ -132,9 +135,9 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Cancel all subscriptions
+        // Cancel all subscriptions immediately
         foreach ($customer->subscriptions()->active()->get() as $subscription) {
-            $subscription->cancelNow();
+            $this->customerService->cancelSubscription($subscription, immediately: true);
         }
 
         // Logout and delete
@@ -148,12 +151,31 @@ class ProfileController extends Controller
     }
 
     /**
-     * Redirect to Stripe Billing Portal.
+     * Redirect to Billing Portal.
      */
     public function billingPortal(Request $request): RedirectResponse
     {
-        return $request->user('customer')->redirectToBillingPortal(
-            route('customer.dashboard')
-        );
+        $customer = $request->user('customer');
+        $provider = $customer->getDefaultProvider() ?? config('payment.default', 'stripe');
+        $gateway = $this->gatewayManager->driver($provider);
+
+        if (! $gateway instanceof SubscriptionGatewayInterface) {
+            return back()->withErrors([
+                'error' => __('Billing portal is not available for your payment provider.'),
+            ]);
+        }
+
+        try {
+            $portalUrl = $gateway->createBillingPortalSession(
+                $customer,
+                route('customer.dashboard')
+            );
+
+            return redirect()->away($portalUrl);
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => __('Unable to create billing portal session. Please try again.'),
+            ]);
+        }
     }
 }

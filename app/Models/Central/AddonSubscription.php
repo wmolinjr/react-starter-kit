@@ -48,9 +48,9 @@ class AddonSubscription extends Model
         'started_at',
         'expires_at',
         'canceled_at',
-        'stripe_subscription_item_id',
-        'stripe_price_id',
-        'paddle_subscription_id',
+        'provider',
+        'provider_item_id',
+        'provider_price_id',
         'metered_usage',
         'metered_reset_at',
         'metadata',
@@ -157,6 +157,12 @@ class AddonSubscription extends Model
     // Actions
     // ==========================================
 
+    /**
+     * Mark this addon as canceled.
+     *
+     * Note: Provider subscription item removal should be handled by AddonService,
+     * not by the model directly. This method only updates the local record.
+     */
     public function cancel(?string $reason = null): void
     {
         $this->update([
@@ -164,19 +170,6 @@ class AddonSubscription extends Model
             'canceled_at' => now(),
             'notes' => $reason ? "Canceled: {$reason}" : $this->notes,
         ]);
-
-        // Remove from Stripe if linked
-        if ($this->stripe_subscription_item_id && $this->tenant->subscribed('default')) {
-            try {
-                $this->tenant->subscription('default')
-                    ->removePrice($this->stripe_price_id);
-            } catch (\Exception $e) {
-                Log::error('Failed to remove addon from Stripe', [
-                    'addon_id' => $this->id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
     }
 
     public function markAsExpired(): void

@@ -47,8 +47,9 @@ class AddonSubscriptionFactory extends Factory
             'started_at' => now(),
             'expires_at' => $type === AddonType::CREDIT ? now()->addYear() : null,
             'canceled_at' => null,
-            'stripe_subscription_item_id' => null,
-            'stripe_price_id' => null,
+            'provider' => null,
+            'provider_item_id' => null,
+            'provider_price_id' => null,
             'metered_usage' => 0,
             'metadata' => null,
             'notes' => null,
@@ -215,14 +216,23 @@ class AddonSubscriptionFactory extends Factory
     }
 
     /**
-     * Set with Stripe subscription item
+     * Set with provider subscription item (Stripe by default)
+     */
+    public function withProvider(string $provider = 'stripe'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'provider' => $provider,
+            'provider_item_id' => 'si_'.fake()->regexify('[A-Za-z0-9]{14}'),
+            'provider_price_id' => 'price_'.fake()->regexify('[A-Za-z0-9]{14}'),
+        ]);
+    }
+
+    /**
+     * @deprecated Use withProvider() instead
      */
     public function withStripe(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'stripe_subscription_item_id' => 'si_'.fake()->regexify('[A-Za-z0-9]{14}'),
-            'stripe_price_id' => 'price_'.fake()->regexify('[A-Za-z0-9]{14}'),
-        ]);
+        return $this->withProvider('stripe');
     }
 
     /**

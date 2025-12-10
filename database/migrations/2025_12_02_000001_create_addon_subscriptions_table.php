@@ -40,10 +40,10 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('canceled_at')->nullable();
 
-            // External billing references
-            $table->string('stripe_subscription_item_id')->nullable()->unique();
-            $table->string('stripe_price_id')->nullable();
-            $table->string('paddle_subscription_id')->nullable();
+            // External billing references (provider-agnostic)
+            $table->string('provider')->nullable(); // 'stripe', 'asaas', etc.
+            $table->string('provider_item_id')->nullable()->unique(); // subscription item ID
+            $table->string('provider_price_id')->nullable(); // price/plan ID
 
             // Usage tracking (for metered billing)
             $table->integer('metered_usage')->default(0);

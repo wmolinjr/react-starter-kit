@@ -597,6 +597,57 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
     }
 
     // =========================================================================
+    // Subscription Item Methods
+    // =========================================================================
+
+    /**
+     * Add item to subscription.
+     *
+     * Note: Asaas doesn't support multi-item subscriptions like Stripe.
+     * For addons, create separate subscriptions or adjust the main subscription value.
+     */
+    public function addSubscriptionItem(
+        Subscription $subscription,
+        string $priceId,
+        int $quantity = 1
+    ): array {
+        // Asaas doesn't support multi-item subscriptions
+        // Option 1: Create a separate subscription for the addon
+        // Option 2: Update the main subscription value
+        throw new \RuntimeException(
+            'Asaas does not support multi-item subscriptions. '.
+            'Create a separate subscription for addons or update the main subscription value.'
+        );
+    }
+
+    /**
+     * Update subscription item quantity.
+     */
+    public function updateSubscriptionItem(
+        Subscription $subscription,
+        string $priceId,
+        int $quantity
+    ): void {
+        throw new \RuntimeException(
+            'Asaas does not support multi-item subscriptions. '.
+            'Update the subscription value directly instead.'
+        );
+    }
+
+    /**
+     * Remove item from subscription.
+     */
+    public function removeSubscriptionItem(
+        Subscription $subscription,
+        string $priceId
+    ): void {
+        throw new \RuntimeException(
+            'Asaas does not support multi-item subscriptions. '.
+            'Cancel the separate addon subscription instead.'
+        );
+    }
+
+    // =========================================================================
     // Helper Methods
     // =========================================================================
 

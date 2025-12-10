@@ -672,6 +672,98 @@ class StripeGateway implements PaymentGatewayInterface, PaymentMethodGatewayInte
     }
 
     // =========================================================================
+    // Subscription Item Methods (Multi-Item Subscriptions / Addons)
+    // =========================================================================
+
+    public function retrieveSubscription(string $subscriptionId): array
+    {
+        try {
+            $subscription = StripeSubscription::retrieve($subscriptionId);
+
+            return $subscription->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to retrieve subscription: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function addSubscriptionItem(
+        Subscription $subscription,
+        string $priceId,
+        int $quantity = 1
+    ): array {
+        try {
+            $item = \Stripe\SubscriptionItem::create([
+                'subscription' => $subscription->provider_subscription_id,
+                'price' => $priceId,
+                'quantity' => $quantity,
+            ]);
+
+            return [
+                'provider_item_id' => $item->id,
+                'quantity' => $item->quantity,
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to add subscription item: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function updateSubscriptionItem(
+        Subscription $subscription,
+        string $priceId,
+        int $quantity
+    ): void {
+        try {
+            // Find the subscription item by price ID
+            $stripeSubscription = StripeSubscription::retrieve($subscription->provider_subscription_id);
+
+            $itemId = null;
+            foreach ($stripeSubscription->items->data as $item) {
+                if ($item->price->id === $priceId) {
+                    $itemId = $item->id;
+                    break;
+                }
+            }
+
+            if (! $itemId) {
+                throw new \RuntimeException("Subscription item with price {$priceId} not found");
+            }
+
+            \Stripe\SubscriptionItem::update($itemId, [
+                'quantity' => $quantity,
+            ]);
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to update subscription item: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function removeSubscriptionItem(
+        Subscription $subscription,
+        string $priceId
+    ): void {
+        try {
+            // Find the subscription item by price ID
+            $stripeSubscription = StripeSubscription::retrieve($subscription->provider_subscription_id);
+
+            $itemId = null;
+            foreach ($stripeSubscription->items->data as $item) {
+                if ($item->price->id === $priceId) {
+                    $itemId = $item->id;
+                    break;
+                }
+            }
+
+            if (! $itemId) {
+                // Item not found, nothing to remove
+                return;
+            }
+
+            \Stripe\SubscriptionItem::retrieve($itemId)->delete();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to remove subscription item: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    // =========================================================================
     // Webhook Handlers
     // =========================================================================
 

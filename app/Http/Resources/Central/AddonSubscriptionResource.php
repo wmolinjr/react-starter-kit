@@ -44,7 +44,8 @@ class AddonSubscriptionResource extends BaseResource
             'is_recurring' => 'boolean',
             'is_metered' => 'boolean',
             'metered_usage' => 'number | null',
-            'stripe_subscription_item_id' => 'string | null',
+            'provider' => 'string | null',
+            'provider_item_id' => 'string | null',
             'tenant' => 'AddonSubscriptionTenant | null',
             'created_at' => 'string',
         ];
@@ -93,7 +94,8 @@ class AddonSubscriptionResource extends BaseResource
             'is_recurring' => $this->isRecurring(),
             'is_metered' => $this->isMetered(),
             'metered_usage' => $this->when($this->isMetered(), $this->metered_usage),
-            'stripe_subscription_item_id' => $this->stripe_subscription_item_id,
+            'provider' => $this->provider,
+            'provider_item_id' => $this->provider_item_id,
             'tenant' => $this->when(
                 $this->relationLoaded('tenant') && $this->tenant,
                 fn () => [

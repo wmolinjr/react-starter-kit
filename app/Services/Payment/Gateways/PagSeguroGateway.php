@@ -185,4 +185,19 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
     {
         return [];
     }
+
+    public function addSubscriptionItem(Subscription $subscription, string $priceId, int $quantity = 1): array
+    {
+        throw new \RuntimeException('PagSeguro gateway not yet implemented');
+    }
+
+    public function updateSubscriptionItem(Subscription $subscription, string $priceId, int $quantity): void
+    {
+        throw new \RuntimeException('PagSeguro gateway not yet implemented');
+    }
+
+    public function removeSubscriptionItem(Subscription $subscription, string $priceId): void
+    {
+        throw new \RuntimeException('PagSeguro gateway not yet implemented');
+    }
 }

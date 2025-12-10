@@ -113,4 +113,53 @@ interface SubscriptionGatewayInterface extends PaymentGatewayInterface
         Customer $customer,
         string $returnUrl
     ): string;
+
+    /**
+     * Retrieve subscription details from provider.
+     */
+    public function retrieveSubscription(string $subscriptionId): array;
+
+    // =========================================================================
+    // Subscription Items (Multi-Item Subscriptions / Addons)
+    // =========================================================================
+
+    /**
+     * Add a price/item to an existing subscription.
+     *
+     * Used for addons that are billed as part of the main subscription.
+     *
+     * @param  Subscription  $subscription  The subscription
+     * @param  string  $priceId  Provider price ID
+     * @param  int  $quantity  Quantity of items
+     * @return array{provider_item_id: string, quantity: int}
+     */
+    public function addSubscriptionItem(
+        Subscription $subscription,
+        string $priceId,
+        int $quantity = 1
+    ): array;
+
+    /**
+     * Update quantity of a subscription item.
+     *
+     * @param  Subscription  $subscription  The subscription
+     * @param  string  $priceId  Provider price ID
+     * @param  int  $quantity  New quantity
+     */
+    public function updateSubscriptionItem(
+        Subscription $subscription,
+        string $priceId,
+        int $quantity
+    ): void;
+
+    /**
+     * Remove an item from a subscription.
+     *
+     * @param  Subscription  $subscription  The subscription
+     * @param  string  $priceId  Provider price ID
+     */
+    public function removeSubscriptionItem(
+        Subscription $subscription,
+        string $priceId
+    ): void;
 }

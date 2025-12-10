@@ -80,10 +80,10 @@ class AddonPurchaseTest extends TenantTestCase
     public function can_format_amount(): void
     {
         $purchase = AddonPurchase::factory()->forTenant($this->tenant)->create([
-            'amount_paid' => 4999, // $49.99
+            'amount_paid' => 4999, // R$49.99
         ]);
 
-        $this->assertEquals('$49.99', $purchase->formatted_amount);
+        $this->assertEquals('R$49.99', $purchase->formatted_amount);
     }
 
     #[Test]

@@ -104,7 +104,8 @@ export interface AddonSubscriptionResource {
     is_recurring: boolean;
     is_metered: boolean;
     metered_usage: number | null;
-    stripe_subscription_item_id: string | null;
+    provider: string | null;
+    provider_item_id: string | null;
     tenant: AddonSubscriptionTenant | null;
     created_at: string;
 }
