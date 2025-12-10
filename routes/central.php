@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Central\Admin\AddonCatalogController;
 use App\Http\Controllers\Central\Admin\AddonManagementController;
+use App\Http\Controllers\Central\Admin\AuditLogController;
 use App\Http\Controllers\Central\Admin\BundleCatalogController;
 use App\Http\Controllers\Central\Admin\DashboardController;
 use App\Http\Controllers\Central\Admin\FederationConflictController;
@@ -271,6 +272,13 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::get('/{group}/conflicts/{conflict}', [FederationConflictController::class, 'show'])->name('conflicts.show');
                     Route::post('/{group}/conflicts/{conflict}/resolve', [FederationConflictController::class, 'resolve'])->name('conflicts.resolve');
                     Route::post('/{group}/conflicts/{conflict}/dismiss', [FederationConflictController::class, 'dismiss'])->name('conflicts.dismiss');
+                });
+
+                // Audit Log Management
+                Route::prefix('audit')->name('audit.')->group(function () {
+                    Route::get('/', [AuditLogController::class, 'index'])->name('index');
+                    Route::get('/export', [AuditLogController::class, 'export'])->name('export');
+                    Route::get('/{activity}', [AuditLogController::class, 'show'])->name('show');
                 });
 
                 /*

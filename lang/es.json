@@ -797,6 +797,8 @@
     "permissions.central.addons:revenue": "Complementos: Ingresos",
     "permissions.central.addons:revoke": "Complementos: Revocar",
     "permissions.central.addons:view": "Complementos: Ver",
+    "permissions.central.audit:export": "Auditoría: Exportar",
+    "permissions.central.audit:view": "Auditoría: Ver",
     "permissions.central.catalog:create": "Catálogo: Crear",
     "permissions.central.catalog:delete": "Catálogo: Eliminar",
     "permissions.central.catalog:edit": "Catálogo: Editar",

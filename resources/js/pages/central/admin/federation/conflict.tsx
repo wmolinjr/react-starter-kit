@@ -64,7 +64,7 @@ function FederationConflict({ group, conflict }: Props) {
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
         { title: t('admin.federation.conflicts'), href: admin.federation.conflicts.index.url(group.id) },
-        { title: conflict.field },
+        { title: conflict.field, href: admin.federation.conflicts.show.url({ group: group.id, conflict: conflict.id }) },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

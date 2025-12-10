@@ -158,6 +158,8 @@ export const CENTRAL_PERMISSION: Record<CentralPermission, CentralPermissionOpti
     'federation:edit': { value: 'federation:edit', label: 'Federation: Edit', description: 'Edit federation groups', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'edit' },
     'federation:delete': { value: 'federation:delete', label: 'Federation: Delete', description: 'Delete federation groups', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'delete' },
     'federation:manageConflicts': { value: 'federation:manageConflicts', label: 'Federation: Manage Conflicts', description: 'Manage federation conflicts', icon: 'Network', color: 'cyan', badge_variant: 'default', category: 'federation', action: 'manageConflicts' },
+    'audit:view': { value: 'audit:view', label: 'Audit: View', description: 'View audit logs', icon: 'ClipboardList', color: 'amber', badge_variant: 'default', category: 'audit', action: 'view' },
+    'audit:export': { value: 'audit:export', label: 'Audit: Export', description: 'Export audit logs', icon: 'ClipboardList', color: 'amber', badge_variant: 'default', category: 'audit', action: 'export' },
 };
 
 export const TENANT_PERMISSION: Record<TenantPermission, TenantPermissionOption> = {

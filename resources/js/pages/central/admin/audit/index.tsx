@@ -3,14 +3,12 @@ import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ClipboardList, Download, RefreshCw } from 'lucide-react';
 
-import AdminLayout from '@/layouts/tenant/admin-layout';
-import admin from '@/routes/tenant/admin';
+import AdminLayout from '@/layouts/central/admin-layout';
+import admin from '@/routes/central/admin';
 import { Button } from '@/components/ui/button';
 import {
     type BreadcrumbItem,
     type ActivityResource,
-    type UserSummaryResource,
-    type TenantSummaryResource,
     type InertiaPaginatedResponse,
 } from '@/types';
 import {
@@ -35,31 +33,36 @@ import {
     type SubjectType,
 } from '@/components/shared/audit';
 
+// Central UserSummaryResource has the same shape as Tenant's
+interface UserSummaryResource {
+    id: string;
+    name: string;
+    email: string;
+}
+
 interface Props {
     activities: InertiaPaginatedResponse<ActivityResource>;
-    teamMembers: UserSummaryResource[];
+    adminUsers: UserSummaryResource[];
     eventTypes: string[];
     subjectTypes: SubjectType[];
     logNames: string[];
     filters: AuditFiltersType;
-    tenant: TenantSummaryResource;
 }
 
 const AUDIT_CONFIG: AuditPageConfig = {
-    translationPrefix: 'tenant.audit',
-    baseUrl: '/audit',
-    exportUrl: '/audit/export',
-    userLabelKey: 'tenant.audit.filter_user',
+    translationPrefix: 'admin.audit',
+    baseUrl: '/admin/audit',
+    exportUrl: '/admin/audit/export',
+    userLabelKey: 'admin.audit.filter_user',
 };
 
 function AuditLogIndex({
     activities,
-    teamMembers,
+    adminUsers,
     eventTypes,
     subjectTypes,
     logNames,
     filters,
-    tenant: tenantData,
 }: Props) {
     const { t } = useLaravelReactI18n();
     const [localFilters, setLocalFilters] = useState<AuditFiltersType>(filters);
@@ -68,7 +71,7 @@ function AuditLogIndex({
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('tenant.audit.title'), href: admin.audit.index().url },
+        { title: t('admin.audit.title'), href: admin.audit.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -103,14 +106,14 @@ function AuditLogIndex({
 
     return (
         <>
-            <Head title={t('tenant.audit.page_title')} />
+            <Head title={t('admin.audit.page_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={ClipboardList}>{t('tenant.audit.page_title')}</PageTitle>
+                        <PageTitle icon={ClipboardList}>{t('admin.audit.page_title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.audit.description', { name: tenantData.name })}
+                            {t('admin.audit.description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -120,7 +123,7 @@ function AuditLogIndex({
                             disabled={isExporting}
                         >
                             <Download className="mr-2 h-4 w-4" />
-                            {isExporting ? t('common.loading') : t('tenant.audit.export_csv')}
+                            {isExporting ? t('common.loading') : t('admin.audit.export_csv')}
                         </Button>
                         <Button
                             variant="outline"
@@ -135,7 +138,7 @@ function AuditLogIndex({
                 <PageContent>
                     <AuditFilters
                         filters={localFilters}
-                        users={teamMembers}
+                        users={adminUsers}
                         eventTypes={eventTypes}
                         subjectTypes={subjectTypes}
                         logNames={logNames}

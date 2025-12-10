@@ -159,7 +159,7 @@ export interface FederationSyncStrategyOption {
     auto_resolves: boolean;
 }
 
-export type CentralPermission = 'tenants:view' | 'tenants:show' | 'tenants:edit' | 'tenants:delete' | 'tenants:impersonate' | 'users:view' | 'users:show' | 'users:edit' | 'users:delete' | 'plans:view' | 'plans:create' | 'plans:edit' | 'plans:delete' | 'plans:sync' | 'catalog:view' | 'catalog:create' | 'catalog:edit' | 'catalog:delete' | 'catalog:sync' | 'addons:view' | 'addons:revenue' | 'addons:grant' | 'addons:revoke' | 'roles:view' | 'roles:create' | 'roles:edit' | 'roles:delete' | 'system:view' | 'system:edit' | 'system:logs' | 'federation:view' | 'federation:create' | 'federation:edit' | 'federation:delete' | 'federation:manageConflicts';
+export type CentralPermission = 'tenants:view' | 'tenants:show' | 'tenants:edit' | 'tenants:delete' | 'tenants:impersonate' | 'users:view' | 'users:show' | 'users:edit' | 'users:delete' | 'plans:view' | 'plans:create' | 'plans:edit' | 'plans:delete' | 'plans:sync' | 'catalog:view' | 'catalog:create' | 'catalog:edit' | 'catalog:delete' | 'catalog:sync' | 'addons:view' | 'addons:revenue' | 'addons:grant' | 'addons:revoke' | 'roles:view' | 'roles:create' | 'roles:edit' | 'roles:delete' | 'system:view' | 'system:edit' | 'system:logs' | 'federation:view' | 'federation:create' | 'federation:edit' | 'federation:delete' | 'federation:manageConflicts' | 'audit:view' | 'audit:export';
 
 export interface CentralPermissionOption {
     value: CentralPermission;

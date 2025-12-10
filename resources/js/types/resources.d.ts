@@ -393,6 +393,12 @@ export interface TenantSummaryResource {
     slug: string;
 }
 
+export interface UserSummaryResource {
+    id: string;
+    name: string;
+    email: string;
+}
+
 export interface ApiTokenResource {
     id: string;
     name: string;

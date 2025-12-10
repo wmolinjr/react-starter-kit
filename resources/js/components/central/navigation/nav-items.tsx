@@ -3,6 +3,7 @@ import { type NavItem } from '@/types';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     Building2,
+    ClipboardList,
     Gauge,
     Shield,
     ShieldCheck,
@@ -106,6 +107,13 @@ export function useCentralAdminNavItems(): NavItem[] {
                     href: admin.roles.index.url(),
                 },
             ],
+        },
+
+        // Audit Log - single item
+        {
+            title: t('sidebar.audit_log'),
+            href: admin.audit.index.url(),
+            icon: ClipboardList,
         },
     ];
 }

@@ -65,6 +65,10 @@ enum CentralPermission: string
     case FEDERATION_DELETE = 'federation:delete';
     case FEDERATION_MANAGE_CONFLICTS = 'federation:manageConflicts';
 
+    // Audit Log (2 permissions)
+    case AUDIT_VIEW = 'audit:view';
+    case AUDIT_EXPORT = 'audit:export';
+
     /**
      * Get translatable name.
      *
@@ -84,6 +88,7 @@ enum CentralPermission: string
             'roles' => ['en' => 'Roles', 'pt_BR' => 'Papéis', 'es' => 'Roles'],
             'system' => ['en' => 'System', 'pt_BR' => 'Sistema', 'es' => 'Sistema'],
             'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
+            'audit' => ['en' => 'Audit', 'pt_BR' => 'Auditoria', 'es' => 'Auditoría'],
         ];
 
         $actionNames = [
@@ -99,6 +104,7 @@ enum CentralPermission: string
             'grant' => ['en' => 'Grant', 'pt_BR' => 'Conceder', 'es' => 'Conceder'],
             'revoke' => ['en' => 'Revoke', 'pt_BR' => 'Revogar', 'es' => 'Revocar'],
             'manageConflicts' => ['en' => 'Manage Conflicts', 'pt_BR' => 'Gerenciar Conflitos', 'es' => 'Gestionar Conflictos'],
+            'export' => ['en' => 'Export', 'pt_BR' => 'Exportar', 'es' => 'Exportar'],
         ];
 
         $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)];
@@ -169,6 +175,10 @@ enum CentralPermission: string
             self::FEDERATION_EDIT => ['en' => 'Edit federation groups', 'pt_BR' => 'Editar grupos de federação', 'es' => 'Editar grupos de federación'],
             self::FEDERATION_DELETE => ['en' => 'Delete federation groups', 'pt_BR' => 'Excluir grupos de federação', 'es' => 'Eliminar grupos de federación'],
             self::FEDERATION_MANAGE_CONFLICTS => ['en' => 'Manage federation conflicts', 'pt_BR' => 'Gerenciar conflitos de federação', 'es' => 'Gestionar conflictos de federación'],
+
+            // Audit Log
+            self::AUDIT_VIEW => ['en' => 'View audit logs', 'pt_BR' => 'Visualizar logs de auditoria', 'es' => 'Ver registros de auditoría'],
+            self::AUDIT_EXPORT => ['en' => 'Export audit logs', 'pt_BR' => 'Exportar logs de auditoria', 'es' => 'Exportar registros de auditoría'],
         };
     }
 
@@ -186,6 +196,7 @@ enum CentralPermission: string
             'roles' => 'Shield',
             'system' => 'Settings',
             'federation' => 'Network',
+            'audit' => 'ClipboardList',
             default => 'Circle',
         };
     }
@@ -204,6 +215,7 @@ enum CentralPermission: string
             'roles' => 'yellow',
             'system' => 'gray',
             'federation' => 'cyan',
+            'audit' => 'amber',
             default => 'gray',
         };
     }
@@ -217,7 +229,7 @@ enum CentralPermission: string
             'tenants', 'users' => 'default',
             'plans', 'catalog', 'addons' => 'secondary',
             'roles', 'system' => 'outline',
-            'federation' => 'default',
+            'federation', 'audit' => 'default',
             default => 'outline',
         };
     }
@@ -276,6 +288,7 @@ enum CentralPermission: string
             'roles' => ['en' => 'Central Roles', 'pt_BR' => 'Papéis Centrais', 'es' => 'Roles Centrales'],
             'system' => ['en' => 'System', 'pt_BR' => 'Sistema', 'es' => 'Sistema'],
             'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
+            'audit' => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria', 'es' => 'Registro de Auditoría'],
             default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)],
         };
     }
