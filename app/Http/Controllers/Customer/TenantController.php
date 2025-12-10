@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Central\TenantDetailResource;
 use App\Http\Resources\Central\TenantSummaryResource;
+use App\Models\Central\AddonPurchase;
 use App\Models\Central\Tenant;
 use App\Services\Central\CustomerService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -175,5 +177,29 @@ class TenantController extends Controller
         if ($tenant->customer_id !== $request->user('customer')->id) {
             abort(403, 'You do not own this workspace.');
         }
+    }
+
+    /**
+     * Get the status of a purchase for async payment polling.
+     *
+     * Used by PIX/Boleto payment components to check if payment was confirmed.
+     */
+    public function purchaseStatus(Request $request, AddonPurchase $purchase): JsonResponse
+    {
+        $customer = $request->user('customer');
+
+        // Verify customer owns the tenant associated with this purchase
+        $tenant = $purchase->tenant;
+
+        if (! $tenant || $tenant->customer_id !== $customer->id) {
+            abort(403, 'You do not have access to this purchase.');
+        }
+
+        return response()->json([
+            'status' => $purchase->status,
+            'completed_at' => $purchase->purchased_at?->toISOString(),
+            'failed_at' => $purchase->isFailed() ? $purchase->updated_at->toISOString() : null,
+            'failure_reason' => $purchase->failure_reason,
+        ]);
     }
 }

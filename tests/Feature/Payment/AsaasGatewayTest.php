@@ -1,0 +1,578 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Payment;
+
+use App\Events\Payment\PaymentConfirmed;
+use App\Events\Payment\PaymentFailed;
+use App\Models\Central\AddonPurchase;
+use App\Models\Central\Customer;
+use App\Services\Payment\Gateways\AsaasGateway;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+
+/**
+ * Asaas Gateway Test Suite
+ *
+ * Tests the Asaas payment gateway implementation for:
+ * - PIX payments (QR code generation, retrieval)
+ * - Boleto payments (barcode, identification field)
+ * - Webhook handling for async payments
+ */
+class AsaasGatewayTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected AsaasGateway $gateway;
+
+    protected Customer $customer;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->gateway = new AsaasGateway([
+            'api_key' => 'test_api_key',
+            'sandbox' => true,
+        ]);
+
+        // Create a customer with Asaas provider ID
+        $this->customer = Customer::factory()->create([
+            'provider_ids' => ['asaas' => 'cus_test_123'],
+        ]);
+    }
+
+    // =========================================================================
+    // Gateway Configuration Tests
+    // =========================================================================
+
+    #[Test]
+    public function gateway_returns_correct_identifier(): void
+    {
+        $this->assertEquals('asaas', $this->gateway->getIdentifier());
+    }
+
+    #[Test]
+    public function gateway_returns_correct_display_name(): void
+    {
+        $this->assertEquals('Asaas', $this->gateway->getDisplayName());
+    }
+
+    #[Test]
+    public function gateway_supports_pix_boleto_and_card(): void
+    {
+        $types = $this->gateway->getSupportedTypes();
+
+        $this->assertContains('card', $types);
+        $this->assertContains('pix', $types);
+        $this->assertContains('boleto', $types);
+    }
+
+    #[Test]
+    public function gateway_supports_brl_currency(): void
+    {
+        $currencies = $this->gateway->getSupportedCurrencies();
+
+        $this->assertContains('BRL', $currencies);
+    }
+
+    #[Test]
+    public function gateway_is_available_when_api_key_is_set(): void
+    {
+        $this->assertTrue($this->gateway->isAvailable());
+    }
+
+    #[Test]
+    public function gateway_is_not_available_when_api_key_is_empty(): void
+    {
+        $gateway = new AsaasGateway(['api_key' => '']);
+
+        $this->assertFalse($gateway->isAvailable());
+    }
+
+    // =========================================================================
+    // PIX Charge Tests
+    // =========================================================================
+
+    #[Test]
+    public function create_pix_charge_returns_success_with_qr_code(): void
+    {
+        Http::fake([
+            // Payment creation
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'id' => 'pay_test_pix_123',
+                'status' => 'PENDING',
+                'billingType' => 'PIX',
+                'value' => 99.90,
+                'dueDate' => '2025-12-15',
+                'invoiceUrl' => 'https://asaas.com/invoice/123',
+            ], 200),
+            // QR code retrieval
+            'sandbox.asaas.com/api/v3/payments/pay_test_pix_123/pixQrCode' => Http::response([
+                'encodedImage' => 'base64_qr_code_image_data',
+                'payload' => '00020126580014br.gov.bcb.pix0136example-pix-key',
+                'expirationDate' => '2025-12-15T23:59:59Z',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->createPixCharge($this->customer, 9990, [
+            'description' => 'Test PIX Payment',
+            'reference' => 'addon_purchase_123',
+        ]);
+
+        $this->assertTrue($result->success);
+        $this->assertEquals('pay_test_pix_123', $result->providerPaymentId);
+        $this->assertEquals('pending', $result->status);
+        $this->assertEquals('PIX', $result->providerData['billing_type']);
+
+        // Check PIX data
+        $this->assertNotNull($result->providerData['pix']);
+        $this->assertEquals('base64_qr_code_image_data', $result->providerData['pix']['qr_code']);
+        $this->assertStringContains('pix', $result->providerData['pix']['copy_paste']);
+        $this->assertNotNull($result->providerData['pix']['expiration']);
+    }
+
+    #[Test]
+    public function create_pix_charge_handles_api_failure(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'errors' => [
+                    ['description' => 'Invalid customer'],
+                ],
+            ], 400),
+        ]);
+
+        $result = $this->gateway->createPixCharge($this->customer, 9990);
+
+        $this->assertFalse($result->success);
+        $this->assertEquals('Invalid customer', $result->failureMessage);
+    }
+
+    #[Test]
+    public function get_pix_qr_code_retrieves_existing_payment_qr(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments/pay_existing_123/pixQrCode' => Http::response([
+                'encodedImage' => 'refreshed_qr_code_data',
+                'payload' => '00020126580014br.gov.bcb.pix',
+                'expirationDate' => '2025-12-20T23:59:59Z',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->getPixQrCode('pay_existing_123');
+
+        $this->assertNotNull($result);
+        $this->assertEquals('refreshed_qr_code_data', $result['qr_code']);
+        $this->assertEquals('refreshed_qr_code_data', $result['qr_code_base64']);
+        $this->assertNotNull($result['copy_paste']);
+        $this->assertNotNull($result['expiration_date']);
+    }
+
+    #[Test]
+    public function get_pix_qr_code_returns_null_on_failure(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments/invalid_123/pixQrCode' => Http::response([
+                'errors' => [['description' => 'Payment not found']],
+            ], 404),
+        ]);
+
+        $result = $this->gateway->getPixQrCode('invalid_123');
+
+        $this->assertNull($result);
+    }
+
+    // =========================================================================
+    // Boleto Charge Tests
+    // =========================================================================
+
+    #[Test]
+    public function create_boleto_charge_returns_success_with_barcode(): void
+    {
+        Http::fake([
+            // Payment creation
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'id' => 'pay_test_boleto_123',
+                'status' => 'PENDING',
+                'billingType' => 'BOLETO',
+                'value' => 149.90,
+                'dueDate' => '2025-12-18',
+                'bankSlipUrl' => 'https://asaas.com/boleto/123',
+                'nossoNumero' => '1234567890',
+                'invoiceUrl' => 'https://asaas.com/invoice/123',
+            ], 200),
+            // Identification field retrieval
+            'sandbox.asaas.com/api/v3/payments/pay_test_boleto_123/identificationField' => Http::response([
+                'identificationField' => '23793.38128 60000.000003 00000.000406 1 84660000014990',
+                'barCode' => '23791846600000149909381286000000000000000040',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->createBoletoCharge($this->customer, 14990, [
+            'description' => 'Test Boleto Payment',
+            'reference' => 'addon_purchase_456',
+            'due_date' => '2025-12-18',
+        ]);
+
+        $this->assertTrue($result->success);
+        $this->assertEquals('pay_test_boleto_123', $result->providerPaymentId);
+        $this->assertEquals('pending', $result->status);
+        $this->assertEquals('BOLETO', $result->providerData['billing_type']);
+
+        // Check Boleto data
+        $this->assertNotNull($result->providerData['boleto']);
+        $this->assertEquals('https://asaas.com/boleto/123', $result->providerData['boleto']['url']);
+        $this->assertEquals('1234567890', $result->providerData['boleto']['nosso_numero']);
+        $this->assertNotNull($result->providerData['boleto']['digitable_line']);
+        $this->assertNotNull($result->providerData['boleto']['barcode']);
+    }
+
+    #[Test]
+    public function create_boleto_charge_includes_fine_and_interest(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'id' => 'pay_test_boleto_fine',
+                'status' => 'PENDING',
+                'billingType' => 'BOLETO',
+                'value' => 100.00,
+                'dueDate' => '2025-12-20',
+            ], 200),
+            'sandbox.asaas.com/api/v3/payments/*/identificationField' => Http::response([
+                'identificationField' => '12345',
+                'barCode' => '12345',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->createBoletoCharge($this->customer, 10000, [
+            'fine_value' => 2,
+            'interest_value' => 1,
+        ]);
+
+        $this->assertTrue($result->success);
+
+        // Verify the request included fine and interest
+        Http::assertSent(function ($request) {
+            $body = json_decode($request->body(), true);
+
+            return $request->url() === 'https://sandbox.asaas.com/api/v3/payments'
+                && isset($body['fine'])
+                && $body['fine']['value'] === 2
+                && $body['fine']['type'] === 'PERCENTAGE'
+                && isset($body['interest'])
+                && $body['interest']['value'] === 1;
+        });
+    }
+
+    #[Test]
+    public function get_boleto_identification_field_retrieves_existing(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments/pay_boleto_456/identificationField' => Http::response([
+                'identificationField' => '23793.38128 60000.000003 00000.000406 1 84660000014990',
+                'barCode' => '23791846600000149909381286000000000000000040',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->getBoletoIdentificationField('pay_boleto_456');
+
+        $this->assertNotNull($result);
+        $this->assertNotNull($result['identification_field']);
+        $this->assertNotNull($result['digitable_line']);
+        $this->assertNotNull($result['barcode']);
+        $this->assertNotNull($result['bar_code']);
+    }
+
+    // =========================================================================
+    // Webhook Handling Tests
+    // =========================================================================
+
+    #[Test]
+    public function webhook_handler_dispatches_payment_confirmed_event(): void
+    {
+        Event::fake([PaymentConfirmed::class]);
+
+        // Create a pending purchase (let factory generate UUID)
+        $purchase = AddonPurchase::factory()->pending()->create();
+
+        $payload = [
+            'event' => 'PAYMENT_CONFIRMED',
+            'payment' => [
+                'id' => 'pay_asaas_123',
+                'externalReference' => $purchase->id,
+                'billingType' => 'PIX',
+                'value' => 99.90,
+                'netValue' => 97.90,
+                'paymentDate' => '2025-12-10',
+                'confirmedDate' => '2025-12-10',
+            ],
+        ];
+
+        $this->gateway->handleWebhook($payload);
+
+        Event::assertDispatched(PaymentConfirmed::class, function ($event) use ($purchase) {
+            return $event->purchase->id === $purchase->id
+                && $event->provider === 'asaas'
+                && $event->paymentIntentId === 'pay_asaas_123';
+        });
+    }
+
+    #[Test]
+    public function webhook_handler_dispatches_payment_received_event(): void
+    {
+        Event::fake([PaymentConfirmed::class]);
+
+        $purchase = AddonPurchase::factory()->pending()->create();
+
+        $payload = [
+            'event' => 'PAYMENT_RECEIVED',
+            'payment' => [
+                'id' => 'pay_asaas_456',
+                'externalReference' => $purchase->id,
+                'billingType' => 'BOLETO',
+                'value' => 149.90,
+            ],
+        ];
+
+        $this->gateway->handleWebhook($payload);
+
+        Event::assertDispatched(PaymentConfirmed::class);
+    }
+
+    #[Test]
+    public function webhook_handler_dispatches_payment_failed_on_overdue(): void
+    {
+        Event::fake([PaymentFailed::class]);
+
+        $purchase = AddonPurchase::factory()->pending()->create();
+
+        $payload = [
+            'event' => 'PAYMENT_OVERDUE',
+            'payment' => [
+                'id' => 'pay_asaas_789',
+                'externalReference' => $purchase->id,
+                'billingType' => 'PIX',
+                'dueDate' => '2025-12-05',
+            ],
+        ];
+
+        $this->gateway->handleWebhook($payload);
+
+        Event::assertDispatched(PaymentFailed::class, function ($event) {
+            return str_contains($event->reason, 'vencido');
+        });
+    }
+
+    #[Test]
+    public function webhook_handler_ignores_unknown_external_reference(): void
+    {
+        Event::fake([PaymentConfirmed::class, PaymentFailed::class]);
+
+        // Use a valid UUID format but nonexistent
+        $payload = [
+            'event' => 'PAYMENT_CONFIRMED',
+            'payment' => [
+                'id' => 'pay_unknown',
+                'externalReference' => '019b09ec-0000-0000-0000-000000000000',
+                'billingType' => 'PIX',
+            ],
+        ];
+
+        $this->gateway->handleWebhook($payload);
+
+        Event::assertNotDispatched(PaymentConfirmed::class);
+        Event::assertNotDispatched(PaymentFailed::class);
+    }
+
+    #[Test]
+    public function webhook_handler_ignores_missing_external_reference(): void
+    {
+        Event::fake([PaymentConfirmed::class]);
+
+        $payload = [
+            'event' => 'PAYMENT_CONFIRMED',
+            'payment' => [
+                'id' => 'pay_no_ref',
+                'billingType' => 'PIX',
+            ],
+        ];
+
+        $this->gateway->handleWebhook($payload);
+
+        Event::assertNotDispatched(PaymentConfirmed::class);
+    }
+
+    // =========================================================================
+    // Webhook Parsing Tests
+    // =========================================================================
+
+    #[Test]
+    public function parse_webhook_payload_normalizes_data(): void
+    {
+        $payload = [
+            'event' => 'PAYMENT_CONFIRMED',
+            'payment' => [
+                'id' => 'pay_123',
+                'externalReference' => 'ref_456',
+                'status' => 'CONFIRMED',
+                'billingType' => 'PIX',
+                'value' => 99.90,
+                'netValue' => 97.90,
+                'dueDate' => '2025-12-15',
+                'paymentDate' => '2025-12-10',
+                'confirmedDate' => '2025-12-10',
+            ],
+        ];
+
+        $result = $this->gateway->parseWebhookPayload($payload);
+
+        $this->assertEquals('PAYMENT_CONFIRMED', $result['event']);
+        $this->assertEquals('payment.confirmed', $result['event_type']);
+        $this->assertEquals('pay_123', $result['payment_id']);
+        $this->assertEquals('ref_456', $result['external_reference']);
+        $this->assertEquals('CONFIRMED', $result['status']);
+        $this->assertEquals('paid', $result['normalized_status']);
+        $this->assertEquals('PIX', $result['billing_type']);
+        $this->assertEquals(9990, $result['value']);
+        $this->assertEquals(9790, $result['net_value']);
+    }
+
+    #[Test]
+    public function is_payment_confirmed_event_returns_true_for_confirmed(): void
+    {
+        $this->assertTrue($this->gateway->isPaymentConfirmedEvent('PAYMENT_CONFIRMED'));
+        $this->assertTrue($this->gateway->isPaymentConfirmedEvent('PAYMENT_RECEIVED'));
+        $this->assertFalse($this->gateway->isPaymentConfirmedEvent('PAYMENT_OVERDUE'));
+    }
+
+    #[Test]
+    public function is_payment_failed_event_returns_true_for_failure_events(): void
+    {
+        $this->assertTrue($this->gateway->isPaymentFailedEvent('PAYMENT_OVERDUE'));
+        $this->assertTrue($this->gateway->isPaymentFailedEvent('PAYMENT_DELETED'));
+        $this->assertTrue($this->gateway->isPaymentFailedEvent('PAYMENT_REFUNDED'));
+        $this->assertTrue($this->gateway->isPaymentFailedEvent('PAYMENT_CHARGEBACK_REQUESTED'));
+        $this->assertFalse($this->gateway->isPaymentFailedEvent('PAYMENT_CONFIRMED'));
+    }
+
+    // =========================================================================
+    // Payment Retrieval Tests
+    // =========================================================================
+
+    #[Test]
+    public function retrieve_payment_returns_payment_data(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments/pay_123' => Http::response([
+                'id' => 'pay_123',
+                'status' => 'CONFIRMED',
+                'billingType' => 'PIX',
+                'value' => 99.90,
+            ], 200),
+        ]);
+
+        $result = $this->gateway->retrievePayment('pay_123');
+
+        $this->assertEquals('pay_123', $result['id']);
+        $this->assertEquals('CONFIRMED', $result['status']);
+    }
+
+    #[Test]
+    public function retrieve_payment_throws_on_failure(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments/invalid' => Http::response([
+                'errors' => [['description' => 'Payment not found']],
+            ], 404),
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Failed to retrieve payment');
+
+        $this->gateway->retrievePayment('invalid');
+    }
+
+    #[Test]
+    public function list_payments_returns_customer_payments(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments*' => Http::response([
+                'data' => [
+                    ['id' => 'pay_1', 'status' => 'CONFIRMED'],
+                    ['id' => 'pay_2', 'status' => 'PENDING'],
+                ],
+                'totalCount' => 2,
+            ], 200),
+        ]);
+
+        $result = $this->gateway->listPayments($this->customer, [
+            'billing_type' => 'PIX',
+            'limit' => 10,
+        ]);
+
+        $this->assertCount(2, $result['data']);
+        $this->assertEquals(2, $result['totalCount']);
+    }
+
+    #[Test]
+    public function list_payments_returns_empty_for_customer_without_asaas_id(): void
+    {
+        $customerWithoutAsaas = Customer::factory()->create([
+            'provider_ids' => [],
+        ]);
+
+        $result = $this->gateway->listPayments($customerWithoutAsaas);
+
+        $this->assertEmpty($result['data']);
+        $this->assertEquals(0, $result['totalCount']);
+    }
+
+    // =========================================================================
+    // Webhook Signature Validation Tests
+    // =========================================================================
+
+    #[Test]
+    public function validate_webhook_signature_with_valid_token(): void
+    {
+        config(['payment.drivers.asaas.webhook_token' => 'test_webhook_token']);
+
+        $gateway = new AsaasGateway([
+            'api_key' => 'test_key',
+            'sandbox' => true,
+        ]);
+
+        $isValid = $gateway->validateWebhookSignature('payload', 'test_webhook_token');
+
+        $this->assertTrue($isValid);
+    }
+
+    #[Test]
+    public function validate_webhook_signature_with_invalid_token(): void
+    {
+        config(['payment.drivers.asaas.webhook_token' => 'test_webhook_token']);
+
+        $gateway = new AsaasGateway([
+            'api_key' => 'test_key',
+            'sandbox' => true,
+        ]);
+
+        $isValid = $gateway->validateWebhookSignature('payload', 'wrong_token');
+
+        $this->assertFalse($isValid);
+    }
+
+    // =========================================================================
+    // Helper Assertion
+    // =========================================================================
+
+    protected function assertStringContains(string $needle, ?string $haystack): void
+    {
+        $this->assertNotNull($haystack);
+        $this->assertStringContainsString($needle, $haystack);
+    }
+}

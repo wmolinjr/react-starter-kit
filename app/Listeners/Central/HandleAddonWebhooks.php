@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Listeners\Central;
 
 use App\Enums\BillingPeriod;
+use App\Events\Payment\PaymentConfirmed;
+use App\Events\Payment\PaymentFailed;
 use App\Events\Payment\WebhookReceived;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonPurchase;
@@ -40,6 +42,8 @@ class HandleAddonWebhooks implements ShouldQueue
 
         match ($type) {
             'checkout.session.completed' => $this->handleCheckoutSessionCompleted($event),
+            'checkout.session.async_payment_succeeded' => $this->handleAsyncPaymentSucceeded($event),
+            'checkout.session.async_payment_failed' => $this->handleAsyncPaymentFailed($event),
             'customer.subscription.created' => $this->handleCustomerSubscriptionCreated($event),
             'customer.subscription.updated' => $this->handleCustomerSubscriptionUpdated($event),
             'customer.subscription.deleted' => $this->handleCustomerSubscriptionDeleted($event),
@@ -64,6 +68,77 @@ class HandleAddonWebhooks implements ShouldQueue
         if (($metadata['purchase_type'] ?? null) === 'one_time') {
             $this->processOneTimePurchase($session);
         }
+    }
+
+    /**
+     * Handle checkout.session.async_payment_succeeded webhook.
+     *
+     * Fired when async payment methods (PIX, Boleto, OXXO) are confirmed.
+     */
+    protected function handleAsyncPaymentSucceeded(WebhookReceived $event): void
+    {
+        $session = $event->getObject();
+
+        Log::info('Async payment succeeded', ['session_id' => $session['id'] ?? 'unknown']);
+
+        $purchase = AddonPurchase::where('stripe_checkout_session_id', $session['id'])->first();
+
+        if (! $purchase) {
+            Log::warning('Purchase not found for async payment', ['session_id' => $session['id']]);
+
+            return;
+        }
+
+        // Dispatch PaymentConfirmed event for centralized handling
+        PaymentConfirmed::dispatch(
+            $purchase,
+            $event->provider,
+            $session['payment_intent'] ?? $session['id'],
+            [
+                'session_id' => $session['id'],
+                'payment_status' => $session['payment_status'] ?? 'paid',
+                'event_type' => 'checkout.session.async_payment_succeeded',
+            ]
+        );
+    }
+
+    /**
+     * Handle checkout.session.async_payment_failed webhook.
+     *
+     * Fired when async payment methods (PIX, Boleto, OXXO) fail or expire.
+     */
+    protected function handleAsyncPaymentFailed(WebhookReceived $event): void
+    {
+        $session = $event->getObject();
+
+        Log::info('Async payment failed', ['session_id' => $session['id'] ?? 'unknown']);
+
+        $purchase = AddonPurchase::where('stripe_checkout_session_id', $session['id'])->first();
+
+        if (! $purchase) {
+            Log::warning('Purchase not found for async payment failure', ['session_id' => $session['id']]);
+
+            return;
+        }
+
+        // Get failure reason from session
+        $reason = 'Async payment failed or expired';
+        if (isset($session['payment_intent'])) {
+            // Could fetch more details from payment_intent if needed
+            $reason = 'Payment method confirmation failed';
+        }
+
+        // Dispatch PaymentFailed event for centralized handling
+        PaymentFailed::dispatch(
+            $purchase,
+            $event->provider,
+            $reason,
+            [
+                'session_id' => $session['id'],
+                'payment_status' => $session['payment_status'] ?? 'unpaid',
+                'event_type' => 'checkout.session.async_payment_failed',
+            ]
+        );
     }
 
     /**

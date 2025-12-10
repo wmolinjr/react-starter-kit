@@ -121,6 +121,13 @@ Route::prefix('account')->name('customer.')->group(function () {
 
             // Stripe Billing Portal (redirect to Stripe-hosted portal)
             Route::get('billing-portal', [ProfileController::class, 'billingPortal'])->name('billing-portal');
+
+            // API Routes (JSON responses for AJAX polling)
+            Route::prefix('api')->name('api.')->group(function () {
+                // Purchase status polling for async payments (PIX, Boleto)
+                Route::get('purchases/{purchase}/status', [TenantController::class, 'purchaseStatus'])
+                    ->name('purchases.status');
+            });
         });
     });
 });

@@ -23,6 +23,9 @@
  * // Import dashboard components
  * import { SubscriptionOverviewWidget, CostBreakdownWidget, UsageDashboard } from '@/components/shared/billing';
  *
+ * // Import payment components
+ * import { PixPayment, BoletoPayment, PaymentMethodSelector } from '@/components/shared/billing';
+ *
  * // Import from specific category
  * import { PricingCard } from '@/components/shared/billing/primitives';
  * import { PlanCard } from '@/components/shared/billing/plans';
@@ -49,3 +52,12 @@ export * from './checkout';
 
 // Dashboard components - Subscription overview and usage
 export * from './dashboard';
+
+// Payment method components - PIX, Boleto, Card selection
+export { PixPayment, type PixPaymentProps } from './pix-payment';
+export { BoletoPayment, type BoletoPaymentProps } from './boleto-payment';
+export {
+    PaymentMethodSelector,
+    type PaymentMethodSelectorProps,
+    type PaymentMethod,
+} from './payment-method-selector';

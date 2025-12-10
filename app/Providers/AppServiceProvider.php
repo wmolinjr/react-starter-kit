@@ -7,11 +7,14 @@ use App\Events\Central\Federation\FederatedUserPasswordChanged;
 use App\Events\Central\Federation\FederatedUserTwoFactorChanged;
 use App\Events\Central\Federation\FederatedUserUpdated;
 use App\Events\Central\Federation\TenantJoinedFederation;
+use App\Events\Payment\PaymentConfirmed;
+use App\Events\Payment\PaymentFailed;
 use App\Listeners\Central\Federation\PropagatePasswordChange;
 use App\Listeners\Central\Federation\PropagateTwoFactorChange;
 use App\Listeners\Central\Federation\SyncNewFederatedUser;
 use App\Listeners\Central\Federation\SyncUpdatedFederatedUser;
 use App\Listeners\Central\Federation\SyncUsersToNewTenant;
+use App\Listeners\Central\HandleAsyncPaymentWebhooks;
 use App\Listeners\Central\SyncPermissionsOnSubscriptionChange;
 use App\Listeners\Central\UpdateTenantLimits;
 use App\Listeners\Shared\SetDatabaseTimezone;
@@ -154,6 +157,17 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             \App\Events\Payment\WebhookReceived::class,
             \App\Listeners\Central\HandleAddonWebhooks::class,
+        );
+
+        // Async Payment Event Listeners (PIX, Boleto)
+        Event::listen(
+            PaymentConfirmed::class,
+            [HandleAsyncPaymentWebhooks::class, 'handlePaymentConfirmed'],
+        );
+
+        Event::listen(
+            PaymentFailed::class,
+            [HandleAsyncPaymentWebhooks::class, 'handlePaymentFailed'],
         );
 
         // Federation Event Listeners
