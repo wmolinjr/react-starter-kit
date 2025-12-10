@@ -15,7 +15,7 @@ interface TenantSummary {
 }
 
 interface TenantsIndexProps {
-    tenants: { data: TenantSummary[] };
+    tenants: TenantSummary[];
 }
 
 export default function TenantsIndex({ tenants }: TenantsIndexProps) {
@@ -48,7 +48,7 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                     </Button>
                 </div>
 
-                {tenants.data.length === 0 ? (
+                {tenants.length === 0 ? (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-16">
                             <Building2 className="h-16 w-16 text-muted-foreground/50 mb-4" />
@@ -68,7 +68,7 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                     </Card>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {tenants.data.map((tenant) => (
+                        {tenants.map((tenant) => (
                             <Card key={tenant.id} className="hover:shadow-md transition-shadow">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">

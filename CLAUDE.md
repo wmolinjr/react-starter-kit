@@ -1052,3 +1052,4 @@ For in-depth technical documentation, see:
 - **[docs/FRONTEND-TYPES-MIGRATION-PLAN.md](docs/FRONTEND-TYPES-MIGRATION-PLAN.md)** - Frontend TypeScript types migration guide
 - **[docs/FORTIFY-REMOVAL-PLAN.md](docs/archive/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
 - **[docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md)** - User sync across tenants (multi-branch companies)
+- Rode sempre testes paralelos (16)

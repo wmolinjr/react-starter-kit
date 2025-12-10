@@ -29,7 +29,7 @@ interface Customer {
 
 interface DashboardProps {
     customer: Customer;
-    tenants: { data: TenantSummary[] };
+    tenants: TenantSummary[];
     stats: Stats;
 }
 
@@ -164,7 +164,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                         </Button>
                     </CardHeader>
                     <CardContent>
-                        {tenants.data.length === 0 ? (
+                        {tenants.length === 0 ? (
                             <div className="text-center py-8 text-muted-foreground">
                                 <Building2 className="mx-auto h-12 w-12 mb-4 opacity-50" />
                                 <p>{t('customer.no_workspaces')}</p>
@@ -176,7 +176,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {tenants.data.map((tenant) => (
+                                {tenants.map((tenant) => (
                                     <div
                                         key={tenant.id}
                                         className="flex items-center justify-between rounded-lg border p-4"
