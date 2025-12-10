@@ -277,6 +277,8 @@ Route::middleware([
             // Billing (Laravel Cashier)
             Route::prefix('billing')->name('billing.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'index'])->name('index');
+                Route::get('/plans', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'plans'])->name('plans');
+                Route::get('/bundles', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'bundles'])->name('bundles');
                 Route::get('/invoices', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'invoices'])->name('invoices');
                 Route::post('/checkout', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'checkout'])->name('checkout');
                 Route::get('/success', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'success'])->name('success');

@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\CheckoutRequest;
-use App\Http\Resources\Tenant\BillingPlanResource;
+use App\Http\Resources\Central\AddonBundleResource;
+use App\Http\Resources\Central\AddonResource;
+use App\Http\Resources\Central\PlanResource;
 use App\Http\Resources\Tenant\InvoiceDetailResource;
 use App\Http\Resources\Tenant\InvoiceResource;
-use App\Http\Resources\Tenant\SubscriptionResource;
+use App\Models\Central\Plan;
+use App\Services\Central\AddonService;
 use App\Services\Tenant\BillingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -20,7 +23,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class BillingController extends Controller implements HasMiddleware
 {
     public function __construct(
-        protected BillingService $billingService
+        protected BillingService $billingService,
+        protected AddonService $addonService
     ) {}
 
     /**
@@ -29,24 +33,69 @@ class BillingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success']),
+            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'plans', 'bundles']),
             new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal']),
             new Middleware('permission:'.TenantPermission::BILLING_INVOICES->value, only: ['invoices', 'invoice']),
         ];
     }
 
     /**
-     * Display billing page.
+     * Display billing dashboard.
      */
     public function index(): Response
     {
         $tenant = tenant();
-        $overview = $this->billingService->getBillingOverview($tenant);
+        $data = $this->billingService->getDashboardData($tenant);
 
         return Inertia::render('tenant/admin/billing/index', [
-            'plans' => BillingPlanResource::collection(collect($overview['plans'])),
-            'subscription' => $overview['subscription'] ? new SubscriptionResource($overview['subscription']) : null,
-            'invoices' => InvoiceResource::collection($overview['invoices']),
+            'plan' => $data['plan'] ? new PlanResource($data['plan']) : null,
+            'subscription' => $data['subscription'],
+            'usage' => $data['usage'],
+            'costs' => $data['costs'],
+            'nextInvoice' => $data['nextInvoice'],
+            'activeAddons' => $data['activeAddons'],
+            'activeBundles' => $data['activeBundles'],
+            'recentInvoices' => InvoiceResource::collection($data['recentInvoices']),
+            'trialEndsAt' => $data['trialEndsAt'],
+        ]);
+    }
+
+    /**
+     * Display plans comparison page.
+     */
+    public function plans(): Response
+    {
+        $tenant = tenant();
+        $currentPlan = $tenant->plan;
+
+        $plans = Plan::active()
+            ->ordered()
+            ->get();
+
+        return Inertia::render('tenant/admin/billing/plans', [
+            'plans' => PlanResource::collection($plans),
+            'currentPlan' => $currentPlan ? new PlanResource($currentPlan) : null,
+            'subscription' => $this->billingService->formatSubscription($tenant->subscription('default')),
+        ]);
+    }
+
+    /**
+     * Display bundles catalog page.
+     */
+    public function bundles(): Response
+    {
+        $tenant = tenant();
+        $bundles = $this->addonService->getAvailableBundles($tenant);
+        $activeBundles = $this->addonService->getActiveBundles($tenant);
+
+        // Get tenant's active addon slugs to detect conflicts
+        $activeAddonSlugs = $tenant->activeAddons()->pluck('addon_slug')->toArray();
+
+        return Inertia::render('tenant/admin/billing/bundles', [
+            'bundles' => AddonBundleResource::collection($bundles),
+            'activeBundles' => $activeBundles,
+            'activeAddonSlugs' => $activeAddonSlugs,
+            'currentPlan' => $tenant->plan ? new PlanResource($tenant->plan) : null,
         ]);
     }
 

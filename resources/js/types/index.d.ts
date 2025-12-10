@@ -10,6 +10,7 @@ export * from './enums';
 export * from './resources';
 export * from './pagination';
 export * from './common';
+export * from './billing';
 
 export interface User {
     id: string; // UUID
