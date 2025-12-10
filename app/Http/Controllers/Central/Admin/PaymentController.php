@@ -73,7 +73,7 @@ class PaymentController extends Controller
             'pending_count' => Payment::where('status', 'pending')->count(),
             'completed_count' => Payment::where('status', 'succeeded')->count(),
             'failed_count' => Payment::where('status', 'failed')->count(),
-            'refunded_amount' => Payment::where('status', 'refunded')->sum('refunded_amount'),
+            'refunded_amount' => Payment::where('status', 'refunded')->sum('amount_refunded'),
         ];
 
         return Inertia::render('central/admin/payments/index', [

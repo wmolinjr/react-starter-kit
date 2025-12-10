@@ -24,11 +24,22 @@ use Stripe\StripeClient;
  */
 class PlanService
 {
-    protected StripeClient $stripe;
+    protected ?StripeClient $stripe = null;
 
     public function __construct()
     {
-        $this->stripe = new StripeClient(config('cashier.secret'));
+        $secret = config('cashier.secret');
+        if ($secret) {
+            $this->stripe = new StripeClient($secret);
+        }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    protected function isStripeConfigured(): bool
+    {
+        return $this->stripe !== null;
     }
 
     /**
@@ -216,6 +227,10 @@ class PlanService
      */
     public function syncToStripe(Plan $plan): void
     {
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured. Please set STRIPE_SECRET in .env');
+        }
+
         try {
             // Create or update Stripe product
             if ($plan->stripe_product_id) {
