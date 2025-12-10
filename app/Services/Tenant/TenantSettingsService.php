@@ -227,8 +227,12 @@ class TenantSettingsService
     /**
      * Get all configuration settings for the config page.
      *
+     * NOTE: Uses 'tenantData' instead of 'tenant' to avoid overriding
+     * the shared 'tenant' prop from HandleInertiaRequests middleware,
+     * which contains plan.features needed for sidebar navigation.
+     *
      * @return array{
-     *     tenant: array{id: string, name: string},
+     *     tenantData: array{id: string, name: string},
      *     config: array<string, mixed>,
      *     availableLocales: array<string>,
      *     localeLabels: array<string, string>,
@@ -239,7 +243,7 @@ class TenantSettingsService
     public function getConfigSettings(Tenant $tenant): array
     {
         return [
-            'tenant' => [
+            'tenantData' => [
                 'id' => $tenant->id,
                 'name' => $tenant->name,
             ],

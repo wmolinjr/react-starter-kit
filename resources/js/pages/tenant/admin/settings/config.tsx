@@ -28,7 +28,7 @@ import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 
 interface Props {
-    tenant: { id: string; name: string };
+    tenantData: { id: string; name: string };
     config: {
         app_name: string | null;
         locale: string;
@@ -45,7 +45,7 @@ interface Props {
 }
 
 function ConfigSettings({
-    tenant: tenantData,
+    tenantData,
     config,
     availableLocales,
     localeLabels,
