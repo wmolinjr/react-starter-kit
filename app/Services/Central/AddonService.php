@@ -28,17 +28,15 @@ class AddonService
     /**
      * Get all available addons for a tenant's plan
      */
-    public function getAvailableAddons(Tenant $tenant): array
+    public function getAvailableAddons(Tenant $tenant): Collection
     {
         if (! $tenant->plan) {
-            return [];
+            return collect();
         }
 
         return Addon::availableFor($tenant->plan)
             ->orderBy('sort_order')
-            ->get()
-            ->mapWithKeys(fn ($addon) => [$addon->slug => $addon])
-            ->toArray();
+            ->get();
     }
 
     /**

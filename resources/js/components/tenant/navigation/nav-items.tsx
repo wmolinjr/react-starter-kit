@@ -99,12 +99,15 @@ export function useTenantAdminNavItems(): NavItem[] {
     if (has('billing:view')) {
         const billingItems: NavItem[] = [];
 
-        if (has('billing:view')) {
-            billingItems.push({
-                title: t('sidebar.subscription'),
-                href: admin.billing.index.url(),
-            });
-        }
+        billingItems.push({
+            title: t('sidebar.subscription'),
+            href: admin.billing.index.url(),
+        });
+
+        billingItems.push({
+            title: t('sidebar.plans'),
+            href: admin.billing.plans.url(),
+        });
 
         if (has('billing:invoices')) {
             billingItems.push({
@@ -117,14 +120,32 @@ export function useTenantAdminNavItems(): NavItem[] {
             title: t('sidebar.billing'),
             href: admin.billing.index.url(),
             icon: CreditCard,
-            items: billingItems.length > 0 ? billingItems : undefined,
+            items: billingItems,
         });
 
-        // Add-ons (under billing permission)
+        // Add-ons section (under billing permission)
+        const addonItems: NavItem[] = [];
+
+        addonItems.push({
+            title: t('sidebar.marketplace'),
+            href: admin.addons.index.url(),
+        });
+
+        addonItems.push({
+            title: t('sidebar.bundles'),
+            href: admin.billing.bundles.url(),
+        });
+
+        addonItems.push({
+            title: t('sidebar.usage'),
+            href: admin.addons.usage.url(),
+        });
+
         navItems.push({
             title: t('sidebar.addons'),
             href: admin.addons.index.url(),
             icon: Package,
+            items: addonItems,
         });
     }
 

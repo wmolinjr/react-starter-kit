@@ -87,7 +87,7 @@ function BillingDashboard({
     };
 
     const handleManageSubscription = () => {
-        router.get('/billing/portal');
+        router.get(admin.billing.portal.url());
     };
 
     const handleViewInvoices = () => {

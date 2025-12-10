@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\CheckoutRequest;
-use App\Http\Resources\Central\AddonBundleResource;
+use App\Http\Resources\Central\BundleResource;
 use App\Http\Resources\Central\AddonResource;
 use App\Http\Resources\Central\PlanResource;
 use App\Http\Resources\Tenant\InvoiceDetailResource;
@@ -92,7 +92,7 @@ class BillingController extends Controller implements HasMiddleware
         $activeAddonSlugs = $tenant->activeAddons()->pluck('addon_slug')->toArray();
 
         return Inertia::render('tenant/admin/billing/bundles', [
-            'bundles' => AddonBundleResource::collection($bundles),
+            'bundles' => BundleResource::collection($bundles),
             'activeBundles' => $activeBundles,
             'activeAddonSlugs' => $activeAddonSlugs,
             'currentPlan' => $tenant->plan ? new PlanResource($tenant->plan) : null,

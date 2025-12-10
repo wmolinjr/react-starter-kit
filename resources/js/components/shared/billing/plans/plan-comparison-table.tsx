@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Check, X, Minus, Crown, ArrowUp } from 'lucide-react';
@@ -234,12 +235,9 @@ export function PlanComparisonTable({
                     <TableBody>
                         {/* Feature categories */}
                         {categories.map((category) => (
-                            <>
+                            <Fragment key={category.name}>
                                 {/* Category header */}
-                                <TableRow
-                                    key={`category-${category.name}`}
-                                    className="bg-muted/50"
-                                >
+                                <TableRow className="bg-muted/50">
                                     <TableCell
                                         colSpan={sortedPlans.length + 1}
                                         className="font-semibold"
@@ -287,7 +285,7 @@ export function PlanComparisonTable({
                                         })}
                                     </TableRow>
                                 ))}
-                            </>
+                            </Fragment>
                         ))}
 
                         {/* Action row */}

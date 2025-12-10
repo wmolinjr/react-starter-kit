@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Central\AddonBundleResource;
+use App\Http\Resources\Central\BundleResource;
 use App\Http\Resources\Central\AddonResource;
 use App\Services\Central\AddonService;
 use App\Services\Central\CheckoutService;
@@ -40,7 +40,7 @@ class AddonController extends Controller
         $monthlyCost = $this->addonService->calculateTotalMonthlyCost($tenant);
 
         return Inertia::render('tenant/admin/addons/index', [
-            'availableAddons' => AddonResource::collection(collect($availableAddons)),
+            'availableAddons' => AddonResource::collection($availableAddons),
             'activeAddons' => $activeAddons->map(fn ($addon) => [
                 'id' => $addon->id,
                 'slug' => $addon->addon_slug,
@@ -57,7 +57,7 @@ class AddonController extends Controller
                 'startedAt' => $addon->started_at?->toISOString(),
                 'expiresAt' => $addon->expires_at?->toISOString(),
             ]),
-            'availableBundles' => AddonBundleResource::collection($availableBundles),
+            'availableBundles' => BundleResource::collection($availableBundles),
             'activeBundles' => $activeBundles,
             'monthlyCost' => $monthlyCost,
             'formattedMonthlyCost' => '$' . number_format($monthlyCost / 100, 2),
