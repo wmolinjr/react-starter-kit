@@ -146,8 +146,8 @@ export function CheckoutSheet({
                 side={side}
                 className={cn('flex w-full flex-col sm:max-w-lg', className)}
             >
-                <SheetHeader className="space-y-1">
-                    <div className="flex items-center justify-between">
+                <SheetHeader className="space-y-1 pb-0">
+                    <div className="flex items-center justify-between pr-8">
                         <SheetTitle className="flex items-center gap-2">
                             <ShoppingCart className="h-5 w-5" />
                             {t('billing.cart', { default: 'Cart' })}
@@ -161,7 +161,7 @@ export function CheckoutSheet({
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-muted-foreground hover:text-destructive h-8 px-2"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 px-2"
                                 onClick={onClearCart}
                             >
                                 <Trash2 className="mr-1 h-4 w-4" />
@@ -180,7 +180,7 @@ export function CheckoutSheet({
 
                 {/* Billing period toggle */}
                 {hasItems && showBillingToggle && onBillingPeriodChange && (
-                    <div className="py-4">
+                    <div>
                         <PricingToggle
                             value={billingPeriod === 'yearly' ? 'yearly' : 'monthly'}
                             onChange={handleBillingPeriodChange}
