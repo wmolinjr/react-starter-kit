@@ -2,19 +2,37 @@
 
 ## Multi-Payment Provider - Phase 4+
 
-**Status**: Future Implementation
+**Status**: ✅ PARTIALLY COMPLETED (December 2025)
 **Estimated Complexity**: High
-**Dependencies**: Phase 2 and 3 completed
+**Dependencies**: Phase 2 and 3 completed ✅
+
+> **Note**: PagSeguro and MercadoPago have been fully implemented. Remaining features (Tenant Billing, PIX/Boleto Próprio) should only be implemented when specific business requirements are met.
 
 ---
 
-## Decision Matrix
+## ✅ Completed (December 2025)
 
-Before implementing any LOW priority feature, evaluate:
+### PagSeguro Gateway
+- **File**: `app/Services/Payment/Gateways/PagSeguroGateway.php` (~850 lines)
+- **Tests**: `tests/Unit/PagSeguroGatewayTest.php` (13 tests)
+- **Features**: PIX, Boleto, Credit Card, Subscriptions, Refunds, Webhooks
+
+### MercadoPago Gateway
+- **File**: `app/Services/Payment/Gateways/MercadoPagoGateway.php` (~1040 lines)
+- **Tests**: `tests/Unit/MercadoPagoGatewayTest.php` (19 tests)
+- **Features**: PIX, Boleto, Credit Card, Debit, Subscriptions, Refunds, Webhooks, Multi-currency (BRL, ARS, MXN, etc.)
+
+### Configuration
+- **File**: `config/payment.php` - Both gateways fully configured
+- **Webhook Routes**: `routes/webhooks.php` - `/pagseguro/webhook`, `/mercadopago/webhook`
+- **Controller**: `app/Http/Controllers/Webhooks/PaymentWebhookController.php`
+
+---
+
+## ⏳ Pending - Implement on Demand
 
 | Feature | Implement When |
 |---------|---------------|
-| PagSeguro/MercadoPago | Customer demand > 20% requests |
 | Tenant Billing (White-Label) | Enterprise clients request it |
 | PIX/Boleto Próprio | Cost savings > R$50k/year |
 
@@ -987,21 +1005,21 @@ abstract class BankDirectGateway implements PaymentGatewayInterface
 
 ## Implementation Checklist
 
-### PagSeguro Gateway
-- [ ] Create gateway class with all methods
-- [ ] Add configuration to services.php
-- [ ] Create webhook controller
-- [ ] Implement frontend card encryption
-- [ ] Write unit tests with mocks
-- [ ] Test in PagSeguro sandbox
+### PagSeguro Gateway ✅ COMPLETED (December 2025)
+- [x] Create gateway class with all methods → `app/Services/Payment/Gateways/PagSeguroGateway.php`
+- [x] Add configuration to config/payment.php
+- [x] Create webhook handler → `PaymentWebhookController::handlePagseguro()`
+- [x] Implement frontend card encryption (uses PagSeguro.js client-side)
+- [x] Write unit tests with mocks → `tests/Unit/PagSeguroGatewayTest.php` (13 tests)
+- [x] Sandbox URL configured: `https://sandbox.api.pagseguro.com`
 
-### MercadoPago Gateway
-- [ ] Create gateway class with all methods
-- [ ] Add configuration to services.php
-- [ ] Create webhook controller
-- [ ] Implement frontend tokenization
-- [ ] Write unit tests with mocks
-- [ ] Test in MercadoPago sandbox
+### MercadoPago Gateway ✅ COMPLETED (December 2025)
+- [x] Create gateway class with all methods → `app/Services/Payment/Gateways/MercadoPagoGateway.php`
+- [x] Add configuration to config/payment.php
+- [x] Create webhook handler → `PaymentWebhookController::handleMercadopago()`
+- [x] Implement frontend tokenization (uses MercadoPago.js client-side)
+- [x] Write unit tests with mocks → `tests/Unit/MercadoPagoGatewayTest.php` (19 tests)
+- [x] Multi-currency support: BRL, ARS, CLP, COP, MXN, PEN, UYU
 
 ### Tenant Billing (White-Label)
 - [ ] Create migration for credentials table
@@ -1027,11 +1045,21 @@ abstract class BankDirectGateway implements PaymentGatewayInterface
 
 ## Decision Criteria
 
-### When to Implement PagSeguro/MercadoPago
-- Customer requests exceed 20% of total
-- Target market includes Latin America (MercadoPago)
-- Need for marketplace split payments (MercadoPago)
-- Existing customer relationships with these providers
+### PagSeguro/MercadoPago ✅ IMPLEMENTED
+Both gateways have been implemented and are ready for production use once API credentials are configured in `.env`:
+```env
+# PagSeguro
+PAGSEGURO_ENABLED=true
+PAGSEGURO_API_KEY=your_api_key
+PAGSEGURO_PUBLIC_KEY=your_public_key
+PAGSEGURO_SANDBOX=true
+
+# MercadoPago
+MERCADOPAGO_ENABLED=true
+MERCADOPAGO_ACCESS_TOKEN=your_access_token
+MERCADOPAGO_PUBLIC_KEY=your_public_key
+MERCADOPAGO_SANDBOX=true
+```
 
 ### When to Implement Tenant Billing
 - Enterprise tier customers requesting white-label

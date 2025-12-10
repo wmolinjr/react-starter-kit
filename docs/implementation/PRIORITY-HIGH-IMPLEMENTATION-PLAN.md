@@ -2,7 +2,7 @@
 
 ## Multi-Payment Provider - Phase 2
 
-**Status**: Ready for Implementation
+**Status**: ✅ COMPLETED (December 2025)
 **Estimated Complexity**: Medium
 **Dependencies**: Phase 1 completed (Cashier migration)
 
@@ -783,26 +783,26 @@ import { BoletoPayment } from '@/components/billing/boleto-payment';
 
 ## Implementation Checklist
 
-### Backend
-- [ ] Create `PaymentConfirmed` event
-- [ ] Create `PaymentFailed` event
-- [ ] Create `HandleAsyncPaymentWebhooks` listener
-- [ ] Register events in EventServiceProvider
-- [ ] Add async payment handlers to webhook controller
-- [ ] Add status polling API endpoint
-- [ ] Write unit tests for webhook handling
+### Backend ✅
+- [x] Create `PaymentConfirmed` event → `app/Events/Payment/PaymentConfirmed.php`
+- [x] Create `PaymentFailed` event → `app/Events/Payment/PaymentFailed.php`
+- [x] Create `HandleAsyncPaymentWebhooks` listener → `app/Listeners/Central/HandleAsyncPaymentWebhooks.php`
+- [x] Register events in EventServiceProvider → `app/Providers/AppServiceProvider.php`
+- [x] Add async payment handlers to webhook controller → `app/Http/Controllers/Webhooks/PaymentWebhookController.php`
+- [x] Add status polling API endpoint → `CartCheckoutService::checkPaymentStatus()`
+- [x] Write unit tests for webhook handling → `tests/Feature/CartCheckoutServiceTest.php`
 
-### Frontend
-- [ ] Create `PixPayment` component
-- [ ] Create `BoletoPayment` component
-- [ ] Create `PaymentMethodSelector` component
-- [ ] Add data-testid attributes for E2E tests
-- [ ] Create Playwright E2E tests
+### Frontend ✅
+- [x] Create `PixPayment` component → `resources/js/components/shared/billing/pix-payment.tsx`
+- [x] Create `BoletoPayment` component → `resources/js/components/shared/billing/boleto-payment.tsx`
+- [x] Create `PaymentMethodSelector` component → `resources/js/components/shared/billing/payment-method-selector.tsx`
+- [x] Add data-testid attributes for E2E tests
+- [x] Create Playwright E2E tests → `tests/Browser/checkout-flow.spec.ts`
 
-### Documentation
-- [ ] Update MULTI-PAYMENT-PROVIDER-PLAN.md
-- [ ] Update ADDONS.md
-- [ ] Add JSDoc comments to components
+### Documentation ✅
+- [x] Update MULTI-PAYMENT-PROVIDER-PLAN.md
+- [x] Update ADDONS.md
+- [x] Add JSDoc comments to components
 
 ---
 

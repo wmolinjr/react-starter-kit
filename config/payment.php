@@ -129,8 +129,9 @@ return [
         */
         'pagseguro' => [
             'enabled' => env('PAGSEGURO_ENABLED', false),
-            'token' => env('PAGSEGURO_TOKEN'),
-            'email' => env('PAGSEGURO_EMAIL'),
+            'api_key' => env('PAGSEGURO_API_KEY'),      // Bearer token for API v4
+            'public_key' => env('PAGSEGURO_PUBLIC_KEY'), // For client-side encryption
+            'receiver_email' => env('PAGSEGURO_EMAIL'), // For subscriptions
             'webhook_token' => env('PAGSEGURO_WEBHOOK_TOKEN'),
             'sandbox' => env('PAGSEGURO_SANDBOX', true),
 
@@ -165,12 +166,16 @@ return [
             'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
             'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
             'webhook_secret' => env('MERCADOPAGO_WEBHOOK_SECRET'),
+            'sandbox' => env('MERCADOPAGO_SANDBOX', true),
 
             // API URL
             'api_url' => env('MERCADOPAGO_API_URL', 'https://api.mercadopago.com'),
 
             // Supported payment types
-            'payment_types' => ['card', 'pix', 'boleto'],
+            'payment_types' => ['card', 'pix', 'boleto', 'debit'],
+
+            // Supported currencies (Latin America)
+            'currencies' => ['BRL', 'ARS', 'CLP', 'COP', 'MXN', 'PEN', 'UYU'],
 
             // Features
             'features' => [
@@ -183,6 +188,7 @@ return [
                 'proration' => false,
                 'pix' => true,
                 'boleto' => true,
+                'installments' => true, // Parcelamento
             ],
         ],
     ],
