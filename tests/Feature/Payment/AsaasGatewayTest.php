@@ -567,6 +567,361 @@ class AsaasGatewayTest extends TestCase
     }
 
     // =========================================================================
+    // Credit Card Charge Tests
+    // =========================================================================
+
+    #[Test]
+    public function create_card_charge_with_token_returns_success(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'id' => 'pay_card_123',
+                'status' => 'CONFIRMED',
+                'billingType' => 'CREDIT_CARD',
+                'value' => 199.90,
+                'invoiceUrl' => 'https://asaas.com/invoice/123',
+                'creditCard' => [
+                    'creditCardNumber' => '4242',
+                    'creditCardBrand' => 'VISA',
+                ],
+            ], 200),
+        ]);
+
+        $result = $this->gateway->createCardCharge(
+            $this->customer,
+            19990,
+            'token_xyz_123',
+            [
+                'description' => 'Test Card Payment',
+                'reference' => 'order_123',
+            ]
+        );
+
+        $this->assertTrue($result->success);
+        $this->assertEquals('pay_card_123', $result->providerPaymentId);
+        $this->assertEquals('paid', $result->status);
+        $this->assertEquals('CREDIT_CARD', $result->providerData['billing_type']);
+        $this->assertEquals('4242', $result->providerData['card']['last_four']);
+        $this->assertEquals('VISA', $result->providerData['card']['brand']);
+    }
+
+    #[Test]
+    public function create_card_charge_with_installments(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'id' => 'pay_installment_123',
+                'status' => 'CONFIRMED',
+                'billingType' => 'CREDIT_CARD',
+                'value' => 600.00,
+                'creditCard' => [
+                    'creditCardNumber' => '1234',
+                    'creditCardBrand' => 'MASTERCARD',
+                ],
+            ], 200),
+        ]);
+
+        $result = $this->gateway->createCardCharge(
+            $this->customer,
+            60000, // R$600.00
+            'token_xyz',
+            ['installments' => 6]
+        );
+
+        $this->assertTrue($result->success);
+        $this->assertEquals('pay_installment_123', $result->providerPaymentId);
+        $this->assertEquals(6, $result->providerData['installments']);
+        $this->assertEquals(60000, $result->providerData['amount']);
+        $this->assertEquals('1234', $result->providerData['card']['last_four']);
+        $this->assertEquals('MASTERCARD', $result->providerData['card']['brand']);
+    }
+
+    #[Test]
+    public function create_card_charge_handles_api_failure(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'errors' => [
+                    ['description' => 'Card declined'],
+                ],
+            ], 400),
+        ]);
+
+        $result = $this->gateway->createCardCharge(
+            $this->customer,
+            10000,
+            'invalid_token'
+        );
+
+        $this->assertFalse($result->success);
+        $this->assertEquals('Card declined', $result->failureMessage);
+    }
+
+    #[Test]
+    public function create_card_charge_with_data_returns_success_and_token(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/payments' => Http::response([
+                'id' => 'pay_direct_123',
+                'status' => 'CONFIRMED',
+                'billingType' => 'CREDIT_CARD',
+                'value' => 99.90,
+                'creditCard' => [
+                    'creditCardNumber' => '4242',
+                    'creditCardBrand' => 'VISA',
+                ],
+                'creditCardToken' => 'new_token_abc',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->createCardChargeWithData(
+            $this->customer,
+            9990,
+            [
+                'holder_name' => 'John Doe',
+                'number' => '4242424242424242',
+                'exp_month' => '12',
+                'exp_year' => '2030',
+                'cvv' => '123',
+            ],
+            [
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
+                'cpf_cnpj' => '123.456.789-00',
+                'postal_code' => '01310-100',
+                'address_number' => '100',
+            ]
+        );
+
+        $this->assertTrue($result->success);
+        $this->assertEquals('pay_direct_123', $result->providerPaymentId);
+        $this->assertEquals('new_token_abc', $result->providerData['card']['token']);
+    }
+
+    // =========================================================================
+    // Card Tokenization Tests
+    // =========================================================================
+
+    #[Test]
+    public function tokenize_card_returns_token(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/creditCard/tokenize' => Http::response([
+                'creditCardNumber' => '4242',
+                'creditCardBrand' => 'VISA',
+                'creditCardToken' => 'token_generated_123',
+            ], 200),
+        ]);
+
+        $result = $this->gateway->tokenizeCard(
+            $this->customer,
+            [
+                'holder_name' => 'Jane Doe',
+                'number' => '4242424242424242',
+                'exp_month' => '06',
+                'exp_year' => '2028',
+                'cvv' => '456',
+            ],
+            [
+                'name' => 'Jane Doe',
+                'email' => 'jane@example.com',
+                'cpf_cnpj' => '98765432100',
+                'postal_code' => '04567890',
+                'address_number' => '200',
+            ]
+        );
+
+        $this->assertTrue($result['success']);
+        $this->assertEquals('token_generated_123', $result['token']);
+        $this->assertEquals('4242', $result['last_four']);
+        $this->assertEquals('VISA', $result['brand']);
+    }
+
+    #[Test]
+    public function tokenize_card_handles_failure(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/creditCard/tokenize' => Http::response([
+                'errors' => [
+                    ['description' => 'Invalid card data'],
+                ],
+            ], 400),
+        ]);
+
+        $result = $this->gateway->tokenizeCard(
+            $this->customer,
+            [
+                'holder_name' => 'Test',
+                'number' => '1234',
+                'exp_month' => '01',
+                'exp_year' => '2020',
+                'cvv' => '123',
+            ],
+            [
+                'name' => 'Test',
+                'email' => 'test@test.com',
+                'cpf_cnpj' => '12345678900',
+                'postal_code' => '12345678',
+                'address_number' => '1',
+            ]
+        );
+
+        $this->assertFalse($result['success']);
+        $this->assertEquals('Invalid card data', $result['error']);
+    }
+
+    #[Test]
+    public function tokenize_card_removes_formatting_from_cpf_and_postal_code(): void
+    {
+        Http::fake([
+            'sandbox.asaas.com/api/v3/creditCard/tokenize' => Http::response([
+                'creditCardNumber' => '4242',
+                'creditCardBrand' => 'VISA',
+                'creditCardToken' => 'token_123',
+            ], 200),
+        ]);
+
+        $this->gateway->tokenizeCard(
+            $this->customer,
+            [
+                'holder_name' => 'Test User',
+                'number' => '4242424242424242',
+                'exp_month' => '12',
+                'exp_year' => '2030',
+                'cvv' => '123',
+            ],
+            [
+                'name' => 'Test User',
+                'email' => 'test@test.com',
+                'cpf_cnpj' => '123.456.789-00',
+                'postal_code' => '01310-100',
+                'address_number' => '100',
+            ]
+        );
+
+        Http::assertSent(function ($request) {
+            $body = json_decode($request->body(), true);
+
+            return $body['creditCardHolderInfo']['cpfCnpj'] === '12345678900'
+                && $body['creditCardHolderInfo']['postalCode'] === '01310100';
+        });
+    }
+
+    // =========================================================================
+    // Card Validation Tests
+    // =========================================================================
+
+    #[Test]
+    public function validate_card_data_returns_valid_for_correct_data(): void
+    {
+        $result = $this->gateway->validateCardData([
+            'holder_name' => 'John Doe',
+            'number' => '4242424242424242',
+            'exp_month' => '12',
+            'exp_year' => '2030',
+            'cvv' => '123',
+        ]);
+
+        $this->assertTrue($result['valid']);
+        $this->assertEmpty($result['errors']);
+    }
+
+    #[Test]
+    public function validate_card_data_detects_missing_fields(): void
+    {
+        $result = $this->gateway->validateCardData([
+            'holder_name' => 'John Doe',
+            // missing other fields
+        ]);
+
+        $this->assertFalse($result['valid']);
+        $this->assertNotEmpty($result['errors']);
+    }
+
+    #[Test]
+    public function validate_card_data_detects_invalid_card_number(): void
+    {
+        $result = $this->gateway->validateCardData([
+            'holder_name' => 'John Doe',
+            'number' => '1234567890123456', // Invalid Luhn
+            'exp_month' => '12',
+            'exp_year' => '2030',
+            'cvv' => '123',
+        ]);
+
+        $this->assertFalse($result['valid']);
+        $this->assertContains('Invalid card number', $result['errors']);
+    }
+
+    #[Test]
+    public function validate_card_data_detects_expired_card(): void
+    {
+        $result = $this->gateway->validateCardData([
+            'holder_name' => 'John Doe',
+            'number' => '4242424242424242',
+            'exp_month' => '01',
+            'exp_year' => '2020', // Expired
+            'cvv' => '123',
+        ]);
+
+        $this->assertFalse($result['valid']);
+        $this->assertContains('Card has expired', $result['errors']);
+    }
+
+    #[Test]
+    public function validate_card_data_detects_invalid_cvv(): void
+    {
+        $result = $this->gateway->validateCardData([
+            'holder_name' => 'John Doe',
+            'number' => '4242424242424242',
+            'exp_month' => '12',
+            'exp_year' => '2030',
+            'cvv' => '12', // Too short
+        ]);
+
+        $this->assertFalse($result['valid']);
+        $this->assertContains('Invalid CVV length', $result['errors']);
+    }
+
+    // =========================================================================
+    // Card Brand Detection Tests
+    // =========================================================================
+
+    #[Test]
+    public function detect_card_brand_identifies_visa(): void
+    {
+        $this->assertEquals('visa', $this->gateway->detectCardBrand('4242424242424242'));
+        $this->assertEquals('visa', $this->gateway->detectCardBrand('4111111111111111'));
+    }
+
+    #[Test]
+    public function detect_card_brand_identifies_mastercard(): void
+    {
+        $this->assertEquals('mastercard', $this->gateway->detectCardBrand('5555555555554444'));
+        $this->assertEquals('mastercard', $this->gateway->detectCardBrand('5105105105105100'));
+        $this->assertEquals('mastercard', $this->gateway->detectCardBrand('2223000048400011'));
+    }
+
+    #[Test]
+    public function detect_card_brand_identifies_amex(): void
+    {
+        $this->assertEquals('amex', $this->gateway->detectCardBrand('378282246310005'));
+        $this->assertEquals('amex', $this->gateway->detectCardBrand('371449635398431'));
+    }
+
+    #[Test]
+    public function detect_card_brand_identifies_elo(): void
+    {
+        $this->assertEquals('elo', $this->gateway->detectCardBrand('6362970000457013'));
+    }
+
+    #[Test]
+    public function detect_card_brand_returns_null_for_unknown(): void
+    {
+        $this->assertNull($this->gateway->detectCardBrand('9999999999999999'));
+    }
+
+    // =========================================================================
     // Helper Assertion
     // =========================================================================
 

@@ -290,6 +290,40 @@ export interface ImpersonationUserResource {
     roles: string[];
 }
 
+export interface PaymentMethodResource {
+    id: string;
+    type: 'card' | 'pix' | 'boleto' | 'bank_transfer';
+    provider: string;
+    brand: string | null;
+    last4: string | null;
+    exp_month: number | null;
+    exp_year: number | null;
+    bank_name: string | null;
+    is_default: boolean;
+    is_verified: boolean;
+    is_expired: boolean;
+    display_label: string;
+    expiration_display: string | null;
+    created_at: string;
+}
+
+export interface PaymentResource {
+    id: string;
+    number: string;
+    date: string;
+    paid_at: string | null;
+    amount: number;
+    amount_formatted: string;
+    currency: string;
+    status: 'paid' | 'open' | 'failed' | 'refunded' | 'void';
+    payment_type: 'card' | 'pix' | 'boleto';
+    provider: string;
+    description: string | null;
+    payable_type: string | null;
+    is_refundable: boolean;
+    failure_message: string | null;
+}
+
 export interface PlanDetailResource {
     id: string;
     name: string;

@@ -5,24 +5,50 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Download, Receipt } from 'lucide-react';
+import { Download, Receipt, CreditCard, Building2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface InvoiceLine {
     description: string;
     amount: number;
-    quantity: number | null;
+    amount_formatted: string;
+    quantity: number;
+}
+
+interface PaymentMethodInfo {
+    type: string;
+    brand: string | null;
+    last4: string | null;
+}
+
+interface TenantInfo {
+    id: string;
+    name: string;
 }
 
 interface Invoice {
     id: string;
-    number: string | null;
+    number: string;
     date: string;
+    paid_at: string | null;
     due_date: string | null;
-    total: string;
-    subtotal: string;
-    tax: string;
-    status: string;
+    amount: number;
+    amount_formatted: string;
+    fee: number;
+    fee_formatted: string;
+    net_amount: number;
+    net_amount_formatted: string;
+    currency: string;
+    status: 'paid' | 'open' | 'failed' | 'refunded' | 'void';
+    payment_type: string;
+    provider: string;
     description: string | null;
+    failure_message: string | null;
+    is_refundable: boolean;
+    amount_refunded: number;
+    amount_refunded_formatted: string;
+    payment_method: PaymentMethodInfo | null;
+    tenant: TenantInfo | null;
     lines: InvoiceLine[];
 }
 
@@ -39,10 +65,10 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                 return <Badge variant="default">{t('billing.paid')}</Badge>;
             case 'open':
                 return <Badge variant="secondary">{t('billing.open')}</Badge>;
-            case 'draft':
-                return <Badge variant="outline">{t('billing.draft')}</Badge>;
-            case 'uncollectible':
-                return <Badge variant="destructive">{t('billing.uncollectible')}</Badge>;
+            case 'failed':
+                return <Badge variant="destructive">{t('billing.failed')}</Badge>;
+            case 'refunded':
+                return <Badge variant="outline">{t('billing.refunded')}</Badge>;
             case 'void':
                 return <Badge variant="outline">{t('billing.void')}</Badge>;
             default:
@@ -50,11 +76,17 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
         }
     };
 
-    const formatAmount = (amount: number) => {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        }).format(amount / 100);
+    const getPaymentTypeLabel = (type: string) => {
+        switch (type) {
+            case 'card':
+                return t('customer.credit_card');
+            case 'pix':
+                return 'PIX';
+            case 'boleto':
+                return 'Boleto';
+            default:
+                return type;
+        }
     };
 
     return (
@@ -62,17 +94,17 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
             breadcrumbs={[
                 { title: t('customer.dashboard'), href: '/account' },
                 { title: t('customer.invoices'), href: '/account/invoices' },
-                { title: invoice.number || invoice.id, href: `/account/invoices/${invoice.id}` },
+                { title: invoice.number, href: `/account/invoices/${invoice.id}` },
             ]}
         >
-            <Head title={`${t('customer.invoice')} ${invoice.number || invoice.id}`} />
+            <Head title={`${t('customer.invoice')} ${invoice.number}`} />
 
             <div className="space-y-6 max-w-3xl">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
                             <Receipt className="h-6 w-6" />
-                            {t('customer.invoice')} {invoice.number || invoice.id.substring(0, 8)}
+                            {t('customer.invoice')} {invoice.number}
                         </h1>
                         <p className="text-muted-foreground">
                             {new Date(invoice.date).toLocaleDateString()}
@@ -89,6 +121,13 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                     </div>
                 </div>
 
+                {invoice.failure_message && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{invoice.failure_message}</AlertDescription>
+                    </Alert>
+                )}
+
                 <Card>
                     <CardHeader>
                         <CardTitle>{t('customer.invoice_details')}</CardTitle>
@@ -97,22 +136,51 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <p className="text-muted-foreground">{t('customer.invoice_number')}</p>
-                                <p className="font-medium">{invoice.number || invoice.id}</p>
+                                <p className="font-medium">{invoice.number}</p>
                             </div>
                             <div>
                                 <p className="text-muted-foreground">{t('customer.date')}</p>
                                 <p className="font-medium">{new Date(invoice.date).toLocaleDateString()}</p>
                             </div>
-                            {invoice.due_date && (
+                            {invoice.paid_at && (
+                                <div>
+                                    <p className="text-muted-foreground">{t('customer.paid_at')}</p>
+                                    <p className="font-medium">{new Date(invoice.paid_at).toLocaleDateString()}</p>
+                                </div>
+                            )}
+                            {invoice.due_date && invoice.status === 'open' && (
                                 <div>
                                     <p className="text-muted-foreground">{t('customer.due_date')}</p>
                                     <p className="font-medium">{new Date(invoice.due_date).toLocaleDateString()}</p>
                                 </div>
                             )}
                             <div>
-                                <p className="text-muted-foreground">{t('customer.status')}</p>
-                                <div className="mt-1">{getStatusBadge(invoice.status)}</div>
+                                <p className="text-muted-foreground">{t('customer.payment_method')}</p>
+                                <p className="font-medium flex items-center gap-1">
+                                    {invoice.payment_method ? (
+                                        <>
+                                            <CreditCard className="h-4 w-4" />
+                                            {invoice.payment_method.brand && (
+                                                <span className="capitalize">{invoice.payment_method.brand}</span>
+                                            )}
+                                            {invoice.payment_method.last4 && (
+                                                <span>•••• {invoice.payment_method.last4}</span>
+                                            )}
+                                        </>
+                                    ) : (
+                                        getPaymentTypeLabel(invoice.payment_type)
+                                    )}
+                                </p>
                             </div>
+                            {invoice.tenant && (
+                                <div>
+                                    <p className="text-muted-foreground">{t('customer.workspace')}</p>
+                                    <p className="font-medium flex items-center gap-1">
+                                        <Building2 className="h-4 w-4" />
+                                        {invoice.tenant.name}
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <Separator />
@@ -124,13 +192,13 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                                     <div key={index} className="flex justify-between items-center py-2 border-b last:border-0">
                                         <div>
                                             <p className="font-medium">{line.description}</p>
-                                            {line.quantity && (
+                                            {line.quantity > 1 && (
                                                 <p className="text-sm text-muted-foreground">
                                                     {t('customer.quantity')}: {line.quantity}
                                                 </p>
                                             )}
                                         </div>
-                                        <p className="font-medium">{formatAmount(line.amount)}</p>
+                                        <p className="font-medium">{line.amount_formatted}</p>
                                     </div>
                                 ))}
                             </div>
@@ -141,16 +209,24 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">{t('customer.subtotal')}</span>
-                                <span>{invoice.subtotal}</span>
+                                <span>{invoice.amount_formatted}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">{t('customer.tax')}</span>
-                                <span>{invoice.tax}</span>
-                            </div>
+                            {invoice.fee > 0 && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">{t('customer.processing_fee')}</span>
+                                    <span>- {invoice.fee_formatted}</span>
+                                </div>
+                            )}
+                            {invoice.amount_refunded > 0 && (
+                                <div className="flex justify-between text-sm text-destructive">
+                                    <span>{t('customer.refunded')}</span>
+                                    <span>- {invoice.amount_refunded_formatted}</span>
+                                </div>
+                            )}
                             <Separator />
                             <div className="flex justify-between font-medium text-lg">
                                 <span>{t('customer.total')}</span>
-                                <span>{invoice.total}</span>
+                                <span>{invoice.amount_formatted}</span>
                             </div>
                         </div>
                     </CardContent>

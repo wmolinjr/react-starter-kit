@@ -16,11 +16,19 @@ import { Receipt, Download, Eye } from 'lucide-react';
 
 interface Invoice {
     id: string;
-    number: string | null;
+    number: string;
     date: string;
-    total: string;
-    status: string;
+    paid_at: string | null;
+    amount: number;
+    amount_formatted: string;
+    currency: string;
+    status: 'paid' | 'open' | 'failed' | 'refunded' | 'void';
+    payment_type: 'card' | 'pix' | 'boleto';
+    provider: string;
     description: string | null;
+    payable_type: string | null;
+    is_refundable: boolean;
+    failure_message: string | null;
 }
 
 interface InvoicesIndexProps {
@@ -36,10 +44,10 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                 return <Badge variant="default">{t('billing.paid')}</Badge>;
             case 'open':
                 return <Badge variant="secondary">{t('billing.open')}</Badge>;
-            case 'draft':
-                return <Badge variant="outline">{t('billing.draft')}</Badge>;
-            case 'uncollectible':
-                return <Badge variant="destructive">{t('billing.uncollectible')}</Badge>;
+            case 'failed':
+                return <Badge variant="destructive">{t('billing.failed')}</Badge>;
+            case 'refunded':
+                return <Badge variant="outline">{t('billing.refunded')}</Badge>;
             case 'void':
                 return <Badge variant="outline">{t('billing.void')}</Badge>;
             default:
@@ -95,7 +103,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                                 {invoices.map((invoice) => (
                                     <TableRow key={invoice.id}>
                                         <TableCell className="font-medium">
-                                            {invoice.number || invoice.id.substring(0, 8)}
+                                            {invoice.number}
                                         </TableCell>
                                         <TableCell>
                                             {new Date(invoice.date).toLocaleDateString()}
@@ -103,7 +111,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                                         <TableCell className="max-w-xs truncate">
                                             {invoice.description || '-'}
                                         </TableCell>
-                                        <TableCell>{invoice.total}</TableCell>
+                                        <TableCell>{invoice.amount_formatted}</TableCell>
                                         <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">

@@ -773,6 +773,449 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
     }
 
     // =========================================================================
+    // Credit Card Payment Methods
+    // =========================================================================
+
+    /**
+     * Create a credit card charge using a tokenized card.
+     *
+     * @param  Customer  $customer  The customer to charge
+     * @param  int  $amount  Amount in cents (BRL)
+     * @param  string  $cardToken  The tokenized card ID from Asaas
+     * @param  array  $options  Additional options:
+     *                          - description: Payment description
+     *                          - reference: External reference ID
+     *                          - remote_ip: Client IP for fraud prevention
+     *                          - installments: Number of installments (1-12)
+     * @return ChargeResult Contains payment status and card details
+     */
+    public function createCardCharge(
+        Customer $customer,
+        int $amount,
+        string $cardToken,
+        array $options = []
+    ): ChargeResult {
+        $asaasId = $this->ensureCustomer($customer);
+
+        $paymentData = [
+            'customer' => $asaasId,
+            'billingType' => 'CREDIT_CARD',
+            'value' => $amount / 100,
+            'dueDate' => now()->format('Y-m-d'),
+            'description' => $options['description'] ?? 'Card Payment',
+            'externalReference' => $options['reference'] ?? null,
+            'creditCardToken' => $cardToken,
+            'remoteIp' => $options['remote_ip'] ?? request()->ip(),
+        ];
+
+        // Add installments if more than 1
+        $installments = $options['installments'] ?? 1;
+        if ($installments > 1) {
+            $paymentData['installmentCount'] = min($installments, 12);
+            $paymentData['installmentValue'] = ($amount / 100) / $installments;
+        }
+
+        try {
+            $response = $this->http()->post('/payments', $paymentData);
+
+            if ($response->failed()) {
+                Log::error('Asaas card charge failed', [
+                    'customer_id' => $customer->id,
+                    'response' => $response->json(),
+                ]);
+
+                return ChargeResult::failed(
+                    $response->json('errors.0.description', 'Card charge failed')
+                );
+            }
+
+            $data = $response->json();
+
+            return ChargeResult::success(
+                providerPaymentId: $data['id'],
+                status: $this->mapPaymentStatus($data['status']),
+                providerData: [
+                    'amount' => (int) ($data['value'] * 100),
+                    'currency' => 'BRL',
+                    'billing_type' => 'CREDIT_CARD',
+                    'invoice_url' => $data['invoiceUrl'] ?? null,
+                    'card' => [
+                        'last_four' => $data['creditCard']['creditCardNumber'] ?? null,
+                        'brand' => $data['creditCard']['creditCardBrand'] ?? null,
+                    ],
+                    'installments' => $installments,
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Asaas card charge exception', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ChargeResult::failed($e->getMessage());
+        }
+    }
+
+    /**
+     * Create a credit card charge with raw card data.
+     *
+     * Note: This method handles sensitive card data. Ensure PCI compliance.
+     * Consider using tokenizeCard() first for recurring payments.
+     *
+     * @param  Customer  $customer  The customer to charge
+     * @param  int  $amount  Amount in cents (BRL)
+     * @param  array  $cardData  Card details:
+     *                           - holder_name: Name on card
+     *                           - number: Card number (16 digits)
+     *                           - exp_month: Expiration month (MM)
+     *                           - exp_year: Expiration year (YYYY)
+     *                           - cvv: Security code
+     * @param  array  $holderInfo  Cardholder details (required by Asaas):
+     *                             - name: Full name
+     *                             - email: Email address
+     *                             - cpf_cnpj: CPF or CNPJ (no formatting)
+     *                             - postal_code: CEP
+     *                             - address_number: Street number
+     *                             - phone: (optional)
+     * @param  array  $options  Additional options:
+     *                          - description: Payment description
+     *                          - reference: External reference ID
+     *                          - remote_ip: Client IP
+     *                          - installments: Number of installments
+     * @return ChargeResult Contains payment status, card token for future use
+     */
+    public function createCardChargeWithData(
+        Customer $customer,
+        int $amount,
+        array $cardData,
+        array $holderInfo,
+        array $options = []
+    ): ChargeResult {
+        $asaasId = $this->ensureCustomer($customer);
+
+        $paymentData = [
+            'customer' => $asaasId,
+            'billingType' => 'CREDIT_CARD',
+            'value' => $amount / 100,
+            'dueDate' => now()->format('Y-m-d'),
+            'description' => $options['description'] ?? 'Card Payment',
+            'externalReference' => $options['reference'] ?? null,
+            'remoteIp' => $options['remote_ip'] ?? request()->ip(),
+            'creditCard' => [
+                'holderName' => $cardData['holder_name'],
+                'number' => $cardData['number'],
+                'expiryMonth' => $cardData['exp_month'],
+                'expiryYear' => $cardData['exp_year'],
+                'ccv' => $cardData['cvv'],
+            ],
+            'creditCardHolderInfo' => [
+                'name' => $holderInfo['name'],
+                'email' => $holderInfo['email'],
+                'cpfCnpj' => preg_replace('/\D/', '', $holderInfo['cpf_cnpj']),
+                'postalCode' => preg_replace('/\D/', '', $holderInfo['postal_code']),
+                'addressNumber' => $holderInfo['address_number'],
+                'addressComplement' => $holderInfo['address_complement'] ?? null,
+                'phone' => $holderInfo['phone'] ?? null,
+                'mobilePhone' => $holderInfo['mobile_phone'] ?? null,
+            ],
+        ];
+
+        // Add installments if more than 1
+        $installments = $options['installments'] ?? 1;
+        if ($installments > 1) {
+            $paymentData['installmentCount'] = min($installments, 12);
+            $paymentData['installmentValue'] = ($amount / 100) / $installments;
+        }
+
+        try {
+            $response = $this->http()->post('/payments', $paymentData);
+
+            if ($response->failed()) {
+                Log::error('Asaas card charge with data failed', [
+                    'customer_id' => $customer->id,
+                    'response' => $response->json(),
+                ]);
+
+                return ChargeResult::failed(
+                    $response->json('errors.0.description', 'Card charge failed')
+                );
+            }
+
+            $data = $response->json();
+
+            return ChargeResult::success(
+                providerPaymentId: $data['id'],
+                status: $this->mapPaymentStatus($data['status']),
+                providerData: [
+                    'amount' => (int) ($data['value'] * 100),
+                    'currency' => 'BRL',
+                    'billing_type' => 'CREDIT_CARD',
+                    'invoice_url' => $data['invoiceUrl'] ?? null,
+                    'card' => [
+                        'last_four' => $data['creditCard']['creditCardNumber'] ?? null,
+                        'brand' => $data['creditCard']['creditCardBrand'] ?? null,
+                        'token' => $data['creditCardToken'] ?? null,
+                    ],
+                    'installments' => $installments,
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Asaas card charge with data exception', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ChargeResult::failed($e->getMessage());
+        }
+    }
+
+    /**
+     * Tokenize a credit card for future use.
+     *
+     * Creates a token that can be stored and used for future payments.
+     * The token is tied to a specific customer and cannot be shared.
+     *
+     * @param  Customer  $customer  The customer owning the card
+     * @param  array  $cardData  Card details:
+     *                           - holder_name: Name on card
+     *                           - number: Card number (16 digits)
+     *                           - exp_month: Expiration month (MM)
+     *                           - exp_year: Expiration year (YYYY)
+     *                           - cvv: Security code
+     * @param  array  $holderInfo  Cardholder details:
+     *                             - name: Full name
+     *                             - email: Email address
+     *                             - cpf_cnpj: CPF or CNPJ
+     *                             - postal_code: CEP
+     *                             - address_number: Street number
+     * @param  array  $options  Additional options:
+     *                          - remote_ip: Client IP for fraud prevention
+     * @return array{success: bool, token?: string, last_four?: string, brand?: string, error?: string}
+     */
+    public function tokenizeCard(
+        Customer $customer,
+        array $cardData,
+        array $holderInfo,
+        array $options = []
+    ): array {
+        $asaasId = $this->ensureCustomer($customer);
+
+        try {
+            $response = $this->http()->post('/creditCard/tokenize', [
+                'customer' => $asaasId,
+                'creditCard' => [
+                    'holderName' => $cardData['holder_name'],
+                    'number' => $cardData['number'],
+                    'expiryMonth' => $cardData['exp_month'],
+                    'expiryYear' => $cardData['exp_year'],
+                    'ccv' => $cardData['cvv'],
+                ],
+                'creditCardHolderInfo' => [
+                    'name' => $holderInfo['name'],
+                    'email' => $holderInfo['email'],
+                    'cpfCnpj' => preg_replace('/\D/', '', $holderInfo['cpf_cnpj']),
+                    'postalCode' => preg_replace('/\D/', '', $holderInfo['postal_code']),
+                    'addressNumber' => $holderInfo['address_number'],
+                    'addressComplement' => $holderInfo['address_complement'] ?? null,
+                    'phone' => $holderInfo['phone'] ?? null,
+                    'mobilePhone' => $holderInfo['mobile_phone'] ?? null,
+                ],
+                'remoteIp' => $options['remote_ip'] ?? request()->ip(),
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Asaas card tokenization failed', [
+                    'customer_id' => $customer->id,
+                    'response' => $response->json(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $response->json('errors.0.description', 'Tokenization failed'),
+                ];
+            }
+
+            $data = $response->json();
+
+            return [
+                'success' => true,
+                'token' => $data['creditCardToken'],
+                'last_four' => $data['creditCardNumber'],
+                'brand' => $data['creditCardBrand'],
+            ];
+        } catch (\Exception $e) {
+            Log::error('Asaas card tokenization exception', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Get customer's saved credit cards.
+     *
+     * Note: Asaas stores cards per customer, not as separate entities.
+     * This retrieves the tokenized card info stored for a customer.
+     *
+     * @param  Customer  $customer  The customer
+     * @return array List of saved cards with token, last_four, brand
+     */
+    public function getCustomerCards(Customer $customer): array
+    {
+        $asaasId = $customer->getProviderId('asaas');
+
+        if (! $asaasId) {
+            return [];
+        }
+
+        try {
+            // Asaas doesn't have a dedicated endpoint for listing cards
+            // Cards are returned with customer info or during payment
+            $response = $this->http()->get("/customers/{$asaasId}");
+
+            if ($response->failed()) {
+                return [];
+            }
+
+            // Check if customer has credit card info
+            // Note: This may not return full card list - Asaas API limitation
+            $data = $response->json();
+
+            // If we have stored tokens in our system, return those
+            // This is a placeholder for actual card storage logic
+            return [];
+        } catch (\Exception $e) {
+            Log::error('Failed to get Asaas customer cards', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    /**
+     * Validate card data before processing.
+     *
+     * Performs basic validation on card data format.
+     *
+     * @param  array  $cardData  Card details to validate
+     * @return array{valid: bool, errors: array}
+     */
+    public function validateCardData(array $cardData): array
+    {
+        $errors = [];
+
+        // Check required fields
+        $required = ['holder_name', 'number', 'exp_month', 'exp_year', 'cvv'];
+        foreach ($required as $field) {
+            if (empty($cardData[$field])) {
+                $errors[] = "Missing required field: {$field}";
+            }
+        }
+
+        // Validate card number (basic Luhn check)
+        if (! empty($cardData['number'])) {
+            $number = preg_replace('/\D/', '', $cardData['number']);
+            if (strlen($number) < 13 || strlen($number) > 19) {
+                $errors[] = 'Invalid card number length';
+            } elseif (! $this->luhnCheck($number)) {
+                $errors[] = 'Invalid card number';
+            }
+        }
+
+        // Validate expiry
+        if (! empty($cardData['exp_month']) && ! empty($cardData['exp_year'])) {
+            $month = (int) $cardData['exp_month'];
+            $year = (int) $cardData['exp_year'];
+
+            if ($month < 1 || $month > 12) {
+                $errors[] = 'Invalid expiration month';
+            }
+
+            $currentYear = (int) date('Y');
+            $currentMonth = (int) date('m');
+
+            if ($year < $currentYear || ($year === $currentYear && $month < $currentMonth)) {
+                $errors[] = 'Card has expired';
+            }
+        }
+
+        // Validate CVV
+        if (! empty($cardData['cvv'])) {
+            $cvv = preg_replace('/\D/', '', $cardData['cvv']);
+            if (strlen($cvv) < 3 || strlen($cvv) > 4) {
+                $errors[] = 'Invalid CVV length';
+            }
+        }
+
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+        ];
+    }
+
+    /**
+     * Detect card brand from number.
+     *
+     * @param  string  $number  Card number
+     * @return string|null Card brand or null if unknown
+     */
+    public function detectCardBrand(string $number): ?string
+    {
+        $number = preg_replace('/\D/', '', $number);
+
+        $patterns = [
+            'visa' => '/^4/',
+            'mastercard' => '/^(5[1-5]|2[2-7])/',
+            'amex' => '/^3[47]/',
+            'diners' => '/^3(?:0[0-5]|[68])/',
+            'discover' => '/^6(?:011|5)/',
+            'jcb' => '/^(?:2131|1800|35)/',
+            'elo' => '/^(?:4011(78|79)|43(1274|8935)|45(1416|7393|763(1|2))|50(4175|6699|67[0-7][0-9]|9000)|627780|63(6297|6368)|650(03([^4])|04([0-9])|05(0|1)|4(0[5-9]|3[0-9]|8[5-9]|9[0-9])|5([0-2][0-9]|3[0-8])|9([2-6][0-9]|7[0-8])|541|700|720|901)|651652|655000|655021)/',
+            'hipercard' => '/^(606282|3841)/',
+        ];
+
+        foreach ($patterns as $brand => $pattern) {
+            if (preg_match($pattern, $number)) {
+                return $brand;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Luhn algorithm for card number validation.
+     */
+    protected function luhnCheck(string $number): bool
+    {
+        $sum = 0;
+        $length = strlen($number);
+        $parity = $length % 2;
+
+        for ($i = 0; $i < $length; $i++) {
+            $digit = (int) $number[$i];
+
+            if ($i % 2 === $parity) {
+                $digit *= 2;
+                if ($digit > 9) {
+                    $digit -= 9;
+                }
+            }
+
+            $sum += $digit;
+        }
+
+        return $sum % 10 === 0;
+    }
+
+    // =========================================================================
     // PIX Payment Methods
     // =========================================================================
 

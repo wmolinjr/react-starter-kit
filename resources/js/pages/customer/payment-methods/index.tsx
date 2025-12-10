@@ -8,11 +8,19 @@ import { CreditCard, Plus, Star, Trash2 } from 'lucide-react';
 
 interface PaymentMethod {
     id: string;
-    brand: string;
-    last4: string;
-    exp_month: number;
-    exp_year: number;
+    type: 'card' | 'pix' | 'boleto' | 'bank_transfer';
+    provider: string;
+    brand: string | null;
+    last4: string | null;
+    exp_month: number | null;
+    exp_year: number | null;
+    bank_name: string | null;
     is_default: boolean;
+    is_verified: boolean;
+    is_expired: boolean;
+    display_label: string;
+    expiration_display: string | null;
+    created_at: string;
 }
 
 interface PaymentMethodsIndexProps {
@@ -23,9 +31,18 @@ interface PaymentMethodsIndexProps {
 export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentMethodsIndexProps) {
     const { t } = useLaravelReactI18n();
 
-    const getBrandIcon = (brand: string) => {
-        // Return brand name for now, could be replaced with actual icons
-        return brand.charAt(0).toUpperCase() + brand.slice(1);
+    const getPaymentIcon = (type: string) => {
+        // Return appropriate icon based on payment type
+        switch (type) {
+            case 'pix':
+                return '◉'; // PIX icon placeholder
+            case 'boleto':
+                return '☰'; // Boleto icon placeholder
+            case 'bank_transfer':
+                return '🏦'; // Bank icon placeholder
+            default:
+                return null; // Will use CreditCard component
+        }
     };
 
     return (
@@ -84,16 +101,16 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                 ) : (
                     <div className="space-y-4">
                         {paymentMethods.map((method) => (
-                            <Card key={method.id}>
+                            <Card key={method.id} className={method.is_expired ? 'opacity-60' : ''}>
                                 <CardContent className="flex items-center justify-between py-4">
                                     <div className="flex items-center gap-4">
                                         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
-                                            <CreditCard className="h-6 w-6" />
+                                            {getPaymentIcon(method.type) || <CreditCard className="h-6 w-6" />}
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2">
                                                 <p className="font-medium">
-                                                    {getBrandIcon(method.brand)} **** {method.last4}
+                                                    {method.display_label}
                                                 </p>
                                                 {method.is_default && (
                                                     <Badge variant="secondary" className="text-xs">
@@ -101,14 +118,21 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                                                         {t('customer.default')}
                                                     </Badge>
                                                 )}
+                                                {method.is_expired && (
+                                                    <Badge variant="destructive" className="text-xs">
+                                                        {t('customer.expired')}
+                                                    </Badge>
+                                                )}
                                             </div>
-                                            <p className="text-sm text-muted-foreground">
-                                                {t('customer.expires')} {method.exp_month}/{method.exp_year}
-                                            </p>
+                                            {method.expiration_display && (
+                                                <p className="text-sm text-muted-foreground">
+                                                    {t('customer.expires')} {method.expiration_display}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        {!method.is_default && (
+                                        {!method.is_default && !method.is_expired && (
                                             <Form
                                                 action={`/account/payment-methods/${method.id}/default`}
                                                 method="post"
