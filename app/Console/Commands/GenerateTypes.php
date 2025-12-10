@@ -546,7 +546,7 @@ class GenerateTypes extends Command
 
         $path = resource_path('js/types/enums.d.ts');
         File::put($path, $output);
-        $this->info("  ✓ Generated: resources/js/types/enums.d.ts");
+        $this->info('  ✓ Generated: resources/js/types/enums.d.ts');
     }
 
     protected function getEnumTypesHeader(): string
@@ -605,7 +605,7 @@ TS;
 
         $path = resource_path('js/lib/enum-metadata.ts');
         File::put($path, $output);
-        $this->info("  ✓ Generated: resources/js/lib/enum-metadata.ts");
+        $this->info('  ✓ Generated: resources/js/lib/enum-metadata.ts');
     }
 
     protected function getMetadataHeader(): string
@@ -728,7 +728,7 @@ TS;
 
         $path = resource_path('js/types/permissions.d.ts');
         File::put($path, $output);
-        $this->info("  ✓ Generated: resources/js/types/permissions.d.ts");
+        $this->info('  ✓ Generated: resources/js/types/permissions.d.ts');
     }
 
     protected function generatePermissionTypesContent(array $permissions, array $categories, array $actions, string $timestamp): string
@@ -911,7 +911,7 @@ TS;
 
         $path = resource_path('js/types/plan.d.ts');
         File::put($path, $output);
-        $this->info("  ✓ Generated: resources/js/types/plan.d.ts");
+        $this->info('  ✓ Generated: resources/js/types/plan.d.ts');
     }
 
     // =========================================================================
@@ -1181,14 +1181,14 @@ TS;
 
         if ($newCount < $minExpected && ! $this->option('force')) {
             $this->error("  ✗ ABORTED: lang/{$locale}.json has only {$newCount} translations (expected at least {$minExpected})");
-            $this->error("    This indicates missing hardcoded translations!");
-            $this->error("    The file was NOT modified to prevent data loss.");
-            $this->error("");
-            $this->error("    To fix this, restore translations from git:");
+            $this->error('    This indicates missing hardcoded translations!');
+            $this->error('    The file was NOT modified to prevent data loss.');
+            $this->error('');
+            $this->error('    To fix this, restore translations from git:');
             $this->error("      git checkout HEAD -- lang/{$locale}.json");
-            $this->error("");
-            $this->error("    Or use --force to write anyway (NOT RECOMMENDED):");
-            $this->error("      sail artisan types:generate --force");
+            $this->error('');
+            $this->error('    Or use --force to write anyway (NOT RECOMMENDED):');
+            $this->error('      sail artisan types:generate --force');
             $this->newLine();
 
             return; // Do NOT write the file
@@ -1198,7 +1198,7 @@ TS;
         $json = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         File::put($filePath, $json."\n");
 
-        $this->info("  ✓ Updated translations: lang/{$locale}.json ({$newCount} keys, " . count($enumKeys) . " enum-generated)");
+        $this->info("  ✓ Updated translations: lang/{$locale}.json ({$newCount} keys, ".count($enumKeys).' enum-generated)');
     }
 
     // =========================================================================

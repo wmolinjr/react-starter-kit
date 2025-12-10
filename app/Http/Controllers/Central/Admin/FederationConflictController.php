@@ -26,8 +26,8 @@ class FederationConflictController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('can:' . CentralPermission::FEDERATION_VIEW->value, only: ['index', 'show']),
-            new Middleware('can:' . CentralPermission::FEDERATION_MANAGE_CONFLICTS->value, only: ['resolve', 'dismiss']),
+            new Middleware('can:'.CentralPermission::FEDERATION_VIEW->value, only: ['index', 'show']),
+            new Middleware('can:'.CentralPermission::FEDERATION_MANAGE_CONFLICTS->value, only: ['resolve', 'dismiss']),
         ];
     }
 

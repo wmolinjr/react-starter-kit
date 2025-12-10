@@ -61,6 +61,7 @@ class SyncFromNewMaster implements ShouldQueue
             Log::info('No users pending master sync', [
                 'group_id' => $this->group->id,
             ]);
+
             return;
         }
 
@@ -114,7 +115,7 @@ class SyncFromNewMaster implements ShouldQueue
                 ->where('tenant_id', $this->newMaster->id)
                 ->first();
 
-            if (!$link) {
+            if (! $link) {
                 FederatedUserLink::create([
                     'federated_user_id' => $federatedUser->id,
                     'tenant_id' => $this->newMaster->id,
@@ -129,7 +130,7 @@ class SyncFromNewMaster implements ShouldQueue
             }
 
             // Update local user's federated_user_id if not set
-            if (!$localUser->federated_user_id) {
+            if (! $localUser->federated_user_id) {
                 $localUser->update(['federated_user_id' => $federatedUser->id]);
             }
 
@@ -162,7 +163,7 @@ class SyncFromNewMaster implements ShouldQueue
         ]);
 
         // Apply 2FA if present
-        if (!empty($syncedData['two_factor_secret'])) {
+        if (! empty($syncedData['two_factor_secret'])) {
             $localUser->two_factor_secret = $syncedData['two_factor_secret'];
             $localUser->two_factor_recovery_codes = $syncedData['two_factor_recovery_codes'] ?? null;
             $localUser->two_factor_confirmed_at = isset($syncedData['two_factor_confirmed_at'])

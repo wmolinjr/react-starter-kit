@@ -35,9 +35,9 @@ class SyncUserToFederatedTenantsJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param FederatedUser $federatedUser The user to sync
-     * @param array|null $fields Specific fields to sync (null = all)
-     * @param string|null $excludeTenantId Tenant to exclude (usually source)
+     * @param  FederatedUser  $federatedUser  The user to sync
+     * @param  array|null  $fields  Specific fields to sync (null = all)
+     * @param  string|null  $excludeTenantId  Tenant to exclude (usually source)
      */
     public function __construct(
         public FederatedUser $federatedUser,
@@ -73,7 +73,7 @@ class SyncUserToFederatedTenantsJob implements ShouldQueue
         ]);
 
         // If there were failures, we might want to retry specific tenants
-        if (!empty($results['failed'])) {
+        if (! empty($results['failed'])) {
             Log::warning('SyncUserToFederatedTenantsJob: Some syncs failed', [
                 'federated_user_id' => $this->federatedUser->id,
                 'failed' => $results['failed'],
@@ -101,8 +101,8 @@ class SyncUserToFederatedTenantsJob implements ShouldQueue
         return [
             'federation',
             'sync',
-            'federated_user:' . $this->federatedUser->id,
-            'group:' . $this->federatedUser->federation_group_id,
+            'federated_user:'.$this->federatedUser->id,
+            'group:'.$this->federatedUser->federation_group_id,
         ];
     }
 }

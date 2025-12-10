@@ -151,6 +151,7 @@ class TeamTest extends TenantTestCase
                 // Verify expected members are present
                 ->where('members', function ($members) use ($member1, $member2) {
                     $emails = array_column($members->toArray(), 'email');
+
                     return in_array($this->user->email, $emails) &&
                            in_array($member1->email, $emails) &&
                            in_array($member2->email, $emails);

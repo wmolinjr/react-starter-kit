@@ -142,7 +142,7 @@ class FederationService
         $oldMaster = $group->masterTenant;
 
         // Validate new master is in group
-        if (!$group->hasTenant($newMaster)) {
+        if (! $group->hasTenant($newMaster)) {
             throw FederationException::tenantNotInGroup($newMaster, $group);
         }
 
@@ -304,7 +304,7 @@ class FederationService
                 $existingMembership->rejoin();
 
                 // Update settings if provided
-                if (!empty($settings)) {
+                if (! empty($settings)) {
                     $existingMembership->update([
                         'settings' => array_merge($existingMembership->settings ?? [], $settings),
                     ]);
@@ -358,7 +358,7 @@ class FederationService
             ->where('tenant_id', $tenant->id)
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             throw FederationException::tenantNotInGroup($tenant, $group);
         }
 
@@ -371,7 +371,7 @@ class FederationService
 
             // Remove all user links for this tenant
             FederatedUserLink::where('tenant_id', $tenant->id)
-                ->whereHas('federatedUser', fn($q) => $q->where('federation_group_id', $group->id))
+                ->whereHas('federatedUser', fn ($q) => $q->where('federation_group_id', $group->id))
                 ->delete();
 
             // Clear cache
@@ -509,6 +509,7 @@ class FederationService
                 if ($group->sync_strategy === FederationSyncStrategy::MANUAL_REVIEW) {
                     $this->createConflict($federatedUser, $newData, $sourceTenant);
                 }
+
                 return;
             }
         }
@@ -545,7 +546,7 @@ class FederationService
     public function getPendingConflicts(FederationGroup $group): Collection
     {
         return FederationConflict::pending()
-            ->whereHas('federatedUser', fn($q) => $q->where('federation_group_id', $group->id))
+            ->whereHas('federatedUser', fn ($q) => $q->where('federation_group_id', $group->id))
             ->with('federatedUser')
             ->get();
     }

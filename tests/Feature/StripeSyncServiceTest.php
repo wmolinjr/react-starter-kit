@@ -10,7 +10,6 @@ use Database\Seeders\AddonSeeder;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Stripe\Price;
-use Stripe\Product;
 use Stripe\Service\PriceService;
 use Stripe\Service\ProductService;
 use Stripe\StripeClient;
@@ -23,7 +22,6 @@ use Tests\TestCase;
  */
 class StripeSyncServiceTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -216,13 +214,13 @@ class StripeSyncServiceTest extends TestCase
         $mockPriceService->shouldReceive('create')
             ->andReturnUsing(function ($data) {
                 // Use stdClass to avoid Stripe SDK static method issues with Mockery
-                return (object) ['id' => 'price_' . ($data['metadata']['billing_period'] ?? 'test')];
+                return (object) ['id' => 'price_'.($data['metadata']['billing_period'] ?? 'test')];
             });
 
         $mockStripe->prices = $mockPriceService;
 
         // Create service with mocked client
-        $service = new StripeSyncService();
+        $service = new StripeSyncService;
         $reflection = new \ReflectionClass($service);
         $property = $reflection->getProperty('stripe');
         $property->setAccessible(true);
@@ -287,7 +285,7 @@ class StripeSyncServiceTest extends TestCase
         $mockStripe->prices = $mockPriceService;
 
         // Create service with mocked client
-        $service = new StripeSyncService();
+        $service = new StripeSyncService;
         $reflection = new \ReflectionClass($service);
         $property = $reflection->getProperty('stripe');
         $property->setAccessible(true);
@@ -341,7 +339,7 @@ class StripeSyncServiceTest extends TestCase
             ->times(2) // Only 2 active bundles
             ->andReturnUsing(function () {
                 // Use stdClass to avoid Stripe SDK static method issues with Mockery
-                return (object) ['id' => 'prod_' . uniqid()];
+                return (object) ['id' => 'prod_'.uniqid()];
             });
 
         $mockStripe->products = $mockProductService;
@@ -349,11 +347,11 @@ class StripeSyncServiceTest extends TestCase
         $mockPriceService = Mockery::mock(PriceService::class);
         $mockPriceService->shouldReceive('create')->andReturnUsing(function ($data) {
             // Use stdClass to avoid Stripe SDK static method issues with Mockery
-            return (object) ['id' => 'price_' . uniqid()];
+            return (object) ['id' => 'price_'.uniqid()];
         });
         $mockStripe->prices = $mockPriceService;
 
-        $service = new StripeSyncService();
+        $service = new StripeSyncService;
         $reflection = new \ReflectionClass($service);
         $property = $reflection->getProperty('stripe');
         $property->setAccessible(true);
@@ -397,10 +395,10 @@ class StripeSyncServiceTest extends TestCase
         $previewPt = $service->dryRun(null, 'pt_BR');
 
         // Both should have locale field set correctly
-        if (!empty($previewEn)) {
+        if (! empty($previewEn)) {
             $this->assertEquals('en', $previewEn[0]['locale']);
         }
-        if (!empty($previewPt)) {
+        if (! empty($previewPt)) {
             $this->assertEquals('pt_BR', $previewPt[0]['locale']);
         }
     }
@@ -414,10 +412,10 @@ class StripeSyncServiceTest extends TestCase
         $previewPt = $service->dryRunBundles(null, 'pt_BR');
 
         // Both should have locale field set correctly
-        if (!empty($previewEn)) {
+        if (! empty($previewEn)) {
             $this->assertEquals('en', $previewEn[0]['locale']);
         }
-        if (!empty($previewPt)) {
+        if (! empty($previewPt)) {
             $this->assertEquals('pt_BR', $previewPt[0]['locale']);
         }
     }

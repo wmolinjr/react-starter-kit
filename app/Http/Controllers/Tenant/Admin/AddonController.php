@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Central\BundleResource;
 use App\Http\Resources\Central\AddonResource;
+use App\Http\Resources\Central\BundleResource;
 use App\Services\Central\AddonService;
 use App\Services\Central\CheckoutService;
 use Illuminate\Http\Request;
@@ -49,9 +49,9 @@ class AddonController extends Controller
                 'type' => $addon->addon_type->value,
                 'quantity' => $addon->quantity,
                 'price' => $addon->price,
-                'formattedPrice' => '$' . number_format($addon->price / 100, 2),
+                'formattedPrice' => '$'.number_format($addon->price / 100, 2),
                 'totalPrice' => $addon->total_price,
-                'formattedTotalPrice' => '$' . number_format($addon->total_price / 100, 2),
+                'formattedTotalPrice' => '$'.number_format($addon->total_price / 100, 2),
                 'billingPeriod' => $addon->billing_period->value,
                 'status' => $addon->status->value,
                 'startedAt' => $addon->started_at?->toISOString(),
@@ -60,7 +60,7 @@ class AddonController extends Controller
             'availableBundles' => BundleResource::collection($availableBundles),
             'activeBundles' => $activeBundles,
             'monthlyCost' => $monthlyCost,
-            'formattedMonthlyCost' => '$' . number_format($monthlyCost / 100, 2),
+            'formattedMonthlyCost' => '$'.number_format($monthlyCost / 100, 2),
             'activeAddonSlugs' => $tenant->activeAddons()->pluck('addon_slug')->toArray(),
         ]);
     }

@@ -259,6 +259,7 @@ class RedisSessionScopingTest extends TenantTestCase
     {
         try {
             Redis::connection('default')->ping();
+
             return true;
         } catch (\Exception $e) {
             return false;
@@ -274,6 +275,6 @@ class RedisSessionScopingTest extends TenantTestCase
         $appPrefix = config('database.redis.options.prefix', '');
 
         // Format: {app_prefix}tenant_{id}:{key}
-        return $appPrefix . $prefixBase . '_' . $tenantId . ':' . $key;
+        return $appPrefix.$prefixBase.'_'.$tenantId.':'.$key;
     }
 }

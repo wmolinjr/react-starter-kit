@@ -39,9 +39,10 @@ class FederationSeeder extends Seeder
         $tenant1 = Tenant::where('slug', 'acme')->first();
         $tenant2 = Tenant::where('slug', 'startup')->first();
 
-        if (!$tenant1 || !$tenant2) {
+        if (! $tenant1 || ! $tenant2) {
             $this->command->warn('Tenants not found. Skipping FederationSeeder.');
             $this->command->warn('Run TenantSeeder first to create tenants.');
+
             return;
         }
 

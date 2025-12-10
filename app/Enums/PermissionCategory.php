@@ -33,7 +33,7 @@ enum PermissionCategory: string
      */
     public function prefix(): string
     {
-        return $this->value . ':';
+        return $this->value.':';
     }
 
     /**

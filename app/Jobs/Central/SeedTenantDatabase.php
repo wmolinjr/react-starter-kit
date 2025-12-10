@@ -3,9 +3,9 @@
 namespace App\Jobs\Central;
 
 use App\Enums\TenantRole;
-use App\Models\Tenant\User;
 use App\Models\Shared\Permission;
 use App\Models\Shared\Role;
+use App\Models\Tenant\User;
 use App\Services\Central\PlanPermissionResolver;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -120,7 +120,7 @@ class SeedTenantDatabase implements ShouldQueue
     public function tags(): array
     {
         return [
-            'tenant:' . $this->tenant->id,
+            'tenant:'.$this->tenant->id,
             'seed-database',
         ];
     }

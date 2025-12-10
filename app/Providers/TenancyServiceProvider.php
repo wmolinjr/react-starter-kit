@@ -43,7 +43,7 @@ class TenancyServiceProvider extends ServiceProvider
      */
     protected function shouldCreateDynamicDatabases(): bool
     {
-        return !env('TENANCY_TESTING_DATABASE');
+        return ! env('TENANCY_TESTING_DATABASE');
     }
 
     public function events()
@@ -121,7 +121,7 @@ class TenancyServiceProvider extends ServiceProvider
                 function (Events\TenancyBootstrapped $event) {
                     $tenantKey = $event->tenancy->tenant->getTenantKey();
                     $permissionRegistrar = app(\Spatie\Permission\PermissionRegistrar::class);
-                    $permissionRegistrar->cacheKey = 'spatie.permission.cache.tenant.' . $tenantKey;
+                    $permissionRegistrar->cacheKey = 'spatie.permission.cache.tenant.'.$tenantKey;
                 },
             ],
             Events\RevertingToCentralContext::class => [],

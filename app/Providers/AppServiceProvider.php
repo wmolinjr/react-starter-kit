@@ -36,11 +36,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Cashier\Events\WebhookReceived;
 use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
@@ -117,7 +115,7 @@ class AppServiceProvider extends ServiceProvider
                 $isPlanEnabled = $tenant->isPlanPermissionEnabled($ability);
 
                 // If permission not enabled by plan, deny
-                if (!$isPlanEnabled) {
+                if (! $isPlanEnabled) {
                     return false;
                 }
 
@@ -142,14 +140,14 @@ class AppServiceProvider extends ServiceProvider
             return $this->where('user_id', $user->id);
         });
 
-        // Event Listeners
+        // Payment Webhook Listeners (provider-agnostic)
         Event::listen(
-            WebhookReceived::class,
+            \App\Events\Payment\WebhookReceived::class,
             UpdateTenantLimits::class,
         );
 
         Event::listen(
-            WebhookReceived::class,
+            \App\Events\Payment\WebhookReceived::class,
             SyncPermissionsOnSubscriptionChange::class,
         );
 

@@ -122,7 +122,7 @@ class TenantTransfer extends Model
 
     public function canBeAccepted(): bool
     {
-        return $this->isPending() && !$this->isExpired();
+        return $this->isPending() && ! $this->isExpired();
     }
 
     public function canBeCancelled(): bool

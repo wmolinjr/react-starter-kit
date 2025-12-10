@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Models\Central\Tenant;
-use App\Services\Central\PlanFeatureResolver;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
+use App\Models\Central\Tenant;
+use App\Services\Central\PlanFeatureResolver;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Pennant\Feature;
 

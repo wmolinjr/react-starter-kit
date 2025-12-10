@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Models\Central\Domain;
 use App\Models\Central\Tenant;
+use Stancl\Tenancy\Bootstrappers;
 use Stancl\Tenancy\Database\Models\ImpersonationToken;
+use Stancl\Tenancy\Enums\RouteMode;
 use Stancl\Tenancy\Middleware;
 use Stancl\Tenancy\Resolvers;
-use Stancl\Tenancy\Bootstrappers;
-use Stancl\Tenancy\Enums\RouteMode;
 
 /**
  * Tenancy for Laravel v4.

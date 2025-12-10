@@ -35,9 +35,9 @@ class FederationSyncService
     /**
      * Sync a federated user's data to all linked tenants.
      *
-     * @param FederatedUser $federatedUser The user to sync
-     * @param array|null $fields Specific fields to sync (null = all)
-     * @param string|null $excludeTenantId Tenant to exclude from sync (usually source)
+     * @param  FederatedUser  $federatedUser  The user to sync
+     * @param  array|null  $fields  Specific fields to sync (null = all)
+     * @param  string|null  $excludeTenantId  Tenant to exclude from sync (usually source)
      */
     public function syncUserToAllTenants(
         FederatedUser $federatedUser,
@@ -54,17 +54,18 @@ class FederationSyncService
 
         // Get all active links except excluded tenant
         $links = $federatedUser->activeLinks()
-            ->when($excludeTenantId, fn($q) => $q->where('tenant_id', '!=', $excludeTenantId))
+            ->when($excludeTenantId, fn ($q) => $q->where('tenant_id', '!=', $excludeTenantId))
             ->get();
 
         foreach ($links as $link) {
             $tenant = Tenant::find($link->tenant_id);
 
-            if (!$tenant) {
+            if (! $tenant) {
                 $results['skipped'][] = [
                     'tenant_id' => $link->tenant_id,
                     'reason' => 'Tenant not found',
                 ];
+
                 continue;
             }
 
@@ -73,12 +74,13 @@ class FederationSyncService
                 ->wherePivot('tenant_id', $tenant->id)
                 ->first();
 
-            if (!$membership || !$membership->pivot->sync_enabled) {
+            if (! $membership || ! $membership->pivot->sync_enabled) {
                 $results['skipped'][] = [
                     'tenant_id' => $tenant->id,
                     'tenant_name' => $tenant->name,
                     'reason' => 'Sync disabled',
                 ];
+
                 continue;
             }
 
@@ -124,10 +126,10 @@ class FederationSyncService
         }
 
         // Run in tenant context
-        $tenant->run(function () use ($federatedUser, $syncedData, $tenant) {
+        $tenant->run(function () use ($federatedUser, $syncedData) {
             $localUser = \App\Models\Tenant\User::where('federated_user_id', $federatedUser->id)->first();
 
-            if (!$localUser) {
+            if (! $localUser) {
                 // User doesn't exist locally - should we create?
                 $group = $federatedUser->federationGroup;
                 if ($group->shouldAutoCreateOnLogin()) {
@@ -271,7 +273,7 @@ class FederationSyncService
         });
 
         // Create the link record (outside tenant context - central DB)
-        if (!$federatedUser->hasLinkToTenant($tenant)) {
+        if (! $federatedUser->hasLinkToTenant($tenant)) {
             FederatedUserLink::create([
                 'federated_user_id' => $federatedUser->id,
                 'tenant_id' => $tenant->id,
@@ -313,7 +315,7 @@ class FederationSyncService
             ]);
 
             // Apply 2FA if enabled
-            if (!empty($syncedData['two_factor_secret'])) {
+            if (! empty($syncedData['two_factor_secret'])) {
                 $user->two_factor_secret = $syncedData['two_factor_secret'];
                 $user->two_factor_recovery_codes = $syncedData['two_factor_recovery_codes'] ?? null;
                 $user->two_factor_confirmed_at = isset($syncedData['two_factor_confirmed_at'])
@@ -365,8 +367,9 @@ class FederationSyncService
             $results['retried']++;
 
             $tenant = Tenant::find($link->tenant_id);
-            if (!$tenant) {
+            if (! $tenant) {
                 $results['still_failed']++;
+
                 continue;
             }
 
@@ -390,7 +393,7 @@ class FederationSyncService
     public function getFailedSyncsForGroup(FederationGroup $group): Collection
     {
         return FederatedUserLink::where('sync_status', FederatedUserLinkSyncStatus::SYNC_FAILED)
-            ->whereHas('federatedUser', fn($q) => $q->where('federation_group_id', $group->id))
+            ->whereHas('federatedUser', fn ($q) => $q->where('federation_group_id', $group->id))
             ->with(['federatedUser', 'tenant'])
             ->get();
     }
@@ -409,7 +412,7 @@ class FederationSyncService
         Tenant $sourceTenant
     ): void {
         // Check if group is active
-        if (!$group->is_active) {
+        if (! $group->is_active) {
             throw FederationException::groupNotActive($group);
         }
 
@@ -419,12 +422,12 @@ class FederationSyncService
             ->whereNull('federation_group_tenants.left_at')
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             throw FederationException::tenantNotInGroup($sourceTenant, $group);
         }
 
         // Check if sync is enabled for tenant
-        if (!$membership->pivot->sync_enabled) {
+        if (! $membership->pivot->sync_enabled) {
             throw FederationException::syncDisabled($sourceTenant);
         }
     }

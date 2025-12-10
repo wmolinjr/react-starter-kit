@@ -2,11 +2,11 @@
 
 namespace App\Services\Shared;
 
+use App\Models\Shared\Activity;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use App\Models\Shared\Activity;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**

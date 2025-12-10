@@ -18,7 +18,7 @@ class ProjectObserver
     public function created(Project $project): void
     {
         // Only track for tenant projects
-        if (!tenancy()->initialized) {
+        if (! tenancy()->initialized) {
             return;
         }
 
@@ -34,7 +34,7 @@ class ProjectObserver
     public function deleted(Project $project): void
     {
         // Only track for tenant projects
-        if (!tenancy()->initialized) {
+        if (! tenancy()->initialized) {
             return;
         }
 

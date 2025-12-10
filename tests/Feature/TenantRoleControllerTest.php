@@ -2,9 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\Central\SyncTenantPermissions;
-use App\Models\Shared\Permission;
 use App\Models\Central\Plan;
+use App\Models\Shared\Permission;
 use App\Models\Shared\Role;
 use App\Services\Central\PlanPermissionResolver;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -21,7 +20,7 @@ class TenantRoleControllerTest extends TenantTestCase
         $this->seedRolesPermissions();
 
         // Sync permissions for tenant's plan
-        $resolver = new PlanPermissionResolver();
+        $resolver = new PlanPermissionResolver;
         $allowedPermissions = $resolver->resolve($this->tenant);
         $this->tenant->forceFill([
             'plan_enabled_permissions' => $allowedPermissions,
@@ -233,7 +232,7 @@ class TenantRoleControllerTest extends TenantTestCase
         $this->tenant->refresh();
 
         // Update plan_enabled_permissions cache
-        $resolver = new PlanPermissionResolver();
+        $resolver = new PlanPermissionResolver;
         $allowedPermissions = $resolver->resolve($this->tenant);
         $this->tenant->forceFill([
             'plan_enabled_permissions' => $allowedPermissions,

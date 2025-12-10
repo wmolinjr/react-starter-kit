@@ -95,7 +95,7 @@ class Role extends SpatieRole
             ->first();
 
         if (! $role) {
-            throw new \Spatie\Permission\Exceptions\RoleDoesNotExist();
+            throw new \Spatie\Permission\Exceptions\RoleDoesNotExist;
         }
 
         return $role;

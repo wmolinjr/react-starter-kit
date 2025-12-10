@@ -11,7 +11,6 @@ use App\Http\Requests\Central\ChangeMasterTenantRequest;
 use App\Http\Requests\Central\StoreFederationGroupRequest;
 use App\Http\Requests\Central\UpdateFederationGroupRequest;
 use App\Http\Resources\Central\FederatedUserDetailResource;
-use App\Http\Resources\Central\FederatedUserResource;
 use App\Http\Resources\Central\FederationGroupDetailResource;
 use App\Http\Resources\Central\FederationGroupResource;
 use App\Http\Resources\Central\TenantSummaryResource;
@@ -36,10 +35,10 @@ class FederationGroupController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('can:' . CentralPermission::FEDERATION_VIEW->value, only: ['index', 'show', 'showUser']),
-            new Middleware('can:' . CentralPermission::FEDERATION_CREATE->value, only: ['create', 'store']),
-            new Middleware('can:' . CentralPermission::FEDERATION_EDIT->value, only: ['edit', 'update', 'addTenant', 'removeTenant', 'toggleTenantSync', 'syncUser', 'retrySync', 'changeMaster']),
-            new Middleware('can:' . CentralPermission::FEDERATION_DELETE->value, only: ['destroy']),
+            new Middleware('can:'.CentralPermission::FEDERATION_VIEW->value, only: ['index', 'show', 'showUser']),
+            new Middleware('can:'.CentralPermission::FEDERATION_CREATE->value, only: ['create', 'store']),
+            new Middleware('can:'.CentralPermission::FEDERATION_EDIT->value, only: ['edit', 'update', 'addTenant', 'removeTenant', 'toggleTenantSync', 'syncUser', 'retrySync', 'changeMaster']),
+            new Middleware('can:'.CentralPermission::FEDERATION_DELETE->value, only: ['destroy']),
         ];
     }
 

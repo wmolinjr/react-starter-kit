@@ -64,9 +64,13 @@ class FederatedUserLink extends Model
      * Created via constants.
      */
     public const CREATED_VIA_AUTO_SYNC = 'auto_sync';
+
     public const CREATED_VIA_MANUAL_LINK = 'manual_link';
+
     public const CREATED_VIA_IMPORT = 'import';
+
     public const CREATED_VIA_LOGIN = 'login';
+
     public const CREATED_VIA_BULK_SYNC = 'bulk_sync';
 
     /**

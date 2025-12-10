@@ -51,7 +51,7 @@ abstract class BaseResource extends JsonResource
     /**
      * Format date for frontend display.
      *
-     * @param Carbon|string|null $date
+     * @param  Carbon|string|null  $date
      */
     protected function formatDate($date, string $format = 'Y-m-d H:i'): ?string
     {
@@ -71,7 +71,7 @@ abstract class BaseResource extends JsonResource
      *
      * Best for JavaScript Date parsing.
      *
-     * @param Carbon|string|null $date
+     * @param  Carbon|string|null  $date
      */
     protected function formatIso($date): ?string
     {
@@ -89,7 +89,7 @@ abstract class BaseResource extends JsonResource
     /**
      * Format date as human-readable relative string.
      *
-     * @param Carbon|string|null $date
+     * @param  Carbon|string|null  $date
      */
     protected function formatDiff($date): ?string
     {
@@ -107,7 +107,7 @@ abstract class BaseResource extends JsonResource
     /**
      * Format date as date only (no time).
      *
-     * @param Carbon|string|null $date
+     * @param  Carbon|string|null  $date
      */
     protected function formatDateOnly($date): ?string
     {
@@ -121,7 +121,7 @@ abstract class BaseResource extends JsonResource
     {
         $value = $cents / 100;
 
-        return number_format($value, 2, ',', '.') . ' ' . strtoupper($currency);
+        return number_format($value, 2, ',', '.').' '.strtoupper($currency);
     }
 
     /**

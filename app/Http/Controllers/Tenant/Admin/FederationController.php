@@ -37,8 +37,8 @@ class FederationController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:' . TenantPermission::FEDERATION_VIEW->value, only: ['index', 'show']),
-            new Middleware('permission:' . TenantPermission::FEDERATION_MANAGE->value, only: ['federateUser', 'unfederateUser', 'federateAll', 'federateBulk']),
+            new Middleware('permission:'.TenantPermission::FEDERATION_VIEW->value, only: ['index', 'show']),
+            new Middleware('permission:'.TenantPermission::FEDERATION_MANAGE->value, only: ['federateUser', 'unfederateUser', 'federateAll', 'federateBulk']),
         ];
     }
 
@@ -73,8 +73,8 @@ class FederationController extends Controller implements HasMiddleware
         return Inertia::render('tenant/admin/team/federation-info', [
             'user' => new TeamMemberResource($user),
             'federationInfo' => new UserFederationInfoResource($federationInfo),
-            'canFederate' => $this->federationService->isFederated() && !$user->isFederated(),
-            'canUnfederate' => $user->isFederated() && !$user->isMasterUser(),
+            'canFederate' => $this->federationService->isFederated() && ! $user->isFederated(),
+            'canUnfederate' => $user->isFederated() && ! $user->isMasterUser(),
         ]);
     }
 
@@ -120,7 +120,7 @@ class FederationController extends Controller implements HasMiddleware
      */
     public function syncUser(User $user): RedirectResponse
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             return back()->with('error', __('flash.federation.user_not_federated'));
         }
 
@@ -181,5 +181,4 @@ class FederationController extends Controller implements HasMiddleware
             'count' => $results['success'],
         ]));
     }
-
 }

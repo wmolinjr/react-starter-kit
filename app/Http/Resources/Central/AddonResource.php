@@ -67,7 +67,7 @@ class AddonResource extends BaseResource
      */
     protected function formatMoney(int $cents): string
     {
-        return '$' . number_format($cents / 100, 2);
+        return '$'.number_format($cents / 100, 2);
     }
 
     public static function typescriptSchema(): array

@@ -53,6 +53,7 @@ trait ValidatesResourceSchema
                 if (! $isNullable) {
                     Assert::fail("Key '{$key}' in {$context} is null but schema type '{$type}' is not nullable");
                 }
+
                 continue;
             }
 

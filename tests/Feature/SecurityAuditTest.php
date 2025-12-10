@@ -14,7 +14,6 @@ use Tests\TestCase;
  */
 class SecurityAuditTest extends TestCase
 {
-
     /**
      * Test 1: Security headers are added to responses
      */
@@ -69,7 +68,7 @@ class SecurityAuditTest extends TestCase
      */
     public function test_user_model_protects_sensitive_attributes(): void
     {
-        $user = new User();
+        $user = new User;
 
         // Critical fields should be guarded
         $this->assertContains('two_factor_secret', $user->getGuarded());
@@ -105,7 +104,7 @@ class SecurityAuditTest extends TestCase
      */
     public function test_two_factor_secrets_are_hidden(): void
     {
-        $user = new User();
+        $user = new User;
 
         $hidden = $user->getHidden();
 
@@ -165,7 +164,7 @@ class SecurityAuditTest extends TestCase
         tenancy()->initialize($tenant);
 
         // Helper to generate tenant URLs
-        $tenantUrl = fn(string $path) => "http://{$domain->domain}/{$path}";
+        $tenantUrl = fn (string $path) => "http://{$domain->domain}/{$path}";
 
         // Try to access team page without auth
         $response = $this->get($tenantUrl('admin/team'));

@@ -10,7 +10,6 @@ use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
 use App\Models\Central\Tenant;
-use App\Models\Shared\Role;
 use App\Models\Tenant\User;
 use App\Services\Central\FederationService as CentralFederationService;
 use App\Services\Tenant\FederationService as TenantFederationService;
@@ -32,7 +31,7 @@ class TenantFederationTest extends TenantTestCase
      */
     protected function uniqueEmail(string $prefix = 'test'): string
     {
-        return $prefix . '-' . uniqid() . '@example.com';
+        return $prefix.'-'.uniqid().'@example.com';
     }
 
     protected function setUp(): void
@@ -59,11 +58,11 @@ class TenantFederationTest extends TenantTestCase
         $professionalPlan = \App\Models\Central\Plan::where('slug', 'professional')->first();
         $this->branchTenant = Tenant::factory()->create([
             'name' => 'Branch Tenant',
-            'slug' => 'branch-tenant-' . uniqid(),
+            'slug' => 'branch-tenant-'.uniqid(),
             'plan_id' => $professionalPlan?->id,
         ]);
         $this->branchTenant->domains()->create([
-            'domain' => $this->branchTenant->slug . '.test',
+            'domain' => $this->branchTenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -569,9 +568,9 @@ class TenantFederationTest extends TenantTestCase
         tenancy()->end();
 
         // Create non-federated tenant
-        $nonFederatedTenant = Tenant::factory()->create(['slug' => 'non-fed-' . uniqid()]);
+        $nonFederatedTenant = Tenant::factory()->create(['slug' => 'non-fed-'.uniqid()]);
         $nonFederatedTenant->domains()->create([
-            'domain' => $nonFederatedTenant->slug . '.test',
+            'domain' => $nonFederatedTenant->slug.'.test',
             'is_primary' => true,
         ]);
 

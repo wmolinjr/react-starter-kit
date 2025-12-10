@@ -42,7 +42,7 @@ class UploadFileRequestTest extends TestCase
         tenancy()->initialize($tenant);
 
         // Create a request with a file that's too large (6MB)
-        $request = new UploadFileRequest();
+        $request = new UploadFileRequest;
         $request->merge([
             'collection' => 'attachments',
         ]);
@@ -73,7 +73,7 @@ class UploadFileRequestTest extends TestCase
         // Create a small file (1KB)
         $file = UploadedFile::fake()->create('test.pdf', 1);
 
-        $request = new UploadFileRequest();
+        $request = new UploadFileRequest;
         $request->files->set('file', $file);
         $request->merge(['collection' => 'attachments']);
 
@@ -104,7 +104,7 @@ class UploadFileRequestTest extends TestCase
 
         tenancy()->initialize($tenant);
 
-        $request = new UploadFileRequest();
+        $request = new UploadFileRequest;
         $request->merge(['collection' => 'attachments']);
 
         $rules = $request->rules();
@@ -118,7 +118,7 @@ class UploadFileRequestTest extends TestCase
     public function test_validation_uses_default_without_tenant(): void
     {
         // Without tenant context, should use default
-        $request = new UploadFileRequest();
+        $request = new UploadFileRequest;
         $request->merge(['collection' => 'attachments']);
 
         $rules = $request->rules();
@@ -143,7 +143,7 @@ class UploadFileRequestTest extends TestCase
 
         tenancy()->initialize($tenant);
 
-        $request = new UploadFileRequest();
+        $request = new UploadFileRequest;
         $messages = $request->messages();
 
         $this->assertArrayHasKey('file.max', $messages);

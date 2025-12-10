@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\AddonType;
 use App\Exceptions\Central\AddonException;
 use App\Models\Central\AddonPurchase;
 use App\Services\Central\CheckoutService;

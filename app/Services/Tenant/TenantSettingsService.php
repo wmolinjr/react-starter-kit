@@ -7,7 +7,6 @@ use App\Exceptions\Tenant\SettingsException;
 use App\Models\Central\Tenant;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 /**

@@ -67,6 +67,7 @@ class SyncTenantPermissions implements ShouldQueue
 
         if (empty($allowedPermissions)) {
             Log::warning("SyncTenantPermissions: No permissions resolved for tenant {$this->tenant->id}");
+
             return;
         }
 
@@ -169,7 +170,7 @@ class SyncTenantPermissions implements ShouldQueue
                 // Sync permissions (removes old, adds new)
                 $role->syncPermissions($permissionModels);
 
-                Log::debug("SyncTenantPermissions: Synced {$tenantRole->value} with " . count($rolePermissions) . " permissions");
+                Log::debug("SyncTenantPermissions: Synced {$tenantRole->value} with ".count($rolePermissions).' permissions');
             }
         }
     }
@@ -191,7 +192,7 @@ class SyncTenantPermissions implements ShouldQueue
     public function tags(): array
     {
         return [
-            'tenant:' . $this->tenant->id,
+            'tenant:'.$this->tenant->id,
             'sync-permissions',
         ];
     }

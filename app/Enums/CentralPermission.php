@@ -314,7 +314,7 @@ enum CentralPermission: string
         $categories = [];
         foreach (self::cases() as $permission) {
             $cat = $permission->category();
-            if (!isset($categories[$cat])) {
+            if (! isset($categories[$cat])) {
                 $categories[$cat] = self::categoryDescription($cat);
             }
         }
@@ -381,7 +381,7 @@ enum CentralPermission: string
      */
     public static function toSeederArray(): array
     {
-        return array_map(fn(self $p) => [
+        return array_map(fn (self $p) => [
             'name' => $p->value,
             'category' => $p->category(),
             'description' => $p->description(),

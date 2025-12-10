@@ -158,6 +158,7 @@ enum PlanFeature: string
     {
         $locale = $locale ?? app()->getLocale();
         $labels = self::categoryLabel($category);
+
         return $labels[$locale] ?? $labels['en'];
     }
 
@@ -169,13 +170,14 @@ enum PlanFeature: string
         $categories = [];
         foreach (self::cases() as $feature) {
             $cat = $feature->category();
-            if (!isset($categories[$cat])) {
+            if (! isset($categories[$cat])) {
                 $categories[$cat] = [
                     'value' => $cat,
                     'label' => self::categoryTrans($cat),
                 ];
             }
         }
+
         return array_values($categories);
     }
 

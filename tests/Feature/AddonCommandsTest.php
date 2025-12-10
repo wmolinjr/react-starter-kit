@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Central\AddonSubscription;
 use App\Models\Central\Plan;
 use App\Models\Central\Tenant;
-use App\Models\Central\AddonSubscription;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -15,7 +15,6 @@ use Tests\TestCase;
  */
 class AddonCommandsTest extends TestCase
 {
-
     protected Plan $plan;
 
     protected function setUp(): void

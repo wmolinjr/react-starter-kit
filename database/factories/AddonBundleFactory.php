@@ -21,7 +21,7 @@ class AddonBundleFactory extends Factory
     {
         return [
             'slug' => fake()->unique()->slug(2),
-            'name' => ['en' => fake()->words(2, true) . ' Bundle', 'pt_BR' => 'Pacote ' . fake()->words(2, true)],
+            'name' => ['en' => fake()->words(2, true).' Bundle', 'pt_BR' => 'Pacote '.fake()->words(2, true)],
             'description' => ['en' => fake()->sentence(), 'pt_BR' => fake()->sentence()],
             'active' => true,
             'discount_percent' => fake()->randomElement([10, 15, 20, 25]),
@@ -93,9 +93,9 @@ class AddonBundleFactory extends Factory
     public function synced(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_product_id' => 'prod_' . fake()->unique()->regexify('[A-Za-z0-9]{14}'),
-            'stripe_price_monthly_id' => 'price_' . fake()->unique()->regexify('[A-Za-z0-9]{24}'),
-            'stripe_price_yearly_id' => 'price_' . fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+            'stripe_product_id' => 'prod_'.fake()->unique()->regexify('[A-Za-z0-9]{14}'),
+            'stripe_price_monthly_id' => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+            'stripe_price_yearly_id' => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
         ]);
     }
 }

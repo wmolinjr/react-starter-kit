@@ -5,9 +5,9 @@ namespace App\Services\Tenant;
 use App\Enums\TenantPermission;
 use App\Exceptions\Shared\RoleException;
 use App\Models\Central\Tenant;
-use App\Models\Tenant\User;
 use App\Models\Shared\Permission;
 use App\Models\Shared\Role;
+use App\Models\Tenant\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 

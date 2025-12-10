@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // API rate limiting: tenant-aware
             RateLimiter::for('api', function (Request $request) {
                 $tenantId = tenancy()->initialized ? tenant('id') : 'global';
+
                 return Limit::perMinute(60)->by($tenantId.':'.$request->user()?->id ?: $request->ip());
             });
 
@@ -41,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
                 $tenantId = tenant('id');
                 $userId = $request->user()?->id;
+
                 return [
                     Limit::perMinute(30)->by($tenantId.':'.$userId),
                     Limit::perMinute(100)->by($tenantId),
@@ -50,6 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // File upload rate limiting
             RateLimiter::for('uploads', function (Request $request) {
                 $tenantId = tenancy()->initialized ? tenant('id') : 'global';
+
                 return [
                     Limit::perMinute(10)->by($tenantId.':'.$request->user()?->id ?: $request->ip()),
                     Limit::perHour(50)->by($tenantId.':'.$request->user()?->id ?: $request->ip()),
@@ -90,6 +93,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->routeIs('central.admin.*')) {
                 return route('central.admin.auth.login');
             }
+
             // Tenant users redirect to tenant login
             return route('tenant.admin.auth.login');
         });
@@ -109,6 +113,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if (auth()->check()) {
                 return route('tenant.admin.dashboard');
             }
+
             // Fallback (should not reach here)
             return '/';
         });

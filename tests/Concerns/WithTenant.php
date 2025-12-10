@@ -21,6 +21,7 @@ use App\Models\Shared\Role;
 trait WithTenant
 {
     protected Tenant $tenant;
+
     protected string $tenantDomain;
 
     /**
@@ -65,6 +66,7 @@ trait WithTenant
     protected function tenantUrl(string $path): string
     {
         $path = ltrim($path, '/');
+
         return "http://{$this->tenantDomain}/{$path}";
     }
 
@@ -75,8 +77,8 @@ trait WithTenant
      * - 'tenant.admin.auth.login'
      * - 'tenant.admin.auth.register'
      *
-     * @param string $name Full route name (e.g., 'tenant.admin.auth.login')
-     * @param array $parameters Route parameters
+     * @param  string  $name  Full route name (e.g., 'tenant.admin.auth.login')
+     * @param  array  $parameters  Route parameters
      * @return string Full URL with tenant domain
      */
     protected function tenantRoute(string $name, array $parameters = []): string

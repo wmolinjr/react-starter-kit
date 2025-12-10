@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Enums\AddonType;
-use App\Models\Central\AddonSubscription;
 use App\Models\Central\AddonPurchase;
+use App\Models\Central\AddonSubscription;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TenantTestCase;
 

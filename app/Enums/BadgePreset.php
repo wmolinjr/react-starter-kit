@@ -238,5 +238,4 @@ enum BadgePreset: string
 
         return $map;
     }
-
 }

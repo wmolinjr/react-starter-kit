@@ -21,10 +21,10 @@ class ProjectController extends Controller implements HasMiddleware
             'auth:sanctum',
 
             // View permissions
-            new Middleware('permission:' . TenantPermission::PROJECTS_VIEW->value, only: ['index']),
+            new Middleware('permission:'.TenantPermission::PROJECTS_VIEW->value, only: ['index']),
 
             // Create permission
-            new Middleware('permission:' . TenantPermission::PROJECTS_CREATE->value, only: ['store']),
+            new Middleware('permission:'.TenantPermission::PROJECTS_CREATE->value, only: ['store']),
 
             // Update and delete use authorize() in methods
         ];

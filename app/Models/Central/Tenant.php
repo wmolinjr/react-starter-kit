@@ -2,7 +2,6 @@
 
 namespace App\Models\Central;
 
-use App\Enums\AddonType;
 use App\Enums\PlanLimit;
 use App\Enums\TenantConfigKey;
 use App\Models\Tenant\User as TenantUser;
@@ -12,13 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Cashier\Billable;
 use Laravel\Pennant\Concerns\HasFeatures;
-use Stancl\Tenancy\Database\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasInternalKeys;
 use Stancl\Tenancy\Database\Concerns\TenantRun;
+use Stancl\Tenancy\Database\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Events;
 use Stancl\VirtualColumn\VirtualColumn;
 
@@ -32,7 +30,7 @@ use Stancl\VirtualColumn\VirtualColumn;
  */
 class Tenant extends Model implements TenantWithDatabase
 {
-    use CentralConnection, HasFactory, HasUuids, Billable, HasDatabase, HasFeatures, HasInternalKeys, TenantRun, VirtualColumn;
+    use CentralConnection, HasDatabase, HasFactory, HasFeatures, HasInternalKeys, HasUuids, TenantRun, VirtualColumn;
 
     /**
      * Bootstrap the model.
@@ -127,9 +125,6 @@ class Tenant extends Model implements TenantWithDatabase
             'plan_limits_override',
             'plan_enabled_permissions',
             'current_usage',
-            'stripe_id',
-            'pm_type',
-            'pm_last_four',
             'trial_ends_at',
             'created_at',
             'updated_at',
@@ -196,17 +191,17 @@ class Tenant extends Model implements TenantWithDatabase
      */
     public function hasActiveSubscriptionViaCustomer(): bool
     {
-        if (!$this->customer) {
+        if (! $this->customer) {
             return false;
         }
 
-        return $this->customer->subscriptionForTenant($this)?->active() ?? false;
+        return $this->customer->subscriptionForTenant($this)?->isActive() ?? false;
     }
 
     /**
      * Get the active subscription for this tenant via customer.
      */
-    public function getSubscriptionViaCustomer(): ?\Laravel\Cashier\Subscription
+    public function getSubscriptionViaCustomer(): ?Subscription
     {
         return $this->customer?->subscriptionForTenant($this);
     }
@@ -214,9 +209,15 @@ class Tenant extends Model implements TenantWithDatabase
     /**
      * Get payment method (tenant override or customer default).
      */
-    public function getPaymentMethod(): ?object
+    public function getPaymentMethod(): ?PaymentMethod
     {
-        return $this->customer?->paymentMethodForTenant($this);
+        // First check if tenant has a specific payment method
+        if ($this->payment_method_id) {
+            return PaymentMethod::find($this->payment_method_id);
+        }
+
+        // Fallback to customer's default
+        return $this->customer?->getDefaultPaymentMethod();
     }
 
     /**
@@ -253,7 +254,7 @@ class Tenant extends Model implements TenantWithDatabase
      * - Queries users directly from tenant database
      * - Uses Spatie Permission for role filtering
      *
-     * @param string $roleName Role name (owner, admin, member, guest)
+     * @param  string  $roleName  Role name (owner, admin, member, guest)
      * @return \Illuminate\Support\Collection<TenantUser>
      */
     public function getUsersByRole(string $roleName): \Illuminate\Support\Collection
@@ -305,8 +306,6 @@ class Tenant extends Model implements TenantWithDatabase
 
     /**
      * Count users in this tenant
-     *
-     * @return int
      */
     public function getUserCount(): int
     {
@@ -330,13 +329,13 @@ class Tenant extends Model implements TenantWithDatabase
     {
         $domain = $this->primaryDomain();
 
-        if (!$domain) {
+        if (! $domain) {
             return config('app.url');
         }
 
         $protocol = config('app.env') === 'local' ? 'http://' : 'https://';
 
-        return $protocol . $domain->domain;
+        return $protocol.$domain->domain;
     }
 
     /**
@@ -526,20 +525,21 @@ class Tenant extends Model implements TenantWithDatabase
      */
     public function regeneratePlanPermissions(): array
     {
-        if (!$this->plan) {
+        if (! $this->plan) {
             return [];
         }
 
         // Check if tenant database exists (skip during initial creation)
         $database = $this->database()->getName();
-        if (!$this->database()->manager()->databaseExists($database)) {
+        if (! $this->database()->manager()->databaseExists($database)) {
             \Illuminate\Support\Facades\Log::info("Skipping regeneratePlanPermissions - tenant database {$database} does not exist yet");
+
             return [];
         }
 
         // Initialize tenancy to access permissions in tenant database
         $wasInitialized = tenancy()->initialized;
-        if (!$wasInitialized) {
+        if (! $wasInitialized) {
             tenancy()->initialize($this);
         }
 
@@ -553,7 +553,7 @@ class Tenant extends Model implements TenantWithDatabase
 
             return $expanded;
         } finally {
-            if (!$wasInitialized) {
+            if (! $wasInitialized) {
                 tenancy()->end();
             }
         }
@@ -671,23 +671,5 @@ class Tenant extends Model implements TenantWithDatabase
         return $this->activeAddons()
             ->where('addon_slug', $addonSlug)
             ->sum('quantity');
-    }
-
-    /**
-     * Stripe customer name para Cashier
-     */
-    public function stripeCustomerName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Stripe customer email para Cashier
-     */
-    public function stripeEmail(): string
-    {
-        $owner = $this->owners()->first();
-
-        return $owner?->email ?? 'noreply@example.com';
     }
 }

@@ -119,7 +119,7 @@ class Permission extends SpatiePermission
             ->first();
 
         if (! $permission) {
-            throw new \Spatie\Permission\Exceptions\PermissionDoesNotExist();
+            throw new \Spatie\Permission\Exceptions\PermissionDoesNotExist;
         }
 
         return $permission;

@@ -24,12 +24,12 @@ class AutoFederateNewUser implements ShouldQueue
 
         // Check if tenant is federated
         $group = $this->federationService->getCurrentGroup();
-        if (!$group) {
+        if (! $group) {
             return;
         }
 
         // Check if auto-federate is enabled
-        if (!$group->shouldAutoFederateNewUsers()) {
+        if (! $group->shouldAutoFederateNewUsers()) {
             return;
         }
 

@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Jobs\Central\SyncTenantPermissions;
-use App\Models\Shared\Permission;
 use App\Models\Central\Plan;
-use App\Models\Shared\Role;
 use App\Models\Central\Tenant;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use App\Services\Central\PlanPermissionResolver;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
@@ -14,7 +14,6 @@ use Tests\TestCase;
 
 class SyncTenantPermissionsTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,7 +33,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         // Create domain for tenant
         $tenant->domains()->create([
-            'domain' => $tenant->slug . '.test',
+            'domain' => $tenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -46,7 +45,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         // Run the job
         $job = new SyncTenantPermissions($tenant);
-        $job->handle(new PlanPermissionResolver());
+        $job->handle(new PlanPermissionResolver);
 
         // Permissions should have been created
         $this->assertDatabaseHas('permissions', [
@@ -72,7 +71,7 @@ class SyncTenantPermissionsTest extends TestCase
         ]);
 
         $tenant->domains()->create([
-            'domain' => $tenant->slug . '.test',
+            'domain' => $tenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -83,7 +82,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         // Run the job
         $job = new SyncTenantPermissions($tenant);
-        $job->handle(new PlanPermissionResolver());
+        $job->handle(new PlanPermissionResolver);
 
         tenancy()->end();
 
@@ -103,7 +102,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         $tenant = Tenant::factory()->create(['plan_id' => $proPlan->id]);
         $tenant->domains()->create([
-            'domain' => $tenant->slug . '.test',
+            'domain' => $tenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -138,7 +137,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         // Run job with isDowngrade=true
         $job = new SyncTenantPermissions($tenant, isDowngrade: true);
-        $job->handle(new PlanPermissionResolver());
+        $job->handle(new PlanPermissionResolver);
 
         // Refresh role
         $customRole->refresh();
@@ -159,7 +158,7 @@ class SyncTenantPermissionsTest extends TestCase
         $proPlan = Plan::where('slug', 'professional')->first();
         $tenant = Tenant::factory()->create(['plan_id' => $proPlan->id]);
         $tenant->domains()->create([
-            'domain' => $tenant->slug . '.test',
+            'domain' => $tenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -192,7 +191,7 @@ class SyncTenantPermissionsTest extends TestCase
 
         // Run the job
         $job = new SyncTenantPermissions($tenant);
-        $job->handle(new PlanPermissionResolver());
+        $job->handle(new PlanPermissionResolver);
 
         // Refresh roles
         $ownerRole->refresh();
@@ -238,7 +237,7 @@ class SyncTenantPermissionsTest extends TestCase
         $job = new SyncTenantPermissions($tenant);
         $tags = $job->tags();
 
-        $this->assertContains('tenant:' . $tenant->id, $tags);
+        $this->assertContains('tenant:'.$tenant->id, $tags);
         $this->assertContains('sync-permissions', $tags);
     }
 
@@ -248,7 +247,7 @@ class SyncTenantPermissionsTest extends TestCase
         $proPlan = Plan::where('slug', 'professional')->first();
         $tenant = Tenant::factory()->create(['plan_id' => $proPlan->id]);
         $tenant->domains()->create([
-            'domain' => $tenant->slug . '.test',
+            'domain' => $tenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -265,7 +264,7 @@ class SyncTenantPermissionsTest extends TestCase
         $memberRole->syncPermissions([]);
 
         $job = new SyncTenantPermissions($tenant);
-        $job->handle(new PlanPermissionResolver());
+        $job->handle(new PlanPermissionResolver);
 
         $memberRole->refresh();
         $memberPermissions = $memberRole->permissions->pluck('name')->toArray();

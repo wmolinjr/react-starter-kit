@@ -8,11 +8,11 @@ use Illuminate\Console\Command;
 use Stripe\StripeClient;
 
 use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\info;
-use function Laravel\Prompts\warning;
 use function Laravel\Prompts\error;
-use function Laravel\Prompts\table;
+use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\table;
+use function Laravel\Prompts\warning;
 
 class StripeCleanupCommand extends Command
 {
@@ -29,9 +29,13 @@ class StripeCleanupCommand extends Command
     private StripeClient $stripe;
 
     private int $deletedProducts = 0;
+
     private int $archivedProducts = 0;
+
     private int $archivedPrices = 0;
+
     private int $deletedCustomers = 0;
+
     private int $cancelledSubscriptions = 0;
 
     public function handle(): int
@@ -39,6 +43,7 @@ class StripeCleanupCommand extends Command
         // Safety check - only allow in local/testing environments
         if (app()->environment('production')) {
             error('This command cannot be run in production!');
+
             return self::FAILURE;
         }
 
@@ -46,7 +51,8 @@ class StripeCleanupCommand extends Command
         $stripeKey = config('cashier.secret');
         if (! str_starts_with($stripeKey, 'sk_test_')) {
             error('This command only works with Stripe TEST keys (sk_test_*)');
-            error('Current key starts with: ' . substr($stripeKey, 0, 10) . '...');
+            error('Current key starts with: '.substr($stripeKey, 0, 10).'...');
+
             return self::FAILURE;
         }
 
@@ -97,6 +103,7 @@ class StripeCleanupCommand extends Command
 
             if (! confirm('Are you sure you want to proceed?', default: false)) {
                 info('Aborted.');
+
                 return self::SUCCESS;
             }
         }
@@ -172,7 +179,7 @@ class StripeCleanupCommand extends Command
                 $priceData[] = [
                     $price->id,
                     $price->product,
-                    $amount . ' ' . strtoupper($price->currency),
+                    $amount.' '.strtoupper($price->currency),
                     $price->recurring ? $price->recurring->interval : 'one-time',
                 ];
             }
@@ -249,7 +256,7 @@ class StripeCleanupCommand extends Command
                 $this->cancelledSubscriptions++;
                 $this->line("  Cancelled: {$subscription->id}");
             } catch (\Exception $e) {
-                warning("  Failed to cancel {$subscription->id}: " . $e->getMessage());
+                warning("  Failed to cancel {$subscription->id}: ".$e->getMessage());
             }
         }
 
@@ -265,7 +272,7 @@ class StripeCleanupCommand extends Command
                 $this->cancelledSubscriptions++;
                 $this->line("  Cancelled: {$subscription->id}");
             } catch (\Exception $e) {
-                warning("  Failed to cancel {$subscription->id}: " . $e->getMessage());
+                warning("  Failed to cancel {$subscription->id}: ".$e->getMessage());
             }
         }
     }
@@ -291,7 +298,7 @@ class StripeCleanupCommand extends Command
                     $this->deletedCustomers++;
                     $this->line("  Deleted: {$customer->id} ({$customer->email})");
                 } catch (\Exception $e) {
-                    warning("  Failed to delete {$customer->id}: " . $e->getMessage());
+                    warning("  Failed to delete {$customer->id}: ".$e->getMessage());
                 }
             }
 
@@ -324,7 +331,7 @@ class StripeCleanupCommand extends Command
                     $this->archivedPrices++;
                     $this->line("  Archived price: {$price->id}");
                 } catch (\Exception $e) {
-                    warning("  Failed to archive price {$price->id}: " . $e->getMessage());
+                    warning("  Failed to archive price {$price->id}: ".$e->getMessage());
                 }
             }
 
@@ -361,7 +368,7 @@ class StripeCleanupCommand extends Command
                         $this->archivedProducts++;
                         $this->line("  Archived: {$product->id} ({$product->name})");
                     } catch (\Exception $e2) {
-                        warning("  Failed to cleanup {$product->id}: " . $e2->getMessage());
+                        warning("  Failed to cleanup {$product->id}: ".$e2->getMessage());
                     }
                 }
             }

@@ -3,13 +3,11 @@
 namespace Tests\Feature\Central;
 
 use App\Enums\CentralPermission;
-use App\Models\Central\FederatedUser;
-use App\Models\Central\FederationGroup;
 use App\Enums\FederationSyncStrategy;
+use App\Models\Central\FederationGroup;
 use App\Models\Central\Tenant;
 use App\Models\Central\User;
 use App\Models\Shared\Role;
-use App\Services\Central\FederationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

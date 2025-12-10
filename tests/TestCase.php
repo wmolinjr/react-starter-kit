@@ -40,7 +40,7 @@ abstract class TestCase extends BaseTestCase
         config(['tenancy.queue_database_deletion' => false]);
 
         // Disable domain resolver cache for tests (avoids stale cache issues)
-        config(['tenancy.identification.resolvers.' . \Stancl\Tenancy\Resolvers\DomainTenantResolver::class . '.cache' => false]);
+        config(['tenancy.identification.resolvers.'.\Stancl\Tenancy\Resolvers\DomainTenantResolver::class.'.cache' => false]);
 
         // Run migrations once per test class
         if (! static::$classMigrationsRun) {
@@ -100,7 +100,7 @@ abstract class TestCase extends BaseTestCase
      * IMPORTANT: Use this instead of route() for central routes when there are
      * conflicting tenant routes (e.g., /admin/addons exists in both central and tenant).
      *
-     * @param string $path The path (e.g., '/admin/addons' or 'admin/addons')
+     * @param  string  $path  The path (e.g., '/admin/addons' or 'admin/addons')
      * @return string Full URL with central domain
      */
     protected function centralUrl(string $path): string
@@ -113,8 +113,8 @@ abstract class TestCase extends BaseTestCase
     /**
      * Generate a central URL from a route name.
      *
-     * @param string $name Route name (e.g., 'addons.index')
-     * @param array $parameters Route parameters
+     * @param  string  $name  Route name (e.g., 'addons.index')
+     * @param  array  $parameters  Route parameters
      * @return string Full URL with central domain
      */
     protected function centralRoute(string $name, array $parameters = []): string

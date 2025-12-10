@@ -27,6 +27,7 @@ class FederationGroupTenant extends Pivot
     protected $table = 'federation_group_tenants';
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -142,7 +143,7 @@ class FederationGroupTenant extends Pivot
     public function toggleSync(): bool
     {
         return $this->update([
-            'sync_enabled' => !$this->sync_enabled,
+            'sync_enabled' => ! $this->sync_enabled,
         ]);
     }
 }

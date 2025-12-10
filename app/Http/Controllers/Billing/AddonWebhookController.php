@@ -20,8 +20,7 @@ class AddonWebhookController extends CashierWebhookController
         protected AddonService $addonService,
         protected CheckoutService $checkoutService,
         protected MeteredBillingService $meteredService
-    ) {
-    }
+    ) {}
 
     /**
      * Handle checkout.session.completed webhook

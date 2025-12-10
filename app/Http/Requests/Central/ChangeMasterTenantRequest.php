@@ -24,7 +24,7 @@ class ChangeMasterTenantRequest extends FormRequest
                 'exists:tenants,id',
                 // Must be a member of the group
                 function ($attribute, $value, $fail) use ($group) {
-                    if (!$group->hasTenant($value)) {
+                    if (! $group->hasTenant($value)) {
                         $fail(__('validation.federation.tenant_not_in_group'));
                     }
                 },

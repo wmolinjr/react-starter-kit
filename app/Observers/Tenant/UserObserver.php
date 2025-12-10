@@ -18,7 +18,7 @@ class UserObserver
     public function created(User $user): void
     {
         // Only track for tenant users
-        if (!tenancy()->initialized) {
+        if (! tenancy()->initialized) {
             return;
         }
 
@@ -34,7 +34,7 @@ class UserObserver
     public function deleted(User $user): void
     {
         // Only track for tenant users
-        if (!tenancy()->initialized) {
+        if (! tenancy()->initialized) {
             return;
         }
 

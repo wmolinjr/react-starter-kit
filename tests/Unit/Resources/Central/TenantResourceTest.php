@@ -4,7 +4,6 @@ namespace Tests\Unit\Resources\Central;
 
 use App\Http\Resources\Central\DomainResource;
 use App\Http\Resources\Central\PlanSummaryResource;
-use App\Http\Resources\Central\TenantDetailResource;
 use App\Http\Resources\Central\TenantEditResource;
 use App\Models\Central\Domain;
 use App\Models\Central\Plan;

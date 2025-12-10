@@ -19,6 +19,7 @@ class TenantConfigSettingsTest extends TestCase
     use RefreshDatabase;
 
     protected Tenant $tenant;
+
     protected TenantSettingsService $service;
 
     protected function setUp(): void
@@ -30,15 +31,15 @@ class TenantConfigSettingsTest extends TestCase
 
         // Create tenant
         $this->tenant = Tenant::factory()->create([
-            'slug' => 'config-test-' . uniqid(),
+            'slug' => 'config-test-'.uniqid(),
         ]);
 
         $this->tenant->domains()->create([
-            'domain' => $this->tenant->slug . '.myapp.test',
+            'domain' => $this->tenant->slug.'.myapp.test',
             'is_primary' => true,
         ]);
 
-        $this->service = new TenantSettingsService();
+        $this->service = new TenantSettingsService;
     }
 
     public function test_get_config_settings_returns_correct_structure(): void

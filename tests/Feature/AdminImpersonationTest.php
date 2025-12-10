@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Central\User as Admin;
 use App\Models\Central\Tenant;
+use App\Models\Central\User as Admin;
 use Database\Seeders\PlanSeeder;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;

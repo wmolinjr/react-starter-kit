@@ -54,14 +54,15 @@ class DomainObserver
     protected function invalidateTenantCache(Domain $domain, string $event): void
     {
         // Only invalidate if caching is enabled
-        if (!DomainTenantResolver::shouldCache()) {
+        if (! DomainTenantResolver::shouldCache()) {
             return;
         }
 
         $tenant = $domain->tenant;
 
-        if (!$tenant) {
+        if (! $tenant) {
             Log::warning("DomainObserver: Domain {$domain->domain} has no tenant, skipping cache invalidation");
+
             return;
         }
 

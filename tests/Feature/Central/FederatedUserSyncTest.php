@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Central;
 
+use App\Enums\FederatedUserLinkSyncStatus;
 use App\Enums\FederatedUserStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederatedUserLink;
 use App\Models\Central\FederationGroup;
-use App\Enums\FederationSyncStrategy;
-use App\Enums\FederatedUserLinkSyncStatus;
-use App\Models\Central\FederationGroupTenant;
 use App\Models\Central\Tenant;
 use App\Services\Central\FederationService;
 use App\Services\Central\FederationSyncService;

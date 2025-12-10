@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners\Central;
 
+use App\Events\Payment\WebhookReceived;
 use App\Jobs\Central\SyncTenantPermissions;
+use App\Models\Central\Customer;
 use App\Models\Central\Plan;
-use App\Models\Central\Tenant;
 use App\Services\Central\PlanPermissionResolver;
 use Illuminate\Support\Facades\Log;
-use Laravel\Cashier\Events\WebhookReceived;
 
 /**
  * SyncPermissionsOnSubscriptionChange
  *
- * Listens for Stripe webhook events related to subscription changes
+ * Listens for payment provider webhook events related to subscription changes
  * and syncs tenant permissions accordingly.
  *
  * Handles:
@@ -21,14 +23,14 @@ use Laravel\Cashier\Events\WebhookReceived;
  * - customer.subscription.created (new subscription)
  *
  * ARCHITECTURE:
- * - Updates tenant's plan_id based on Stripe price ID
+ * - Updates tenant's plan_id based on provider price ID
  * - Dispatches SyncTenantPermissions job for async processing
  * - Detects downgrade for proper permission cleanup
  */
 class SyncPermissionsOnSubscriptionChange
 {
     /**
-     * Stripe event types we handle.
+     * Event types we handle (Stripe format).
      */
     protected array $handledEvents = [
         'customer.subscription.updated',
@@ -41,9 +43,15 @@ class SyncPermissionsOnSubscriptionChange
      */
     public function handle(WebhookReceived $event): void
     {
-        $eventType = $event->payload['type'] ?? '';
+        // Only handle Stripe for now
+        // TODO: Add support for other providers
+        if (! $event->isFromProvider('stripe')) {
+            return;
+        }
 
-        if (!in_array($eventType, $this->handledEvents)) {
+        $eventType = $event->getType();
+
+        if (! in_array($eventType, $this->handledEvents)) {
             return;
         }
 
@@ -62,10 +70,11 @@ class SyncPermissionsOnSubscriptionChange
      */
     protected function handleSubscriptionUpdated(WebhookReceived $event): void
     {
-        $customerId = $event->payload['data']['object']['customer'] ?? null;
-        $status = $event->payload['data']['object']['status'] ?? null;
+        $object = $event->getObject();
+        $providerCustomerId = $object['customer'] ?? null;
+        $status = $object['status'] ?? null;
 
-        if (!$customerId) {
+        if (! $providerCustomerId) {
             return;
         }
 
@@ -74,40 +83,43 @@ class SyncPermissionsOnSubscriptionChange
             return;
         }
 
-        $tenant = Tenant::where('stripe_id', $customerId)->first();
+        $customer = $this->findCustomerByProviderId($event->provider, $providerCustomerId);
 
-        if (!$tenant) {
-            Log::warning("SyncPermissionsOnSubscriptionChange: Tenant not found for customer {$customerId}");
+        if (! $customer) {
+            Log::warning("SyncPermissionsOnSubscriptionChange: Customer not found for provider customer {$providerCustomerId}");
+
             return;
         }
 
         // Get the new price ID from the subscription
         $priceId = $this->extractPriceId($event->payload);
 
-        if (!$priceId) {
+        if (! $priceId) {
             return;
         }
 
-        // Find the plan by Stripe price ID
+        // Find the plan by provider price ID
         $newPlan = $this->findPlanByPriceId($priceId);
 
-        if (!$newPlan) {
+        if (! $newPlan) {
             Log::warning("SyncPermissionsOnSubscriptionChange: Plan not found for price {$priceId}");
+
             return;
         }
 
-        // Check if this is a downgrade
-        $oldPlan = $tenant->plan;
-        $isDowngrade = $this->isDowngrade($oldPlan, $newPlan);
+        // Update all tenants owned by this customer
+        foreach ($customer->ownedTenants as $tenant) {
+            $oldPlan = $tenant->plan;
+            $isDowngrade = $this->isDowngrade($oldPlan, $newPlan);
 
-        // Update tenant's plan (this will trigger TenantObserver)
-        if ($tenant->plan_id !== $newPlan->id) {
-            Log::info("SyncPermissionsOnSubscriptionChange: Updating tenant {$tenant->id} from plan {$oldPlan?->slug} to {$newPlan->slug}");
+            if ($tenant->plan_id !== $newPlan->id) {
+                Log::info("SyncPermissionsOnSubscriptionChange: Updating tenant {$tenant->id} from plan {$oldPlan?->slug} to {$newPlan->slug}");
 
-            $tenant->update(['plan_id' => $newPlan->id]);
+                $tenant->update(['plan_id' => $newPlan->id]);
 
-            // Dispatch async job for permission sync (in addition to observer)
-            SyncTenantPermissions::dispatch($tenant, $isDowngrade);
+                // Dispatch async job for permission sync
+                SyncTenantPermissions::dispatch($tenant, $isDowngrade);
+            }
         }
     }
 
@@ -116,27 +128,25 @@ class SyncPermissionsOnSubscriptionChange
      */
     protected function handleSubscriptionDeleted(WebhookReceived $event): void
     {
-        $customerId = $event->payload['data']['object']['customer'] ?? null;
+        $object = $event->getObject();
+        $providerCustomerId = $object['customer'] ?? null;
 
-        if (!$customerId) {
+        if (! $providerCustomerId) {
             return;
         }
 
-        $tenant = Tenant::where('stripe_id', $customerId)->first();
+        $customer = $this->findCustomerByProviderId($event->provider, $providerCustomerId);
 
-        if (!$tenant) {
+        if (! $customer) {
             return;
         }
 
-        Log::info("SyncPermissionsOnSubscriptionChange: Subscription canceled for tenant {$tenant->id}");
+        Log::info("SyncPermissionsOnSubscriptionChange: Subscription canceled for customer {$customer->id}");
 
-        // When subscription is canceled, we might want to:
-        // 1. Set plan to a free tier (if exists)
-        // 2. Or set plan_id to null
-        // For now, we don't change the plan automatically - let the admin decide
-        // But we do sync permissions to ensure they reflect current state
-
-        SyncTenantPermissions::dispatch($tenant, isDowngrade: true);
+        // Sync permissions for all tenants owned by this customer
+        foreach ($customer->ownedTenants as $tenant) {
+            SyncTenantPermissions::dispatch($tenant, isDowngrade: true);
+        }
     }
 
     /**
@@ -144,28 +154,43 @@ class SyncPermissionsOnSubscriptionChange
      */
     protected function handleSubscriptionCreated(WebhookReceived $event): void
     {
-        $customerId = $event->payload['data']['object']['customer'] ?? null;
-        $status = $event->payload['data']['object']['status'] ?? null;
+        $object = $event->getObject();
+        $providerCustomerId = $object['customer'] ?? null;
+        $status = $object['status'] ?? null;
 
-        if (!$customerId || $status !== 'active') {
+        if (! $providerCustomerId || $status !== 'active') {
             return;
         }
 
-        $tenant = Tenant::where('stripe_id', $customerId)->first();
+        $customer = $this->findCustomerByProviderId($event->provider, $providerCustomerId);
 
-        if (!$tenant) {
+        if (! $customer) {
             return;
         }
 
         $priceId = $this->extractPriceId($event->payload);
         $newPlan = $this->findPlanByPriceId($priceId);
 
-        if ($newPlan && $tenant->plan_id !== $newPlan->id) {
-            Log::info("SyncPermissionsOnSubscriptionChange: New subscription for tenant {$tenant->id} with plan {$newPlan->slug}");
-
-            $tenant->update(['plan_id' => $newPlan->id]);
-            SyncTenantPermissions::dispatch($tenant, isDowngrade: false);
+        if (! $newPlan) {
+            return;
         }
+
+        foreach ($customer->ownedTenants as $tenant) {
+            if ($tenant->plan_id !== $newPlan->id) {
+                Log::info("SyncPermissionsOnSubscriptionChange: New subscription for tenant {$tenant->id} with plan {$newPlan->slug}");
+
+                $tenant->update(['plan_id' => $newPlan->id]);
+                SyncTenantPermissions::dispatch($tenant, isDowngrade: false);
+            }
+        }
+    }
+
+    /**
+     * Find customer by provider ID.
+     */
+    protected function findCustomerByProviderId(string $provider, string $providerCustomerId): ?Customer
+    {
+        return Customer::whereJsonContains("provider_ids->{$provider}", $providerCustomerId)->first();
     }
 
     /**
@@ -177,7 +202,7 @@ class SyncPermissionsOnSubscriptionChange
     }
 
     /**
-     * Find plan by Stripe price ID.
+     * Find plan by provider price ID.
      */
     protected function findPlanByPriceId(string $priceId): ?Plan
     {
@@ -191,11 +216,12 @@ class SyncPermissionsOnSubscriptionChange
      */
     protected function isDowngrade(?Plan $oldPlan, Plan $newPlan): bool
     {
-        if (!$oldPlan) {
+        if (! $oldPlan) {
             return false; // New subscription is not a downgrade
         }
 
         $resolver = app(PlanPermissionResolver::class);
+
         return $resolver->isDowngrade($oldPlan, $newPlan);
     }
 }

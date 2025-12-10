@@ -22,8 +22,11 @@ class FederationCacheService
      * Cache key prefixes.
      */
     private const PREFIX_TENANT_GROUP = 'federation:tenant_group:';
+
     private const PREFIX_GROUP_TENANTS = 'federation:group_tenants:';
+
     private const PREFIX_USER_LINKS = 'federation:user_links:';
+
     private const PREFIX_USER_BY_EMAIL = 'federation:user_email:';
 
     // =========================================================================
@@ -36,7 +39,7 @@ class FederationCacheService
     public function getTenantGroup(string $tenantId): ?FederationGroup
     {
         return Cache::remember(
-            self::PREFIX_TENANT_GROUP . $tenantId,
+            self::PREFIX_TENANT_GROUP.$tenantId,
             self::CACHE_TTL,
             function () use ($tenantId) {
                 return FederationGroup::whereHas('tenants', function ($query) use ($tenantId) {
@@ -52,7 +55,7 @@ class FederationCacheService
      */
     public function invalidateTenant(string $tenantId): void
     {
-        Cache::forget(self::PREFIX_TENANT_GROUP . $tenantId);
+        Cache::forget(self::PREFIX_TENANT_GROUP.$tenantId);
     }
 
     // =========================================================================
@@ -65,11 +68,11 @@ class FederationCacheService
     public function getGroupTenantIds(string $groupId): array
     {
         return Cache::remember(
-            self::PREFIX_GROUP_TENANTS . $groupId,
+            self::PREFIX_GROUP_TENANTS.$groupId,
             self::CACHE_TTL,
             function () use ($groupId) {
                 $group = FederationGroup::find($groupId);
-                if (!$group) {
+                if (! $group) {
                     return [];
                 }
 
@@ -83,7 +86,7 @@ class FederationCacheService
      */
     public function invalidateGroup(string $groupId): void
     {
-        Cache::forget(self::PREFIX_GROUP_TENANTS . $groupId);
+        Cache::forget(self::PREFIX_GROUP_TENANTS.$groupId);
     }
 
     // =========================================================================
@@ -96,11 +99,11 @@ class FederationCacheService
     public function getUserLinkedTenantIds(string $federatedUserId): array
     {
         return Cache::remember(
-            self::PREFIX_USER_LINKS . $federatedUserId,
+            self::PREFIX_USER_LINKS.$federatedUserId,
             self::CACHE_TTL,
             function () use ($federatedUserId) {
                 $federatedUser = FederatedUser::find($federatedUserId);
-                if (!$federatedUser) {
+                if (! $federatedUser) {
                     return [];
                 }
 
@@ -114,7 +117,7 @@ class FederationCacheService
      */
     public function invalidateUserLinks(string $federatedUserId): void
     {
-        Cache::forget(self::PREFIX_USER_LINKS . $federatedUserId);
+        Cache::forget(self::PREFIX_USER_LINKS.$federatedUserId);
     }
 
     // =========================================================================
@@ -126,7 +129,7 @@ class FederationCacheService
      */
     public function getUserByEmailInGroup(string $email, string $groupId): ?FederatedUser
     {
-        $cacheKey = self::PREFIX_USER_BY_EMAIL . md5(strtolower($email) . ':' . $groupId);
+        $cacheKey = self::PREFIX_USER_BY_EMAIL.md5(strtolower($email).':'.$groupId);
 
         return Cache::remember(
             $cacheKey,
@@ -142,7 +145,7 @@ class FederationCacheService
      */
     public function invalidateUserByEmail(string $email, string $groupId): void
     {
-        $cacheKey = self::PREFIX_USER_BY_EMAIL . md5(strtolower($email) . ':' . $groupId);
+        $cacheKey = self::PREFIX_USER_BY_EMAIL.md5(strtolower($email).':'.$groupId);
         Cache::forget($cacheKey);
     }
 
@@ -188,7 +191,7 @@ class FederationCacheService
      * Check if we should process a sync for a user/field.
      * Implements debouncing to avoid duplicate syncs.
      *
-     * @param int $debounceSeconds How long to debounce (default: 5 seconds)
+     * @param  int  $debounceSeconds  How long to debounce (default: 5 seconds)
      */
     public function shouldSync(string $federatedUserId, string $field, int $debounceSeconds = 5): bool
     {
@@ -199,6 +202,7 @@ class FederationCacheService
         }
 
         Cache::put($key, true, $debounceSeconds);
+
         return true;
     }
 

@@ -4,11 +4,11 @@ namespace Tests\Feature\Central;
 
 use App\Enums\CentralPermission;
 use App\Enums\FederatedUserStatus;
+use App\Enums\FederationConflictStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationConflict;
 use App\Models\Central\FederationGroup;
-use App\Enums\FederationSyncStrategy;
-use App\Enums\FederationConflictStatus;
 use App\Models\Central\Tenant;
 use App\Models\Central\User;
 use App\Models\Shared\Role;

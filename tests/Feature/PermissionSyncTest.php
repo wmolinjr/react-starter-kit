@@ -3,16 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Central\Plan;
-use App\Models\Shared\Role;
 use App\Models\Central\Tenant;
-use App\Models\Tenant\User;
 use Laravel\Pennant\Feature;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PermissionSyncTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();

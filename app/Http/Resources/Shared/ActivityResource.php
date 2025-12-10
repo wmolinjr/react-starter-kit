@@ -78,11 +78,12 @@ class ActivityResource extends BaseResource
         if (! $this->subject) {
             $properties = $this->properties?->toArray() ?? [];
             if (isset($properties['old']['name'])) {
-                return $properties['old']['name'] . ' (deleted)';
+                return $properties['old']['name'].' (deleted)';
             }
             if (isset($properties['attributes']['name'])) {
                 return $properties['attributes']['name'];
             }
+
             return null;
         }
 

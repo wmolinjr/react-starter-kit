@@ -19,13 +19,13 @@ class ApiTokenController extends Controller implements HasMiddleware
     {
         return [
             // View permission
-            new Middleware('permission:' . TenantPermission::API_TOKENS_VIEW->value, only: ['index']),
+            new Middleware('permission:'.TenantPermission::API_TOKENS_VIEW->value, only: ['index']),
 
             // Create permission
-            new Middleware('permission:' . TenantPermission::API_TOKENS_CREATE->value, only: ['store', 'update']),
+            new Middleware('permission:'.TenantPermission::API_TOKENS_CREATE->value, only: ['store', 'update']),
 
             // Delete permission
-            new Middleware('permission:' . TenantPermission::API_TOKENS_DELETE->value, only: ['destroy']),
+            new Middleware('permission:'.TenantPermission::API_TOKENS_DELETE->value, only: ['destroy']),
         ];
     }
 

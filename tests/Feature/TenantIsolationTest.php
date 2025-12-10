@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Tenant\Project;
 use App\Models\Central\Tenant;
+use App\Models\Tenant\Project;
 use App\Models\Tenant\User;
 use Tests\TenantTestCase;
 

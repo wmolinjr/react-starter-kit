@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class StripeSyncServiceTest extends TestCase
 {
-
     protected StripeSyncService $service;
 
     protected function setUp(): void

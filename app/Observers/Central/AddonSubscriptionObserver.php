@@ -13,9 +13,7 @@ use App\Services\Central\AddonService;
  */
 class AddonSubscriptionObserver
 {
-    public function __construct(protected AddonService $addonService)
-    {
-    }
+    public function __construct(protected AddonService $addonService) {}
 
     public function created(AddonSubscription $subscription): void
     {

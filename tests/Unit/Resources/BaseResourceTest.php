@@ -11,7 +11,8 @@ class BaseResourceTest extends TestCase
 {
     public function test_format_iso_returns_null_for_null_date(): void
     {
-        $resource = new class (null) extends BaseResource {
+        $resource = new class(null) extends BaseResource
+        {
             public function toArray(Request $request): array
             {
                 return ['date' => $this->formatIso(null)];
@@ -27,7 +28,8 @@ class BaseResourceTest extends TestCase
     {
         $date = Carbon::parse('2024-01-15 10:30:00');
 
-        $resource = new class ((object) ['date' => $date]) extends BaseResource {
+        $resource = new class((object) ['date' => $date]) extends BaseResource
+        {
             public function toArray(Request $request): array
             {
                 return ['date' => $this->formatIso($this->resource->date)];
@@ -43,7 +45,8 @@ class BaseResourceTest extends TestCase
     {
         $date = Carbon::parse('2024-01-15 10:30:00');
 
-        $resource = new class ((object) ['date' => $date]) extends BaseResource {
+        $resource = new class((object) ['date' => $date]) extends BaseResource
+        {
             public function toArray(Request $request): array
             {
                 return ['date' => $this->formatDate($this->resource->date, 'Y-m-d')];
@@ -59,7 +62,8 @@ class BaseResourceTest extends TestCase
     {
         $date = Carbon::parse('2024-01-15 10:30:00');
 
-        $resource = new class ((object) ['date' => $date]) extends BaseResource {
+        $resource = new class((object) ['date' => $date]) extends BaseResource
+        {
             public function toArray(Request $request): array
             {
                 return ['date' => $this->formatDateOnly($this->resource->date)];
@@ -73,7 +77,8 @@ class BaseResourceTest extends TestCase
 
     public function test_format_currency_formats_cents_correctly(): void
     {
-        $resource = new class (null) extends BaseResource {
+        $resource = new class(null) extends BaseResource
+        {
             public function toArray(Request $request): array
             {
                 return [

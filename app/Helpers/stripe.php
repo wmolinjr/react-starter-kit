@@ -5,7 +5,6 @@
  *
  * @see https://stripe.com/docs/checkout/customization#supported-locales
  */
-
 if (! function_exists('stripe_locale')) {
     /**
      * Stripe supported locales (34 languages).
@@ -89,7 +88,7 @@ if (! function_exists('stripe_currency')) {
      */
     function stripe_currency(): string
     {
-        return strtolower(config('cashier.currency', 'usd'));
+        return strtolower(config('payment.currency', 'brl'));
     }
 }
 
@@ -142,13 +141,14 @@ if (! function_exists('format_stripe_price')) {
     function format_stripe_price(int $cents, ?string $currency = null, ?string $locale = null): string
     {
         $currency = strtoupper($currency ?? stripe_currency());
-        $locale = $locale ?? config('cashier.currency_locale', 'en');
+        $locale = $locale ?? config('app.locale', 'en');
 
         // Convert underscore to hyphen for NumberFormatter (e.g., pt_BR -> pt-BR)
         $formatterLocale = str_replace('_', '-', $locale);
 
         if (class_exists(\NumberFormatter::class)) {
             $formatter = new \NumberFormatter($formatterLocale, \NumberFormatter::CURRENCY);
+
             return $formatter->formatCurrency($cents / 100, $currency);
         }
 
@@ -171,7 +171,7 @@ if (! function_exists('stripe_currency_config')) {
         return [
             'code' => stripe_currency(),
             'symbol' => stripe_currency_symbol(),
-            'locale' => config('cashier.currency_locale', 'en'),
+            'locale' => config('app.locale', 'en'),
         ];
     }
 }

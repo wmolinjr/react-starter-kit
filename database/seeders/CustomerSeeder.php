@@ -34,8 +34,9 @@ class CustomerSeeder extends Seeder
         $tenant2 = Tenant::where('slug', 'startup')->first();
         $tenant3 = Tenant::where('slug', 'enterprise')->first();
 
-        if (!$tenant1 || !$tenant2 || !$tenant3) {
+        if (! $tenant1 || ! $tenant2 || ! $tenant3) {
             $this->command->error('Tenants not found! Run TenantSeeder first.');
+
             return;
         }
 
@@ -133,7 +134,7 @@ class CustomerSeeder extends Seeder
         ?array $billingAddress = null
     ): Customer {
         $customer = Customer::create([
-            'global_id' => 'cust_' . Str::orderedUuid()->toString(),
+            'global_id' => 'cust_'.Str::orderedUuid()->toString(),
             'name' => $name,
             'email' => $email,
             'password' => 'password', // Will be hashed by model cast

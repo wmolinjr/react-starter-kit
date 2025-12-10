@@ -40,7 +40,7 @@ class InvoiceController extends Controller
 
         $invoiceObj = $customer->findInvoice($invoice);
 
-        if (!$invoiceObj) {
+        if (! $invoiceObj) {
             abort(404);
         }
 

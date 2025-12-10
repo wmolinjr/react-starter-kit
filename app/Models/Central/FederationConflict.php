@@ -63,7 +63,9 @@ class FederationConflict extends Model
      * Resolution constants.
      */
     public const RESOLUTION_MASTER_VALUE = 'master_value';
+
     public const RESOLUTION_MANUAL = 'manual';
+
     public const RESOLUTION_DISMISSED = 'dismissed';
 
     /**

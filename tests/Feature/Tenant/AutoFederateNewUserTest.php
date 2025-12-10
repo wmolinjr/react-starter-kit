@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Tenant;
 
+use App\Enums\FederatedUserStatus;
+use App\Enums\FederationSyncStrategy;
 use App\Events\Tenant\UserCreated;
 use App\Listeners\Tenant\AutoFederateNewUser;
-use App\Enums\FederatedUserStatus;
 use App\Models\Central\FederatedUser;
 use App\Models\Central\FederationGroup;
-use App\Enums\FederationSyncStrategy;
 use App\Models\Central\Tenant;
 use App\Models\Tenant\User;
 use App\Services\Central\FederationService as CentralFederationService;
@@ -44,11 +44,11 @@ class AutoFederateNewUserTest extends TenantTestCase
         $professionalPlan = \App\Models\Central\Plan::where('slug', 'professional')->first();
         $this->branchTenant = Tenant::factory()->create([
             'name' => 'Branch Tenant',
-            'slug' => 'branch-tenant-' . uniqid(),
+            'slug' => 'branch-tenant-'.uniqid(),
             'plan_id' => $professionalPlan?->id,
         ]);
         $this->branchTenant->domains()->create([
-            'domain' => $this->branchTenant->slug . '.test',
+            'domain' => $this->branchTenant->slug.'.test',
             'is_primary' => true,
         ]);
 
@@ -224,9 +224,9 @@ class AutoFederateNewUserTest extends TenantTestCase
         // End tenancy and create a non-federated tenant
         tenancy()->end();
 
-        $nonFederatedTenant = Tenant::factory()->create(['slug' => 'non-fed-' . $uniqueId]);
+        $nonFederatedTenant = Tenant::factory()->create(['slug' => 'non-fed-'.$uniqueId]);
         $nonFederatedTenant->domains()->create([
-            'domain' => $nonFederatedTenant->slug . '.test',
+            'domain' => $nonFederatedTenant->slug.'.test',
             'is_primary' => true,
         ]);
 

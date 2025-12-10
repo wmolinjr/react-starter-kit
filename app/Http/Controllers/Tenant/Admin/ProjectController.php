@@ -11,7 +11,6 @@ use App\Http\Resources\Tenant\ProjectDetailResource;
 use App\Http\Resources\Tenant\ProjectEditResource;
 use App\Http\Resources\Tenant\ProjectResource;
 use App\Models\Tenant\Project;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;

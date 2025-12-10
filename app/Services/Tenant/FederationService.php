@@ -42,7 +42,7 @@ class FederationService
     public function getCurrentGroup(): ?FederationGroup
     {
         $tenant = tenant();
-        if (!$tenant) {
+        if (! $tenant) {
             return null;
         }
 
@@ -74,7 +74,7 @@ class FederationService
     public function getMembership(): ?FederationGroupTenant
     {
         $tenant = tenant();
-        if (!$tenant) {
+        if (! $tenant) {
             return null;
         }
 
@@ -116,12 +116,12 @@ class FederationService
      */
     public function getUserFederationInfo(User $user): ?array
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             return null;
         }
 
         $federatedUser = $user->getFederatedUser();
-        if (!$federatedUser) {
+        if (! $federatedUser) {
             return null;
         }
 
@@ -176,7 +176,7 @@ class FederationService
         $group = $this->getCurrentGroup();
         $tenant = tenant();
 
-        if (!$group || !$tenant) {
+        if (! $group || ! $tenant) {
             throw FederationException::notInFederationGroup();
         }
 
@@ -195,6 +195,7 @@ class FederationService
         // Create new federated user
         // Use central connection for transaction since FederatedUser/Link are in central database
         $centralConnection = config('tenancy.database.central_connection');
+
         return DB::connection($centralConnection)->transaction(function () use ($user, $group, $tenant) {
             $syncedData = $user->toFederationSyncData();
 
@@ -281,7 +282,7 @@ class FederationService
      */
     public function unfederateUser(User $user): void
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             throw FederationException::userNotFederated($user->email);
         }
 
@@ -313,7 +314,7 @@ class FederationService
      */
     public function syncUserToFederation(User $user): void
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             return;
         }
 
@@ -323,14 +324,14 @@ class FederationService
 
         // Check if we can sync (master_wins strategy)
         if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
-            if (!$group->isMaster($tenant)) {
+            if (! $group->isMaster($tenant)) {
                 // Non-master tenants can't initiate sync with master_wins
                 return;
             }
         }
 
         // Check debounce
-        if (!$this->cacheService->shouldSync($federatedUser->id, 'profile')) {
+        if (! $this->cacheService->shouldSync($federatedUser->id, 'profile')) {
             return;
         }
 
@@ -349,7 +350,7 @@ class FederationService
      */
     public function syncPasswordToFederation(User $user, string $hashedPassword): void
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             return;
         }
 
@@ -359,7 +360,7 @@ class FederationService
 
         // Check if we can sync
         if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
-            if (!$group->isMaster($tenant)) {
+            if (! $group->isMaster($tenant)) {
                 return;
             }
         }
@@ -374,7 +375,7 @@ class FederationService
      */
     public function syncTwoFactorToFederation(User $user): void
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             return;
         }
 
@@ -384,7 +385,7 @@ class FederationService
 
         // Check if we can sync
         if ($group->sync_strategy === FederationSyncStrategy::MASTER_WINS) {
-            if (!$group->isMaster($tenant)) {
+            if (! $group->isMaster($tenant)) {
                 return;
             }
         }
@@ -406,7 +407,7 @@ class FederationService
      */
     public function applyFederationDataToUser(User $user): void
     {
-        if (!$user->isFederated()) {
+        if (! $user->isFederated()) {
             return;
         }
 
@@ -433,18 +434,18 @@ class FederationService
     public function findOrCreateFromFederation(string $email): ?User
     {
         $group = $this->getCurrentGroup();
-        if (!$group) {
+        if (! $group) {
             return null;
         }
 
         // Check if auto-create is enabled
-        if (!$group->shouldAutoCreateOnLogin()) {
+        if (! $group->shouldAutoCreateOnLogin()) {
             return null;
         }
 
         // Find federated user
         $federatedUser = FederatedUser::findByEmailInGroup($email, $group->id);
-        if (!$federatedUser) {
+        if (! $federatedUser) {
             return null;
         }
 
@@ -452,9 +453,10 @@ class FederationService
         $existingUser = User::where('email', $email)->first();
         if ($existingUser) {
             // Link if not already linked
-            if (!$existingUser->isFederated()) {
+            if (! $existingUser->isFederated()) {
                 $this->linkUserToFederatedUser($existingUser, $federatedUser);
             }
+
             return $existingUser;
         }
 
@@ -489,7 +491,7 @@ class FederationService
             $user->forceFill(['federated_user_id' => $federatedUser->id])->save();
 
             // Apply 2FA if enabled
-            if (!empty($syncedData['two_factor_secret'])) {
+            if (! empty($syncedData['two_factor_secret'])) {
                 $user->two_factor_secret = $syncedData['two_factor_secret'];
                 $user->two_factor_recovery_codes = $syncedData['two_factor_recovery_codes'] ?? null;
                 $user->two_factor_confirmed_at = isset($syncedData['two_factor_confirmed_at'])
@@ -538,7 +540,7 @@ class FederationService
     {
         $group = $this->getCurrentGroup();
 
-        if (!$group) {
+        if (! $group) {
             return [
                 'is_federated' => false,
             ];

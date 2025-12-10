@@ -157,6 +157,7 @@ class User extends Authenticatable
     public function getRoleDisplayName(): ?string
     {
         $role = $this->roles->first();
+
         return $role?->display_name ?? $role?->name;
     }
 

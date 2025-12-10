@@ -93,7 +93,7 @@ class TwoFactorAuthenticationTest extends TestCase
 
         // Generate a valid code using the secret
         $secret = decrypt($this->admin->two_factor_secret);
-        $google2fa = new \PragmaRX\Google2FA\Google2FA();
+        $google2fa = new \PragmaRX\Google2FA\Google2FA;
         $code = $google2fa->getCurrentOtp($secret);
 
         $response = $this->actingAs($this->admin, 'central')

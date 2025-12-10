@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Customer\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Central\Customer;
 use App\Services\Central\CustomerService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;

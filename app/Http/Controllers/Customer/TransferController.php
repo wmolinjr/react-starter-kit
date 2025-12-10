@@ -83,7 +83,7 @@ class TransferController extends Controller
             return Inertia::render('customer/transfers/expired');
         }
 
-        if (!$transfer->canBeAccepted()) {
+        if (! $transfer->canBeAccepted()) {
             return Inertia::render('customer/transfers/invalid', [
                 'status' => $transfer->status,
             ]);
@@ -117,7 +117,7 @@ class TransferController extends Controller
 
         $customer = $request->user('customer');
 
-        if (!$customer) {
+        if (! $customer) {
             // Redirect to login with return URL
             return redirect()->route('customer.login')
                 ->with('intended_url', route('customer.transfers.accept.show', $token));

@@ -185,6 +185,7 @@ class FederatedUser extends Model
     public function getLinkForTenant(Tenant|string $tenant): ?FederatedUserLink
     {
         $tenantId = $tenant instanceof Tenant ? $tenant->id : $tenant;
+
         return $this->links()->where('tenant_id', $tenantId)->first();
     }
 

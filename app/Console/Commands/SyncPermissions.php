@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Shared\Permission;
-use App\Models\Shared\Role;
 use App\Enums\CentralPermission;
 use App\Enums\TenantPermission;
+use App\Models\Shared\Permission;
+use App\Models\Shared\Role;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 
@@ -71,6 +71,7 @@ class SyncPermissions extends Command
 
             if (! $this->confirm('Are you sure? This will delete ALL permissions and roles!', false)) {
                 $this->error('❌ Operation cancelled.');
+
                 return self::FAILURE;
             }
 
@@ -219,7 +220,7 @@ class SyncPermissions extends Command
 
         // Show tenant permission count (for reference - seeded per tenant database)
         $tenantPermissions = TenantPermission::toSeederArray();
-        $this->info("📋 Tenant Permissions (guard: tenant, seeded per tenant database): " . count($tenantPermissions) . " permissions");
+        $this->info('📋 Tenant Permissions (guard: tenant, seeded per tenant database): '.count($tenantPermissions).' permissions');
         $this->newLine();
 
         // Central Roles with permission count

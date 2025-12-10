@@ -5,8 +5,8 @@ namespace Tests;
 use App\Enums\TenantPermission;
 use App\Enums\TenantRole;
 use App\Models\Central\Tenant;
-use App\Models\Tenant\User;
 use App\Models\Shared\Role;
+use App\Models\Tenant\User;
 
 /**
  * Base test case for tenant-scoped tests.
@@ -23,7 +23,9 @@ use App\Models\Shared\Role;
 abstract class TenantTestCase extends TestCase
 {
     protected Tenant $tenant;
+
     protected User $user;
+
     protected string $tenantDomain;
 
     protected function setUp(): void
@@ -84,12 +86,13 @@ abstract class TenantTestCase extends TestCase
      * Laravel's route() helper uses APP_URL (localhost) which can match central routes
      * instead of tenant routes. Using tenantUrl() ensures the correct domain is used.
      *
-     * @param string $path The path (e.g., '/admin/addons' or 'admin/addons')
+     * @param  string  $path  The path (e.g., '/admin/addons' or 'admin/addons')
      * @return string Full URL with tenant domain
      */
     protected function tenantUrl(string $path): string
     {
         $path = ltrim($path, '/');
+
         return "http://{$this->tenantDomain}/{$path}";
     }
 
@@ -100,8 +103,8 @@ abstract class TenantTestCase extends TestCase
      * - 'tenant.admin.projects.index'
      * - 'tenant.admin.settings.roles.index'
      *
-     * @param string $name Full route name (e.g., 'tenant.admin.addons.index')
-     * @param array $parameters Route parameters
+     * @param  string  $name  Full route name (e.g., 'tenant.admin.addons.index')
+     * @param  array  $parameters  Route parameters
      * @return string Full URL with tenant domain
      */
     protected function tenantRoute(string $name, array $parameters = []): string

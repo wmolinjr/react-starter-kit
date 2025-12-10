@@ -2,29 +2,30 @@
 
 namespace App\Models\Central;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasPaymentMethods;
+use App\Traits\HasSubscriptions;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Cashier\Billable;
-use Laravel\Cashier\Subscription;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
 use Stancl\Tenancy\Database\TenantCollection;
-use Stancl\Tenancy\ResourceSyncing\SyncMaster;
 use Stancl\Tenancy\ResourceSyncing\ResourceSyncing;
+use Stancl\Tenancy\ResourceSyncing\SyncMaster;
 
 /**
  * Customer Model - Central Billing Entity
  *
- * ARCHITECTURE:
- * - One Customer = One Stripe Customer
+ * PROVIDER-AGNOSTIC ARCHITECTURE:
+ * - One Customer = Multiple Provider Customers (via provider_ids)
  * - Customer can own multiple Tenants
  * - Implements SyncMaster for Resource Syncing with Tenant\User
  * - Synced attributes: global_id, name, email, password, locale
@@ -39,10 +40,8 @@ use Stancl\Tenancy\ResourceSyncing\ResourceSyncing;
  * @property string $email
  * @property string|null $phone
  * @property string $password
- * @property string|null $stripe_id
- * @property string|null $pm_type
- * @property string|null $pm_last_four
- * @property \Carbon\Carbon|null $trial_ends_at
+ * @property array|null $provider_ids Provider customer IDs {"stripe": "cus_xxx", "asaas": "cus_yyy"}
+ * @property string|null $default_payment_method_id
  * @property array|null $billing_address
  * @property string $locale
  * @property string $currency
@@ -51,11 +50,12 @@ use Stancl\Tenancy\ResourceSyncing\ResourceSyncing;
  * @property array|null $metadata
  * @property \Carbon\Carbon|null $deleted_at
  */
-class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
+class Customer extends Authenticatable implements MustVerifyEmail, SyncMaster
 {
-    use Billable;
     use CentralConnection;
     use HasFactory;
+    use HasPaymentMethods;
+    use HasSubscriptions;
     use HasUuids;
     use Notifiable;
     use ResourceSyncing;
@@ -78,6 +78,8 @@ class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
         'email',
         'phone',
         'password',
+        'provider_ids',
+        'default_payment_method_id',
         'billing_address',
         'locale',
         'currency',
@@ -97,10 +99,10 @@ class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'provider_ids' => 'array',
             'billing_address' => 'array',
             'tax_ids' => 'array',
             'metadata' => 'array',
-            'trial_ends_at' => 'datetime',
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
@@ -184,7 +186,7 @@ class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
             'global_id',         // This model's local key
             'id'                 // Related model's local key
         )->using(CustomerTenantPivot::class)
-         ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -196,7 +198,7 @@ class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
         $tenants = $this->getRelationValue('tenants');
 
         if ($tenants === null) {
-            return new TenantCollection();
+            return new TenantCollection;
         }
 
         if ($tenants instanceof TenantCollection) {
@@ -236,57 +238,58 @@ class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
     }
 
     // =========================================================================
-    // Billing (Laravel Cashier)
+    // Provider IDs (Multi-Provider Support)
     // =========================================================================
 
     /**
-     * Get all subscriptions (across all owned tenants).
+     * Get customer ID for a specific provider.
      */
-    public function subscriptions(): HasMany
+    public function getProviderCustomerId(string $provider): ?string
     {
-        return $this->hasMany(Subscription::class, 'customer_id');
+        return $this->provider_ids[$provider] ?? null;
     }
 
     /**
-     * Get active subscription for a specific tenant.
+     * Set customer ID for a specific provider.
      */
-    public function subscriptionForTenant(Tenant $tenant): ?Subscription
+    public function setProviderCustomerId(string $provider, string $id): void
     {
-        return $this->subscriptions()
-            ->where('tenant_id', $tenant->id)
-            ->where(function ($query) {
-                $query->whereNull('ends_at')
-                    ->orWhere('ends_at', '>', now());
-            })
-            ->first();
+        $this->update([
+            'provider_ids' => array_merge($this->provider_ids ?? [], [$provider => $id]),
+        ]);
     }
 
     /**
-     * Get default payment method or tenant-specific override.
+     * Check if customer exists in a specific provider.
      */
-    public function paymentMethodForTenant(Tenant $tenant): ?object
+    public function hasProviderCustomer(string $provider): bool
     {
-        if ($tenant->payment_method_id) {
-            return $this->findPaymentMethod($tenant->payment_method_id);
-        }
-
-        return $this->defaultPaymentMethod();
+        return ! empty($this->provider_ids[$provider]);
     }
 
     /**
-     * Get Stripe customer name.
+     * Remove customer ID for a specific provider.
      */
-    public function stripeName(): ?string
+    public function removeProviderCustomerId(string $provider): void
     {
-        return $this->name;
+        $providerIds = $this->provider_ids ?? [];
+        unset($providerIds[$provider]);
+
+        $this->update([
+            'provider_ids' => $providerIds,
+        ]);
     }
 
+    // =========================================================================
+    // Default Payment Method
+    // =========================================================================
+
     /**
-     * Get Stripe customer email.
+     * Get the default payment method relationship.
      */
-    public function stripeEmail(): ?string
+    public function defaultPaymentMethod(): BelongsTo
     {
-        return $this->email;
+        return $this->belongsTo(PaymentMethod::class, 'default_payment_method_id');
     }
 
     // =========================================================================
@@ -332,38 +335,6 @@ class Customer extends Authenticatable implements SyncMaster, MustVerifyEmail
     // =========================================================================
     // Helper Methods
     // =========================================================================
-
-    /**
-     * Get total monthly billing across all tenants.
-     */
-    public function getTotalMonthlyBilling(): int
-    {
-        return $this->subscriptions()
-            ->where(function ($query) {
-                $query->whereNull('ends_at')
-                    ->orWhere('ends_at', '>', now());
-            })
-            ->get()
-            ->sum(function ($subscription) {
-                // Get the price from subscription items if available
-                $item = $subscription->items()->first();
-
-                return $item ? ($item->quantity ?? 1) * 100 : 0; // Placeholder - actual price from Stripe
-            });
-    }
-
-    /**
-     * Check if customer has any active subscription.
-     */
-    public function hasActiveSubscription(): bool
-    {
-        return $this->subscriptions()
-            ->where(function ($query) {
-                $query->whereNull('ends_at')
-                    ->orWhere('ends_at', '>', now());
-            })
-            ->exists();
-    }
 
     /**
      * Route notifications for the mail channel.

@@ -36,7 +36,7 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            'global_id' => 'cust_' . Str::orderedUuid()->toString(),
+            'global_id' => 'cust_'.Str::orderedUuid()->toString(),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -135,7 +135,7 @@ class CustomerFactory extends Factory
     public function withStripeCustomer(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_id' => 'cus_' . Str::random(14),
+            'stripe_id' => 'cus_'.Str::random(14),
             'pm_type' => 'card',
             'pm_last_four' => '4242',
         ]);

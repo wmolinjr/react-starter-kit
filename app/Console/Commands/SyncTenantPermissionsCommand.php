@@ -36,8 +36,9 @@ class SyncTenantPermissionsCommand extends Command
 
         $tenantInput = $this->argument('tenant');
 
-        if (!$tenantInput) {
+        if (! $tenantInput) {
             $this->error('Please provide a tenant ID/slug or use --all flag.');
+
             return Command::FAILURE;
         }
 
@@ -51,8 +52,9 @@ class SyncTenantPermissionsCommand extends Command
     {
         $tenant = $this->findTenant($tenantInput);
 
-        if (!$tenant) {
+        if (! $tenant) {
             $this->error("Tenant not found: {$tenantInput}");
+
             return Command::FAILURE;
         }
 
@@ -68,6 +70,7 @@ class SyncTenantPermissionsCommand extends Command
 
         if ($tenants->isEmpty()) {
             $this->warn('No tenants found.');
+
             return Command::SUCCESS;
         }
 
@@ -81,9 +84,10 @@ class SyncTenantPermissionsCommand extends Command
 
         foreach ($tenants as $tenant) {
             try {
-                if (!$tenant->plan) {
+                if (! $tenant->plan) {
                     $results['skipped']++;
                     $bar->advance();
+
                     continue;
                 }
 
@@ -109,7 +113,7 @@ class SyncTenantPermissionsCommand extends Command
         $bar->finish();
         $this->newLine(2);
 
-        $this->info("Results:");
+        $this->info('Results:');
         $this->line("  Success: {$results['success']}");
         $this->line("  Failed: {$results['failed']}");
         $this->line("  Skipped (no plan): {$results['skipped']}");
@@ -123,21 +127,24 @@ class SyncTenantPermissionsCommand extends Command
     protected function syncTenant(Tenant $tenant, PlanPermissionResolver $resolver): int
     {
         $this->info("Syncing permissions for tenant: {$tenant->name} ({$tenant->id})");
-        $this->line("Plan: " . ($tenant->plan?->name ?? 'None'));
+        $this->line('Plan: '.($tenant->plan?->name ?? 'None'));
 
-        if (!$tenant->plan) {
+        if (! $tenant->plan) {
             $this->warn('Tenant has no plan assigned. Skipping.');
+
             return Command::SUCCESS;
         }
 
         if ($this->option('dry-run')) {
             $this->showDryRun($tenant, $resolver);
+
             return Command::SUCCESS;
         }
 
         if ($this->option('cache-only')) {
             $this->updateCacheOnly($tenant, $resolver);
             $this->info('Cache updated successfully!');
+
             return Command::SUCCESS;
         }
 
@@ -150,9 +157,11 @@ class SyncTenantPermissionsCommand extends Command
         try {
             $this->syncTenantSync($tenant, $resolver, $isDowngrade);
             $this->info('Permissions synced successfully!');
+
             return Command::SUCCESS;
         } catch (\Exception $e) {
             $this->error("Failed to sync permissions: {$e->getMessage()}");
+
             return Command::FAILURE;
         }
     }
@@ -194,32 +203,32 @@ class SyncTenantPermissionsCommand extends Command
         $removed = array_diff($currentPermissions, $newPermissions);
         $unchanged = array_intersect($currentPermissions, $newPermissions);
 
-        $this->line("Current permissions: " . count($currentPermissions));
-        $this->line("New permissions: " . count($newPermissions));
+        $this->line('Current permissions: '.count($currentPermissions));
+        $this->line('New permissions: '.count($newPermissions));
         $this->newLine();
 
-        if (!empty($added)) {
-            $this->info("Would ADD " . count($added) . " permissions:");
+        if (! empty($added)) {
+            $this->info('Would ADD '.count($added).' permissions:');
             foreach (array_slice($added, 0, 10) as $p) {
                 $this->line("  + {$p}");
             }
             if (count($added) > 10) {
-                $this->line("  ... and " . (count($added) - 10) . " more");
+                $this->line('  ... and '.(count($added) - 10).' more');
             }
         }
 
-        if (!empty($removed)) {
-            $this->warn("Would REMOVE " . count($removed) . " permissions:");
+        if (! empty($removed)) {
+            $this->warn('Would REMOVE '.count($removed).' permissions:');
             foreach (array_slice($removed, 0, 10) as $p) {
                 $this->line("  - {$p}");
             }
             if (count($removed) > 10) {
-                $this->line("  ... and " . (count($removed) - 10) . " more");
+                $this->line('  ... and '.(count($removed) - 10).' more');
             }
         }
 
         if (empty($added) && empty($removed)) {
-            $this->info("No changes needed.");
+            $this->info('No changes needed.');
         }
 
         $this->newLine();

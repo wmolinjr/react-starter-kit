@@ -61,7 +61,6 @@ class MediaLibraryConfigBootstrapper implements TenancyBootstrapper
     /**
      * Get the file upload size limit for the tenant.
      *
-     * @param Tenant $tenant
      * @return int Limit in MB
      */
     protected function getFileUploadLimit(Tenant $tenant): int

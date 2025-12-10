@@ -35,9 +35,9 @@ class PropagatePasswordChangeJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param FederatedUser $federatedUser The user whose password changed
-     * @param string $hashedPassword The new hashed password
-     * @param string $sourceTenantId The tenant where the change originated
+     * @param  FederatedUser  $federatedUser  The user whose password changed
+     * @param  string  $hashedPassword  The new hashed password
+     * @param  string  $sourceTenantId  The tenant where the change originated
      */
     public function __construct(
         public FederatedUser $federatedUser,
@@ -71,7 +71,7 @@ class PropagatePasswordChangeJob implements ShouldQueue
             'skipped_count' => count($results['skipped']),
         ]);
 
-        if (!empty($results['failed'])) {
+        if (! empty($results['failed'])) {
             Log::warning('PropagatePasswordChangeJob: Some password syncs failed', [
                 'federated_user_id' => $this->federatedUser->id,
                 'failed' => $results['failed'],
@@ -100,9 +100,9 @@ class PropagatePasswordChangeJob implements ShouldQueue
         return [
             'federation',
             'password-sync',
-            'federated_user:' . $this->federatedUser->id,
-            'group:' . $this->federatedUser->federation_group_id,
-            'source:' . $this->sourceTenantId,
+            'federated_user:'.$this->federatedUser->id,
+            'group:'.$this->federatedUser->federation_group_id,
+            'source:'.$this->sourceTenantId,
         ];
     }
 }

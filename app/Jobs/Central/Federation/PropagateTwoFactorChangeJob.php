@@ -35,9 +35,9 @@ class PropagateTwoFactorChangeJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param FederatedUser $federatedUser The user whose 2FA settings changed
-     * @param array $twoFactorData The 2FA data to sync
-     * @param string $sourceTenantId The tenant where the change originated
+     * @param  FederatedUser  $federatedUser  The user whose 2FA settings changed
+     * @param  array  $twoFactorData  The 2FA data to sync
+     * @param  string  $sourceTenantId  The tenant where the change originated
      */
     public function __construct(
         public FederatedUser $federatedUser,
@@ -74,7 +74,7 @@ class PropagateTwoFactorChangeJob implements ShouldQueue
             'skipped_count' => count($results['skipped']),
         ]);
 
-        if (!empty($results['failed'])) {
+        if (! empty($results['failed'])) {
             Log::warning('PropagateTwoFactorChangeJob: Some 2FA syncs failed', [
                 'federated_user_id' => $this->federatedUser->id,
                 'failed' => $results['failed'],
@@ -103,9 +103,9 @@ class PropagateTwoFactorChangeJob implements ShouldQueue
         return [
             'federation',
             '2fa-sync',
-            'federated_user:' . $this->federatedUser->id,
-            'group:' . $this->federatedUser->federation_group_id,
-            'source:' . $this->sourceTenantId,
+            'federated_user:'.$this->federatedUser->id,
+            'group:'.$this->federatedUser->federation_group_id,
+            'source:'.$this->sourceTenantId,
         ];
     }
 }

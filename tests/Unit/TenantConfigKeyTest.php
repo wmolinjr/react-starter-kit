@@ -70,7 +70,7 @@ class TenantConfigKeyTest extends TestCase
             $settingsPath = $case->settingsPath();
 
             $this->assertStringStartsWith('config.', $settingsPath);
-            $this->assertEquals('config.' . $case->value, $settingsPath);
+            $this->assertEquals('config.'.$case->value, $settingsPath);
         }
     }
 

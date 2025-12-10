@@ -21,7 +21,7 @@ class CheckPlan
     {
         $tenant = tenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             abort(403, 'Tenant not found.');
         }
 
@@ -37,7 +37,7 @@ class CheckPlan
      */
     protected function checkFeature(Request $request, Closure $next, Tenant $tenant, string $feature): Response
     {
-        if (!Feature::for($tenant)->active($feature)) {
+        if (! Feature::for($tenant)->active($feature)) {
             return $this->denyAccess($request, __('flash.middleware.feature_not_available'), [
                 'feature' => $feature,
             ]);
@@ -51,7 +51,7 @@ class CheckPlan
      */
     protected function checkLimit(Request $request, Closure $next, Tenant $tenant, string $resource): Response
     {
-        $limitFeature = 'max' . ucfirst($resource);
+        $limitFeature = 'max'.ucfirst($resource);
         $limit = Feature::for($tenant)->value($limitFeature);
         $usage = $tenant->getCurrentUsage($resource);
 

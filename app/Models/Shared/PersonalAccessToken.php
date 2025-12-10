@@ -37,8 +37,6 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
 
     /**
      * Get the current connection name for the model.
-     *
-     * @return string|null
      */
     public function getConnectionName(): ?string
     {
@@ -54,8 +52,6 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
     /**
      * Get the table associated with the model.
      * Both contexts use 'personal_access_tokens' in their respective databases.
-     *
-     * @return string
      */
     public function getTable(): string
     {

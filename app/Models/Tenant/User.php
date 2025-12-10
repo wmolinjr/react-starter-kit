@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use App\Models\Central\Customer;
+use App\Models\Tenant\Traits\HasFederation;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -18,9 +19,8 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Tenant\Traits\HasFederation;
-use Stancl\Tenancy\ResourceSyncing\Syncable;
 use Stancl\Tenancy\ResourceSyncing\ResourceSyncing;
+use Stancl\Tenancy\ResourceSyncing\Syncable;
 
 /**
  * User - Tenant users stored in tenant database.
@@ -206,8 +206,6 @@ class User extends Authenticatable implements MustVerifyEmail, Syncable
 
     /**
      * User's projects (same database = native JOIN).
-     *
-     * @return HasMany
      */
     public function projects(): HasMany
     {
@@ -297,7 +295,7 @@ class User extends Authenticatable implements MustVerifyEmail, Syncable
      */
     public function getCentralCustomer(): ?Customer
     {
-        if (!$this->global_id) {
+        if (! $this->global_id) {
             return null;
         }
 

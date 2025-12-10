@@ -15,7 +15,6 @@ use App\Http\Resources\Central\PlanResource;
 use App\Http\Resources\Central\PlanSummaryResource;
 use App\Http\Resources\Central\TenantResource;
 use App\Http\Resources\Central\TenantSummaryResource;
-use App\Http\Resources\Concerns\HasTypescriptType;
 use App\Http\Resources\Shared\CategoryOptionResource;
 use App\Http\Resources\Shared\FeatureDefinitionResource;
 use App\Http\Resources\Shared\LimitDefinitionResource;

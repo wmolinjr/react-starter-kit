@@ -28,11 +28,11 @@ class TenantConfigBootstrapperTest extends TestCase
 
         // Create test tenant
         $this->tenant = Tenant::factory()->create([
-            'slug' => 'config-test-' . uniqid(),
+            'slug' => 'config-test-'.uniqid(),
         ]);
 
         $this->tenant->domains()->create([
-            'domain' => $this->tenant->slug . '.myapp.test',
+            'domain' => $this->tenant->slug.'.myapp.test',
             'is_primary' => true,
         ]);
     }
@@ -190,10 +190,10 @@ class TenantConfigBootstrapperTest extends TestCase
 
         // Create second tenant with different config
         $tenant2 = Tenant::factory()->create([
-            'slug' => 'config-test-2-' . uniqid(),
+            'slug' => 'config-test-2-'.uniqid(),
         ]);
         $tenant2->domains()->create([
-            'domain' => $tenant2->slug . '.myapp.test',
+            'domain' => $tenant2->slug.'.myapp.test',
             'is_primary' => true,
         ]);
         $tenant2->updateConfig(TenantConfigKey::LOCALE, 'en');

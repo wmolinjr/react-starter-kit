@@ -86,7 +86,7 @@ class ParallelTestingServiceProvider extends ServiceProvider
     protected function createDatabaseIfNotExists(\PDO $pdo, string $database): void
     {
         // Check if database exists
-        $stmt = $pdo->prepare("SELECT 1 FROM pg_database WHERE datname = ?");
+        $stmt = $pdo->prepare('SELECT 1 FROM pg_database WHERE datname = ?');
         $stmt->execute([$database]);
 
         if (! $stmt->fetch()) {

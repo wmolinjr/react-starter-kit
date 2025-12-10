@@ -195,13 +195,13 @@ class HandleInertiaRequests extends Middleware
         $rolePermissions = $user->getAllPermissions()->pluck('name')->toArray();
 
         // If no tenant context, return only role permissions
-        if (!tenancy()->initialized) {
+        if (! tenancy()->initialized) {
             return $rolePermissions;
         }
 
         // Only merge plan permissions for admin/owner roles
         // Members should not get plan-level permissions automatically
-        if (!$user->isAdminOrOwner()) {
+        if (! $user->isAdminOrOwner()) {
             return $rolePermissions;
         }
 

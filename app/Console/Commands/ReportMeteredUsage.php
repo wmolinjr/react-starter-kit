@@ -41,8 +41,8 @@ class ReportMeteredUsage extends Command
             }
 
             $results = $service->reportTenantUsage($tenant);
-            $this->line("Storage reported: " . ($results['storage'] ? 'Yes' : 'No'));
-            $this->line("Bandwidth reported: " . ($results['bandwidth'] ? 'Yes' : 'No'));
+            $this->line('Storage reported: '.($results['storage'] ? 'Yes' : 'No'));
+            $this->line('Bandwidth reported: '.($results['bandwidth'] ? 'Yes' : 'No'));
 
             return self::SUCCESS;
         }
@@ -76,14 +76,14 @@ class ReportMeteredUsage extends Command
                     number_format($summary['storage']['used_mb']),
                     number_format($summary['storage']['limit_mb']),
                     number_format($summary['storage']['overage_mb']),
-                    '$' . number_format($summary['storage']['overage_cost'] / 100, 2),
+                    '$'.number_format($summary['storage']['overage_cost'] / 100, 2),
                 ],
                 [
                     'Bandwidth',
                     number_format($summary['bandwidth']['used_mb']),
                     number_format($summary['bandwidth']['free_tier_mb']),
                     number_format($summary['bandwidth']['overage_mb']),
-                    '$' . number_format($summary['bandwidth']['overage_cost'] / 100, 2),
+                    '$'.number_format($summary['bandwidth']['overage_cost'] / 100, 2),
                 ],
             ]
         );

@@ -45,7 +45,7 @@ class MediaLibraryConfigBootstrapperTest extends TestCase
             'plan_id' => $plan->id,
         ]);
 
-        $bootstrapper = new MediaLibraryConfigBootstrapper();
+        $bootstrapper = new MediaLibraryConfigBootstrapper;
         $bootstrapper->bootstrap($tenant);
 
         // 25 MB = 25 * 1024 * 1024 = 26214400 bytes
@@ -69,7 +69,7 @@ class MediaLibraryConfigBootstrapperTest extends TestCase
             ],
         ]);
 
-        $bootstrapper = new MediaLibraryConfigBootstrapper();
+        $bootstrapper = new MediaLibraryConfigBootstrapper;
         $bootstrapper->bootstrap($tenant);
 
         // Override takes priority: 50 MB = 52428800 bytes
@@ -90,7 +90,7 @@ class MediaLibraryConfigBootstrapperTest extends TestCase
             'plan_limits_override' => [], // No override
         ]);
 
-        $bootstrapper = new MediaLibraryConfigBootstrapper();
+        $bootstrapper = new MediaLibraryConfigBootstrapper;
         $bootstrapper->bootstrap($tenant);
 
         // 15 MB = 15728640 bytes
@@ -104,7 +104,7 @@ class MediaLibraryConfigBootstrapperTest extends TestCase
             'plan_limits_override' => [],
         ]);
 
-        $bootstrapper = new MediaLibraryConfigBootstrapper();
+        $bootstrapper = new MediaLibraryConfigBootstrapper;
         $bootstrapper->bootstrap($tenant);
 
         // Default: 10 MB = 10485760 bytes
@@ -119,7 +119,7 @@ class MediaLibraryConfigBootstrapperTest extends TestCase
         config(['media-library.max_file_size' => $knownOriginal]);
 
         // Bootstrapper captures the current config value in constructor
-        $bootstrapper = new MediaLibraryConfigBootstrapper();
+        $bootstrapper = new MediaLibraryConfigBootstrapper;
 
         // Create a tenant with different limit
         $plan = Plan::factory()->create([
@@ -153,7 +153,7 @@ class MediaLibraryConfigBootstrapperTest extends TestCase
             'plan_id' => $plan->id,
         ]);
 
-        $bootstrapper = new MediaLibraryConfigBootstrapper();
+        $bootstrapper = new MediaLibraryConfigBootstrapper;
         $bootstrapper->bootstrap($tenant);
 
         $this->assertIsInt(config('media-library.max_file_size'));

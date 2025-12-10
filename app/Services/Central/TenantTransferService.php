@@ -29,11 +29,10 @@ class TenantTransferService
     /**
      * Initiate a tenant transfer.
      *
-     * @param Tenant $tenant Tenant to transfer
-     * @param Customer $fromCustomer Current owner
-     * @param string $toEmail Recipient email (may be existing or new customer)
-     * @param array $options Additional options (transfer_fee, notes, etc.)
-     * @return TenantTransfer
+     * @param  Tenant  $tenant  Tenant to transfer
+     * @param  Customer  $fromCustomer  Current owner
+     * @param  string  $toEmail  Recipient email (may be existing or new customer)
+     * @param  array  $options  Additional options (transfer_fee, notes, etc.)
      */
     public function initiate(
         Tenant $tenant,
@@ -78,14 +77,12 @@ class TenantTransferService
     /**
      * Accept a transfer (by recipient).
      *
-     * @param TenantTransfer $transfer
-     * @param Customer $acceptingCustomer Customer accepting the transfer
-     * @return TenantTransfer
+     * @param  Customer  $acceptingCustomer  Customer accepting the transfer
      */
     public function accept(TenantTransfer $transfer, Customer $acceptingCustomer): TenantTransfer
     {
         // Validate transfer can be accepted
-        if (!$transfer->canBeAccepted()) {
+        if (! $transfer->canBeAccepted()) {
             throw new TransferException('This transfer cannot be accepted.');
         }
 
@@ -105,9 +102,6 @@ class TenantTransferService
 
     /**
      * Complete a transfer (actually move ownership).
-     *
-     * @param TenantTransfer $transfer
-     * @return Tenant
      */
     public function complete(TenantTransfer $transfer): Tenant
     {
@@ -151,14 +145,10 @@ class TenantTransferService
 
     /**
      * Cancel a pending transfer (by initiator).
-     *
-     * @param TenantTransfer $transfer
-     * @param Customer $cancellingCustomer
-     * @return TenantTransfer
      */
     public function cancel(TenantTransfer $transfer, Customer $cancellingCustomer): TenantTransfer
     {
-        if (!$transfer->canBeCancelled()) {
+        if (! $transfer->canBeCancelled()) {
             throw new TransferException('This transfer cannot be cancelled.');
         }
 
@@ -175,14 +165,10 @@ class TenantTransferService
 
     /**
      * Reject a transfer (by recipient).
-     *
-     * @param TenantTransfer $transfer
-     * @param Customer $rejectingCustomer
-     * @return TenantTransfer
      */
     public function reject(TenantTransfer $transfer, Customer $rejectingCustomer): TenantTransfer
     {
-        if (!$transfer->canBeAccepted()) {
+        if (! $transfer->canBeAccepted()) {
             throw new TransferException('This transfer cannot be rejected.');
         }
 
@@ -199,9 +185,6 @@ class TenantTransferService
 
     /**
      * Find a transfer by token (for acceptance link).
-     *
-     * @param string $token
-     * @return TenantTransfer|null
      */
     public function findByToken(string $token): ?TenantTransfer
     {
@@ -210,9 +193,6 @@ class TenantTransferService
 
     /**
      * Get pending transfers for a customer (as recipient).
-     *
-     * @param Customer $customer
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getPendingTransfersForRecipient(Customer $customer): \Illuminate\Database\Eloquent\Collection
     {
@@ -224,9 +204,6 @@ class TenantTransferService
 
     /**
      * Get transfers initiated by a customer.
-     *
-     * @param Customer $customer
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getInitiatedTransfers(Customer $customer): \Illuminate\Database\Eloquent\Collection
     {
@@ -251,16 +228,13 @@ class TenantTransferService
 
     /**
      * Calculate remaining subscription value for a tenant.
-     *
-     * @param Tenant $tenant
-     * @return float
      */
     protected function calculateRemainingSubscriptionValue(Tenant $tenant): float
     {
         // Get active subscription via customer
         $subscription = $tenant->getSubscriptionViaCustomer();
 
-        if (!$subscription || !$subscription->active()) {
+        if (! $subscription || ! $subscription->active()) {
             return 0;
         }
 

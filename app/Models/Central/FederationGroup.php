@@ -6,8 +6,8 @@ use App\Enums\FederationSyncStrategy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Stancl\Tenancy\Database\Concerns\CentralConnection;
@@ -156,6 +156,7 @@ class FederationGroup extends Model
     public function isMaster(Tenant|string $tenant): bool
     {
         $tenantId = $tenant instanceof Tenant ? $tenant->id : $tenant;
+
         return $this->master_tenant_id === $tenantId;
     }
 
@@ -165,6 +166,7 @@ class FederationGroup extends Model
     public function hasTenant(Tenant|string $tenant): bool
     {
         $tenantId = $tenant instanceof Tenant ? $tenant->id : $tenant;
+
         return $this->activeTenants()->where('tenants.id', $tenantId)->exists();
     }
 
@@ -174,6 +176,7 @@ class FederationGroup extends Model
     public function getOtherTenants(Tenant|string $excludeTenant): \Illuminate\Database\Eloquent\Collection
     {
         $tenantId = $excludeTenant instanceof Tenant ? $excludeTenant->id : $excludeTenant;
+
         return $this->activeTenants()->where('tenants.id', '!=', $tenantId)->get();
     }
 

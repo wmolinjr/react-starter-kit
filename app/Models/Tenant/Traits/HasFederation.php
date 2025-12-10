@@ -36,7 +36,7 @@ trait HasFederation
      */
     public function getFederatedUser(): ?FederatedUser
     {
-        if (!$this->isFederated()) {
+        if (! $this->isFederated()) {
             return null;
         }
 
@@ -58,12 +58,12 @@ trait HasFederation
      */
     public function getFederationLink(): ?FederatedUserLink
     {
-        if (!$this->isFederated()) {
+        if (! $this->isFederated()) {
             return null;
         }
 
         $tenant = tenant();
-        if (!$tenant) {
+        if (! $tenant) {
             return null;
         }
 
@@ -78,12 +78,12 @@ trait HasFederation
     public function isMasterUser(): bool
     {
         $federatedUser = $this->getFederatedUser();
-        if (!$federatedUser) {
+        if (! $federatedUser) {
             return false;
         }
 
         $tenant = tenant();
-        if (!$tenant) {
+        if (! $tenant) {
             return false;
         }
 

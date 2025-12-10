@@ -26,8 +26,8 @@ class CustomerService
      * 2. Create Tenant with customer_id
      * 3. Attach Customer to Tenant (triggers Resource Syncing to create Tenant\User)
      *
-     * @param array $customerData Customer attributes (name, email, password, etc.)
-     * @param array $tenantData Tenant attributes (name, slug, plan_id, etc.)
+     * @param  array  $customerData  Customer attributes (name, email, password, etc.)
+     * @param  array  $tenantData  Tenant attributes (name, slug, plan_id, etc.)
      * @return array{customer: Customer, tenant: Tenant}
      */
     public function register(array $customerData, array $tenantData): array
@@ -71,9 +71,9 @@ class CustomerService
      * Add existing customer to an existing tenant.
      * Used when inviting a customer to access another tenant.
      *
-     * @param Customer $customer The customer to add
-     * @param Tenant $tenant The tenant to grant access to
-     * @param string|null $role Role to assign in tenant (owner, admin, member)
+     * @param  Customer  $customer  The customer to add
+     * @param  Tenant  $tenant  The tenant to grant access to
+     * @param  string|null  $role  Role to assign in tenant (owner, admin, member)
      */
     public function addCustomerToTenant(
         Customer $customer,
@@ -97,8 +97,8 @@ class CustomerService
     /**
      * Remove customer access from a tenant.
      *
-     * @param Customer $customer The customer to remove
-     * @param Tenant $tenant The tenant to remove access from
+     * @param  Customer  $customer  The customer to remove
+     * @param  Tenant  $tenant  The tenant to remove access from
      */
     public function removeCustomerFromTenant(Customer $customer, Tenant $tenant): void
     {
@@ -109,9 +109,8 @@ class CustomerService
     /**
      * Create a new tenant for an existing customer.
      *
-     * @param Customer $customer Owner customer
-     * @param array $tenantData Tenant attributes
-     * @return Tenant
+     * @param  Customer  $customer  Owner customer
+     * @param  array  $tenantData  Tenant attributes
      */
     public function createTenantForCustomer(Customer $customer, array $tenantData): Tenant
     {
@@ -142,8 +141,8 @@ class CustomerService
      * Find or create a customer by email.
      * Used for transfers and invitations.
      *
-     * @param string $email Customer email
-     * @param array $data Additional customer data if creating
+     * @param  string  $email  Customer email
+     * @param  array  $data  Additional customer data if creating
      * @return array{customer: Customer, created: bool}
      */
     public function findOrCreateByEmail(string $email, array $data = []): array
@@ -169,9 +168,6 @@ class CustomerService
 
     /**
      * Get customer's billing summary across all tenants.
-     *
-     * @param Customer $customer
-     * @return array
      */
     public function getBillingSummary(Customer $customer): array
     {
@@ -200,10 +196,6 @@ class CustomerService
 
     /**
      * Update customer profile.
-     *
-     * @param Customer $customer
-     * @param array $data
-     * @return Customer
      */
     public function updateProfile(Customer $customer, array $data): Customer
     {
@@ -214,17 +206,13 @@ class CustomerService
             'locale' => $data['locale'] ?? null,
             'billing_address' => $data['billing_address'] ?? null,
             'tax_ids' => $data['tax_ids'] ?? null,
-        ], fn($value) => $value !== null));
+        ], fn ($value) => $value !== null));
 
         return $customer->fresh();
     }
 
     /**
      * Update customer password.
-     *
-     * @param Customer $customer
-     * @param string $newPassword
-     * @return void
      */
     public function updatePassword(Customer $customer, string $newPassword): void
     {
@@ -235,9 +223,6 @@ class CustomerService
 
     /**
      * Delete customer and clean up resources.
-     *
-     * @param Customer $customer
-     * @return void
      */
     public function deleteCustomer(Customer $customer): void
     {
@@ -261,8 +246,7 @@ class CustomerService
      * Register a new customer (without tenant).
      * Used for customer portal registration.
      *
-     * @param array $data Customer attributes (name, email, password)
-     * @return Customer
+     * @param  array  $data  Customer attributes (name, email, password)
      */
     public function registerCustomerOnly(array $data): Customer
     {
@@ -279,9 +263,8 @@ class CustomerService
     /**
      * Create a new tenant for an existing customer (controller-friendly).
      *
-     * @param Customer $customer Owner customer
-     * @param array $data Tenant data (name, slug, domain)
-     * @return Tenant
+     * @param  Customer  $customer  Owner customer
+     * @param  array  $data  Tenant data (name, slug, domain)
      */
     public function createTenant(Customer $customer, array $data): Tenant
     {
@@ -293,10 +276,6 @@ class CustomerService
 
     /**
      * Update customer billing address.
-     *
-     * @param Customer $customer
-     * @param array $billingAddress
-     * @return Customer
      */
     public function updateBillingAddress(Customer $customer, array $billingAddress): Customer
     {
@@ -323,11 +302,9 @@ class CustomerService
 
     /**
      * Generate a unique global_id for Resource Syncing.
-     *
-     * @return string
      */
     protected function generateGlobalId(): string
     {
-        return 'cust_' . Str::orderedUuid()->toString();
+        return 'cust_'.Str::orderedUuid()->toString();
     }
 }

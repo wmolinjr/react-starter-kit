@@ -43,8 +43,9 @@ class TenantObserver
     {
         // Check if tenant database exists (skip during initial creation)
         $database = $tenant->database()->getName();
-        if (!$tenant->database()->manager()->databaseExists($database)) {
+        if (! $tenant->database()->manager()->databaseExists($database)) {
             Log::info("Skipping permission sync - tenant database {$database} does not exist yet");
+
             return;
         }
 
@@ -113,8 +114,8 @@ class TenantObserver
             // Get removed permissions
             $removedPermissions = array_diff($currentPermissions, $allowedPermissions);
 
-            if (!empty($removedPermissions)) {
-                Log::info("Removing " . count($removedPermissions) . " permissions from role {$role->name}");
+            if (! empty($removedPermissions)) {
+                Log::info('Removing '.count($removedPermissions)." permissions from role {$role->name}");
 
                 // Sync to allowed only
                 $role->syncPermissions(

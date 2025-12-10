@@ -36,8 +36,8 @@ class RetryFailedSyncsJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param FederationGroup|null $group Specific group to retry (null = all groups)
-     * @param FederatedUser|null $federatedUser Specific user to retry (null = all users)
+     * @param  FederationGroup|null  $group  Specific group to retry (null = all groups)
+     * @param  FederatedUser|null  $federatedUser  Specific user to retry (null = all users)
      */
     public function __construct(
         public ?FederationGroup $group = null,
@@ -54,12 +54,14 @@ class RetryFailedSyncsJob implements ShouldQueue
         if ($this->federatedUser) {
             // Retry for specific user
             $this->retryForUser($syncService, $this->federatedUser);
+
             return;
         }
 
         if ($this->group) {
             // Retry for all users in group
             $this->retryForGroup($syncService, $this->group);
+
             return;
         }
 
@@ -106,7 +108,7 @@ class RetryFailedSyncsJob implements ShouldQueue
 
         foreach ($userIds as $userId) {
             $user = FederatedUser::find($userId);
-            if (!$user) {
+            if (! $user) {
                 continue;
             }
 
@@ -163,11 +165,11 @@ class RetryFailedSyncsJob implements ShouldQueue
         $tags = ['federation', 'retry'];
 
         if ($this->group) {
-            $tags[] = 'group:' . $this->group->id;
+            $tags[] = 'group:'.$this->group->id;
         }
 
         if ($this->federatedUser) {
-            $tags[] = 'federated_user:' . $this->federatedUser->id;
+            $tags[] = 'federated_user:'.$this->federatedUser->id;
         }
 
         return $tags;

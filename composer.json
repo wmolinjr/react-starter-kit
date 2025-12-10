@@ -11,9 +11,9 @@
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
-        "laravel/cashier": "^16.0",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
+        "stripe/stripe-php": "^16.0",
         "laravel/horizon": "^5.40",
         "laravel/pennant": "^1.18",
         "laravel/sanctum": "^4.2",

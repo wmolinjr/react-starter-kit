@@ -11,14 +11,13 @@ use Tests\TestCase;
 
 class PlanPermissionResolverTest extends TestCase
 {
-
     protected PlanPermissionResolver $resolver;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->resolver = new PlanPermissionResolver();
+        $this->resolver = new PlanPermissionResolver;
 
         // Seed plans
         \Artisan::call('db:seed', ['--class' => 'PlanSeeder']);

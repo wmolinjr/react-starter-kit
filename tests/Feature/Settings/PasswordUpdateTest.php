@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Settings;
 
-use App\Models\Tenant\User;
 use Illuminate\Support\Facades\Hash;
 use Tests\TenantTestCase;
 

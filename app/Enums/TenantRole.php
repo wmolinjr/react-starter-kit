@@ -219,7 +219,7 @@ enum TenantRole: string
      * Filter permissions based on this role's rules.
      *
      * @param  array<string>  $permissions  Available permission strings
-     * @return array<string>  Filtered permissions for this role
+     * @return array<string> Filtered permissions for this role
      */
     public function filterPermissions(array $permissions): array
     {

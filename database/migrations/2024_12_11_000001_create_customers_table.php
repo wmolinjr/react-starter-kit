@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Central Migration: Customers Table
  *
- * Customer is the BILLING ENTITY in the new architecture:
- * - One Customer = One Stripe Customer
+ * Customer is the BILLING ENTITY in the architecture:
+ * - One Customer = Multiple Payment Provider Customers (via provider_ids)
  * - Customer can own multiple Tenants
  * - Implements SyncMaster for Resource Syncing with Tenant\User
  *
- * This replaces Tenant as the primary Billable entity.
+ * PROVIDER-AGNOSTIC: No stripe_* columns. Uses provider_ids JSON for multi-provider support.
  */
 return new class extends Migration
 {
@@ -32,11 +32,13 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
 
-            // Stripe Billable (Laravel Cashier)
-            $table->string('stripe_id')->nullable()->unique();
-            $table->string('pm_type')->nullable();
-            $table->string('pm_last_four', 4)->nullable();
-            $table->timestamp('trial_ends_at')->nullable();
+            // Provider-Agnostic Billing
+            // Stores customer IDs in each payment provider
+            // Example: {"stripe": "cus_xxx", "asaas": "cus_yyy"}
+            $table->json('provider_ids')->nullable();
+
+            // Default payment method reference
+            $table->uuid('default_payment_method_id')->nullable();
 
             // Billing Information
             $table->json('billing_address')->nullable();
@@ -57,7 +59,6 @@ return new class extends Migration
 
             // Indexes
             $table->index('email');
-            $table->index('stripe_id');
             $table->index('global_id');
         });
     }

@@ -112,7 +112,7 @@ Route::middleware([
         session()->forget('tenancy_impersonating');
         session()->forget('tenancy_admin_mode');
 
-        $centralUrl = config('app.url') . '/admin/tenants';
+        $centralUrl = config('app.url').'/admin/tenants';
 
         return Inertia::location($centralUrl);
     })->middleware('admin.mode')->name('impersonate.stop');

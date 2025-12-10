@@ -31,7 +31,7 @@ class SpatiePermissionsBootstrapper implements TenancyBootstrapper
         $tenantKey = $tenant->getTenantKey();
 
         // Set cache key to include tenant ID
-        $this->registrar->cacheKey = 'spatie.permission.cache.tenant.' . $tenantKey;
+        $this->registrar->cacheKey = 'spatie.permission.cache.tenant.'.$tenantKey;
 
         // Clear cached permissions - they're from the previous database
         $this->registrar->forgetCachedPermissions();

@@ -41,8 +41,8 @@ class SyncAllUsersToTenantJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param FederationGroup $group The federation group
-     * @param Tenant $tenant The tenant to sync users to
+     * @param  FederationGroup  $group  The federation group
+     * @param  Tenant  $tenant  The tenant to sync users to
      */
     public function __construct(
         public FederationGroup $group,
@@ -107,8 +107,8 @@ class SyncAllUsersToTenantJob implements ShouldQueue
         return [
             'federation',
             'bulk-sync',
-            'group:' . $this->group->id,
-            'tenant:' . $this->tenant->id,
+            'group:'.$this->group->id,
+            'tenant:'.$this->tenant->id,
         ];
     }
 }

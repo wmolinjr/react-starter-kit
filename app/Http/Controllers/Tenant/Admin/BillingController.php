@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\CartCheckoutRequest;
 use App\Http\Requests\Tenant\CheckoutRequest;
 use App\Http\Resources\Central\BundleResource;
-use App\Http\Resources\Central\AddonResource;
 use App\Http\Resources\Central\PlanResource;
 use App\Http\Resources\Tenant\InvoiceDetailResource;
 use App\Http\Resources\Tenant\InvoiceResource;
