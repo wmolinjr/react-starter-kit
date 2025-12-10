@@ -66,6 +66,11 @@ class DatabaseSeeder extends Seeder
         $this->call([TenantSeeder::class]);
         $this->command->newLine();
 
+        // Seed customers (billing entities for centralized billing)
+        $this->command->info('Seeding customers (billing entities)...');
+        $this->call([CustomerSeeder::class]);
+        $this->command->newLine();
+
         // Seed federation groups and federated users
         $this->command->info('Seeding federation data...');
         $this->call([FederationSeeder::class]);

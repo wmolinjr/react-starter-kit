@@ -59,6 +59,9 @@ return Application::configure(basePath: dirname(__DIR__))
             // Central routes (admin + panel + auth) - managed by domain scoping
             require base_path('routes/central.php');
 
+            // Customer Portal routes (/account/*) - uses 'customer' guard
+            Route::middleware('web')->group(base_path('routes/customer.php'));
+
             // Webhook routes (Stripe, etc.) - no CSRF, no auth
             Route::middleware('api')->group(base_path('routes/webhooks.php'));
 
@@ -78,8 +81,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         // Configure redirect for unauthenticated users
-        // Both central and tenant use /admin/login for consistency
         $middleware->redirectGuestsTo(function (Request $request) {
+            // Customer portal routes redirect to customer login
+            if ($request->routeIs('customer.*')) {
+                return route('customer.login');
+            }
+            // Central admin routes redirect to central admin login
             if ($request->routeIs('central.admin.*')) {
                 return route('central.admin.auth.login');
             }
@@ -90,6 +97,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Configure redirect for authenticated users (trying to access login pages)
         // Check which guard the user is authenticated with to redirect to correct dashboard
         $middleware->redirectUsersTo(function (Request $request) {
+            // If authenticated as customer, redirect to customer dashboard
+            if (auth('customer')->check()) {
+                return route('customer.dashboard');
+            }
             // If authenticated as central admin, redirect to central admin dashboard
             if (auth('central')->check()) {
                 return route('central.admin.dashboard');
@@ -123,6 +134,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Middleware aliases
         $middleware->alias([
+            // Customer email verification (redirects to customer.verification.notice)
+            'customer.verified' => \App\Http\Middleware\Customer\EnsureCustomerEmailIsVerified::class,
+
             // Custom middleware (unified tenant access + impersonation restrictions)
             'tenant.access' => VerifyTenantAccess::class,
 

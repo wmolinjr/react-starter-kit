@@ -125,6 +125,18 @@ class HandleInertiaRequests extends Middleware
             ];
         }
 
+        // Customer: Billing entity - no Spatie roles/permissions
+        // Authenticated via 'customer' guard at /account/* routes
+        if ($user instanceof \App\Models\Central\Customer) {
+            return [
+                'user' => $user->toArray(),
+                'tenant' => null, // Customers manage tenants, don't belong to them
+                'permissions' => [], // Customers don't use Spatie Permission
+                'role' => 'customer',
+                'guard' => 'customer', // Indicate which guard is active
+            ];
+        }
+
         return [
             'user' => $user->toArray(),
 

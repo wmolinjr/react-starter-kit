@@ -1,0 +1,115 @@
+import InputError from '@/components/shared/feedback/input-error';
+import TextLink from '@/components/shared/typography/text-link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import AuthLayout from '@/layouts/auth-layout';
+import { Form, Head, usePage } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
+
+export default function Register() {
+    const { t } = useLaravelReactI18n();
+    const { errors } = usePage().props as { errors?: Record<string, string> };
+
+    return (
+        <AuthLayout
+            title={t('customer.create_account')}
+            description={t('customer.start_managing_billing')}
+        >
+            <Head title={t('auth.sign_up')} />
+
+            <Form
+                action="/account/register"
+                method="post"
+                className="flex flex-col gap-6"
+            >
+                {({ processing }) => (
+                    <>
+                        <div className="grid gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">{t('auth.name')}</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    required
+                                    autoFocus
+                                    tabIndex={1}
+                                    autoComplete="name"
+                                    placeholder={t('auth.full_name')}
+                                />
+                                <InputError message={errors?.name} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="email">
+                                    {t('auth.email_address')}
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    required
+                                    tabIndex={2}
+                                    autoComplete="email"
+                                    placeholder="email@example.com"
+                                />
+                                <InputError message={errors?.email} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">
+                                    {t('auth.password')}
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    tabIndex={3}
+                                    autoComplete="new-password"
+                                    placeholder={t('auth.password')}
+                                />
+                                <InputError message={errors?.password} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="password_confirmation">
+                                    {t('auth.confirm_password')}
+                                </Label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    name="password_confirmation"
+                                    required
+                                    tabIndex={4}
+                                    autoComplete="new-password"
+                                    placeholder={t('auth.confirm_password')}
+                                />
+                                <InputError message={errors?.password_confirmation} />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                className="mt-4 w-full"
+                                tabIndex={5}
+                                disabled={processing}
+                            >
+                                {processing && <Spinner />}
+                                {t('auth.sign_up')}
+                            </Button>
+                        </div>
+
+                        <div className="text-center text-sm text-muted-foreground">
+                            {t('auth.already_have_account')}{' '}
+                            <TextLink href="/account/login" tabIndex={6}>
+                                {t('auth.log_in')}
+                            </TextLink>
+                        </div>
+                    </>
+                )}
+            </Form>
+        </AuthLayout>
+    );
+}

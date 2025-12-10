@@ -1,0 +1,153 @@
+import CustomerLayout from '@/layouts/customer-layout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Form, Head, Link } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { CreditCard, Plus, Star, Trash2 } from 'lucide-react';
+
+interface PaymentMethod {
+    id: string;
+    brand: string;
+    last4: string;
+    exp_month: number;
+    exp_year: number;
+    is_default: boolean;
+}
+
+interface PaymentMethodsIndexProps {
+    paymentMethods: PaymentMethod[];
+    status?: string;
+}
+
+export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentMethodsIndexProps) {
+    const { t } = useLaravelReactI18n();
+
+    const getBrandIcon = (brand: string) => {
+        // Return brand name for now, could be replaced with actual icons
+        return brand.charAt(0).toUpperCase() + brand.slice(1);
+    };
+
+    return (
+        <CustomerLayout
+            breadcrumbs={[
+                { title: t('customer.dashboard'), href: '/account' },
+                { title: t('customer.payment_methods'), href: '/account/payment-methods' },
+            ]}
+        >
+            <Head title={t('customer.payment_methods')} />
+
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            {t('customer.payment_methods')}
+                        </h1>
+                        <p className="text-muted-foreground">
+                            {t('customer.payment_methods_description')}
+                        </p>
+                    </div>
+                    <Button asChild>
+                        <Link href="/account/payment-methods/create">
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('customer.add_payment_method')}
+                        </Link>
+                    </Button>
+                </div>
+
+                {status && (
+                    <div className="rounded-lg bg-green-50 p-4 text-green-700">
+                        {status === 'payment-method-added' && t('customer.payment_method_added')}
+                        {status === 'payment-method-removed' && t('customer.payment_method_removed')}
+                        {status === 'default-payment-method-updated' && t('customer.default_payment_method_updated')}
+                    </div>
+                )}
+
+                {paymentMethods.length === 0 ? (
+                    <Card>
+                        <CardContent className="flex flex-col items-center justify-center py-16">
+                            <CreditCard className="h-16 w-16 text-muted-foreground/50 mb-4" />
+                            <h3 className="text-lg font-medium mb-2">
+                                {t('customer.no_payment_methods')}
+                            </h3>
+                            <p className="text-muted-foreground text-center mb-4">
+                                {t('customer.no_payment_methods_description')}
+                            </p>
+                            <Button asChild>
+                                <Link href="/account/payment-methods/create">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t('customer.add_first_payment_method')}
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="space-y-4">
+                        {paymentMethods.map((method) => (
+                            <Card key={method.id}>
+                                <CardContent className="flex items-center justify-between py-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                                            <CreditCard className="h-6 w-6" />
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-medium">
+                                                    {getBrandIcon(method.brand)} **** {method.last4}
+                                                </p>
+                                                {method.is_default && (
+                                                    <Badge variant="secondary" className="text-xs">
+                                                        <Star className="mr-1 h-3 w-3" />
+                                                        {t('customer.default')}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-muted-foreground">
+                                                {t('customer.expires')} {method.exp_month}/{method.exp_year}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {!method.is_default && (
+                                            <Form
+                                                action={`/account/payment-methods/${method.id}/default`}
+                                                method="post"
+                                            >
+                                                {({ processing }) => (
+                                                    <Button
+                                                        type="submit"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        disabled={processing}
+                                                    >
+                                                        {t('customer.set_as_default')}
+                                                    </Button>
+                                                )}
+                                            </Form>
+                                        )}
+                                        <Form
+                                            action={`/account/payment-methods/${method.id}`}
+                                            method="delete"
+                                        >
+                                            {({ processing }) => (
+                                                <Button
+                                                    type="submit"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    disabled={processing}
+                                                    className="text-destructive hover:text-destructive"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                        </Form>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </CustomerLayout>
+    );
+}

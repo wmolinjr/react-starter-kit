@@ -77,6 +77,9 @@ class Tenant extends Model implements TenantWithDatabase
         'plan_enabled_permissions',
         'current_usage',
         'trial_ends_at',
+        // Customer billing (new architecture)
+        'customer_id',
+        'payment_method_id',
     ];
 
     protected $casts = [
@@ -113,6 +116,8 @@ class Tenant extends Model implements TenantWithDatabase
     {
         return [
             'id',
+            'customer_id',
+            'payment_method_id',
             'name',
             'slug',
             'data',
@@ -163,6 +168,55 @@ class Tenant extends Model implements TenantWithDatabase
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
+    }
+
+    // =========================================================================
+    // Customer Billing Relationship (New Architecture)
+    // =========================================================================
+
+    /**
+     * The customer who pays for this tenant.
+     */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * Get the billable entity for this tenant.
+     * Delegates billing to the customer.
+     */
+    public function getBillable(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    /**
+     * Check if this tenant has an active subscription via customer.
+     */
+    public function hasActiveSubscriptionViaCustomer(): bool
+    {
+        if (!$this->customer) {
+            return false;
+        }
+
+        return $this->customer->subscriptionForTenant($this)?->active() ?? false;
+    }
+
+    /**
+     * Get the active subscription for this tenant via customer.
+     */
+    public function getSubscriptionViaCustomer(): ?\Laravel\Cashier\Subscription
+    {
+        return $this->customer?->subscriptionForTenant($this);
+    }
+
+    /**
+     * Get payment method (tenant override or customer default).
+     */
+    public function getPaymentMethod(): ?object
+    {
+        return $this->customer?->paymentMethodForTenant($this);
     }
 
     /**

@@ -16,6 +16,8 @@ use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use Stancl\Tenancy\ResourceSyncing;
+use Stancl\Tenancy\ResourceSyncing\Listeners\UpdateOrCreateSyncedResource;
 
 /**
  * TenancyServiceProvider
@@ -131,11 +133,37 @@ class TenancyServiceProvider extends ServiceProvider
                 },
             ],
 
-            // Resource syncing
-            Events\SyncedResourceSaved::class => [
-                Listeners\UpdateSyncedResource::class,
+            // ─────────────────────────────────────────────────────────────────
+            // Resource Syncing Events (Customer ↔ Tenant\User)
+            // ─────────────────────────────────────────────────────────────────
+
+            // When a synced resource (Customer or Tenant\User) is saved
+            ResourceSyncing\Events\SyncedResourceSaved::class => [
+                ResourceSyncing\Listeners\UpdateOrCreateSyncedResource::class,
             ],
-            Events\SyncedResourceChangedInForeignDatabase::class => [],
+
+            // When a SyncMaster (Customer) is deleted
+            ResourceSyncing\Events\SyncMasterDeleted::class => [
+                ResourceSyncing\Listeners\DeleteResourcesInTenants::class,
+            ],
+
+            // When a SyncMaster (Customer) is restored from soft delete
+            ResourceSyncing\Events\SyncMasterRestored::class => [
+                ResourceSyncing\Listeners\RestoreResourcesInTenants::class,
+            ],
+
+            // When a Customer is attached to a Tenant (via pivot)
+            ResourceSyncing\Events\CentralResourceAttachedToTenant::class => [
+                ResourceSyncing\Listeners\CreateTenantResource::class,
+            ],
+
+            // When a Customer is detached from a Tenant (via pivot)
+            ResourceSyncing\Events\CentralResourceDetachedFromTenant::class => [
+                ResourceSyncing\Listeners\DeleteResourceInTenant::class,
+            ],
+
+            // Fired when sync happens in foreign database (for custom logic)
+            ResourceSyncing\Events\SyncedResourceSavedInForeignDatabase::class => [],
         ];
     }
 
@@ -188,6 +216,23 @@ class TenancyServiceProvider extends ServiceProvider
             // Redirect to login with error message
             return redirect()->route('login')
                 ->with('error', __('Your session has expired. Please log in again.'));
+        };
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Resource Syncing Configuration (Customer ↔ Tenant\User)
+        // ─────────────────────────────────────────────────────────────────────
+
+        // Production: Queue resource syncing operations for better performance
+        if (app()->environment('production')) {
+            UpdateOrCreateSyncedResource::$shouldQueue = true;
+        }
+
+        // Include soft-deleted records in sync queries
+        // This ensures deleted customers can still sync to tenant users
+        UpdateOrCreateSyncedResource::$scopeGetModelQuery = function ($query) {
+            if ($query->hasMacro('withTrashed')) {
+                $query->withTrashed();
+            }
         };
     }
 

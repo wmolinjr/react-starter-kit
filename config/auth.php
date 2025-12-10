@@ -52,6 +52,13 @@ return [
             'provider' => 'central_users',
         ],
 
+        // Guard for customers (billing entity, central database)
+        // Used for /account/* routes (customer portal)
+        'customer' => [
+            'driver' => 'session',
+            'provider' => 'customers',
+        ],
+
         // Sanctum guards - using smart PersonalAccessToken model that auto-detects context
         // @see App\Models\Shared\PersonalAccessToken
 
@@ -65,6 +72,12 @@ return [
         'central-sanctum' => [
             'driver' => 'sanctum',
             'provider' => 'central_users',
+        ],
+
+        // API tokens for customers (Sanctum)
+        'customer-sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'customers',
         ],
     ],
 
@@ -101,6 +114,12 @@ return [
         'central_users' => [
             'driver' => 'eloquent',
             'model' => App\Models\Central\User::class,
+        ],
+
+        // Customers (billing entities, customers table in central database)
+        'customers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Central\Customer::class,
         ],
     ],
 
@@ -141,6 +160,15 @@ return [
         'central_users' => [
             'provider' => 'central_users',
             'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+            'connection' => 'central', // Explicitly use central connection
+        ],
+
+        // Password reset for customers (central database)
+        'customers' => [
+            'provider' => 'customers',
+            'table' => 'customer_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
             'connection' => 'central', // Explicitly use central connection
