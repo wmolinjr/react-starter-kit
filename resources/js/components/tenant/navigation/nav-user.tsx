@@ -12,12 +12,12 @@ import {
 import { UserInfo } from '@/components/shared/user/user-info';
 import { TenantUserMenuContent } from '@/components/tenant/navigation/user-menu-content';
 import { useIsMobile } from '@/hooks/shared/use-mobile';
-import { type SharedData } from '@/types';
+import { type PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 
 export function TenantNavUser() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<PageProps>().props;
     const { state } = useSidebar();
     const isMobile = useIsMobile();
 

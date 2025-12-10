@@ -1,5 +1,5 @@
 import { send } from '@/routes/central/admin/auth/verification';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type PageProps } from '@/types';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
 import { Transition } from '@headlessui/react';
@@ -27,7 +27,7 @@ function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth, errors } = usePage<SharedData & { errors?: PageErrors }>().props;
+    const { auth, errors } = usePage<PageProps & { errors?: PageErrors }>().props;
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [

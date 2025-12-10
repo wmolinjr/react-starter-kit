@@ -66,9 +66,9 @@ class AddonServiceTest extends TenantTestCase
     {
         $available = $this->addonService->getAvailableAddons($this->tenant);
 
-        $this->assertIsArray($available);
-        $this->assertArrayHasKey('storage_50gb', $available);
-        $this->assertArrayHasKey('extra_users_5', $available);
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $available);
+        $this->assertTrue($available->contains('slug', 'storage_50gb'));
+        $this->assertTrue($available->contains('slug', 'extra_users_5'));
     }
 
     #[Test]

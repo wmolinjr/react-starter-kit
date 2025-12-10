@@ -11,7 +11,7 @@ import {
 import { useTenant } from '@/hooks/tenant/use-tenant';
 import centralProfile from '@/routes/central/admin/settings/profile';
 import tenantProfile from '@/routes/tenant/admin/user-settings/profile';
-import { type SharedData } from '@/types';
+import { type PageProps } from '@/types';
 
 interface LanguageSelectorProps {
     variant?: 'dropdown' | 'list';
@@ -19,7 +19,7 @@ interface LanguageSelectorProps {
 }
 
 export function LanguageSelector({ variant = 'dropdown', showLabel = true }: LanguageSelectorProps) {
-    const { locale, availableLocales, localeLabels } = usePage<SharedData>().props;
+    const { locale, availableLocales, localeLabels } = usePage<PageProps>().props;
     const { isTenantContext } = useTenant();
 
     // Use appropriate route based on context

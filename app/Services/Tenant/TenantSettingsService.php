@@ -257,11 +257,6 @@ class TenantSettingsService
 
             $tenant->updateConfig($configKey, $value);
         }
-
-        // Backward compatibility: sync locale with language.default
-        if (isset($data['locale'])) {
-            $tenant->updateSetting('language.default', $data['locale']);
-        }
     }
 
     /**

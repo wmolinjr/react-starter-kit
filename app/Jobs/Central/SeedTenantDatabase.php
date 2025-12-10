@@ -100,7 +100,7 @@ class SeedTenantDatabase implements ShouldQueue
             );
 
             // Set translations using Spatie's method to avoid double-encoding
-            $role->setTranslations('display_name', $tenantRole->displayName());
+            $role->setTranslations('display_name', $tenantRole->name());
             $role->setTranslations('description', $tenantRole->description());
             $role->save();
 

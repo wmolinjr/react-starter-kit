@@ -1,10 +1,10 @@
 import { login } from '@/routes/central/admin/auth';
 import central from '@/routes/central';
-import { type SharedData } from '@/types';
+import { type PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<PageProps>().props;
 
     return (
         <>

@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import type { SharedData } from '@/types';
+import type { PageProps } from '@/types';
 import type { AddonSubscription, AddonCatalogItem } from '@/types/addons';
 
 interface AddonsData {
@@ -25,7 +25,7 @@ interface UseAddonsReturn {
 }
 
 export function useAddons(): UseAddonsReturn {
-    const { addons } = usePage<SharedData & { addons: AddonsData | null }>().props;
+    const { addons } = usePage<PageProps & { addons: AddonsData | null }>().props;
 
     const active = addons?.active || [];
     const catalog = addons?.catalog || [];

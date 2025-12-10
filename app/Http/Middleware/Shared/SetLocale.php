@@ -15,7 +15,7 @@ class SetLocale
      *
      * Sets the application locale based on priority:
      * 1. Authenticated user's locale preference
-     * 2. Tenant's default language (if in tenant context)
+     * 2. Tenant's locale (already in config via TenantConfigBootstrapper)
      * 3. Cookie 'locale' (for guests)
      * 4. Accept-Language header (browser preference)
      * 5. App's default locale
@@ -46,12 +46,11 @@ class SetLocale
             }
         }
 
-        // 2. Tenant's default language (for tenant context)
-        if (tenancy()->initialized) {
-            $tenantLocale = tenant()?->getSetting('language.default');
-            if ($tenantLocale && in_array($tenantLocale, $availableLocales)) {
-                return $tenantLocale;
-            }
+        // 2. Tenant's locale (already set in config by TenantConfigBootstrapper)
+        // Note: TenantConfigBootstrapper sets config('app.locale') from tenant's config.locale setting
+        $configLocale = config('app.locale');
+        if ($configLocale && in_array($configLocale, $availableLocales)) {
+            return $configLocale;
         }
 
         // 3. Cookie locale (for guests who selected a language)

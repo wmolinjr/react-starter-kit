@@ -109,7 +109,7 @@ trait WithTenant
             $role = Role::firstOrCreate(
                 ['name' => $tenantRole->value, 'guard_name' => 'tenant'],
                 [
-                    'display_name' => $tenantRole->displayName(),
+                    'display_name' => $tenantRole->name(),
                     'description' => $tenantRole->description(),
                     'is_protected' => $tenantRole->isSystemRole(),
                 ]

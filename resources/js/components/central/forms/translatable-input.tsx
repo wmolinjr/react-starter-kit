@@ -159,7 +159,7 @@ export function ensureTranslations(
     }
 
     if (typeof value === 'string') {
-        // Legacy: single string, use as fallback for all locales
+        // Fallback: single string, use as value for all locales
         return locales.reduce((acc, l) => ({ ...acc, [l]: value }), {});
     }
 

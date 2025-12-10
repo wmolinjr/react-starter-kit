@@ -203,8 +203,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get user's preferred locale with fallback chain:
      * 1. User's explicit locale preference
-     * 2. Tenant's default language (if available)
-     * 3. App's default locale
+     * 2. App's current locale (set by TenantConfigBootstrapper from tenant settings)
      */
     public function getPreferredLocale(): string
     {
@@ -213,15 +212,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return $this->locale;
         }
 
-        // Fallback to tenant's default language (via tenant settings if available)
-        if (tenancy()->initialized) {
-            $tenantLocale = tenant()?->getSetting('language.default');
-            if ($tenantLocale && in_array($tenantLocale, config('app.locales', []))) {
-                return $tenantLocale;
-            }
-        }
-
-        // Final fallback to app default
+        // Fallback to app locale (already set by TenantConfigBootstrapper from tenant config.locale)
         return config('app.locale', 'en');
     }
 

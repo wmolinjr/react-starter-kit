@@ -34,18 +34,6 @@ enum TenantRole: string
     }
 
     /**
-     * Get translatable display name (alias for name()).
-     *
-     * @return array<string, string>
-     *
-     * @deprecated Use name() instead
-     */
-    public function displayName(): array
-    {
-        return $this->name();
-    }
-
-    /**
      * Get translatable description.
      *
      * @return array<string, string>

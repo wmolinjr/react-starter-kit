@@ -336,12 +336,6 @@ class AddonBundle extends Model
         $features = $this->features ?? [];
 
         return collect($features)->map(function ($feature) use ($locale) {
-            // If feature is already a string (legacy format), return as-is
-            if (is_string($feature)) {
-                return $feature;
-            }
-
-            // If feature is an array of translations, get the correct locale
             if (is_array($feature)) {
                 return $feature[$locale] ?? $feature['en'] ?? array_values($feature)[0] ?? '';
             }

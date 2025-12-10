@@ -159,7 +159,3 @@ export interface PageProps extends LocaleConfig {
     currency: CurrencyConfig;
     [key: string]: unknown;
 }
-
-// Deprecated: Use PageProps instead
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SharedData extends PageProps {}

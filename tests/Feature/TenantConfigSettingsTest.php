@@ -45,7 +45,7 @@ class TenantConfigSettingsTest extends TestCase
     {
         $settings = $this->service->getConfigSettings($this->tenant);
 
-        $this->assertArrayHasKey('tenant', $settings);
+        $this->assertArrayHasKey('tenantData', $settings);
         $this->assertArrayHasKey('config', $settings);
         $this->assertArrayHasKey('availableLocales', $settings);
         $this->assertArrayHasKey('localeLabels', $settings);
@@ -53,10 +53,10 @@ class TenantConfigSettingsTest extends TestCase
         $this->assertArrayHasKey('availableCurrencies', $settings);
 
         // Verify tenant structure
-        $this->assertArrayHasKey('id', $settings['tenant']);
-        $this->assertArrayHasKey('name', $settings['tenant']);
-        $this->assertEquals($this->tenant->id, $settings['tenant']['id']);
-        $this->assertEquals($this->tenant->name, $settings['tenant']['name']);
+        $this->assertArrayHasKey('id', $settings['tenantData']);
+        $this->assertArrayHasKey('name', $settings['tenantData']);
+        $this->assertEquals($this->tenant->id, $settings['tenantData']['id']);
+        $this->assertEquals($this->tenant->name, $settings['tenantData']['name']);
     }
 
     public function test_get_config_settings_includes_all_config_keys(): void
@@ -206,18 +206,6 @@ class TenantConfigSettingsTest extends TestCase
         $this->tenant->refresh();
 
         $this->assertEquals('pt_BR', $this->tenant->getConfig(TenantConfigKey::LOCALE));
-    }
-
-    public function test_update_config_syncs_locale_with_language_default(): void
-    {
-        $this->service->updateConfig($this->tenant, [
-            'locale' => 'pt_BR',
-        ]);
-
-        $this->tenant->refresh();
-
-        // Should also update legacy language.default setting
-        $this->assertEquals('pt_BR', $this->tenant->getSetting('language.default'));
     }
 
     public function test_get_config_settings_returns_tenant_values(): void

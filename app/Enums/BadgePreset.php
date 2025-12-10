@@ -239,23 +239,4 @@ enum BadgePreset: string
         return $map;
     }
 
-    /**
-     * Convert to array for frontend (alias for toFrontend).
-     *
-     * @deprecated Use toFrontend() instead
-     */
-    public function toArray(): array
-    {
-        return $this->toFrontend();
-    }
-
-    /**
-     * Get all badges as array for frontend (alias for toFrontendArray).
-     *
-     * @deprecated Use toFrontendArray() instead
-     */
-    public static function all(): array
-    {
-        return self::toFrontendArray();
-    }
 }

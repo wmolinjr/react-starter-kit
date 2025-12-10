@@ -245,10 +245,10 @@ Use `usePage()` para acessar shared data e evitar prop drilling.
 
 ```tsx
 import { usePage } from '@inertiajs/react';
-import { type SharedData } from '@/types';
+import { type PageProps } from '@/types';
 
 export default function Profile() {
-    const { auth, name, quote, sidebarOpen } = usePage<SharedData>().props;
+    const { auth, name, quote, sidebarOpen } = usePage<PageProps>().props;
 
     return (
         <div>
@@ -262,10 +262,10 @@ export default function Profile() {
 #### Props Disponíveis via usePage()
 
 ```tsx
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 page.component  // Nome do componente atual (ex: "settings/profile")
-page.props      // Props da página (tipados com SharedData)
+page.props      // Props da página (tipados com PageProps)
 page.url        // URL atual
 page.version    // Versão dos assets (para cache busting)
 ```
@@ -289,7 +289,7 @@ public function share(Request $request): array {
 Interface TypeScript (`resources/js/types/index.d.ts`):
 
 ```typescript
-export interface SharedData {
+export interface PageProps {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
@@ -300,7 +300,7 @@ export interface SharedData {
 **✅ CORRETO - Usar usePage():**
 ```tsx
 function UserProfile() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<PageProps>().props;
     return <p>{auth.user.name}</p>;
 }
 ```
@@ -483,7 +483,7 @@ export default function Login({
 }
 ```
 
-### Interface SharedData
+### Interface PageProps
 
 Defina tipos para shared data em `resources/js/types/index.d.ts`:
 
@@ -503,7 +503,7 @@ export interface User {
     updated_at: string;
 }
 
-export interface SharedData {
+export interface PageProps {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
@@ -513,7 +513,7 @@ export interface SharedData {
 
 Use com `usePage()`:
 ```tsx
-const { auth } = usePage<SharedData>().props;
+const { auth } = usePage<PageProps>().props;
 // auth.user.email é totalmente tipado!
 ```
 
@@ -642,7 +642,7 @@ const navItems: NavItem[] = [
 
 Permite imports limpos:
 ```tsx
-import { SharedData } from '@/types';
+import { PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { usePage } from '@inertiajs/react';
 ```
@@ -781,7 +781,7 @@ export default function Page({ mustVerifyEmail, status }: PageProps) {
 ### Padrão 3: Shared Data com usePage
 
 ```tsx
-const { auth } = usePage<SharedData>().props;
+const { auth } = usePage<PageProps>().props;
 
 {auth.user && (
     <UserMenu user={auth.user} />
@@ -837,7 +837,7 @@ import { store } from '@/routes/profile';
 ### Padrão 7: Conditional Rendering
 
 ```tsx
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 const { auth, canRegister } = page.props;
 
 {auth.user ? (
@@ -869,7 +869,7 @@ function App({ auth, user, settings }) {
 **✅ CORRETO:**
 ```tsx
 function Component() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<PageProps>().props;
     return <p>{auth.user.name}</p>;
 }
 ```
@@ -1028,7 +1028,7 @@ const [errors, setErrors] = useState({});
 | **Forms** | `useForm()` manual | `<Form>` com render props | Form component sempre |
 | **Props** | Sem tipos | TypeScript interfaces | Sempre tipar props |
 | **Rotas** | Strings literais | Wayfinder type-safe | Importar de @/routes |
-| **Shared Data** | Prop drilling | `usePage<SharedData>()` | usePage em qualquer lugar |
+| **Shared Data** | Prop drilling | `usePage<PageProps>()` | usePage em qualquer lugar |
 | **Navegação** | `router.post()` direto | `<Link>` ou `<Form>` | Link/Form > router |
 | **SSR** | Limitado | Nativo com `createServer` | ssr.tsx configurado |
 | **Type Safety** | Parcial | Strict mode completo | strict: true no tsconfig |
@@ -1081,7 +1081,7 @@ Ao desenvolver com Inertia v2, sempre:
 
 - [ ] Usar `<Form>` com render props ao invés de `useForm()` manual
 - [ ] Tipar props de páginas com interfaces TypeScript
-- [ ] Usar `usePage<SharedData>()` ao invés de prop drilling
+- [ ] Usar `usePage<PageProps>()` ao invés de prop drilling
 - [ ] Importar rotas de `@/routes` com Wayfinder (nunca strings)
 - [ ] Usar `<Link>` para navegação (não `router.visit()` direto)
 - [ ] Adicionar `prefetch` em Links importantes
