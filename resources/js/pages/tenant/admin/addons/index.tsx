@@ -30,6 +30,8 @@ import {
     ActiveAddonCard,
     BundleCard,
     PricingToggle,
+    CheckoutCartButton,
+    CheckoutPaymentSheet,
 } from '@/components/shared/billing';
 import { BillingPeriodProvider, useBillingPeriod, useCheckout, createCheckoutItem } from '@/hooks/billing';
 import type { BreadcrumbItem, AddonResource, BundleResource, BillingPeriod } from '@/types';
@@ -82,10 +84,18 @@ function AddonsPageContent({
 }: AddonsPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();
-    const { addItem, hasProduct } = useCheckout();
+    const { items, addItem, removeItem, updateQuantity, clearCart, hasProduct, total } = useCheckout();
     const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
     const [cancelingAddon, setCancelingAddon] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+
+    // Check if cart has recurring items (for payment method filtering)
+    const hasRecurringItems = items.some((item) => item.isRecurring);
+
+    // Cart item count
+    const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const cartTotal = total;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -292,6 +302,13 @@ function AddonsPageContent({
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
+                        <CheckoutCartButton
+                            itemCount={cartItemCount}
+                            total={cartTotal}
+                            currency="BRL"
+                            onClick={() => setIsCartOpen(true)}
+                            variant={cartItemCount > 0 ? 'default' : 'outline'}
+                        />
                         <Button variant="outline" onClick={() => router.visit(admin.billing.index.url())}>
                             <CreditCard className="mr-2 h-4 w-4" />
                             {t('tenant.billing.title', { default: 'Billing' })}
@@ -474,6 +491,23 @@ function AddonsPageContent({
                     </Tabs>
                 </PageContent>
             </Page>
+
+            {/* Checkout Payment Sheet */}
+            <CheckoutPaymentSheet
+                open={isCartOpen}
+                onOpenChange={setIsCartOpen}
+                items={items}
+                billingPeriod={period}
+                onBillingPeriodChange={(p) => setPeriod(p as 'monthly' | 'yearly')}
+                onRemoveItem={removeItem}
+                onUpdateQuantity={updateQuantity}
+                onClearCart={clearCart}
+                currency="BRL"
+                showBillingToggle={true}
+                yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                availableMethods={['card', 'pix', 'boleto']}
+                hasRecurring={hasRecurringItems}
+            />
         </>
     );
 }

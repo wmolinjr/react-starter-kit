@@ -4,6 +4,7 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     Building2,
     ClipboardList,
+    CreditCard,
     Gauge,
     Shield,
     ShieldCheck,
@@ -114,6 +115,13 @@ export function useCentralAdminNavItems(): NavItem[] {
             title: t('sidebar.audit_log'),
             href: admin.audit.index.url(),
             icon: ClipboardList,
+        },
+
+        // Payments - single item
+        {
+            title: t('sidebar.payments'),
+            href: admin.payments.index.url(),
+            icon: CreditCard,
         },
     ];
 }

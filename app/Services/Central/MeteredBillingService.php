@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Central;
 
 use App\Models\Central\Addon;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Tenant;
+use App\Models\Central\UsageRecord;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 
@@ -34,6 +39,98 @@ class MeteredBillingService
     protected function getBandwidthOverageAddon(): ?Addon
     {
         return Addon::where('slug', 'bandwidth_overage')->first();
+    }
+
+    /**
+     * Record usage for a tenant.
+     * Creates a local UsageRecord for historical tracking.
+     */
+    public function recordUsage(
+        Tenant $tenant,
+        string $usageType,
+        int $quantity,
+        string $unit = 'units',
+        ?Addon $addon = null,
+        ?array $metadata = null
+    ): UsageRecord {
+        $billingPeriod = $this->getCurrentBillingPeriod($tenant);
+        $planLimit = $this->getPlanLimitForUsageType($tenant, $usageType);
+        $overage = max(0, $quantity - $planLimit);
+        $unitPrice = $addon?->price_metered ?? 0;
+        $totalCost = $this->calculateUsageCost($overage, $unitPrice, $unit);
+
+        return UsageRecord::create([
+            'tenant_id' => $tenant->id,
+            'addon_id' => $addon?->id,
+            'usage_type' => $usageType,
+            'quantity' => $quantity,
+            'unit' => $unit,
+            'plan_limit' => $planLimit,
+            'overage' => $overage,
+            'unit_price' => $unitPrice,
+            'total_cost' => $totalCost,
+            'billing_period_start' => $billingPeriod['start'],
+            'billing_period_end' => $billingPeriod['end'],
+            'metadata' => $metadata,
+        ]);
+    }
+
+    /**
+     * Get current billing period for tenant.
+     *
+     * @return array{start: Carbon, end: Carbon}
+     */
+    public function getCurrentBillingPeriod(Tenant $tenant): array
+    {
+        // Try to get from subscription
+        $subscription = $tenant->subscription('default');
+
+        if ($subscription && $subscription->billing_period_starts_at) {
+            $start = Carbon::parse($subscription->billing_period_starts_at);
+            $end = Carbon::parse($subscription->billing_period_ends_at ?? $start->copy()->addMonth());
+        } else {
+            // Default to calendar month
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now()->endOfMonth();
+        }
+
+        return ['start' => $start, 'end' => $end];
+    }
+
+    /**
+     * Get plan limit for a specific usage type.
+     */
+    protected function getPlanLimitForUsageType(Tenant $tenant, string $usageType): int
+    {
+        if (! $tenant->plan) {
+            return 0;
+        }
+
+        return match ($usageType) {
+            'storage' => $tenant->plan->getLimit('storage') ?? 0,
+            'bandwidth' => 100000, // Default 100GB free tier
+            'api_calls' => $tenant->plan->getLimit('api_calls') ?? 0,
+            default => 0,
+        };
+    }
+
+    /**
+     * Calculate usage cost.
+     */
+    protected function calculateUsageCost(int $overage, int $unitPrice, string $unit): int
+    {
+        if ($overage <= 0 || $unitPrice <= 0) {
+            return 0;
+        }
+
+        if ($unit === 'MB') {
+            // Convert MB to GB for pricing
+            $overageGB = $overage / 1024;
+
+            return (int) round($overageGB * $unitPrice);
+        }
+
+        return $overage * $unitPrice;
     }
 
     /**
@@ -67,13 +164,26 @@ class MeteredBillingService
         }
 
         try {
-            $this->stripe->billing->meterEvents->create([
+            $meterEvent = $this->stripe->billing->meterEvents->create([
                 'event_name' => $addon->stripe_meter_id,
                 'payload' => [
                     'stripe_customer_id' => $tenant->stripe_id,
                     'value' => (string) round($overageGB, 2),
                 ],
             ]);
+
+            // Record locally
+            $record = $this->recordUsage(
+                tenant: $tenant,
+                usageType: 'storage',
+                quantity: $storageUsedMB,
+                unit: 'MB',
+                addon: $addon,
+                metadata: ['stripe_event' => $meterEvent->id ?? null]
+            );
+
+            // Mark as reported
+            $record->markAsReported($meterEvent->id ?? null);
 
             // Update metered addon record if exists
             $this->updateMeteredAddon($tenant, 'storage_overage', $overageGB);
@@ -120,13 +230,26 @@ class MeteredBillingService
         }
 
         try {
-            $this->stripe->billing->meterEvents->create([
+            $meterEvent = $this->stripe->billing->meterEvents->create([
                 'event_name' => $addon->stripe_meter_id,
                 'payload' => [
                     'stripe_customer_id' => $tenant->stripe_id,
                     'value' => (string) round($overageGB, 2),
                 ],
             ]);
+
+            // Record locally
+            $record = $this->recordUsage(
+                tenant: $tenant,
+                usageType: 'bandwidth',
+                quantity: $bandwidthUsedMB,
+                unit: 'MB',
+                addon: $addon,
+                metadata: ['stripe_event' => $meterEvent->id ?? null]
+            );
+
+            // Mark as reported
+            $record->markAsReported($meterEvent->id ?? null);
 
             $this->updateMeteredAddon($tenant, 'bandwidth_overage', $overageGB);
 
@@ -247,5 +370,131 @@ class MeteredBillingService
         $pricePerGB = $addon->price_metered ?? 0;
 
         return (int) round($overageGB * $pricePerGB);
+    }
+
+    /**
+     * Get usage history for a tenant.
+     *
+     * @return Collection<int, UsageRecord>
+     */
+    public function getUsageHistory(
+        Tenant $tenant,
+        ?string $usageType = null,
+        ?Carbon $from = null,
+        ?Carbon $to = null,
+        int $limit = 100
+    ): Collection {
+        $query = UsageRecord::where('tenant_id', $tenant->id);
+
+        if ($usageType) {
+            $query->where('usage_type', $usageType);
+        }
+
+        if ($from) {
+            $query->where('created_at', '>=', $from);
+        }
+
+        if ($to) {
+            $query->where('created_at', '<=', $to);
+        }
+
+        return $query->latest()->limit($limit)->get();
+    }
+
+    /**
+     * Get aggregated usage for a billing period.
+     */
+    public function getAggregatedUsage(Tenant $tenant, Carbon $periodStart, Carbon $periodEnd): array
+    {
+        $records = UsageRecord::where('tenant_id', $tenant->id)
+            ->where('billing_period_start', '>=', $periodStart)
+            ->where('billing_period_end', '<=', $periodEnd)
+            ->get();
+
+        $aggregated = [];
+
+        foreach ($records as $record) {
+            $type = $record->usage_type;
+            if (! isset($aggregated[$type])) {
+                $aggregated[$type] = [
+                    'total_quantity' => 0,
+                    'total_overage' => 0,
+                    'total_cost' => 0,
+                    'records_count' => 0,
+                ];
+            }
+
+            $aggregated[$type]['total_quantity'] += $record->quantity;
+            $aggregated[$type]['total_overage'] += $record->overage;
+            $aggregated[$type]['total_cost'] += $record->total_cost;
+            $aggregated[$type]['records_count']++;
+        }
+
+        return $aggregated;
+    }
+
+    /**
+     * Get unreported usage records that need to be sent to billing provider.
+     *
+     * @return Collection<int, UsageRecord>
+     */
+    public function getUnreportedRecords(?Tenant $tenant = null): Collection
+    {
+        $query = UsageRecord::where('reported_to_provider', false)
+            ->where('overage', '>', 0);
+
+        if ($tenant) {
+            $query->where('tenant_id', $tenant->id);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Process and report all unreported usage records to Stripe.
+     */
+    public function processUnreportedRecords(): int
+    {
+        if (! $this->stripe) {
+            return 0;
+        }
+
+        $processed = 0;
+        $records = $this->getUnreportedRecords();
+
+        foreach ($records as $record) {
+            try {
+                $tenant = $record->tenant;
+                if (! $tenant || ! $tenant->stripe_id) {
+                    continue;
+                }
+
+                $addon = $record->addon;
+                if (! $addon || ! $addon->stripe_meter_id) {
+                    continue;
+                }
+
+                // Convert overage to appropriate unit
+                $value = $record->unit === 'MB' ? $record->overage / 1024 : $record->overage;
+
+                $meterEvent = $this->stripe->billing->meterEvents->create([
+                    'event_name' => $addon->stripe_meter_id,
+                    'payload' => [
+                        'stripe_customer_id' => $tenant->stripe_id,
+                        'value' => (string) round($value, 2),
+                    ],
+                ]);
+
+                $record->markAsReported($meterEvent->id ?? null);
+                $processed++;
+            } catch (\Exception $e) {
+                Log::error('Failed to process usage record', [
+                    'record_id' => $record->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $processed;
     }
 }

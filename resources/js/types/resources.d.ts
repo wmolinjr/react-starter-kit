@@ -290,6 +290,38 @@ export interface ImpersonationUserResource {
     roles: string[];
 }
 
+export interface PaymentAdminResource {
+    id: string;
+    tenant_id: string | null;
+    customer_id: string | null;
+    payment_method_id: string | null;
+    provider: string;
+    provider_payment_id: string | null;
+    provider_data: Record<string, unknown> | null;
+    amount: number;
+    formatted_amount: string;
+    currency: string;
+    refunded_amount: number;
+    formatted_refunded_amount: string;
+    status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'canceled' | 'refunded' | 'partially_refunded';
+    status_label: string;
+    status_color: string;
+    payment_method: string | null;
+    payment_method_label: string;
+    description: string | null;
+    metadata: Record<string, unknown> | null;
+    paid_at: string | null;
+    failed_at: string | null;
+    refunded_at: string | null;
+    created_at: string;
+    tenant: { id: string; name: string } | undefined;
+    customer: { id: string; name: string; email: string } | undefined;
+    payment_method_details: { type: string; brand: string | null; last_four: string | null } | undefined;
+    can_refund: boolean;
+    refundable_amount: number;
+    formatted_refundable_amount: string;
+}
+
 export interface PaymentMethodResource {
     id: string;
     type: 'card' | 'pix' | 'boleto' | 'bank_transfer';

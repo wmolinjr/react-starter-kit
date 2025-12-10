@@ -22,6 +22,7 @@ class CartCheckoutRequest extends FormRequest
             'items.*.slug' => ['required', 'string', 'max:100'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:100'],
             'items.*.billing_period' => ['required', 'in:monthly,yearly,one_time'],
+            'payment_method' => ['sometimes', 'string', 'in:card,pix,boleto'],
         ];
     }
 

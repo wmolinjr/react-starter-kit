@@ -4,7 +4,7 @@
  * Components for the checkout cart and order summary.
  *
  * @example
- * import { CheckoutSheet, CheckoutLineItem, CheckoutSummary } from '@/components/shared/billing/checkout';
+ * import { CheckoutSheet, CheckoutPaymentSheet, CheckoutLineItem, CheckoutSummary } from '@/components/shared/billing/checkout';
  */
 
 export {
@@ -25,3 +25,8 @@ export {
     type CheckoutSheetProps,
     type CheckoutCartButtonProps,
 } from './checkout-sheet';
+
+export {
+    CheckoutPaymentSheet,
+    type CheckoutPaymentSheetProps,
+} from './checkout-payment-sheet';

@@ -24,6 +24,7 @@ class CustomerService
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {}
+
     /**
      * Register a new customer and create their first tenant.
      *

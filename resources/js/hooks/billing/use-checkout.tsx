@@ -4,10 +4,21 @@ import {
     useState,
     useCallback,
     useEffect,
+    useRef,
     type ReactNode,
 } from 'react';
+import { toast } from 'sonner';
 import type { BillingPeriod } from '@/types/enums';
 import type { BillingProduct, CheckoutItem } from '@/types/billing';
+
+/** Time in milliseconds before cart expires (24 hours) */
+const CART_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
+/** Stored cart data structure */
+interface StoredCart {
+    items: CheckoutItem[];
+    timestamp: number;
+}
 
 interface CheckoutContextValue {
     /** Items in the cart */
@@ -19,12 +30,15 @@ interface CheckoutContextValue {
     /** Default billing period for new items */
     defaultBillingPeriod: BillingPeriod;
 
+    /** Whether cart is being restored from storage */
+    isRestoring: boolean;
+
     // Actions
     /** Add an item to the cart */
-    addItem: (item: Omit<CheckoutItem, 'id'>) => void;
+    addItem: (item: Omit<CheckoutItem, 'id'>, showToast?: boolean) => void;
 
     /** Remove an item from the cart */
-    removeItem: (id: string) => void;
+    removeItem: (id: string, showToast?: boolean) => void;
 
     /** Update item quantity */
     updateQuantity: (id: string, quantity: number) => void;
@@ -33,7 +47,7 @@ interface CheckoutContextValue {
     updateBillingPeriod: (id: string, billingPeriod: BillingPeriod) => void;
 
     /** Clear all items */
-    clearCart: () => void;
+    clearCart: (showToast?: boolean) => void;
 
     /** Open the checkout sheet */
     open: () => void;
@@ -65,6 +79,9 @@ interface CheckoutContextValue {
 
     /** Get item by product slug */
     getItemBySlug: (slug: string) => CheckoutItem | undefined;
+
+    /** Time remaining until cart expires (in minutes) */
+    expiresInMinutes: number | null;
 }
 
 const STORAGE_KEY = 'checkout-cart';
@@ -95,6 +112,43 @@ function generateId(): string {
 }
 
 /**
+ * Load cart from localStorage with expiry check
+ */
+function loadStoredCart(): { items: CheckoutItem[]; timestamp: number } {
+    if (typeof window === 'undefined') {
+        return { items: [], timestamp: Date.now() };
+    }
+
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+            return { items: [], timestamp: Date.now() };
+        }
+
+        const data = JSON.parse(stored);
+
+        // Handle legacy format (array only)
+        if (Array.isArray(data)) {
+            return { items: data, timestamp: Date.now() };
+        }
+
+        // Check expiry
+        const storedCart = data as StoredCart;
+        const now = Date.now();
+        const isExpired = now - storedCart.timestamp > CART_EXPIRY_MS;
+
+        if (isExpired) {
+            localStorage.removeItem(STORAGE_KEY);
+            return { items: [], timestamp: now };
+        }
+
+        return storedCart;
+    } catch {
+        return { items: [], timestamp: Date.now() };
+    }
+}
+
+/**
  * CheckoutProvider - Provides checkout cart state to children
  *
  * @example
@@ -103,33 +157,61 @@ function generateId(): string {
  * </CheckoutProvider>
  */
 export function CheckoutProvider({ children }: { children: ReactNode }) {
-    const [items, setItems] = useState<CheckoutItem[]>(() => {
-        if (typeof window === 'undefined') return [];
-
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : [];
-        } catch {
-            return [];
-        }
-    });
-
+    const [items, setItems] = useState<CheckoutItem[]>([]);
+    const [cartTimestamp, setCartTimestamp] = useState<number>(Date.now());
+    const [isRestoring, setIsRestoring] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [defaultBillingPeriod, setDefaultBillingPeriod] = useState<BillingPeriod>('monthly');
+    const initialLoadRef = useRef(false);
 
-    // Persist to localStorage
+    // Initialize cart from storage
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-        }
-    }, [items]);
+        if (initialLoadRef.current) return;
+        initialLoadRef.current = true;
 
-    const addItem = useCallback((item: Omit<CheckoutItem, 'id'>) => {
+        const { items: storedItems, timestamp } = loadStoredCart();
+        setItems(storedItems);
+        setCartTimestamp(timestamp);
+        setIsRestoring(false);
+
+        // Show notification if cart was restored with items
+        if (storedItems.length > 0) {
+            const itemCount = storedItems.reduce((sum, item) => sum + item.quantity, 0);
+            toast.info(`Cart restored with ${itemCount} item${itemCount > 1 ? 's' : ''}`, {
+                description: 'Your previous cart has been restored.',
+                duration: 3000,
+            });
+        }
+    }, []);
+
+    // Persist to localStorage with timestamp
+    useEffect(() => {
+        if (typeof window !== 'undefined' && !isRestoring) {
+            const cartData: StoredCart = {
+                items,
+                timestamp: items.length > 0 ? cartTimestamp : Date.now(),
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cartData));
+        }
+    }, [items, cartTimestamp, isRestoring]);
+
+    // Calculate expiry time
+    const expiresInMinutes = items.length > 0
+        ? Math.max(0, Math.floor((CART_EXPIRY_MS - (Date.now() - cartTimestamp)) / 60000))
+        : null;
+
+    const addItem = useCallback((item: Omit<CheckoutItem, 'id'>, showToast = true) => {
         setItems((prev) => {
             const existingItem = prev.find((i) => i.product.slug === item.product.slug);
 
             if (existingItem && item.product.type !== 'plan') {
                 // Update quantity for existing addon/bundle
+                if (showToast) {
+                    toast.success('Quantity updated', {
+                        description: `${item.product.name} quantity increased`,
+                        duration: 2000,
+                    });
+                }
                 return prev.map((i) =>
                     i.id === existingItem.id
                         ? {
@@ -145,14 +227,31 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
             }
 
             // Add new item
+            if (showToast) {
+                toast.success('Added to cart', {
+                    description: item.product.name,
+                    duration: 2000,
+                });
+            }
             return [...prev, { ...item, id: generateId() }];
         });
 
+        // Update timestamp when adding items
+        setCartTimestamp(Date.now());
         setIsOpen(true);
     }, []);
 
-    const removeItem = useCallback((id: string) => {
-        setItems((prev) => prev.filter((item) => item.id !== id));
+    const removeItem = useCallback((id: string, showToast = true) => {
+        setItems((prev) => {
+            const item = prev.find((i) => i.id === id);
+            if (item && showToast) {
+                toast.info('Removed from cart', {
+                    description: item.product.name,
+                    duration: 2000,
+                });
+            }
+            return prev.filter((i) => i.id !== id);
+        });
     }, []);
 
     const updateQuantity = useCallback((id: string, quantity: number) => {
@@ -176,8 +275,15 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         );
     }, []);
 
-    const clearCart = useCallback(() => {
+    const clearCart = useCallback((showToast = true) => {
         setItems([]);
+        setCartTimestamp(Date.now());
+        if (showToast) {
+            toast.info('Cart cleared', {
+                description: 'All items have been removed',
+                duration: 2000,
+            });
+        }
     }, []);
 
     const open = useCallback(() => setIsOpen(true), []);
@@ -204,6 +310,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         items,
         isOpen,
         defaultBillingPeriod,
+        isRestoring,
         addItem,
         removeItem,
         updateQuantity,
@@ -219,6 +326,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         hasItems,
         hasProduct,
         getItemBySlug,
+        expiresInMinutes,
     };
 
     return (
@@ -272,6 +380,7 @@ export function useCheckoutSafe(): CheckoutContextValue {
             items: [],
             isOpen: false,
             defaultBillingPeriod: 'monthly',
+            isRestoring: false,
             addItem: () => {},
             removeItem: () => {},
             updateQuantity: () => {},
@@ -287,6 +396,7 @@ export function useCheckoutSafe(): CheckoutContextValue {
             hasItems: false,
             hasProduct: () => false,
             getItemBySlug: () => undefined,
+            expiresInMinutes: null,
         };
     }
 

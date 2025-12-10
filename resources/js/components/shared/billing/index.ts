@@ -61,3 +61,7 @@ export {
     type PaymentMethodSelectorProps,
     type PaymentMethod,
 } from './payment-method-selector';
+
+// Cart status components - Cart indicators and warnings
+export { CartStatusBadge } from './cart-status-badge';
+export { CartExpiryWarning } from './cart-expiry-warning';

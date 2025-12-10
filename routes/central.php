@@ -10,6 +10,7 @@ use App\Http\Controllers\Central\Admin\DashboardController;
 use App\Http\Controllers\Central\Admin\FederationConflictController;
 use App\Http\Controllers\Central\Admin\FederationGroupController;
 use App\Http\Controllers\Central\Admin\ImpersonationController;
+use App\Http\Controllers\Central\Admin\PaymentController;
 use App\Http\Controllers\Central\Admin\PlanCatalogController;
 use App\Http\Controllers\Central\Admin\RoleManagementController;
 use App\Http\Controllers\Central\Admin\TenantManagementController;
@@ -279,6 +280,14 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::get('/', [AuditLogController::class, 'index'])->name('index');
                     Route::get('/export', [AuditLogController::class, 'export'])->name('export');
                     Route::get('/{activity}', [AuditLogController::class, 'show'])->name('show');
+                });
+
+                // Payment Management
+                Route::prefix('payments')->name('payments.')->group(function () {
+                    Route::get('/', [PaymentController::class, 'index'])->name('index');
+                    Route::get('/export', [PaymentController::class, 'export'])->name('export');
+                    Route::get('/{payment}', [PaymentController::class, 'show'])->name('show');
+                    Route::post('/{payment}/refund', [PaymentController::class, 'refund'])->name('refund');
                 });
 
                 /*

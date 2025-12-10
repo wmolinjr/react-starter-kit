@@ -287,6 +287,16 @@ Route::middleware([
                 // Cart checkout routes
                 Route::post('/cart-checkout', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'cartCheckout'])->name('cart-checkout');
                 Route::get('/cart-success', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'cartSuccess'])->name('cart-success');
+                // Async payment status (PIX/Boleto)
+                Route::post('/cart-payment-status', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'checkCartPaymentStatus'])->name('cart-payment-status');
+                Route::post('/pix-refresh', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'refreshPixQrCode'])->name('pix-refresh');
+
+                // Subscription management
+                Route::post('/subscription/cancel', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'cancelSubscription'])->name('subscription.cancel');
+                Route::post('/subscription/resume', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'resumeSubscription'])->name('subscription.resume');
+                Route::post('/subscription/pause', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'pauseSubscription'])->name('subscription.pause');
+                Route::post('/subscription/unpause', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'unpauseSubscription'])->name('subscription.unpause');
+                Route::post('/subscription/change-plan', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'changePlan'])->name('subscription.change-plan');
             });
 
             // Add-ons

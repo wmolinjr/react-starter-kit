@@ -592,6 +592,248 @@ class BillingService
     }
 
     /**
+     * Cancel subscription.
+     *
+     * @param  bool  $immediately  If true, cancel now. If false, cancel at period end.
+     */
+    public function cancelSubscription(Tenant $tenant, bool $immediately = false): array
+    {
+        $subscription = $this->getTenantSubscription($tenant);
+
+        if (! $subscription) {
+            throw new \RuntimeException('No active subscription found');
+        }
+
+        if (! $subscription->provider_subscription_id) {
+            throw new \RuntimeException('Subscription has no provider ID');
+        }
+
+        try {
+            if ($immediately) {
+                $this->stripe->subscriptions->cancel($subscription->provider_subscription_id);
+                $subscription->update([
+                    'status' => 'canceled',
+                    'ends_at' => now(),
+                ]);
+            } else {
+                $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+                    'cancel_at_period_end' => true,
+                ]);
+                $subscription->update([
+                    'ends_at' => $subscription->current_period_end,
+                ]);
+            }
+
+            Log::info('Subscription canceled', [
+                'tenant_id' => $tenant->id,
+                'subscription_id' => $subscription->id,
+                'immediately' => $immediately,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => $immediately
+                    ? __('billing.subscription_canceled_immediately')
+                    : __('billing.subscription_canceled_at_period_end'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to cancel subscription', [
+                'tenant_id' => $tenant->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to cancel subscription: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Resume a canceled subscription (if on grace period).
+     */
+    public function resumeSubscription(Tenant $tenant): array
+    {
+        $subscription = $this->getTenantSubscription($tenant);
+
+        if (! $subscription) {
+            throw new \RuntimeException('No subscription found');
+        }
+
+        if (! $subscription->onGracePeriod()) {
+            throw new \RuntimeException('Subscription is not on grace period and cannot be resumed');
+        }
+
+        try {
+            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+                'cancel_at_period_end' => false,
+            ]);
+
+            $subscription->update([
+                'ends_at' => null,
+            ]);
+
+            Log::info('Subscription resumed', [
+                'tenant_id' => $tenant->id,
+                'subscription_id' => $subscription->id,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => __('billing.subscription_resumed'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to resume subscription', [
+                'tenant_id' => $tenant->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to resume subscription: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Pause subscription (Stripe payment collection).
+     */
+    public function pauseSubscription(Tenant $tenant): array
+    {
+        $subscription = $this->getTenantSubscription($tenant);
+
+        if (! $subscription) {
+            throw new \RuntimeException('No active subscription found');
+        }
+
+        try {
+            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+                'pause_collection' => [
+                    'behavior' => 'void',
+                ],
+            ]);
+
+            $subscription->update([
+                'status' => 'paused',
+            ]);
+
+            Log::info('Subscription paused', [
+                'tenant_id' => $tenant->id,
+                'subscription_id' => $subscription->id,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => __('billing.subscription_paused'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to pause subscription', [
+                'tenant_id' => $tenant->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to pause subscription: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Unpause a paused subscription.
+     */
+    public function unpauseSubscription(Tenant $tenant): array
+    {
+        $subscription = $this->getTenantSubscription($tenant);
+
+        if (! $subscription) {
+            throw new \RuntimeException('No subscription found');
+        }
+
+        if ($subscription->status !== 'paused') {
+            throw new \RuntimeException('Subscription is not paused');
+        }
+
+        try {
+            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+                'pause_collection' => null,
+            ]);
+
+            $subscription->update([
+                'status' => 'active',
+            ]);
+
+            Log::info('Subscription unpaused', [
+                'tenant_id' => $tenant->id,
+                'subscription_id' => $subscription->id,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => __('billing.subscription_resumed'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to unpause subscription', [
+                'tenant_id' => $tenant->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to unpause subscription: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Change subscription plan.
+     */
+    public function changePlan(Tenant $tenant, string $newPlanSlug): array
+    {
+        $subscription = $this->getTenantSubscription($tenant);
+
+        if (! $subscription) {
+            throw new \RuntimeException('No active subscription found');
+        }
+
+        $newPlan = Plan::where('slug', $newPlanSlug)->firstOrFail();
+
+        if (! $newPlan->stripe_price_id) {
+            throw new \RuntimeException('Plan has no Stripe price configured');
+        }
+
+        try {
+            // Get current subscription item
+            $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->provider_subscription_id);
+            $subscriptionItemId = $stripeSubscription->items->data[0]->id ?? null;
+
+            if (! $subscriptionItemId) {
+                throw new \RuntimeException('Could not find subscription item');
+            }
+
+            // Update the subscription with new price
+            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+                'items' => [
+                    [
+                        'id' => $subscriptionItemId,
+                        'price' => $newPlan->stripe_price_id,
+                    ],
+                ],
+                'proration_behavior' => 'create_prorations',
+            ]);
+
+            // Update local subscription
+            $subscription->update([
+                'provider_price_id' => $newPlan->stripe_price_id,
+            ]);
+
+            // Update tenant plan
+            $tenant->update(['plan_id' => $newPlan->id]);
+
+            Log::info('Subscription plan changed', [
+                'tenant_id' => $tenant->id,
+                'subscription_id' => $subscription->id,
+                'new_plan' => $newPlanSlug,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => __('billing.plan_changed'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to change subscription plan', [
+                'tenant_id' => $tenant->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to change plan: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Get tenant's active subscription.
      */
     protected function getTenantSubscription(Tenant $tenant): ?Subscription

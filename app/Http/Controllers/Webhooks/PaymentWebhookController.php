@@ -67,7 +67,7 @@ class PaymentWebhookController extends Controller
         try {
             $gateway = $this->gatewayManager->driver($provider);
         } catch (\Exception $e) {
-            Log::error("Payment webhook: Gateway not found", [
+            Log::error('Payment webhook: Gateway not found', [
                 'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
@@ -77,7 +77,7 @@ class PaymentWebhookController extends Controller
 
         // Validate signature
         if (! $gateway->validateWebhookSignature($payload, $signature)) {
-            Log::warning("Payment webhook: Invalid signature", [
+            Log::warning('Payment webhook: Invalid signature', [
                 'provider' => $provider,
             ]);
 
@@ -88,14 +88,14 @@ class PaymentWebhookController extends Controller
         $data = json_decode($payload, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::error("Payment webhook: Invalid JSON payload", [
+            Log::error('Payment webhook: Invalid JSON payload', [
                 'provider' => $provider,
             ]);
 
             return $this->invalidPayload();
         }
 
-        Log::info("Payment webhook received", [
+        Log::info('Payment webhook received', [
             'provider' => $provider,
             'type' => $data['type'] ?? 'unknown',
         ]);
@@ -107,7 +107,7 @@ class PaymentWebhookController extends Controller
         try {
             $gateway->handleWebhook($data, $request->headers->all());
         } catch (\Exception $e) {
-            Log::error("Payment webhook: Handler error", [
+            Log::error('Payment webhook: Handler error', [
                 'provider' => $provider,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

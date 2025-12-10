@@ -96,7 +96,7 @@ class InvoiceController extends Controller
         // Generate PDF receipt
         $pdf = $this->generatePdf($invoice);
 
-        $filename = 'invoice-' . $this->generateInvoiceNumber($invoice) . '.pdf';
+        $filename = 'invoice-'.$this->generateInvoiceNumber($invoice).'.pdf';
 
         return new StreamedResponse(
             function () use ($pdf) {
@@ -105,7 +105,7 @@ class InvoiceController extends Controller
             200,
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]
         );
     }
@@ -146,10 +146,10 @@ class InvoiceController extends Controller
             'BRL' => 'R$',
             'USD' => '$',
             'EUR' => '€',
-            default => $currency . ' ',
+            default => $currency.' ',
         };
 
-        return $symbol . ' ' . number_format($value, 2, ',', '.');
+        return $symbol.' '.number_format($value, 2, ',', '.');
     }
 
     /**
