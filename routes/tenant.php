@@ -313,7 +313,6 @@ Route::middleware([
                 Route::get('/', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'index'])->name('index');
                 Route::get('/branding', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'branding'])->name('branding');
                 Route::get('/domains', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'domains'])->name('domains');
-                Route::get('/language', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'language'])->name('language');
                 Route::get('/config', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'config'])->name('config');
                 Route::get('/api-tokens', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'apiTokens'])->name('api-tokens');
                 Route::get('/danger', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'danger'])->name('danger');
@@ -336,7 +335,6 @@ Route::middleware([
                     Route::delete('/domains/{domainId}', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'removeDomain'])->name('domains.remove');
                     Route::post('/features', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'updateFeatures'])->name('features.update');
                     Route::post('/notifications', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'updateNotifications'])->name('notifications.update');
-                    Route::post('/language', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'updateLanguage'])->name('language.update');
                     Route::post('/config', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'updateConfig'])->name('config.update');
                     Route::delete('/delete', [\App\Http\Controllers\Tenant\Admin\TenantSettingsController::class, 'destroy'])->name('destroy');
                 });

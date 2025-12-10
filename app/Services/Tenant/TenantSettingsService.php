@@ -190,36 +190,6 @@ class TenantSettingsService
         }
     }
 
-    /**
-     * Get language settings.
-     *
-     * @return array{currentLanguage: string, availableLanguages: array, languageLabels: array}
-     */
-    public function getLanguageSettings(Tenant $tenant): array
-    {
-        return [
-            'currentLanguage' => $tenant->getSetting('language.default', config('app.locale')),
-            'availableLanguages' => config('app.locales'),
-            'languageLabels' => collect(config('app.locale_labels'))
-                ->only(config('app.locales'))
-                ->toArray(),
-        ];
-    }
-
-    /**
-     * Update language setting.
-     */
-    public function updateLanguage(Tenant $tenant, string $language): void
-    {
-        $availableLocales = config('app.locales');
-
-        if (! in_array($language, $availableLocales)) {
-            throw new SettingsException(__('tenant.settings.invalid_language'));
-        }
-
-        $tenant->updateSetting('language.default', $language);
-    }
-
     // ==========================================
     // Config Settings (TenantConfigBootstrapper)
     // ==========================================

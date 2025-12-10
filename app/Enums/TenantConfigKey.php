@@ -471,11 +471,7 @@ enum TenantConfigKey: string
         $options = [];
 
         foreach (self::availableDateFormats() as $format => $data) {
-            $label = $data['label'][$locale] ?? $data['label']['en'];
-            $example = is_array($data['example'])
-                ? ($data['example'][$locale] ?? $data['example']['en'])
-                : $data['example'];
-            $options[$format] = $label.' ('.$example.')';
+            $options[$format] = $data['label'][$locale] ?? $data['label']['en'];
         }
 
         return $options;
@@ -489,8 +485,8 @@ enum TenantConfigKey: string
     public static function availableTimeFormats(): array
     {
         return [
-            '24h' => ['en' => '24-hour (14:30)', 'pt_BR' => '24 horas (14:30)', 'es' => '24 horas (14:30)'],
-            '12h' => ['en' => '12-hour (2:30 PM)', 'pt_BR' => '12 horas (2:30 PM)', 'es' => '12 horas (2:30 PM)'],
+            '24h' => ['en' => '24-hour', 'pt_BR' => '24 horas', 'es' => '24 horas'],
+            '12h' => ['en' => '12-hour', 'pt_BR' => '12 horas', 'es' => '12 horas'],
         ];
     }
 

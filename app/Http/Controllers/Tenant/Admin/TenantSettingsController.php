@@ -167,34 +167,6 @@ class TenantSettingsController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display language settings page.
-     */
-    public function language(): Response
-    {
-        return Inertia::render('tenant/admin/settings/language', $this->settingsService->getLanguageSettings(tenant()));
-    }
-
-    /**
-     * Update language settings.
-     */
-    public function updateLanguage(Request $request): RedirectResponse
-    {
-        $availableLocales = config('app.locales');
-
-        $request->validate([
-            'language' => ['required', 'string', 'in:'.implode(',', $availableLocales)],
-        ]);
-
-        try {
-            $this->settingsService->updateLanguage(tenant(), $request->language);
-
-            return back()->with('success', __('flash.settings.language_updated'));
-        } catch (SettingsException $e) {
-            return back()->with('error', $e->getMessage());
-        }
-    }
-
-    /**
      * Display configuration settings page.
      *
      * Shows locale, timezone, email, and currency settings that override

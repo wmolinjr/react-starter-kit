@@ -155,14 +155,6 @@ export function useTenantAdminNavItems(): NavItem[] {
             });
         }
 
-        // Language (Multi-language feature)
-        if (has('locales:view') && hasFeature('multiLanguage')) {
-            settingsItems.push({
-                title: t('tenant.settings.language'),
-                href: admin.settings.language.url(),
-            });
-        }
-
         // Config
         if (has('settings:edit')) {
             settingsItems.push({

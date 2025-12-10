@@ -14,7 +14,6 @@ import {
     AlertTriangle,
     Globe,
     Key,
-    Languages,
     Network,
     Palette,
     Settings,
@@ -82,14 +81,6 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
             icon: Globe,
             badge: t('tenant.settings.domains_count', { count: domains.length }),
             permission: 'settings:edit',
-        },
-        {
-            title: t('tenant.settings.language'),
-            description: t('tenant.settings.language_description'),
-            href: admin.settings.language.url(),
-            icon: Languages,
-            permission: 'locales:view',
-            feature: 'multiLanguage',
         },
         {
             title: t('tenant.config.title'),

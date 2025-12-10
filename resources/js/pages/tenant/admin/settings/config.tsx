@@ -19,10 +19,13 @@ import {
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Building2, Calendar, CalendarDays, Check, Clock, Clock3, DollarSign, Globe, Mail, Settings2 } from 'lucide-react';
-import { FormEvent, useMemo, useState } from 'react';
+import { Building2, Check, Globe, Mail, Settings2 } from 'lucide-react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { format } from 'date-fns';
+import { TZDate } from '@date-fns/tz';
+import { getDateFnsLocale } from '@/lib/date-locale';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -63,6 +66,15 @@ function ConfigSettings({
 }: Props) {
     const { t } = useLaravelReactI18n();
     const [timezoneSearch, setTimezoneSearch] = useState('');
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    // Update current time every second for live preview
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
@@ -84,6 +96,28 @@ function ConfigSettings({
         currency: config.currency,
         currency_locale: config.currency_locale,
     });
+
+    // Get date-fns locale based on selected locale
+    const dateFnsLocale = useMemo(() => getDateFnsLocale(data.locale), [data.locale]);
+
+    // Map backend time format values to date-fns tokens
+    const timeFormatTokens: Record<string, string> = {
+        '24h': 'HH:mm:ss',
+        '12h': 'h:mm:ss a',
+    };
+
+    // Format date/time for a specific timezone using date-fns
+    const formatForTimezone = (date: Date, timezone: string, dateFormat: string, timeFormat: string) => {
+        try {
+            const tzDate = new TZDate(date, timezone);
+            const timeToken = timeFormatTokens[timeFormat] ?? 'HH:mm:ss';
+            const formattedDate = format(tzDate, dateFormat, { locale: dateFnsLocale });
+            const formattedTime = format(tzDate, timeToken, { locale: dateFnsLocale });
+            return { date: formattedDate, time: formattedTime };
+        } catch {
+            return { date: '---', time: '--:--' };
+        }
+    };
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -169,178 +203,202 @@ function ConfigSettings({
                             </CardContent>
                         </Card>
 
-                        {/* Localization Section */}
+                        {/* Regional Settings Section */}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Globe className="h-5 w-5" />
-                                    {t('tenant.config.localization')}
+                                    {t('tenant.config.regional_settings')}
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('tenant.config.localization_description')}
+                                    {t('tenant.config.regional_settings_description')}
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="grid gap-6 md:grid-cols-2">
-                                {/* Language */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="locale">{t('tenant.config.language')}</Label>
-                                    <Select
-                                        value={data.locale}
-                                        onValueChange={(value) => setData('locale', value)}
-                                    >
-                                        <SelectTrigger id="locale">
-                                            <SelectValue placeholder={t('tenant.config.select_language')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {availableLocales.map((locale) => (
-                                                <SelectItem key={locale} value={locale}>
-                                                    <div className="flex items-center gap-2">
-                                                        <span>{localeLabels[locale] ?? locale}</span>
-                                                        {locale === config.locale && (
-                                                            <Check className="h-4 w-4 text-green-500" />
-                                                        )}
-                                                    </div>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.locale && (
-                                        <p className="text-sm text-destructive">{errors.locale}</p>
-                                    )}
+                            <CardContent className="space-y-6">
+                                {/* Language & Currency Row */}
+                                <div className="grid gap-6 md:grid-cols-2">
+                                    {/* Language */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="locale">{t('tenant.config.language')}</Label>
+                                        <Select
+                                            value={data.locale}
+                                            onValueChange={(value) => setData('locale', value)}
+                                        >
+                                            <SelectTrigger id="locale">
+                                                <SelectValue placeholder={t('tenant.config.select_language')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableLocales.map((locale) => (
+                                                    <SelectItem key={locale} value={locale}>
+                                                        {localeLabels[locale] ?? locale}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.locale && (
+                                            <p className="text-sm text-destructive">{errors.locale}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Currency */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="currency">{t('tenant.config.currency')}</Label>
+                                        <Select
+                                            value={data.currency}
+                                            onValueChange={(value) => setData('currency', value)}
+                                        >
+                                            <SelectTrigger id="currency">
+                                                <SelectValue placeholder={t('tenant.config.select_currency')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(availableCurrencies).map(([code, name]) => (
+                                                    <SelectItem key={code} value={code}>
+                                                        {name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.currency && (
+                                            <p className="text-sm text-destructive">{errors.currency}</p>
+                                        )}
+                                        {/* Currency Locale (hidden, auto-synced with locale) */}
+                                        <input type="hidden" name="currency_locale" value={data.locale} />
+                                    </div>
+                                </div>
+
+                                {/* Date & Time Settings Row */}
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                                    {/* Timezone */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="timezone">{t('tenant.config.timezone')}</Label>
+                                        <Select
+                                            value={data.timezone}
+                                            onValueChange={(value) => setData('timezone', value)}
+                                        >
+                                            <SelectTrigger id="timezone">
+                                                <SelectValue placeholder={t('tenant.config.select_timezone')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <div className="px-2 pb-2">
+                                                    <Input
+                                                        placeholder={t('tenant.config.search_timezone')}
+                                                        value={timezoneSearch}
+                                                        onChange={(e) => setTimezoneSearch(e.target.value)}
+                                                        className="h-8"
+                                                    />
+                                                </div>
+                                                {filteredTimezones.slice(0, 50).map((tz) => (
+                                                    <SelectItem key={tz} value={tz}>
+                                                        {tz.replace(/_/g, ' ')}
+                                                    </SelectItem>
+                                                ))}
+                                                {filteredTimezones.length > 50 && (
+                                                    <p className="px-2 py-1 text-xs text-muted-foreground">
+                                                        {t('tenant.config.more_timezones', { count: filteredTimezones.length - 50 })}
+                                                    </p>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.timezone && (
+                                            <p className="text-sm text-destructive">{errors.timezone}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Date Format */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="date_format">{t('tenant.config.date_format')}</Label>
+                                        <Select
+                                            value={data.date_format}
+                                            onValueChange={(value) => setData('date_format', value)}
+                                        >
+                                            <SelectTrigger id="date_format">
+                                                <SelectValue placeholder={t('tenant.config.select_date_format')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(availableDateFormats).map(([format, label]) => (
+                                                    <SelectItem key={format} value={format}>
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.date_format && (
+                                            <p className="text-sm text-destructive">{errors.date_format}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Time Format */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="time_format">{t('tenant.config.time_format')}</Label>
+                                        <Select
+                                            value={data.time_format}
+                                            onValueChange={(value) => setData('time_format', value)}
+                                        >
+                                            <SelectTrigger id="time_format">
+                                                <SelectValue placeholder={t('tenant.config.select_time_format')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(availableTimeFormats).map(([format, label]) => (
+                                                    <SelectItem key={format} value={format}>
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.time_format && (
+                                            <p className="text-sm text-destructive">{errors.time_format}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Week Starts On */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="week_starts_on">{t('tenant.config.week_starts_on')}</Label>
+                                        <Select
+                                            value={String(data.week_starts_on)}
+                                            onValueChange={(value) => setData('week_starts_on', parseInt(value, 10))}
+                                        >
+                                            <SelectTrigger id="week_starts_on">
+                                                <SelectValue placeholder={t('tenant.config.select_week_start')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(availableWeekdays).map(([day, label]) => (
+                                                    <SelectItem key={day} value={day}>
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.week_starts_on && (
+                                            <p className="text-sm text-destructive">{errors.week_starts_on}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Timezone Helper & Preview */}
+                                <div className="rounded-md border bg-muted/50 p-4 space-y-3">
                                     <p className="text-sm text-muted-foreground">
-                                        {t('tenant.config.language_note')}
+                                        {t('tenant.config.timezone_helper')}
                                     </p>
-                                </div>
-
-                                {/* Timezone */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="timezone" className="flex items-center gap-2">
-                                        <Clock className="h-4 w-4" />
-                                        {t('tenant.config.timezone')}
-                                    </Label>
-                                    <Select
-                                        value={data.timezone}
-                                        onValueChange={(value) => setData('timezone', value)}
-                                    >
-                                        <SelectTrigger id="timezone">
-                                            <SelectValue placeholder={t('tenant.config.select_timezone')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <div className="px-2 pb-2">
-                                                <Input
-                                                    placeholder={t('tenant.config.search_timezone')}
-                                                    value={timezoneSearch}
-                                                    onChange={(e) => setTimezoneSearch(e.target.value)}
-                                                    className="h-8"
-                                                />
-                                            </div>
-                                            {filteredTimezones.slice(0, 50).map((tz) => (
-                                                <SelectItem key={tz} value={tz}>
-                                                    {tz.replace(/_/g, ' ')}
-                                                </SelectItem>
-                                            ))}
-                                            {filteredTimezones.length > 50 && (
-                                                <p className="px-2 py-1 text-xs text-muted-foreground">
-                                                    {t('tenant.config.more_timezones', { count: filteredTimezones.length - 50 })}
-                                                </p>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.timezone && (
-                                        <p className="text-sm text-destructive">{errors.timezone}</p>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Date & Time Format Section */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Calendar className="h-5 w-5" />
-                                    {t('tenant.config.date_time_settings')}
-                                </CardTitle>
-                                <CardDescription>
-                                    {t('tenant.config.date_time_description')}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid gap-6 md:grid-cols-3">
-                                {/* Date Format */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="date_format" className="flex items-center gap-2">
-                                        <Calendar className="h-4 w-4" />
-                                        {t('tenant.config.date_format')}
-                                    </Label>
-                                    <Select
-                                        value={data.date_format}
-                                        onValueChange={(value) => setData('date_format', value)}
-                                    >
-                                        <SelectTrigger id="date_format">
-                                            <SelectValue placeholder={t('tenant.config.select_date_format')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Object.entries(availableDateFormats).map(([format, label]) => (
-                                                <SelectItem key={format} value={format}>
-                                                    {label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.date_format && (
-                                        <p className="text-sm text-destructive">{errors.date_format}</p>
-                                    )}
-                                </div>
-
-                                {/* Time Format */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="time_format" className="flex items-center gap-2">
-                                        <Clock3 className="h-4 w-4" />
-                                        {t('tenant.config.time_format')}
-                                    </Label>
-                                    <Select
-                                        value={data.time_format}
-                                        onValueChange={(value) => setData('time_format', value)}
-                                    >
-                                        <SelectTrigger id="time_format">
-                                            <SelectValue placeholder={t('tenant.config.select_time_format')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Object.entries(availableTimeFormats).map(([format, label]) => (
-                                                <SelectItem key={format} value={format}>
-                                                    {label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.time_format && (
-                                        <p className="text-sm text-destructive">{errors.time_format}</p>
-                                    )}
-                                </div>
-
-                                {/* Week Starts On */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="week_starts_on" className="flex items-center gap-2">
-                                        <CalendarDays className="h-4 w-4" />
-                                        {t('tenant.config.week_starts_on')}
-                                    </Label>
-                                    <Select
-                                        value={String(data.week_starts_on)}
-                                        onValueChange={(value) => setData('week_starts_on', parseInt(value, 10))}
-                                    >
-                                        <SelectTrigger id="week_starts_on">
-                                            <SelectValue placeholder={t('tenant.config.select_week_start')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Object.entries(availableWeekdays).map(([day, label]) => (
-                                                <SelectItem key={day} value={day}>
-                                                    {label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.week_starts_on && (
-                                        <p className="text-sm text-destructive">{errors.week_starts_on}</p>
-                                    )}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-muted-foreground">{t('tenant.config.universal_time')}</span>
+                                            <span className="font-mono">
+                                                {(() => {
+                                                    const utc = formatForTimezone(currentTime, 'UTC', data.date_format, data.time_format);
+                                                    return `${utc.date} ${utc.time}`;
+                                                })()}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-muted-foreground">{t('tenant.config.local_time')}</span>
+                                            <span className="font-mono font-medium">
+                                                {(() => {
+                                                    const local = formatForTimezone(currentTime, data.timezone, data.date_format, data.time_format);
+                                                    return `${local.date} ${local.time}`;
+                                                })()}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -393,48 +451,6 @@ function ConfigSettings({
                                         <p className="text-sm text-destructive">{errors.mail_from_name}</p>
                                     )}
                                 </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Currency Section */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <DollarSign className="h-5 w-5" />
-                                    {t('tenant.config.currency_settings')}
-                                </CardTitle>
-                                <CardDescription>
-                                    {t('tenant.config.currency_settings_description')}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid gap-6 md:grid-cols-2">
-                                {/* Currency */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="currency">
-                                        {t('tenant.config.default_currency')}
-                                    </Label>
-                                    <Select
-                                        value={data.currency}
-                                        onValueChange={(value) => setData('currency', value)}
-                                    >
-                                        <SelectTrigger id="currency">
-                                            <SelectValue placeholder={t('tenant.config.select_currency')} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Object.entries(availableCurrencies).map(([code, name]) => (
-                                                <SelectItem key={code} value={code}>
-                                                    {name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.currency && (
-                                        <p className="text-sm text-destructive">{errors.currency}</p>
-                                    )}
-                                </div>
-
-                                {/* Currency Locale (hidden for now, auto-synced with locale) */}
-                                <input type="hidden" name="currency_locale" value={data.locale} />
                             </CardContent>
                         </Card>
 
