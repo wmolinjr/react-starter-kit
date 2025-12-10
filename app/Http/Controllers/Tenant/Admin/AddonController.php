@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\AddonBundleResource;
+use App\Http\Resources\Central\AddonResource;
 use App\Services\Central\AddonService;
 use App\Services\Central\CheckoutService;
 use Illuminate\Http\Request;
@@ -18,7 +20,49 @@ class AddonController extends Controller
 
     public function index(): Response
     {
-        return Inertia::render('tenant/admin/addons/index');
+        $tenant = tenant();
+
+        // Get available addons for tenant's plan
+        $availableAddons = $this->addonService->getAvailableAddons($tenant);
+
+        // Get active addons
+        $activeAddons = $tenant->activeAddons()
+            ->whereNull('metadata->bundle_slug')
+            ->get();
+
+        // Get active bundles grouped
+        $activeBundles = $this->addonService->getActiveBundles($tenant);
+
+        // Get available bundles
+        $availableBundles = $this->addonService->getAvailableBundles($tenant);
+
+        // Calculate total monthly cost
+        $monthlyCost = $this->addonService->calculateTotalMonthlyCost($tenant);
+
+        return Inertia::render('tenant/admin/addons/index', [
+            'availableAddons' => AddonResource::collection(collect($availableAddons)),
+            'activeAddons' => $activeAddons->map(fn ($addon) => [
+                'id' => $addon->id,
+                'slug' => $addon->addon_slug,
+                'name' => $addon->name,
+                'description' => $addon->description,
+                'type' => $addon->addon_type->value,
+                'quantity' => $addon->quantity,
+                'price' => $addon->price,
+                'formattedPrice' => '$' . number_format($addon->price / 100, 2),
+                'totalPrice' => $addon->total_price,
+                'formattedTotalPrice' => '$' . number_format($addon->total_price / 100, 2),
+                'billingPeriod' => $addon->billing_period->value,
+                'status' => $addon->status->value,
+                'startedAt' => $addon->started_at?->toISOString(),
+                'expiresAt' => $addon->expires_at?->toISOString(),
+            ]),
+            'availableBundles' => AddonBundleResource::collection($availableBundles),
+            'activeBundles' => $activeBundles,
+            'monthlyCost' => $monthlyCost,
+            'formattedMonthlyCost' => '$' . number_format($monthlyCost / 100, 2),
+            'activeAddonSlugs' => $tenant->activeAddons()->pluck('addon_slug')->toArray(),
+        ]);
     }
 
     public function usage(): Response

@@ -51,6 +51,36 @@ export interface AddonOptionForPlanResource {
     slug: string;
 }
 
+export interface AddonResource {
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    type: AddonType;
+    type_label: string;
+    active: boolean;
+    price_monthly: number | null;
+    price_yearly: number | null;
+    price_one_time: number | null;
+    price_metered: number | null;
+    formatted_price_monthly: string | null;
+    formatted_price_yearly: string | null;
+    formatted_price_one_time: string | null;
+    currency: string;
+    min_quantity: number;
+    max_quantity: number;
+    stackable: boolean;
+    unit_value: number | null;
+    unit_label: string | null;
+    limit_key: string | null;
+    features: Record<string, boolean> | null;
+    icon: string | null;
+    icon_color: string | null;
+    badge: string | null;
+    sort_order: number;
+    validity_months: number | null;
+}
+
 export interface AddonSubscriptionResource {
     id: string;
     addon_slug: string;

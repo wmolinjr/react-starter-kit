@@ -216,7 +216,7 @@ export interface BadgePresetOption {
     border: string;
 }
 
-export type TenantConfigKey = 'app_name' | 'locale' | 'timezone' | 'mail_from_address' | 'mail_from_name' | 'currency' | 'currency_locale';
+export type TenantConfigKey = 'app_name' | 'locale' | 'timezone' | 'date_format' | 'time_format' | 'week_starts_on' | 'mail_from_address' | 'mail_from_name' | 'currency' | 'currency_locale';
 
 export interface TenantConfigKeyOption {
     value: TenantConfigKey;

@@ -11,6 +11,9 @@
  * // Import plan components
  * import { PlanCard, PlanComparisonTable, CurrentPlanBanner } from '@/components/shared/billing';
  *
+ * // Import addon components
+ * import { AddonCard, ActiveAddonCard } from '@/components/shared/billing';
+ *
  * // Import bundle components
  * import { BundleCard, BundleContents, BundleSavings } from '@/components/shared/billing';
  *
@@ -23,6 +26,7 @@
  * // Import from specific category
  * import { PricingCard } from '@/components/shared/billing/primitives';
  * import { PlanCard } from '@/components/shared/billing/plans';
+ * import { AddonCard } from '@/components/shared/billing/addons';
  * import { BundleCard } from '@/components/shared/billing/bundles';
  * import { CheckoutSheet } from '@/components/shared/billing/checkout';
  * import { SubscriptionOverviewWidget } from '@/components/shared/billing/dashboard';
@@ -33,6 +37,9 @@ export * from './primitives';
 
 // Plan components - Plan display and comparison
 export * from './plans';
+
+// Addon components - Add-on display and purchase
+export * from './addons';
 
 // Bundle components - Add-on bundle display
 export * from './bundles';

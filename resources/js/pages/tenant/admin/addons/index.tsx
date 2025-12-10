@@ -1,70 +1,205 @@
-import admin from '@/routes/tenant/admin';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { type ReactElement, useState, useMemo } from 'react';
 import AdminLayout from '@/layouts/tenant/admin-layout';
-import { useAddons } from '@/hooks/tenant/use-addons';
-import { usePurchase } from '@/hooks/tenant/use-purchase';
-import { AddonCard } from '@/components/tenant/addons/addon-card';
-import { ActiveAddonCard } from '@/components/tenant/addons/active-addon-card';
-import { PurchaseModal } from '@/components/tenant/addons/purchase-modal';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
-import { useState } from 'react';
-import type { AddonCatalogItem } from '@/types/addons';
-import type { BillingPeriod } from '@/types/enums';
-import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
-import { type BreadcrumbItem } from '@/types';
-
+import admin from '@/routes/tenant/admin';
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
-import { type ReactElement } from 'react';
+import {
+    Page,
+    PageHeader,
+    PageHeaderContent,
+    PageTitle,
+    PageDescription,
+    PageContent,
+    PageHeaderActions,
+} from '@/components/shared/layout/page';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+    Puzzle,
+    Package,
+    CheckCircle2,
+    AlertCircle,
+    CreditCard,
+} from 'lucide-react';
+import {
+    AddonCard,
+    ActiveAddonCard,
+    AddonCardSkeleton,
+    BundleCard,
+    PricingToggle,
+} from '@/components/shared/billing';
+import { BillingPeriodProvider, useBillingPeriod } from '@/hooks/billing';
+import type { BreadcrumbItem, AddonResource, BundleResource } from '@/types';
 
-function AddonsIndex() {
+interface ActiveAddon {
+    id: string;
+    slug: string;
+    name: string;
+    description?: string;
+    type: string;
+    quantity: number;
+    price: number;
+    formattedPrice: string;
+    totalPrice: number;
+    formattedTotalPrice: string;
+    billingPeriod: string;
+    status: string;
+    startedAt: string | null;
+    expiresAt: string | null;
+}
+
+interface ActiveBundle {
+    purchase_id: string;
+    bundle_slug: string | null;
+    bundle_name: string | null;
+    addons: Array<{ name: string; slug: string }>;
+    addon_count: number;
+    total_monthly: number;
+    started_at: string | null;
+}
+
+interface AddonsPageProps {
+    availableAddons: AddonResource[];
+    activeAddons: ActiveAddon[];
+    availableBundles: BundleResource[];
+    activeBundles: ActiveBundle[];
+    monthlyCost: number;
+    formattedMonthlyCost: string;
+    activeAddonSlugs: string[];
+    [key: string]: unknown;
+}
+
+function AddonsPageContent({
+    availableAddons,
+    activeAddons,
+    availableBundles,
+    activeBundles,
+    monthlyCost,
+    formattedMonthlyCost,
+    activeAddonSlugs,
+}: AddonsPageProps) {
     const { t } = useLaravelReactI18n();
+    const { period, setPeriod } = useBillingPeriod();
+    const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
+    const [cancelingAddon, setCancelingAddon] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: 'Add-ons', href: admin.addons.index.url() },
+        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
+        { title: t('tenant.addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
-    const { active, catalog, formattedMonthlyCost } = useAddons();
-    const { purchase, cancel, isPurchasing, isCanceling, error } = usePurchase();
-    const [selectedAddon, setSelectedAddon] = useState<AddonCatalogItem | null>(null);
+    const handlePurchaseAddon = (slug: string, quantity: number) => {
+        setPurchasingAddon(slug);
+        setError(null);
 
-    const handlePurchase = (slug: string, billingPeriod: BillingPeriod) => {
-        const addon = catalog.find((a) => a.slug === slug);
-        if (addon && addon.billing.monthly && addon.billing.yearly) {
-            setSelectedAddon(addon);
-        } else {
-            purchase(slug, 1, billingPeriod);
-        }
+        router.post(admin.addons.purchase.url(), {
+            addon_slug: slug,
+            quantity,
+            billing_period: period,
+        }, {
+            onFinish: () => setPurchasingAddon(null),
+            onError: (errors) => {
+                setError(errors.addon || t('common.error', { default: 'An error occurred' }));
+            },
+        });
     };
 
-    const handleModalConfirm = (slug: string, quantity: number, billingPeriod: BillingPeriod) => {
-        purchase(slug, quantity, billingPeriod);
-        setSelectedAddon(null);
+    const handlePurchaseBundle = (slug: string) => {
+        setPurchasingAddon(slug);
+        setError(null);
+
+        router.post(admin.addons.purchase.url(), {
+            type: 'bundle',
+            slug,
+            billing_period: period,
+        }, {
+            onFinish: () => setPurchasingAddon(null),
+            onError: (errors) => {
+                setError(errors.addon || t('common.error', { default: 'An error occurred' }));
+            },
+        });
     };
 
-    const handleCancel = (addonId: string) => {
-        cancel(addonId);
+    const handleCancelAddon = (addonId: string) => {
+        setCancelingAddon(addonId);
+        setError(null);
+
+        router.post(admin.addons.cancel.url({ addon: addonId }), {}, {
+            onFinish: () => setCancelingAddon(null),
+            onError: (errors) => {
+                setError(errors.addon || t('common.error', { default: 'An error occurred' }));
+            },
+        });
     };
+
+    // Check which addons are already owned
+    const ownedAddonSlugs = useMemo(() => new Set(activeAddonSlugs), [activeAddonSlugs]);
+
+    // Get quantity for each owned addon
+    const addonQuantities = useMemo(() => {
+        const quantities: Record<string, number> = {};
+        activeAddons.forEach((addon) => {
+            quantities[addon.slug] = (quantities[addon.slug] || 0) + addon.quantity;
+        });
+        return quantities;
+    }, [activeAddons]);
+
+    // Check which bundles have conflicts
+    const bundleConflicts = useMemo(() => {
+        const conflicts: Record<string, string[]> = {};
+        availableBundles.forEach((bundle) => {
+            const conflictingAddons = bundle.addons
+                ?.filter((addon) => ownedAddonSlugs.has(addon.slug))
+                .map((addon) => addon.name) ?? [];
+            if (conflictingAddons.length > 0) {
+                conflicts[bundle.slug] = conflictingAddons;
+            }
+        });
+        return conflicts;
+    }, [availableBundles, ownedAddonSlugs]);
+
+    // Active bundle slugs
+    const activeBundleSlugs = useMemo(() => {
+        return new Set(activeBundles.map((b) => b.bundle_slug).filter(Boolean));
+    }, [activeBundles]);
+
+    const hasActiveSubscriptions = activeAddons.length > 0 || activeBundles.length > 0;
 
     return (
         <>
-            <Head title="Add-ons" />
+            <Head title={t('tenant.addons.title', { default: 'Add-ons' })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>Add-ons</PageTitle>
+                        <PageTitle>
+                            <Puzzle className="mr-2 h-6 w-6" />
+                            {t('tenant.addons.title', { default: 'Add-ons' })}
+                        </PageTitle>
                         <PageDescription>
-                            {t('tenant.addons.description')}
+                            {t('tenant.addons.description', {
+                                default: 'Extend your capabilities with additional features and quotas',
+                            })}
                         </PageDescription>
                     </PageHeaderContent>
+                    <PageHeaderActions>
+                        <Button variant="outline" onClick={() => router.visit(admin.billing.index.url())}>
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            {t('tenant.billing.title', { default: 'Billing' })}
+                        </Button>
+                    </PageHeaderActions>
                 </PageHeader>
 
-                <PageContent>
+                <PageContent className="space-y-8">
+                    {/* Error Alert */}
                     {error && (
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
@@ -72,51 +207,177 @@ function AddonsIndex() {
                         </Alert>
                     )}
 
-                    {active.length > 0 && (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-semibold">{t('tenant.addons.active_addons')}</h2>
-                                <span className="text-muted-foreground text-sm">
-                                    {t('tenant.addons.monthly_cost')}: {formattedMonthlyCost}
-                                </span>
-                            </div>
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {active.map((addon) => (
-                                    <ActiveAddonCard
-                                        key={addon.id}
-                                        addon={addon}
-                                        onCancel={handleCancel}
-                                        disabled={isCanceling}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                    {/* Active Subscriptions Summary */}
+                    {hasActiveSubscriptions && (
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="flex items-center gap-2 text-base">
+                                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                        {t('tenant.addons.active_subscriptions', { default: 'Active Subscriptions' })}
+                                    </CardTitle>
+                                    <Badge variant="secondary" className="text-sm">
+                                        {formattedMonthlyCost}
+                                        <span className="text-muted-foreground ml-1">
+                                            /{t('billing.month', { default: 'mo' })}
+                                        </span>
+                                    </Badge>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                    {/* Active Bundles */}
+                                    {activeBundles.map((bundle) => (
+                                        <div
+                                            key={bundle.purchase_id}
+                                            className="flex items-center justify-between rounded-lg border p-3"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <Package className="text-muted-foreground h-5 w-5" />
+                                                <div>
+                                                    <p className="font-medium">{bundle.bundle_name}</p>
+                                                    <p className="text-muted-foreground text-xs">
+                                                        {bundle.addon_count} {t('tenant.addons.addons_included', { default: 'add-ons' })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Badge variant="outline">
+                                                ${(bundle.total_monthly / 100).toFixed(2)}
+                                            </Badge>
+                                        </div>
+                                    ))}
+
+                                    {/* Active Individual Addons */}
+                                    {activeAddons.map((addon) => (
+                                        <ActiveAddonCard
+                                            key={addon.id}
+                                            addon={addon}
+                                            onCancel={handleCancelAddon}
+                                            isLoading={cancelingAddon === addon.id}
+                                        />
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
                     )}
 
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">{t('tenant.addons.available_addons')}</h2>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {catalog.map((addon) => (
-                                <AddonCard
-                                    key={addon.slug}
-                                    addon={addon}
-                                    onPurchase={handlePurchase}
-                                    disabled={isPurchasing}
-                                />
-                            ))}
-                        </div>
+                    {/* Billing Period Toggle */}
+                    <div className="flex justify-center">
+                        <PricingToggle
+                            value={period}
+                            onChange={setPeriod}
+                            savings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                        />
                     </div>
+
+                    {/* Tabs for Addons and Bundles */}
+                    <Tabs defaultValue="addons" className="w-full">
+                        <TabsList className="grid w-full max-w-md grid-cols-2">
+                            <TabsTrigger value="addons" className="gap-2">
+                                <Puzzle className="h-4 w-4" />
+                                {t('tenant.addons.individual', { default: 'Individual Add-ons' })}
+                            </TabsTrigger>
+                            <TabsTrigger value="bundles" className="gap-2">
+                                <Package className="h-4 w-4" />
+                                {t('tenant.addons.bundles', { default: 'Bundles' })}
+                                {availableBundles.length > 0 && (
+                                    <Badge variant="secondary" className="ml-1">
+                                        {t('billing.save', { default: 'Save' })}
+                                    </Badge>
+                                )}
+                            </TabsTrigger>
+                        </TabsList>
+
+                        {/* Individual Addons Tab */}
+                        <TabsContent value="addons" className="mt-6">
+                            {availableAddons.length === 0 ? (
+                                <Card>
+                                    <CardContent className="py-12 text-center">
+                                        <Puzzle className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                                        <h3 className="text-lg font-semibold">
+                                            {t('tenant.addons.no_addons', { default: 'No add-ons available' })}
+                                        </h3>
+                                        <p className="text-muted-foreground mt-2">
+                                            {t('tenant.addons.no_addons_description', {
+                                                default: 'There are no add-ons available for your current plan.',
+                                            })}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {availableAddons.map((addon) => (
+                                        <AddonCard
+                                            key={addon.slug}
+                                            addon={addon}
+                                            billingPeriod={period}
+                                            isPurchased={ownedAddonSlugs.has(addon.slug)}
+                                            currentQuantity={addonQuantities[addon.slug] || 0}
+                                            isLoading={purchasingAddon === addon.slug}
+                                            onPurchase={handlePurchaseAddon}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </TabsContent>
+
+                        {/* Bundles Tab */}
+                        <TabsContent value="bundles" className="mt-6">
+                            {availableBundles.length === 0 ? (
+                                <Card>
+                                    <CardContent className="py-12 text-center">
+                                        <Package className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                                        <h3 className="text-lg font-semibold">
+                                            {t('tenant.addons.no_bundles', { default: 'No bundles available' })}
+                                        </h3>
+                                        <p className="text-muted-foreground mt-2">
+                                            {t('tenant.addons.no_bundles_description', {
+                                                default: 'There are no bundles available for your current plan.',
+                                            })}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {availableBundles.map((bundle) => {
+                                        const isPurchased = activeBundleSlugs.has(bundle.slug);
+                                        const conflicts = bundleConflicts[bundle.slug] ?? [];
+                                        const hasConflicts = conflicts.length > 0;
+
+                                        return (
+                                            <BundleCard
+                                                key={bundle.slug}
+                                                bundle={bundle}
+                                                billingPeriod={period}
+                                                isPurchased={isPurchased}
+                                                hasConflicts={hasConflicts}
+                                                conflictMessage={hasConflicts
+                                                    ? t('tenant.addons.bundle_conflict', {
+                                                        default: 'You already own: :addons',
+                                                        addons: conflicts.join(', '),
+                                                    }).replace(':addons', conflicts.join(', '))
+                                                    : undefined
+                                                }
+                                                isLoading={purchasingAddon === bundle.slug}
+                                                onPurchase={() => handlePurchaseBundle(bundle.slug)}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </TabsContent>
+                    </Tabs>
                 </PageContent>
             </Page>
-
-            <PurchaseModal
-                addon={selectedAddon}
-                open={!!selectedAddon}
-                onClose={() => setSelectedAddon(null)}
-                onConfirm={handleModalConfirm}
-                isPurchasing={isPurchasing}
-            />
         </>
+    );
+}
+
+function AddonsIndex(props: AddonsPageProps) {
+    return (
+        <BillingPeriodProvider>
+            <AddonsPageContent {...props} />
+        </BillingPeriodProvider>
     );
 }
 

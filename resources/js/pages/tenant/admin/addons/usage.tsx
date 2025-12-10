@@ -3,10 +3,11 @@ import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import AdminLayout from '@/layouts/tenant/admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UsageMeter } from '@/components/tenant/addons/usage-meter';
+import { UsageProgress } from '@/components/shared/billing';
 import { useAddons } from '@/hooks/tenant/use-addons';
 import { Page, PageHeader, PageHeaderContent, PageTitle, PageDescription, PageContent } from '@/components/shared/layout/page';
 import { type BreadcrumbItem } from '@/types';
+import { Activity } from 'lucide-react';
 
 import { useSetBreadcrumbs } from '@/contexts/breadcrumb-context';
 import { type ReactElement } from 'react';
@@ -17,8 +18,8 @@ function AddonsUsage() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: 'Add-ons', href: admin.addons.index.url() },
-        { title: t('tenant.addons.usage'), href: admin.addons.usage.url() },
+        { title: t('tenant.addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
+        { title: t('tenant.addons.usage', { default: 'Usage' }), href: admin.addons.usage.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -27,13 +28,20 @@ function AddonsUsage() {
 
     return (
         <>
-            <Head title={t('tenant.addons.usage')} />
+            <Head title={t('tenant.addons.usage', { default: 'Usage' })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('tenant.addons.usage_dashboard')}</PageTitle>
-                        <PageDescription>{t('tenant.addons.usage_description')}</PageDescription>
+                        <PageTitle>
+                            <Activity className="mr-2 h-6 w-6" />
+                            {t('tenant.addons.usage_dashboard', { default: 'Usage Dashboard' })}
+                        </PageTitle>
+                        <PageDescription>
+                            {t('tenant.addons.usage_description', {
+                                default: 'Track your metered addon usage for the current billing period',
+                            })}
+                        </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -41,7 +49,15 @@ function AddonsUsage() {
                     {meteredAddons.length === 0 ? (
                         <Card>
                             <CardContent className="py-12 text-center">
-                                <p className="text-muted-foreground">{t('tenant.addons.no_metered_addons')}</p>
+                                <Activity className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                                <h3 className="text-lg font-semibold">
+                                    {t('tenant.addons.no_metered_addons', { default: 'No metered add-ons' })}
+                                </h3>
+                                <p className="text-muted-foreground mt-2">
+                                    {t('tenant.addons.no_metered_description', {
+                                        default: 'You don\'t have any metered add-ons to track.',
+                                    })}
+                                </p>
                             </CardContent>
                         </Card>
                     ) : (
@@ -50,14 +66,20 @@ function AddonsUsage() {
                                 <Card key={addon.id}>
                                     <CardHeader>
                                         <CardTitle className="text-lg">{addon.name}</CardTitle>
-                                        <CardDescription>{t('tenant.addons.current_billing_period')}</CardDescription>
+                                        <CardDescription>
+                                            {t('tenant.addons.current_billing_period', {
+                                                default: 'Current billing period',
+                                            })}
+                                        </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <UsageMeter
-                                            label={t('tenant.addons.usage')}
+                                        <UsageProgress
+                                            label={t('tenant.addons.usage', { default: 'Usage' })}
                                             used={addon.metered_usage || 0}
                                             limit={addon.quantity * 1000}
-                                            unit={t('tenant.addons.units')}
+                                            showPercentage
+                                            showValues
+                                            size="lg"
                                         />
                                     </CardContent>
                                 </Card>
