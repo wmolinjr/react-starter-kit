@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Gateways;
 
+use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Contracts\Payment\PaymentMethodGatewayInterface;
 use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\DTOs\Payment\ChargeResult;
@@ -36,7 +37,7 @@ use Stripe\Webhook;
  * - Payment methods management
  * - Webhook processing
  */
-class StripeGateway implements PaymentMethodGatewayInterface, SubscriptionGatewayInterface
+class StripeGateway implements PaymentGatewayInterface, PaymentMethodGatewayInterface, SubscriptionGatewayInterface
 {
     protected array $config;
 

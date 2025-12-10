@@ -41,6 +41,7 @@ class CustomerSeeder extends Seeder
         }
 
         // Customer 1 - Brazilian (owns Acme/tenant1)
+        // Uses Asaas (Brazilian provider) as primary, with Stripe as backup
         $customer1 = $this->createCustomer(
             name: 'Acme Billing',
             email: 'billing@acme.com',
@@ -54,11 +55,18 @@ class CustomerSeeder extends Seeder
                 'state' => 'SP',
                 'postal_code' => '01310-100',
                 'country' => 'BR',
+            ],
+            providerIds: [
+                // These are placeholder IDs for development
+                // Real IDs will be created when customer makes first payment
+                // 'stripe' => 'cus_test_acme',
+                // 'asaas' => 'cus_test_acme_asaas',
             ]
         );
         $this->associateTenant($customer1, $tenant1);
 
         // Customer 2 - American (owns Startup/tenant2)
+        // Uses Stripe (international provider) as primary
         $customer2 = $this->createCustomer(
             name: 'Startup Billing',
             email: 'billing@startup.com',
@@ -72,11 +80,16 @@ class CustomerSeeder extends Seeder
                 'state' => 'CA',
                 'postal_code' => '94107',
                 'country' => 'US',
+            ],
+            providerIds: [
+                // Real IDs will be created when customer makes first payment
+                // 'stripe' => 'cus_test_startup',
             ]
         );
         $this->associateTenant($customer2, $tenant2);
 
         // Customer 3 - Spanish (owns Enterprise/tenant3)
+        // Uses Stripe (international provider) as primary
         $customer3 = $this->createCustomer(
             name: 'Enterprise Billing',
             email: 'billing@enterprise.com',
@@ -90,11 +103,16 @@ class CustomerSeeder extends Seeder
                 'state' => 'Madrid',
                 'postal_code' => '28013',
                 'country' => 'ES',
+            ],
+            providerIds: [
+                // Real IDs will be created when customer makes first payment
+                // 'stripe' => 'cus_test_enterprise',
             ]
         );
         $this->associateTenant($customer3, $tenant3);
 
-        // Multi-tenant Customer - Owns tenant1 AND tenant2 (for testing multi-workspace scenarios)
+        // Multi-tenant Customer - For testing multi-workspace scenarios
+        // Uses Stripe (international provider) as primary
         $customer4 = $this->createCustomer(
             name: 'Multi Tenant Owner',
             email: 'multi@example.com',
@@ -107,6 +125,10 @@ class CustomerSeeder extends Seeder
                 'state' => 'NY',
                 'postal_code' => '10001',
                 'country' => 'US',
+            ],
+            providerIds: [
+                // Real IDs will be created when customer makes first payment
+                // 'stripe' => 'cus_test_multi',
             ]
         );
         // Note: This customer has access but doesn't own these tenants
@@ -131,7 +153,8 @@ class CustomerSeeder extends Seeder
         string $locale = 'pt_BR',
         string $currency = 'brl',
         ?string $phone = null,
-        ?array $billingAddress = null
+        ?array $billingAddress = null,
+        ?array $providerIds = null
     ): Customer {
         $customer = Customer::create([
             'global_id' => 'cust_'.Str::orderedUuid()->toString(),
@@ -142,6 +165,7 @@ class CustomerSeeder extends Seeder
             'currency' => $currency,
             'phone' => $phone,
             'billing_address' => $billingAddress,
+            'provider_ids' => $providerIds ?? [],
             'email_verified_at' => now(),
         ]);
 

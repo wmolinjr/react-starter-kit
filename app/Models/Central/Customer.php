@@ -268,6 +268,30 @@ class Customer extends Authenticatable implements MustVerifyEmail, SyncMaster
     }
 
     /**
+     * Alias for getProviderCustomerId (shorter name).
+     */
+    public function getProviderId(string $provider): ?string
+    {
+        return $this->getProviderCustomerId($provider);
+    }
+
+    /**
+     * Alias for setProviderCustomerId (shorter name).
+     */
+    public function setProviderId(string $provider, string $id): void
+    {
+        $this->setProviderCustomerId($provider, $id);
+    }
+
+    /**
+     * Alias for hasProviderCustomer (shorter name).
+     */
+    public function hasProviderId(string $provider): bool
+    {
+        return $this->hasProviderCustomer($provider);
+    }
+
+    /**
      * Remove customer ID for a specific provider.
      */
     public function removeProviderCustomerId(string $provider): void

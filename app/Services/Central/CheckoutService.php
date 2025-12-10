@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Central;
 
 use App\Exceptions\Central\AddonException;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonPurchase;
+use App\Models\Central\Customer;
 use App\Models\Central\Tenant;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 
@@ -13,16 +17,17 @@ class CheckoutService
 {
     protected ?StripeClient $stripe = null;
 
-    public function __construct()
-    {
-        $secret = config('cashier.secret');
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        $secret = config('payment.drivers.stripe.secret');
         if ($secret) {
             $this->stripe = new StripeClient($secret);
         }
     }
 
     /**
-     * Create Stripe Checkout session for one-time addon purchase
+     * Create Stripe Checkout session for one-time addon purchase.
      */
     public function createCheckoutSession(
         Tenant $tenant,
@@ -50,10 +55,13 @@ class CheckoutService
             throw new AddonException("Maximum quantity is {$addon->max_quantity}");
         }
 
-        // Ensure tenant has Stripe customer
-        if (! $tenant->stripe_id) {
-            $tenant->createAsStripeCustomer();
+        // Ensure customer has Stripe customer ID
+        $customer = $tenant->customer;
+        if (! $customer) {
+            throw new AddonException('Tenant has no associated customer for billing');
         }
+
+        $stripeCustomerId = $this->ensureStripeCustomer($customer);
 
         // Create pending purchase record
         $purchase = AddonPurchase::create([
@@ -74,13 +82,14 @@ class CheckoutService
 
         // Build checkout session
         $sessionParams = [
-            'customer' => $tenant->stripe_id,
+            'customer' => $stripeCustomerId,
             'mode' => 'payment',
             'locale' => stripe_locale(),
             'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => $cancelUrl ?? $tenant->url().route('tenant.admin.addons.index', [], false),
             'metadata' => [
                 'tenant_id' => $tenant->id,
+                'customer_id' => $customer->id,
                 'addon_slug' => $addon->slug,
                 'quantity' => $quantity,
                 'purchase_id' => $purchase->id,
@@ -97,7 +106,7 @@ class CheckoutService
             $sessionParams['line_items'] = [
                 [
                     'price_data' => [
-                        'currency' => config('cashier.currency', 'usd'),
+                        'currency' => config('payment.currency', 'usd'),
                         'product_data' => [
                             'name' => $addon->name,
                             'description' => $addon->description,
@@ -130,7 +139,7 @@ class CheckoutService
     }
 
     /**
-     * Create Stripe Checkout session for subscription addon purchase
+     * Create Stripe Checkout session for subscription addon purchase.
      */
     public function createSubscriptionCheckout(
         Tenant $tenant,
@@ -162,20 +171,24 @@ class CheckoutService
             throw new AddonException("Maximum quantity is {$addon->max_quantity}");
         }
 
-        // Ensure tenant has Stripe customer
-        if (! $tenant->stripe_id) {
-            $tenant->createAsStripeCustomer();
+        // Ensure customer has Stripe customer ID
+        $customer = $tenant->customer;
+        if (! $customer) {
+            throw new AddonException('Tenant has no associated customer for billing');
         }
+
+        $stripeCustomerId = $this->ensureStripeCustomer($customer);
 
         // Build checkout session
         $sessionParams = [
-            'customer' => $tenant->stripe_id,
+            'customer' => $stripeCustomerId,
             'mode' => 'subscription',
             'locale' => stripe_locale(),
             'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => $cancelUrl ?? $tenant->url().route('tenant.admin.addons.index', [], false),
             'metadata' => [
                 'tenant_id' => $tenant->id,
+                'customer_id' => $customer->id,
                 'addon_slug' => $addon->slug,
                 'quantity' => $quantity,
                 'billing_period' => $billingPeriod,
@@ -184,6 +197,7 @@ class CheckoutService
             'subscription_data' => [
                 'metadata' => [
                     'tenant_id' => $tenant->id,
+                    'customer_id' => $customer->id,
                     'addon_slug' => $addon->slug,
                     'billing_period' => $billingPeriod,
                 ],
@@ -200,7 +214,7 @@ class CheckoutService
             $sessionParams['line_items'] = [
                 [
                     'price_data' => [
-                        'currency' => config('cashier.currency', 'usd'),
+                        'currency' => config('payment.currency', 'usd'),
                         'product_data' => [
                             'name' => $addon->name,
                             'description' => $addon->description,
@@ -242,7 +256,7 @@ class CheckoutService
     }
 
     /**
-     * Handle successful checkout completion
+     * Handle successful checkout completion.
      */
     public function handleCheckoutCompleted(string $sessionId): ?AddonPurchase
     {
@@ -281,7 +295,7 @@ class CheckoutService
     }
 
     /**
-     * Get checkout session status
+     * Get checkout session status.
      */
     public function getSessionStatus(string $sessionId): ?array
     {
@@ -305,7 +319,7 @@ class CheckoutService
     }
 
     /**
-     * Process refund for a purchase
+     * Process refund for a purchase.
      */
     public function refundPurchase(AddonPurchase $purchase, ?int $amount = null): bool
     {
@@ -338,6 +352,39 @@ class CheckoutService
             ]);
 
             throw new AddonException('Failed to process refund: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Ensure customer has a Stripe customer ID.
+     */
+    protected function ensureStripeCustomer(Customer $customer): string
+    {
+        $stripeId = $customer->getProviderId('stripe');
+
+        if ($stripeId) {
+            return $stripeId;
+        }
+
+        // Create Stripe customer
+        try {
+            $stripeCustomer = $this->stripe->customers->create([
+                'email' => $customer->email,
+                'name' => $customer->name ?? $customer->email,
+                'metadata' => [
+                    'customer_id' => $customer->id,
+                ],
+            ]);
+
+            $customer->setProviderId('stripe', $stripeCustomer->id);
+
+            return $stripeCustomer->id;
+        } catch (\Exception $e) {
+            Log::error('Failed to create Stripe customer', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new AddonException('Failed to create payment customer: '.$e->getMessage());
         }
     }
 }

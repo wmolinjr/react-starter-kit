@@ -151,6 +151,11 @@ class AppServiceProvider extends ServiceProvider
             SyncPermissionsOnSubscriptionChange::class,
         );
 
+        Event::listen(
+            \App\Events\Payment\WebhookReceived::class,
+            \App\Listeners\Central\HandleAddonWebhooks::class,
+        );
+
         // Federation Event Listeners
         Event::listen(FederatedUserCreated::class, SyncNewFederatedUser::class);
         Event::listen(FederatedUserUpdated::class, SyncUpdatedFederatedUser::class);

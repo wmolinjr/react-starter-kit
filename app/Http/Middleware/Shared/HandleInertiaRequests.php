@@ -309,8 +309,8 @@ class HandleInertiaRequests extends Middleware
         }
 
         return [
-            'name' => $subscription->stripe_price,
-            'active' => $subscription->active(),
+            'name' => $subscription->provider_price_id,
+            'active' => $subscription->isActive(),
             'on_trial' => $subscription->onTrial(),
             'ends_at' => $subscription->ends_at?->toISOString(),
             'trial_ends_at' => $subscription->trial_ends_at?->toISOString(),

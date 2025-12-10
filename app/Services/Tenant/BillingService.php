@@ -1,21 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Tenant;
 
+use App\Models\Central\Customer;
+use App\Models\Central\Payment;
 use App\Models\Central\Plan;
+use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Collection;
-use Laravel\Cashier\Subscription;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+use Stripe\StripeClient;
 
 /**
  * BillingService
  *
  * Handles all business logic for billing operations in tenant context.
- * Integrates with Laravel Cashier for Stripe billing.
+ * Integrates with the multi-provider payment gateway system.
  */
 class BillingService
 {
+    protected ?StripeClient $stripe = null;
+
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        $secret = config('payment.drivers.stripe.secret');
+        if ($secret) {
+            $this->stripe = new StripeClient($secret);
+        }
+    }
+
     /**
      * Get billing overview for tenant.
      *
@@ -25,7 +42,7 @@ class BillingService
     {
         return [
             'plans' => $this->getPlansForDisplay(),
-            'subscription' => $this->formatSubscription($tenant->subscription('default')),
+            'subscription' => $this->formatSubscription($this->getTenantSubscription($tenant)),
             'invoices' => $this->getRecentInvoices($tenant),
         ];
     }
@@ -65,8 +82,8 @@ class BillingService
         }
 
         return [
-            'name' => $subscription->stripe_price,
-            'status' => $subscription->stripe_status,
+            'name' => $subscription->provider_price_id,
+            'status' => $subscription->status,
             'trial_ends_at' => $subscription->trial_ends_at?->toDateString(),
             'ends_at' => $subscription->ends_at?->toDateString(),
             'on_trial' => $subscription->onTrial(),
@@ -82,12 +99,25 @@ class BillingService
      */
     public function getRecentInvoices(Tenant $tenant): Collection
     {
-        return $tenant->invoices()->map(fn ($invoice) => [
-            'id' => $invoice->id,
-            'date' => $invoice->date()->toFormattedDateString(),
-            'total' => $invoice->total(),
-            'download_url' => route('tenant.admin.billing.invoice', $invoice->id),
-        ]);
+        $customer = $tenant->customer;
+
+        if (! $customer) {
+            return collect();
+        }
+
+        return Payment::where('customer_id', $customer->id)
+            ->where('status', 'succeeded')
+            ->orderByDesc('created_at')
+            ->take(10)
+            ->get()
+            ->map(fn (Payment $payment) => [
+                'id' => $payment->id,
+                'date' => $payment->created_at->toFormattedDateString(),
+                'total' => '$'.number_format($payment->amount / 100, 2),
+                'download_url' => $payment->provider_invoice_id
+                    ? route('tenant.admin.billing.invoice', $payment->id)
+                    : null,
+            ]);
     }
 
     /**
@@ -97,41 +127,86 @@ class BillingService
      */
     public function getDetailedInvoices(Tenant $tenant): Collection
     {
-        return $tenant->invoices()->map(fn ($invoice) => [
-            'id' => $invoice->id,
-            'number' => $invoice->number,
-            'date' => $invoice->date()->toISOString(),
-            'date_formatted' => $invoice->date()->toFormattedDateString(),
-            'due_date' => $invoice->dueDate()?->toISOString(),
-            'total' => $invoice->total(),
-            'status' => $invoice->status,
-            'paid' => $invoice->status === 'paid',
-            'download_url' => route('tenant.admin.billing.invoice', $invoice->id),
-            'lines' => collect($invoice->invoiceLineItems())->map(fn ($line) => [
-                'description' => $line->description,
-                'quantity' => $line->quantity,
-                'amount' => '$'.number_format($line->amount / 100, 2),
-            ])->toArray(),
-        ]);
+        $customer = $tenant->customer;
+
+        if (! $customer) {
+            return collect();
+        }
+
+        return Payment::where('customer_id', $customer->id)
+            ->whereIn('status', ['succeeded', 'pending'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn (Payment $payment) => [
+                'id' => $payment->id,
+                'number' => $payment->provider_payment_id,
+                'date' => $payment->created_at->toISOString(),
+                'date_formatted' => $payment->created_at->toFormattedDateString(),
+                'due_date' => null,
+                'total' => '$'.number_format($payment->amount / 100, 2),
+                'status' => $payment->status,
+                'paid' => $payment->status === 'succeeded',
+                'download_url' => $payment->provider_invoice_id
+                    ? route('tenant.admin.billing.invoice', $payment->id)
+                    : null,
+                'lines' => [],
+            ]);
     }
 
     /**
      * Create checkout session for plan subscription.
-     *
-     * @return \Laravel\Cashier\Checkout
      */
-    public function createCheckout(Tenant $tenant, string $planSlug): mixed
+    public function createCheckout(Tenant $tenant, string $planSlug): array
     {
         $plan = Plan::where('slug', $planSlug)->firstOrFail();
         $priceId = $plan->stripe_price_id;
 
-        return $tenant->newSubscription('default', $priceId)
-            ->trialDays(14)
-            ->checkout([
-                'locale' => stripe_locale(),
-                'success_url' => route('tenant.admin.billing.success'),
-                'cancel_url' => route('tenant.admin.billing.index'),
+        $customer = $tenant->customer;
+        if (! $customer) {
+            throw new \RuntimeException('Tenant has no associated customer for billing');
+        }
+
+        $stripeCustomerId = $this->ensureStripeCustomer($customer);
+
+        $sessionParams = [
+            'customer' => $stripeCustomerId,
+            'mode' => 'subscription',
+            'locale' => stripe_locale(),
+            'success_url' => route('tenant.admin.billing.success').'?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('tenant.admin.billing.index'),
+            'metadata' => [
+                'tenant_id' => $tenant->id,
+                'customer_id' => $customer->id,
+                'plan_slug' => $planSlug,
+            ],
+            'subscription_data' => [
+                'trial_period_days' => 14,
+                'metadata' => [
+                    'tenant_id' => $tenant->id,
+                    'customer_id' => $customer->id,
+                    'plan_slug' => $planSlug,
+                ],
+            ],
+            'line_items' => [
+                ['price' => $priceId, 'quantity' => 1],
+            ],
+        ];
+
+        try {
+            $session = $this->stripe->checkout->sessions->create($sessionParams);
+
+            return [
+                'session_id' => $session->id,
+                'url' => $session->url,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to create checkout session', [
+                'tenant_id' => $tenant->id,
+                'plan_slug' => $planSlug,
+                'error' => $e->getMessage(),
             ]);
+            throw new \RuntimeException('Failed to create checkout session: '.$e->getMessage());
+        }
     }
 
     /**
@@ -139,13 +214,13 @@ class BillingService
      */
     public function handleSuccessfulCheckout(Tenant $tenant): void
     {
-        $subscription = $tenant->subscription('default');
+        $subscription = $this->getTenantSubscription($tenant);
 
         if (! $subscription) {
             return;
         }
 
-        $priceId = $subscription->stripe_price;
+        $priceId = $subscription->provider_price_id;
         $plan = Plan::where('stripe_price_id', $priceId)->first();
 
         if ($plan) {
@@ -157,31 +232,77 @@ class BillingService
     /**
      * Get URL to Stripe billing portal.
      */
-    public function getPortalUrl(Tenant $tenant): string
+    public function getPortalUrl(Tenant $tenant): ?string
     {
-        return $tenant->billingPortalUrl(route('tenant.admin.billing.index'));
+        $customer = $tenant->customer;
+        if (! $customer) {
+            return null;
+        }
+
+        $stripeId = $customer->getProviderId('stripe');
+        if (! $stripeId) {
+            return null;
+        }
+
+        try {
+            $session = $this->stripe->billingPortal->sessions->create([
+                'customer' => $stripeId,
+                'return_url' => route('tenant.admin.billing.index'),
+                'locale' => stripe_locale(),
+            ]);
+
+            return $session->url;
+        } catch (\Exception $e) {
+            Log::error('Failed to create billing portal session', [
+                'tenant_id' => $tenant->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     /**
      * Redirect to billing portal.
      */
-    public function redirectToPortal(Tenant $tenant): Response
+    public function redirectToPortal(Tenant $tenant): \Illuminate\Http\RedirectResponse
     {
-        return $tenant->redirectToBillingPortal(
-            route('tenant.admin.billing.index'),
-            ['locale' => stripe_locale()]
-        );
+        $url = $this->getPortalUrl($tenant);
+
+        if (! $url) {
+            return redirect()->route('tenant.admin.billing.index')
+                ->with('error', __('billing.portal_unavailable'));
+        }
+
+        return redirect($url);
     }
 
     /**
      * Download invoice PDF.
      */
-    public function downloadInvoice(Tenant $tenant, string $invoiceId): Response
+    public function downloadInvoice(Tenant $tenant, string $paymentId): mixed
     {
-        return $tenant->downloadInvoice($invoiceId, [
-            'vendor' => config('app.name'),
-            'product' => 'Subscription',
-        ]);
+        $payment = Payment::findOrFail($paymentId);
+
+        if (! $payment->provider_invoice_id) {
+            abort(404, 'Invoice not found');
+        }
+
+        try {
+            $invoice = $this->stripe->invoices->retrieve($payment->provider_invoice_id);
+
+            if ($invoice->invoice_pdf) {
+                return redirect($invoice->invoice_pdf);
+            }
+
+            abort(404, 'Invoice PDF not available');
+        } catch (\Exception $e) {
+            Log::error('Failed to retrieve invoice', [
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+            ]);
+            abort(500, 'Failed to retrieve invoice');
+        }
     }
 
     /**
@@ -194,23 +315,11 @@ class BillingService
 
     /**
      * Get comprehensive billing dashboard data.
-     *
-     * @return array{
-     *     plan: Plan|null,
-     *     subscription: array|null,
-     *     usage: array,
-     *     costs: array|null,
-     *     nextInvoice: array|null,
-     *     activeAddons: array,
-     *     activeBundles: array,
-     *     recentInvoices: \Illuminate\Support\Collection,
-     *     trialEndsAt: string|null
-     * }
      */
     public function getDashboardData(Tenant $tenant): array
     {
         $plan = $tenant->plan;
-        $subscription = $tenant->subscription('default');
+        $subscription = $this->getTenantSubscription($tenant);
 
         return [
             'plan' => $plan,
@@ -236,21 +345,21 @@ class BillingService
 
         return [
             'id' => $subscription->id,
-            'name' => $subscription->name,
-            'stripePrice' => $subscription->stripe_price,
-            'stripeStatus' => $subscription->stripe_status,
-            'status' => $subscription->stripe_status,
-            'quantity' => $subscription->quantity ?? 1,
+            'name' => $subscription->type,
+            'stripePrice' => $subscription->provider_price_id,
+            'stripeStatus' => $subscription->status,
+            'status' => $subscription->status,
+            'quantity' => $subscription->quantity,
             'trialEndsAt' => $subscription->trial_ends_at?->toISOString(),
             'endsAt' => $subscription->ends_at?->toISOString(),
             'startedAt' => $subscription->created_at?->toISOString(),
-            'currentPeriodStart' => null,
-            'currentPeriodEnd' => null,
+            'currentPeriodStart' => $subscription->current_period_start?->toISOString(),
+            'currentPeriodEnd' => $subscription->current_period_end?->toISOString(),
             'cancelAtPeriodEnd' => $subscription->ends_at !== null,
             'onTrial' => $subscription->onTrial(),
             'onGracePeriod' => $subscription->onGracePeriod(),
             'canceled' => $subscription->canceled(),
-            'active' => $subscription->active(),
+            'active' => $subscription->isActive(),
         ];
     }
 
@@ -350,7 +459,7 @@ class BillingService
 
         $planCost = $plan->price ?? 0;
         $addonsCost = $tenant->activeAddons->sum('price') ?? 0;
-        $bundlesCost = 0; // Bundles are tracked as addons with discounted prices
+        $bundlesCost = 0;
         $totalCost = $planCost + $addonsCost;
 
         $currency = $plan->currency ?? 'USD';
@@ -374,19 +483,31 @@ class BillingService
      */
     protected function getNextInvoicePreview(Tenant $tenant): ?array
     {
-        try {
-            $upcomingInvoice = $tenant->upcomingInvoice();
+        $customer = $tenant->customer;
+        if (! $customer) {
+            return null;
+        }
 
-            if (! $upcomingInvoice) {
-                return null;
-            }
+        $stripeId = $customer->getProviderId('stripe');
+        if (! $stripeId) {
+            return null;
+        }
+
+        try {
+            $upcomingInvoice = $this->stripe->invoices->upcoming([
+                'customer' => $stripeId,
+            ]);
 
             return [
-                'total' => $upcomingInvoice->total(),
-                'formattedTotal' => $upcomingInvoice->total(),
-                'dueDate' => $upcomingInvoice->dueDate()?->toISOString(),
-                'formattedDueDate' => $upcomingInvoice->dueDate()?->toFormattedDateString(),
-                'items' => collect($upcomingInvoice->invoiceLineItems())->map(fn ($line) => [
+                'total' => '$'.number_format($upcomingInvoice->total / 100, 2),
+                'formattedTotal' => '$'.number_format($upcomingInvoice->total / 100, 2),
+                'dueDate' => $upcomingInvoice->due_date
+                    ? \Carbon\Carbon::createFromTimestamp($upcomingInvoice->due_date)->toISOString()
+                    : null,
+                'formattedDueDate' => $upcomingInvoice->due_date
+                    ? \Carbon\Carbon::createFromTimestamp($upcomingInvoice->due_date)->toFormattedDateString()
+                    : null,
+                'items' => collect($upcomingInvoice->lines->data)->map(fn ($line) => [
                     'description' => $line->description,
                     'amount' => '$'.number_format($line->amount / 100, 2),
                 ])->toArray(),
@@ -402,7 +523,7 @@ class BillingService
     protected function getActiveAddonsInfo(Tenant $tenant): array
     {
         return $tenant->activeAddons()
-            ->whereNull('metadata->bundle_slug') // Exclude bundle addons
+            ->whereNull('metadata->bundle_slug')
             ->get()
             ->map(fn ($addon) => [
                 'id' => $addon->id,
@@ -455,7 +576,9 @@ class BillingService
      */
     public function hasActiveSubscription(Tenant $tenant): bool
     {
-        return $tenant->subscribed('default');
+        $subscription = $this->getTenantSubscription($tenant);
+
+        return $subscription && $subscription->isActive();
     }
 
     /**
@@ -463,8 +586,57 @@ class BillingService
      */
     public function isOnTrial(Tenant $tenant): bool
     {
-        $subscription = $tenant->subscription('default');
+        $subscription = $this->getTenantSubscription($tenant);
 
         return $subscription && $subscription->onTrial();
+    }
+
+    /**
+     * Get tenant's active subscription.
+     */
+    protected function getTenantSubscription(Tenant $tenant): ?Subscription
+    {
+        $customer = $tenant->customer;
+        if (! $customer) {
+            return null;
+        }
+
+        return Subscription::where('customer_id', $customer->id)
+            ->where('tenant_id', $tenant->id)
+            ->where('type', 'default')
+            ->whereIn('status', ['active', 'trialing', 'past_due'])
+            ->first();
+    }
+
+    /**
+     * Ensure customer has a Stripe customer ID.
+     */
+    protected function ensureStripeCustomer(Customer $customer): string
+    {
+        $stripeId = $customer->getProviderId('stripe');
+
+        if ($stripeId) {
+            return $stripeId;
+        }
+
+        try {
+            $stripeCustomer = $this->stripe->customers->create([
+                'email' => $customer->email,
+                'name' => $customer->name ?? $customer->email,
+                'metadata' => [
+                    'customer_id' => $customer->id,
+                ],
+            ]);
+
+            $customer->setProviderId('stripe', $stripeCustomer->id);
+
+            return $stripeCustomer->id;
+        } catch (\Exception $e) {
+            Log::error('Failed to create Stripe customer', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to create payment customer: '.$e->getMessage());
+        }
     }
 }

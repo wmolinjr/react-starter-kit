@@ -1,48 +1,73 @@
 <?php
 
-namespace App\Http\Controllers\Billing;
+declare(strict_types=1);
+
+namespace App\Listeners\Central;
 
 use App\Enums\BillingPeriod;
+use App\Events\Payment\WebhookReceived;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\AddonSubscription;
+use App\Models\Central\Customer;
 use App\Models\Central\Tenant;
 use App\Services\Central\AddonService;
-use App\Services\Central\CheckoutService;
 use App\Services\Central\MeteredBillingService;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
-use Laravel\Cashier\Http\Controllers\WebhookController as CashierWebhookController;
-use Symfony\Component\HttpFoundation\Response;
 
-class AddonWebhookController extends CashierWebhookController
+/**
+ * Handle Addon Webhooks
+ *
+ * Processes payment webhook events related to addon purchases and subscriptions.
+ * Listens to the provider-agnostic WebhookReceived event.
+ */
+class HandleAddonWebhooks implements ShouldQueue
 {
+    public string $queue = 'high';
+
     public function __construct(
         protected AddonService $addonService,
-        protected CheckoutService $checkoutService,
         protected MeteredBillingService $meteredService
     ) {}
 
     /**
-     * Handle checkout.session.completed webhook
+     * Handle the event.
      */
-    protected function handleCheckoutSessionCompleted(array $payload): Response
+    public function handle(WebhookReceived $event): void
     {
-        $session = $payload['data']['object'];
+        $type = $event->getType();
 
-        Log::info('Checkout session completed', ['session_id' => $session['id']]);
+        match ($type) {
+            'checkout.session.completed' => $this->handleCheckoutSessionCompleted($event),
+            'customer.subscription.created' => $this->handleCustomerSubscriptionCreated($event),
+            'customer.subscription.updated' => $this->handleCustomerSubscriptionUpdated($event),
+            'customer.subscription.deleted' => $this->handleCustomerSubscriptionDeleted($event),
+            'invoice.payment_succeeded' => $this->handleInvoicePaymentSucceeded($event),
+            'invoice.payment_failed' => $this->handleInvoicePaymentFailed($event),
+            'charge.refunded' => $this->handleChargeRefunded($event),
+            default => null,
+        };
+    }
 
-        // Check if this is an addon purchase
+    /**
+     * Handle checkout.session.completed webhook.
+     */
+    protected function handleCheckoutSessionCompleted(WebhookReceived $event): void
+    {
+        $session = $event->getObject();
+
+        Log::info('Checkout session completed', ['session_id' => $session['id'] ?? 'unknown']);
+
         $metadata = $session['metadata'] ?? [];
 
         if (($metadata['purchase_type'] ?? null) === 'one_time') {
             $this->processOneTimePurchase($session);
         }
-
-        return $this->successMethod();
     }
 
     /**
-     * Process one-time addon purchase
+     * Process one-time addon purchase.
      */
     protected function processOneTimePurchase(array $session): void
     {
@@ -55,7 +80,7 @@ class AddonWebhookController extends CashierWebhookController
         }
 
         if ($purchase->isCompleted()) {
-            return; // Already processed
+            return;
         }
 
         if ($session['payment_status'] === 'paid') {
@@ -64,7 +89,6 @@ class AddonWebhookController extends CashierWebhookController
             ]);
             $purchase->markAsCompleted();
 
-            // Create the addon record for this one-time purchase
             $addon = Addon::where('slug', $purchase->addon_slug)->first();
 
             if ($addon) {
@@ -82,7 +106,6 @@ class AddonWebhookController extends CashierWebhookController
                     'expires_at' => $purchase->valid_until,
                 ]);
 
-                // Sync tenant limits
                 $this->addonService->syncTenantLimits($purchase->tenant);
             } else {
                 Log::warning('Addon not found in database', ['addon_slug' => $purchase->addon_slug]);
@@ -96,15 +119,15 @@ class AddonWebhookController extends CashierWebhookController
     }
 
     /**
-     * Handle customer.subscription.created webhook
+     * Handle customer.subscription.created webhook.
      */
-    protected function handleCustomerSubscriptionCreated(array $payload): Response
+    protected function handleCustomerSubscriptionCreated(WebhookReceived $event): void
     {
-        $subscription = $payload['data']['object'];
+        $subscription = $event->getObject();
         $metadata = $subscription['metadata'] ?? [];
 
         Log::info('Subscription created', [
-            'subscription_id' => $subscription['id'],
+            'subscription_id' => $subscription['id'] ?? 'unknown',
             'metadata' => $metadata,
         ]);
 
@@ -113,9 +136,9 @@ class AddonWebhookController extends CashierWebhookController
         $billingPeriod = $metadata['billing_period'] ?? 'monthly';
 
         if (! $tenantId || ! $addonSlug) {
-            Log::warning('Subscription created without addon metadata', ['subscription_id' => $subscription['id']]);
+            Log::warning('Subscription created without addon metadata', ['subscription_id' => $subscription['id'] ?? 'unknown']);
 
-            return $this->successMethod();
+            return;
         }
 
         $tenant = Tenant::find($tenantId);
@@ -123,12 +146,17 @@ class AddonWebhookController extends CashierWebhookController
         if (! $tenant) {
             Log::warning('Tenant not found for subscription', ['tenant_id' => $tenantId]);
 
-            return $this->successMethod();
+            return;
         }
 
-        // Update tenant stripe_id if not set
-        if (! $tenant->stripe_id) {
-            $tenant->update(['stripe_id' => $subscription['customer']]);
+        // Update customer provider_ids if needed
+        $customer = $tenant->customer;
+        if ($customer && ! empty($subscription['customer'])) {
+            $providerIds = $customer->provider_ids ?? [];
+            if (empty($providerIds[$event->provider])) {
+                $providerIds[$event->provider] = $subscription['customer'];
+                $customer->update(['provider_ids' => $providerIds]);
+            }
         }
 
         $addon = Addon::where('slug', $addonSlug)->first();
@@ -136,20 +164,17 @@ class AddonWebhookController extends CashierWebhookController
         if (! $addon) {
             Log::warning('Addon not found in database', ['addon_slug' => $addonSlug]);
 
-            return $this->successMethod();
+            return;
         }
 
-        // Get quantity from subscription items
         $quantity = 1;
         foreach ($subscription['items']['data'] ?? [] as $item) {
             $quantity = $item['quantity'] ?? 1;
             break;
         }
 
-        // Get price based on billing period
         $price = $billingPeriod === 'yearly' ? $addon->price_yearly : $addon->price_monthly;
 
-        // Create or update addon record
         $tenantAddon = AddonSubscription::updateOrCreate(
             [
                 'tenant_id' => $tenant->id,
@@ -168,7 +193,6 @@ class AddonWebhookController extends CashierWebhookController
             ]
         );
 
-        // Sync tenant limits
         $this->addonService->syncTenantLimits($tenant);
 
         Log::info('Addon created from subscription', [
@@ -176,100 +200,108 @@ class AddonWebhookController extends CashierWebhookController
             'addon_id' => $tenantAddon->id,
             'addon_slug' => $addonSlug,
         ]);
-
-        return $this->successMethod();
     }
 
     /**
-     * Handle customer.subscription.updated webhook
+     * Handle customer.subscription.updated webhook.
      */
-    protected function handleCustomerSubscriptionUpdated(array $payload): Response
+    protected function handleCustomerSubscriptionUpdated(WebhookReceived $event): void
     {
-        // Let Cashier handle base subscription updates
-        parent::handleCustomerSubscriptionUpdated($payload);
+        $subscription = $event->getObject();
+        $customerId = $subscription['customer'] ?? null;
 
-        $subscription = $payload['data']['object'];
-        $tenant = Tenant::where('stripe_id', $subscription['customer'])->first();
-
-        if ($tenant) {
-            // Sync addon limits when subscription changes
-            $this->addonService->syncTenantLimits($tenant);
-
-            Log::info('Subscription updated, synced addon limits', ['tenant_id' => $tenant->id]);
+        if (! $customerId) {
+            return;
         }
 
-        return $this->successMethod();
-    }
+        $customer = Customer::whereJsonContains('provider_ids->'.$event->provider, $customerId)->first();
 
-    /**
-     * Handle customer.subscription.deleted webhook
-     */
-    protected function handleCustomerSubscriptionDeleted(array $payload): Response
-    {
-        parent::handleCustomerSubscriptionDeleted($payload);
-
-        $subscription = $payload['data']['object'];
-        $tenant = Tenant::where('stripe_id', $subscription['customer'])->first();
-
-        if ($tenant) {
-            // Cancel all subscription-based addons
-            $tenant->addons()
-                ->whereIn('billing_period', [BillingPeriod::MONTHLY, BillingPeriod::YEARLY])
-                ->where('status', 'active')
-                ->each(fn ($addon) => $addon->cancel('Subscription canceled'));
-
-            Log::info('Subscription deleted, canceled subscription addons', ['tenant_id' => $tenant->id]);
-        }
-
-        return $this->successMethod();
-    }
-
-    /**
-     * Handle invoice.payment_succeeded webhook
-     */
-    protected function handleInvoicePaymentSucceeded(array $payload): Response
-    {
-        $invoice = $payload['data']['object'];
-        $tenant = Tenant::where('stripe_id', $invoice['customer'])->first();
-
-        if ($tenant) {
-            // Reset metered usage after successful billing
-            if ($this->hasMeteredItems($invoice)) {
-                $this->meteredService->resetMeteredUsage($tenant);
-
-                Log::info('Reset metered usage after invoice payment', ['tenant_id' => $tenant->id]);
+        if ($customer) {
+            foreach ($customer->tenants as $tenant) {
+                $this->addonService->syncTenantLimits($tenant);
             }
-        }
 
-        return $this->successMethod();
+            Log::info('Subscription updated, synced addon limits', ['customer_id' => $customer->id]);
+        }
     }
 
     /**
-     * Handle invoice.payment_failed webhook
+     * Handle customer.subscription.deleted webhook.
      */
-    protected function handleInvoicePaymentFailed(array $payload): Response
+    protected function handleCustomerSubscriptionDeleted(WebhookReceived $event): void
     {
-        $invoice = $payload['data']['object'];
-        $tenant = Tenant::where('stripe_id', $invoice['customer'])->first();
+        $subscription = $event->getObject();
+        $customerId = $subscription['customer'] ?? null;
 
-        if ($tenant) {
+        if (! $customerId) {
+            return;
+        }
+
+        $customer = Customer::whereJsonContains('provider_ids->'.$event->provider, $customerId)->first();
+
+        if ($customer) {
+            foreach ($customer->tenants as $tenant) {
+                $tenant->addons()
+                    ->whereIn('billing_period', [BillingPeriod::MONTHLY, BillingPeriod::YEARLY])
+                    ->where('status', 'active')
+                    ->each(fn ($addon) => $addon->cancel('Subscription canceled'));
+            }
+
+            Log::info('Subscription deleted, canceled subscription addons', ['customer_id' => $customer->id]);
+        }
+    }
+
+    /**
+     * Handle invoice.payment_succeeded webhook.
+     */
+    protected function handleInvoicePaymentSucceeded(WebhookReceived $event): void
+    {
+        $invoice = $event->getObject();
+        $customerId = $invoice['customer'] ?? null;
+
+        if (! $customerId) {
+            return;
+        }
+
+        $customer = Customer::whereJsonContains('provider_ids->'.$event->provider, $customerId)->first();
+
+        if ($customer && $this->hasMeteredItems($invoice)) {
+            foreach ($customer->tenants as $tenant) {
+                $this->meteredService->resetMeteredUsage($tenant);
+            }
+
+            Log::info('Reset metered usage after invoice payment', ['customer_id' => $customer->id]);
+        }
+    }
+
+    /**
+     * Handle invoice.payment_failed webhook.
+     */
+    protected function handleInvoicePaymentFailed(WebhookReceived $event): void
+    {
+        $invoice = $event->getObject();
+        $customerId = $invoice['customer'] ?? null;
+
+        if (! $customerId) {
+            return;
+        }
+
+        $customer = Customer::whereJsonContains('provider_ids->'.$event->provider, $customerId)->first();
+
+        if ($customer) {
             Log::warning('Invoice payment failed', [
-                'tenant_id' => $tenant->id,
-                'invoice_id' => $invoice['id'],
+                'customer_id' => $customer->id,
+                'invoice_id' => $invoice['id'] ?? 'unknown',
             ]);
-
-            // Could send notification, pause features, etc.
         }
-
-        return $this->successMethod();
     }
 
     /**
-     * Handle charge.refunded webhook
+     * Handle charge.refunded webhook.
      */
-    protected function handleChargeRefunded(array $payload): Response
+    protected function handleChargeRefunded(WebhookReceived $event): void
     {
-        $charge = $payload['data']['object'];
+        $charge = $event->getObject();
         $paymentIntentId = $charge['payment_intent'] ?? null;
 
         if ($paymentIntentId) {
@@ -278,7 +310,6 @@ class AddonWebhookController extends CashierWebhookController
             if ($purchase && ! $purchase->isRefunded()) {
                 $purchase->refund();
 
-                // Deactivate associated addon
                 $addon = AddonSubscription::where('tenant_id', $purchase->tenant_id)
                     ->where('addon_slug', $purchase->addon_slug)
                     ->where('billing_period', BillingPeriod::ONE_TIME)
@@ -292,12 +323,10 @@ class AddonWebhookController extends CashierWebhookController
                 Log::info('Purchase refunded', ['purchase_id' => $purchase->id]);
             }
         }
-
-        return $this->successMethod();
     }
 
     /**
-     * Check if invoice has metered items
+     * Check if invoice has metered items.
      */
     protected function hasMeteredItems(array $invoice): bool
     {

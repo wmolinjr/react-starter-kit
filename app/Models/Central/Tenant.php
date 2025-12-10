@@ -207,6 +207,39 @@ class Tenant extends Model implements TenantWithDatabase
     }
 
     /**
+     * Get subscription for this tenant (backward compatible with Cashier API).
+     *
+     * In the old Cashier architecture, this was called as $tenant->subscription('default').
+     * Now it proxies to the customer's subscription for this tenant.
+     *
+     * @param  string  $type  Subscription type (default, addon, etc.)
+     */
+    public function subscription(string $type = 'default'): ?Subscription
+    {
+        return $this->customer?->subscriptionForTenant($this, $type);
+    }
+
+    /**
+     * Check if tenant has an active subscription.
+     */
+    public function subscribed(string $type = 'default'): bool
+    {
+        $subscription = $this->subscription($type);
+
+        return $subscription !== null && $subscription->isActive();
+    }
+
+    /**
+     * Check if tenant is on trial via subscription.
+     */
+    public function onSubscriptionTrial(string $type = 'default'): bool
+    {
+        $subscription = $this->subscription($type);
+
+        return $subscription !== null && $subscription->onTrial();
+    }
+
+    /**
      * Get payment method (tenant override or customer default).
      */
     public function getPaymentMethod(): ?PaymentMethod
