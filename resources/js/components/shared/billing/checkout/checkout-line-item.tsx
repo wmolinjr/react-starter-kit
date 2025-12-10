@@ -15,10 +15,23 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { CheckoutItem } from '@/types/billing';
+import type { BillingPeriod } from '@/types/enums';
+
+// Helper function to format price
+function formatPrice(amount: number, currency = 'USD'): string {
+    return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: amount % 100 === 0 ? 0 : 2,
+        maximumFractionDigits: 2,
+    }).format(amount / 100);
+}
 
 export interface CheckoutLineItemProps {
     /** The checkout item to display */
     item: CheckoutItem;
+    /** Current billing period (for dynamic price calculation) */
+    currentBillingPeriod?: BillingPeriod;
     /** Callback when removing the item */
     onRemove?: () => void;
     /** Callback when quantity changes */
@@ -49,6 +62,7 @@ export interface CheckoutLineItemProps {
  */
 export function CheckoutLineItem({
     item,
+    currentBillingPeriod,
     onRemove,
     onQuantityChange,
     readonly = false,
@@ -57,6 +71,35 @@ export function CheckoutLineItem({
     className,
 }: CheckoutLineItemProps) {
     const { t } = useLaravelReactI18n();
+
+    // Calculate current pricing based on billing period
+    const getCurrentPricing = () => {
+        // If we have pricingByPeriod and a different current period, use that
+        if (item.pricingByPeriod && currentBillingPeriod && item.isRecurring) {
+            const periodKey = currentBillingPeriod === 'yearly' ? 'yearly' : 'monthly';
+            const periodPricing = item.pricingByPeriod[periodKey];
+            if (periodPricing) {
+                const totalPrice = periodPricing.price * item.quantity;
+                return {
+                    unitPrice: periodPricing.price,
+                    totalPrice,
+                    formattedUnitPrice: periodPricing.formattedPrice,
+                    formattedTotalPrice: formatPrice(totalPrice),
+                    billingPeriod: currentBillingPeriod,
+                };
+            }
+        }
+        // Fallback to stored pricing
+        return {
+            unitPrice: item.unitPrice,
+            totalPrice: item.totalPrice,
+            formattedUnitPrice: item.formattedUnitPrice,
+            formattedTotalPrice: item.formattedTotalPrice,
+            billingPeriod: item.billingPeriod,
+        };
+    };
+
+    const pricing = getCurrentPricing();
 
     // Get icon for product type
     const getProductIcon = () => {
@@ -115,7 +158,7 @@ export function CheckoutLineItem({
             return t('billing.one_time', { default: 'One-time' });
         }
 
-        return item.billingPeriod === 'yearly'
+        return pricing.billingPeriod === 'yearly'
             ? t('billing.per_year', { default: '/year' })
             : t('billing.per_month', { default: '/month' });
     };
@@ -145,7 +188,7 @@ export function CheckoutLineItem({
                     )}
                 </div>
                 <span className="shrink-0 text-sm font-medium">
-                    {item.formattedTotalPrice}
+                    {pricing.formattedTotalPrice}
                 </span>
             </div>
         );
@@ -154,92 +197,88 @@ export function CheckoutLineItem({
     return (
         <div
             className={cn(
-                'flex items-start gap-3 rounded-lg border p-3',
+                'rounded-lg border p-3',
                 className
             )}
         >
-            {/* Icon */}
-            <div className="bg-muted text-muted-foreground shrink-0 rounded-lg p-2">
-                {getProductIcon()}
+            {/* Header row: Icon + Name + Badge + Price + Remove */}
+            <div className="flex items-start gap-2">
+                {/* Icon */}
+                <div className="bg-muted text-muted-foreground shrink-0 rounded-md p-1.5 mt-0.5">
+                    {getProductIcon()}
+                </div>
+
+                {/* Name, badge and description */}
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-sm font-medium leading-tight">{item.product.name}</h4>
+                        {getTypeBadge()}
+                    </div>
+                    {item.product.description && (
+                        <p className="text-muted-foreground mt-0.5 text-xs line-clamp-2">
+                            {item.product.description}
+                        </p>
+                    )}
+                </div>
+
+                {/* Price - always visible, fixed position */}
+                <div className="shrink-0 text-right">
+                    <div className="font-semibold">{pricing.formattedTotalPrice}</div>
+                    {item.isRecurring && (
+                        <div className="text-muted-foreground text-xs">
+                            {getBillingLabel()}
+                        </div>
+                    )}
+                </div>
+
+                {/* Remove button */}
+                {!readonly && onRemove && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive h-6 w-6 shrink-0 -mr-1"
+                        onClick={onRemove}
+                    >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span className="sr-only">
+                            {t('billing.remove', { default: 'Remove' })}
+                        </span>
+                    </Button>
+                )}
             </div>
 
-            {/* Content */}
-            <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                            <h4 className="truncate font-medium">{item.product.name}</h4>
-                            {getTypeBadge()}
-                        </div>
-                        {item.product.description && (
-                            <p className="text-muted-foreground mt-0.5 truncate text-sm">
-                                {item.product.description}
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Remove button */}
-                    {!readonly && onRemove && (
+            {/* Quantity row */}
+            <div className="mt-2 flex items-center">
+                {canChangeQuantity ? (
+                    <div className="flex items-center gap-1">
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
-                            className="text-muted-foreground hover:text-destructive h-8 w-8 shrink-0"
-                            onClick={onRemove}
+                            className="h-6 w-6"
+                            onClick={() => handleQuantityChange(-1)}
+                            disabled={item.quantity <= 1}
                         >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">
-                                {t('billing.remove', { default: 'Remove' })}
-                            </span>
+                            <Minus className="h-3 w-3" />
                         </Button>
-                    )}
-                </div>
-
-                {/* Price and quantity row */}
-                <div className="mt-2 flex items-center justify-between">
-                    {/* Quantity controls */}
-                    {canChangeQuantity ? (
-                        <div className="flex items-center gap-1">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => handleQuantityChange(-1)}
-                                disabled={item.quantity <= 1}
-                            >
-                                <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="w-8 text-center text-sm font-medium">
-                                {item.quantity}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => handleQuantityChange(1)}
-                            >
-                                <Plus className="h-3 w-3" />
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="text-muted-foreground text-sm">
-                            {item.quantity > 1 && (
-                                <span>
-                                    {item.quantity} x {item.formattedUnitPrice}
-                                </span>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Price */}
-                    <div className="text-right">
-                        <p className="font-semibold">{item.formattedTotalPrice}</p>
-                        {item.isRecurring && (
-                            <p className="text-muted-foreground text-xs">
-                                {getBillingLabel()}
-                            </p>
-                        )}
+                        <span className="w-6 text-center text-sm font-medium">
+                            {item.quantity}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleQuantityChange(1)}
+                        >
+                            <Plus className="h-3 w-3" />
+                        </Button>
                     </div>
-                </div>
+                ) : (
+                    item.quantity > 1 && (
+                        <span className="text-muted-foreground text-xs">
+                            {item.quantity} x {pricing.formattedUnitPrice}
+                        </span>
+                    )
+                )}
             </div>
         </div>
     );

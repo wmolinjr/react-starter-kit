@@ -21,7 +21,7 @@ import {
     BundleCard,
     PricingToggle,
 } from '@/components/shared/billing';
-import { BillingPeriodProvider, useBillingPeriod } from '@/hooks/billing';
+import { BillingPeriodProvider, useBillingPeriod, useCheckout, createCheckoutItem } from '@/hooks/billing';
 import type { BreadcrumbItem, PlanResource, BundleResource } from '@/types';
 
 interface ActiveBundle {
@@ -50,6 +50,7 @@ function BundlesPageContent({
 }: BundlesPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();
+    const { addItem, hasProduct } = useCheckout();
     const [purchasingBundle, setPurchasingBundle] = useState<string | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -64,9 +65,46 @@ function BundlesPageContent({
         router.visit(admin.billing.index.url());
     };
 
+    // Add bundle to cart
+    const handleAddBundleToCart = (bundleSlug: string) => {
+        const bundle = bundles.find((b) => b.slug === bundleSlug);
+        if (!bundle) return;
+
+        const monthlyPricing = {
+            price: bundle.price_monthly_effective ?? 0,
+            formattedPrice: `$${((bundle.price_monthly_effective ?? 0) / 100).toFixed(2)}`,
+        };
+        const yearlyPricing = {
+            price: bundle.price_yearly_effective ?? 0,
+            formattedPrice: `$${((bundle.price_yearly_effective ?? 0) / 100).toFixed(2)}`,
+        };
+
+        const pricing = period === 'yearly' ? yearlyPricing : monthlyPricing;
+
+        addItem(
+            createCheckoutItem(
+                {
+                    id: bundle.id,
+                    type: 'bundle',
+                    slug: bundle.slug,
+                    name: typeof bundle.name === 'string' ? bundle.name : bundle.name_display || '',
+                    description:
+                        typeof bundle.description === 'string'
+                            ? bundle.description
+                            : '',
+                },
+                pricing,
+                1,
+                period,
+                true,
+                { monthly: monthlyPricing, yearly: yearlyPricing }
+            )
+        );
+    };
+
+    // Direct purchase bundle (existing flow)
     const handlePurchaseBundle = (bundleSlug: string) => {
         setPurchasingBundle(bundleSlug);
-        // Navigate to addons page with bundle pre-selected for purchase
         router.post(admin.addons.purchase.url(), {
             type: 'bundle',
             slug: bundleSlug,
@@ -193,6 +231,7 @@ function BundlesPageContent({
                                         bundle={bundle}
                                         billingPeriod={period}
                                         isPurchased={isPurchased}
+                                        isInCart={hasProduct(bundle.slug)}
                                         hasConflicts={hasConflicts}
                                         conflictMessage={hasConflicts
                                             ? t('tenant.billing.bundle_conflict', {
@@ -202,6 +241,7 @@ function BundlesPageContent({
                                             : undefined
                                         }
                                         isLoading={purchasingBundle === bundle.slug}
+                                        onAddToCart={() => handleAddBundleToCart(bundle.slug)}
                                         onPurchase={() => handlePurchaseBundle(bundle.slug)}
                                     />
                                 );

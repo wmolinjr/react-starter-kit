@@ -81,9 +81,17 @@ function formatPrice(amount: number, currency = 'USD'): string {
     }).format(amount / 100);
 }
 
-// Generate UUID
+// Generate UUID with fallback for older browsers
 function generateId(): string {
-    return crypto.randomUUID();
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    // Fallback for environments without crypto.randomUUID
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }
 
 /**
@@ -286,14 +294,33 @@ export function useCheckoutSafe(): CheckoutContextValue {
 }
 
 /**
+ * Pricing info for createCheckoutItem
+ */
+interface CreateCheckoutItemPricing {
+    price: number;
+    formattedPrice: string;
+}
+
+/**
  * createCheckoutItem - Helper to create a checkout item from a product
+ *
+ * @param product - The product being added to cart
+ * @param pricing - Current pricing (based on selected period)
+ * @param quantity - Quantity to add
+ * @param billingPeriod - Selected billing period
+ * @param isRecurring - Whether this is a recurring charge
+ * @param pricingByPeriod - Optional pricing for both periods (enables dynamic price updates)
  */
 export function createCheckoutItem(
     product: BillingProduct,
-    pricing: { price: number; formattedPrice: string },
+    pricing: CreateCheckoutItemPricing,
     quantity: number,
     billingPeriod: BillingPeriod,
-    isRecurring: boolean
+    isRecurring: boolean,
+    pricingByPeriod?: {
+        monthly?: CreateCheckoutItemPricing;
+        yearly?: CreateCheckoutItemPricing;
+    }
 ): Omit<CheckoutItem, 'id'> {
     const totalPrice = pricing.price * quantity;
 
@@ -306,5 +333,6 @@ export function createCheckoutItem(
         isRecurring,
         formattedUnitPrice: pricing.formattedPrice,
         formattedTotalPrice: formatPrice(totalPrice),
+        pricingByPeriod,
     };
 }

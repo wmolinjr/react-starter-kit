@@ -284,6 +284,9 @@ Route::middleware([
                 Route::get('/success', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'success'])->name('success');
                 Route::get('/portal', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'portal'])->name('portal');
                 Route::get('/invoice/{invoiceId}', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'invoice'])->name('invoice');
+                // Cart checkout routes
+                Route::post('/cart-checkout', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'cartCheckout'])->name('cart-checkout');
+                Route::get('/cart-success', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'cartSuccess'])->name('cart-success');
             });
 
             // Add-ons

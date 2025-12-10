@@ -32,8 +32,8 @@ import {
     BundleCard,
     PricingToggle,
 } from '@/components/shared/billing';
-import { BillingPeriodProvider, useBillingPeriod } from '@/hooks/billing';
-import type { BreadcrumbItem, AddonResource, BundleResource } from '@/types';
+import { BillingPeriodProvider, useBillingPeriod, useCheckout, createCheckoutItem } from '@/hooks/billing';
+import type { BreadcrumbItem, AddonResource, BundleResource, BillingPeriod } from '@/types';
 
 interface ActiveAddon {
     id: string;
@@ -84,6 +84,7 @@ function AddonsPageContent({
 }: AddonsPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();
+    const { addItem, hasProduct } = useCheckout();
     const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
     const [cancelingAddon, setCancelingAddon] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -96,6 +97,107 @@ function AddonsPageContent({
 
     useSetBreadcrumbs(breadcrumbs);
 
+    // Add addon to cart
+    const handleAddAddonToCart = (slug: string, quantity: number) => {
+        const addon = availableAddons.find((a) => a.slug === slug);
+        if (!addon) return;
+
+        const isRecurring = addon.price_one_time === null;
+
+        // Handle one-time purchases separately
+        if (!isRecurring) {
+            const oneTimePricing = {
+                price: addon.price_one_time ?? 0,
+                formattedPrice: addon.formatted_price_one_time || `$${((addon.price_one_time ?? 0) / 100).toFixed(2)}`,
+            };
+
+            addItem(
+                createCheckoutItem(
+                    {
+                        id: addon.id,
+                        type: 'addon',
+                        slug: addon.slug,
+                        name: addon.name,
+                        description: addon.description ?? undefined,
+                    },
+                    oneTimePricing,
+                    quantity,
+                    'one_time' as BillingPeriod,
+                    false // not recurring
+                    // No pricingByPeriod for one-time purchases
+                )
+            );
+            return;
+        }
+
+        // Recurring add-ons have monthly/yearly pricing
+        const monthlyPricing = {
+            price: addon.price_monthly ?? 0,
+            formattedPrice: addon.formatted_price_monthly || `$${((addon.price_monthly ?? 0) / 100).toFixed(2)}`,
+        };
+        const yearlyPricing = {
+            price: addon.price_yearly ?? 0,
+            formattedPrice: addon.formatted_price_yearly || `$${((addon.price_yearly ?? 0) / 100).toFixed(2)}`,
+        };
+
+        const pricing = period === 'yearly' && addon.price_yearly ? yearlyPricing : monthlyPricing;
+
+        addItem(
+            createCheckoutItem(
+                {
+                    id: addon.id,
+                    type: 'addon',
+                    slug: addon.slug,
+                    name: addon.name,
+                    description: addon.description ?? undefined,
+                },
+                pricing,
+                quantity,
+                period,
+                true, // recurring
+                { monthly: monthlyPricing, yearly: yearlyPricing }
+            )
+        );
+    };
+
+    // Add bundle to cart
+    const handleAddBundleToCart = (slug: string) => {
+        const bundle = availableBundles.find((b) => b.slug === slug);
+        if (!bundle) return;
+
+        const monthlyPricing = {
+            price: bundle.price_monthly_effective ?? 0,
+            formattedPrice: `$${((bundle.price_monthly_effective ?? 0) / 100).toFixed(2)}`,
+        };
+        const yearlyPricing = {
+            price: bundle.price_yearly_effective ?? 0,
+            formattedPrice: `$${((bundle.price_yearly_effective ?? 0) / 100).toFixed(2)}`,
+        };
+
+        const pricing = period === 'yearly' ? yearlyPricing : monthlyPricing;
+
+        addItem(
+            createCheckoutItem(
+                {
+                    id: bundle.id,
+                    type: 'bundle',
+                    slug: bundle.slug,
+                    name: typeof bundle.name === 'string' ? bundle.name : bundle.name_display || '',
+                    description:
+                        typeof bundle.description === 'string'
+                            ? bundle.description
+                            : '',
+                },
+                pricing,
+                1,
+                period,
+                true,
+                { monthly: monthlyPricing, yearly: yearlyPricing }
+            )
+        );
+    };
+
+    // Direct purchase addon (existing flow)
     const handlePurchaseAddon = (slug: string, quantity: number) => {
         setPurchasingAddon(slug);
         setError(null);
@@ -112,6 +214,7 @@ function AddonsPageContent({
         });
     };
 
+    // Direct purchase bundle (existing flow)
     const handlePurchaseBundle = (slug: string) => {
         setPurchasingAddon(slug);
         setError(null);
@@ -312,8 +415,10 @@ function AddonsPageContent({
                                             addon={addon}
                                             billingPeriod={period}
                                             isPurchased={ownedAddonSlugs.has(addon.slug)}
+                                            isInCart={hasProduct(addon.slug)}
                                             currentQuantity={addonQuantities[addon.slug] || 0}
                                             isLoading={purchasingAddon === addon.slug}
+                                            onAddToCart={handleAddAddonToCart}
                                             onPurchase={handlePurchaseAddon}
                                         />
                                     ))}
@@ -350,6 +455,7 @@ function AddonsPageContent({
                                                 bundle={bundle}
                                                 billingPeriod={period}
                                                 isPurchased={isPurchased}
+                                                isInCart={hasProduct(bundle.slug)}
                                                 hasConflicts={hasConflicts}
                                                 conflictMessage={hasConflicts
                                                     ? t('tenant.addons.bundle_conflict', {
@@ -359,6 +465,7 @@ function AddonsPageContent({
                                                     : undefined
                                                 }
                                                 isLoading={purchasingAddon === bundle.slug}
+                                                onAddToCart={() => handleAddBundleToCart(bundle.slug)}
                                                 onPurchase={() => handlePurchaseBundle(bundle.slug)}
                                             />
                                         );

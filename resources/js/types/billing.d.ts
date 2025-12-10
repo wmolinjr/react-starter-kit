@@ -170,6 +170,14 @@ export interface FeatureMatrixItem {
 // =============================================================================
 
 /**
+ * Price info for a specific billing period
+ */
+export interface PeriodPricing {
+    price: number;
+    formattedPrice: string;
+}
+
+/**
  * Item in the checkout cart
  */
 export interface CheckoutItem {
@@ -182,6 +190,11 @@ export interface CheckoutItem {
     isRecurring: boolean;
     formattedUnitPrice: string;
     formattedTotalPrice: string;
+    /** Pricing for different billing periods (for dynamic price updates) */
+    pricingByPeriod?: {
+        monthly?: PeriodPricing;
+        yearly?: PeriodPricing;
+    };
 }
 
 /**

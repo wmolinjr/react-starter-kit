@@ -85,15 +85,39 @@ export function CheckoutSummary({
         }).format(amount / 100);
     };
 
+    // Helper to get item price based on current billing period
+    const getItemPrice = (item: CheckoutItem): number => {
+        if (item.pricingByPeriod && item.isRecurring) {
+            const periodKey = billingPeriod === 'yearly' ? 'yearly' : 'monthly';
+            const periodPricing = item.pricingByPeriod[periodKey];
+            if (periodPricing) {
+                return periodPricing.price * item.quantity;
+            }
+        }
+        return item.totalPrice;
+    };
+
+    // Helper to get formatted item price based on current billing period
+    const getFormattedItemPrice = (item: CheckoutItem): string => {
+        if (item.pricingByPeriod && item.isRecurring) {
+            const periodKey = billingPeriod === 'yearly' ? 'yearly' : 'monthly';
+            const periodPricing = item.pricingByPeriod[periodKey];
+            if (periodPricing) {
+                return formatPrice(periodPricing.price * item.quantity);
+            }
+        }
+        return item.formattedTotalPrice;
+    };
+
     // Count recurring vs one-time items
     const recurringItems = items.filter((item) => item.isRecurring);
     const oneTimeItems = items.filter((item) => !item.isRecurring);
     const hasRecurring = recurringItems.length > 0;
     const hasOneTime = oneTimeItems.length > 0;
 
-    // Calculate recurring and one-time totals
-    const recurringTotal = recurringItems.reduce((sum, item) => sum + item.totalPrice, 0);
-    const oneTimeTotal = oneTimeItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    // Calculate recurring and one-time totals using dynamic pricing
+    const recurringTotal = recurringItems.reduce((sum, item) => sum + getItemPrice(item), 0);
+    const oneTimeTotal = oneTimeItems.reduce((sum, item) => sum + getItemPrice(item), 0);
 
     // Get billing period label
     const periodLabel =
@@ -153,7 +177,7 @@ export function CheckoutSummary({
                                     </span>
                                 )}
                             </div>
-                            <span>{item.formattedTotalPrice}</span>
+                            <span>{getFormattedItemPrice(item)}</span>
                         </div>
                     ))}
                     <Separator />

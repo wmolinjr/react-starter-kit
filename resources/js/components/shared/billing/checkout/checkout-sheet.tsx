@@ -104,8 +104,20 @@ export function CheckoutSheet({
 }: CheckoutSheetProps) {
     const { t } = useLaravelReactI18n();
 
-    // Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
+    // Helper to get item price based on current billing period
+    const getItemPrice = (item: CheckoutItem): number => {
+        if (item.pricingByPeriod && item.isRecurring) {
+            const periodKey = billingPeriod === 'yearly' ? 'yearly' : 'monthly';
+            const periodPricing = item.pricingByPeriod[periodKey];
+            if (periodPricing) {
+                return periodPricing.price * item.quantity;
+            }
+        }
+        return item.totalPrice;
+    };
+
+    // Calculate totals using dynamic pricing
+    const subtotal = items.reduce((sum, item) => sum + getItemPrice(item), 0);
     const discount = 0; // Future: calculate bundle/promo discounts
     const total = subtotal - discount;
 
@@ -186,6 +198,7 @@ export function CheckoutSheet({
                                 <CheckoutLineItem
                                     key={item.id}
                                     item={item}
+                                    currentBillingPeriod={billingPeriod}
                                     onRemove={
                                         onRemoveItem
                                             ? () => onRemoveItem(item.id)

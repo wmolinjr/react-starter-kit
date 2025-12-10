@@ -28,10 +28,14 @@ export interface AddonCardProps {
     addon: AddonResource;
     /** Current billing period */
     billingPeriod: BillingPeriod;
-    /** Callback when purchasing */
+    /** Callback when purchasing (direct checkout) */
     onPurchase?: (slug: string, quantity: number) => void;
+    /** Callback when adding to cart */
+    onAddToCart?: (slug: string, quantity: number) => void;
     /** Whether the addon is already purchased */
     isPurchased?: boolean;
+    /** Whether the addon is already in cart */
+    isInCart?: boolean;
     /** Current quantity owned */
     currentQuantity?: number;
     /** Whether the action is loading */
@@ -51,7 +55,9 @@ export function AddonCard({
     addon,
     billingPeriod,
     onPurchase,
+    onAddToCart,
     isPurchased = false,
+    isInCart = false,
     currentQuantity = 0,
     isLoading = false,
     disabled = false,
@@ -189,37 +195,62 @@ export function AddonCard({
                 )}
             </CardContent>
 
-            <CardFooter>
-                <Button
-                    className="w-full"
-                    onClick={() => onPurchase?.(addon.slug, 1)}
-                    disabled={disabled || isLoading || !canPurchase}
-                    variant={isPurchased ? 'outline' : 'default'}
-                >
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            {t('common.loading', { default: 'Loading...' })}
-                        </>
-                    ) : isPurchased ? (
-                        canPurchase ? (
+            <CardFooter className="flex gap-2">
+                {/* Add to Cart button */}
+                {onAddToCart && (
+                    <Button
+                        className="flex-1"
+                        variant={isInCart ? 'secondary' : 'outline'}
+                        onClick={() => onAddToCart(addon.slug, 1)}
+                        disabled={disabled || isLoading || !canPurchase}
+                    >
+                        {isInCart ? (
                             <>
-                                <Plus className="mr-2 h-4 w-4" />
-                                {t('billing.add_more', { default: 'Add More' })}
+                                <Check className="mr-2 h-4 w-4" />
+                                {t('billing.in_cart', { default: 'In Cart' })}
                             </>
                         ) : (
                             <>
-                                <Check className="mr-2 h-4 w-4" />
-                                {t('billing.already_owned', { default: 'Already Owned' })}
+                                <Plus className="mr-2 h-4 w-4" />
+                                {t('billing.add_to_cart', { default: 'Add to Cart' })}
                             </>
-                        )
-                    ) : (
-                        <>
-                            <ShoppingCart className="mr-2 h-4 w-4" />
-                            {t('billing.purchase', { default: 'Purchase' })}
-                        </>
-                    )}
-                </Button>
+                        )}
+                    </Button>
+                )}
+
+                {/* Direct Purchase button */}
+                {onPurchase && (
+                    <Button
+                        className={onAddToCart ? 'flex-1' : 'w-full'}
+                        onClick={() => onPurchase(addon.slug, 1)}
+                        disabled={disabled || isLoading || !canPurchase}
+                        variant={isPurchased ? 'outline' : 'default'}
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                {t('common.loading', { default: 'Loading...' })}
+                            </>
+                        ) : isPurchased ? (
+                            canPurchase ? (
+                                <>
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t('billing.add_more', { default: 'Add More' })}
+                                </>
+                            ) : (
+                                <>
+                                    <Check className="mr-2 h-4 w-4" />
+                                    {t('billing.already_owned', { default: 'Already Owned' })}
+                                </>
+                            )
+                        ) : (
+                            <>
+                                <ShoppingCart className="mr-2 h-4 w-4" />
+                                {t('billing.purchase', { default: 'Purchase' })}
+                            </>
+                        )}
+                    </Button>
+                )}
             </CardFooter>
         </Card>
     );

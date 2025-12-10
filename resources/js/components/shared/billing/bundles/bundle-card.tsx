@@ -6,6 +6,7 @@ import {
     ShoppingCart,
     AlertTriangle,
     Loader2,
+    Plus,
 } from 'lucide-react';
 import {
     Card,
@@ -30,10 +31,14 @@ export interface BundleCardProps {
     bundle: BundleResource | BundleProduct;
     /** Current billing period */
     billingPeriod: BillingPeriod;
-    /** Callback when purchasing */
+    /** Callback when purchasing (direct checkout) */
     onPurchase?: () => void;
+    /** Callback when adding to cart */
+    onAddToCart?: () => void;
     /** Whether the bundle is already purchased */
     isPurchased?: boolean;
+    /** Whether the bundle is already in cart */
+    isInCart?: boolean;
     /** Whether the user has conflicting addons (already owns some addons in bundle) */
     hasConflicts?: boolean;
     /** Conflict message to display */
@@ -74,7 +79,9 @@ export function BundleCard({
     bundle,
     billingPeriod,
     onPurchase,
+    onAddToCart,
     isPurchased: propIsPurchased,
+    isInCart = false,
     hasConflicts = false,
     conflictMessage,
     isLoading = false,
@@ -337,30 +344,57 @@ export function BundleCard({
                 )}
             </CardContent>
 
-            <CardFooter className="pt-4">
+            <CardFooter className="flex gap-2 pt-4">
                 {isPurchased ? (
                     <Button variant="outline" disabled className="w-full">
                         <Check className="mr-2 h-4 w-4" />
                         {t('billing.already_purchased', { default: 'Already Purchased' })}
                     </Button>
                 ) : (
-                    <Button
-                        onClick={onPurchase}
-                        disabled={disabled || isLoading}
-                        variant={hasConflicts ? 'outline' : 'default'}
-                        className="w-full"
-                    >
-                        {isLoading ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                            <ShoppingCart className="mr-2 h-4 w-4" />
+                    <>
+                        {/* Add to Cart button */}
+                        {onAddToCart && (
+                            <Button
+                                className="flex-1"
+                                variant={isInCart ? 'secondary' : 'outline'}
+                                onClick={onAddToCart}
+                                disabled={disabled || isLoading}
+                            >
+                                {isInCart ? (
+                                    <>
+                                        <Check className="mr-2 h-4 w-4" />
+                                        {t('billing.in_cart', { default: 'In Cart' })}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        {t('billing.add_to_cart', { default: 'Add to Cart' })}
+                                    </>
+                                )}
+                            </Button>
                         )}
-                        {hasConflicts
-                            ? t('billing.replace_and_purchase', {
-                                  default: 'Replace & Purchase',
-                              })
-                            : t('billing.add_to_cart', { default: 'Add to Cart' })}
-                    </Button>
+
+                        {/* Direct Purchase button */}
+                        {onPurchase && (
+                            <Button
+                                onClick={onPurchase}
+                                disabled={disabled || isLoading}
+                                variant={hasConflicts ? 'outline' : 'default'}
+                                className={onAddToCart ? 'flex-1' : 'w-full'}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <ShoppingCart className="mr-2 h-4 w-4" />
+                                )}
+                                {hasConflicts
+                                    ? t('billing.replace_and_purchase', {
+                                          default: 'Replace & Purchase',
+                                      })
+                                    : t('billing.purchase', { default: 'Purchase' })}
+                            </Button>
+                        )}
+                    </>
                 )}
             </CardFooter>
         </Card>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenant\Admin;
 
 use App\Enums\TenantPermission;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tenant\CartCheckoutRequest;
 use App\Http\Requests\Tenant\CheckoutRequest;
 use App\Http\Resources\Central\BundleResource;
 use App\Http\Resources\Central\AddonResource;
@@ -12,6 +13,7 @@ use App\Http\Resources\Tenant\InvoiceDetailResource;
 use App\Http\Resources\Tenant\InvoiceResource;
 use App\Models\Central\Plan;
 use App\Services\Central\AddonService;
+use App\Services\Central\CartCheckoutService;
 use App\Services\Tenant\BillingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -24,7 +26,8 @@ class BillingController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected BillingService $billingService,
-        protected AddonService $addonService
+        protected AddonService $addonService,
+        protected CartCheckoutService $cartCheckoutService
     ) {}
 
     /**
@@ -33,8 +36,8 @@ class BillingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'plans', 'bundles']),
-            new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal']),
+            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'cartSuccess', 'plans', 'bundles']),
+            new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal', 'cartCheckout']),
             new Middleware('permission:'.TenantPermission::BILLING_INVOICES->value, only: ['invoices', 'invoice']),
         ];
     }
@@ -144,5 +147,27 @@ class BillingController extends Controller implements HasMiddleware
     public function invoice(string $invoiceId): HttpResponse
     {
         return $this->billingService->downloadInvoice(tenant(), $invoiceId);
+    }
+
+    /**
+     * Create Stripe checkout session for cart items.
+     */
+    public function cartCheckout(CartCheckoutRequest $request): HttpResponse
+    {
+        $result = $this->cartCheckoutService->createCartCheckoutSession(
+            tenant(),
+            $request->validated()['items']
+        );
+
+        return Inertia::location($result['url']);
+    }
+
+    /**
+     * Cart checkout success callback.
+     */
+    public function cartSuccess(): RedirectResponse
+    {
+        return redirect()->route('tenant.admin.billing.index')
+            ->with('success', __('flash.billing.cart_checkout_success'));
     }
 }

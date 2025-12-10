@@ -9,6 +9,7 @@ import { initializeTheme } from './hooks/shared/use-appearance';
 import { Toaster } from './components/ui/sonner';
 import { FlashMessages } from './components/shared/feedback/flash-messages';
 import { BreadcrumbProvider } from './contexts/breadcrumb-context';
+import { CheckoutProvider, BillingPeriodProvider } from './hooks/billing';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -81,8 +82,12 @@ createInertiaApp({
                     files={import.meta.glob('/lang/*.json', { eager: true })}
                 >
                     <BreadcrumbProvider>
-                        <App {...props} />
-                        <Toaster position="top-right" richColors closeButton />
+                        <BillingPeriodProvider>
+                            <CheckoutProvider>
+                                <App {...props} />
+                                <Toaster position="top-right" richColors closeButton />
+                            </CheckoutProvider>
+                        </BillingPeriodProvider>
                     </BreadcrumbProvider>
                 </LaravelReactI18nProvider>
             </StrictMode>,
