@@ -36,7 +36,7 @@ class DashboardController extends Controller
                 'name' => $customer->name,
                 'email' => $customer->email,
                 'currency' => $customer->currency,
-                'has_payment_method' => $customer->hasDefaultPaymentMethod(),
+                'has_payment_method' => $customer->hasPaymentMethod(),
             ],
             'tenants' => TenantSummaryResource::collection($tenants),
             'stats' => [

@@ -143,22 +143,22 @@ class AddonSubscriptionTest extends TenantTestCase
     public function can_calculate_total_price(): void
     {
         $addon = AddonSubscription::factory()->forTenant($this->tenant)->create([
-            'price' => 1000, // $10
+            'price' => 1000, // R$10
             'quantity' => 5,
         ]);
 
         $this->assertEquals(5000, $addon->total_price);
-        $this->assertEquals('$50.00', $addon->formatted_total_price);
+        $this->assertEquals('R$50.00', $addon->formatted_total_price);
     }
 
     #[Test]
     public function can_format_price(): void
     {
         $addon = AddonSubscription::factory()->forTenant($this->tenant)->create([
-            'price' => 4999, // $49.99
+            'price' => 4999, // R$49.99
         ]);
 
-        $this->assertEquals('$49.99', $addon->formatted_price);
+        $this->assertEquals('R$49.99', $addon->formatted_price);
     }
 
     #[Test]

@@ -93,7 +93,7 @@ class PlanTest extends TestCase
     public function it_returns_formatted_price(): void
     {
         $plan = Plan::factory()->create(['price' => 2900]);
-        $this->assertEquals('$29.00', $plan->formatted_price);
+        $this->assertEquals('R$29.00', $plan->formatted_price);
 
         $plan = Plan::factory()->create(['price' => 0]);
         $this->assertEquals('Custom', $plan->formatted_price);
