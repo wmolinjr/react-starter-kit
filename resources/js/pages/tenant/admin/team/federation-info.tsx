@@ -42,7 +42,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.team.title'), href: admin.team.index.url() },
         { title: user.name, href: admin.settings.federation.show.url(user.id) },
     ];

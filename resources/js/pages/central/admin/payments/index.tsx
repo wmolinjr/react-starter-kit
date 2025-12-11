@@ -151,7 +151,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
     const [isExporting, setIsExporting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.payments.title'), href: admin.payments.index.url() },
     ];
 

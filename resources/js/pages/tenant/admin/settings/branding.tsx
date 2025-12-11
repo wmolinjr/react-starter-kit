@@ -38,7 +38,7 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
         { title: 'Branding', href: admin.settings.branding.url() },
     ];

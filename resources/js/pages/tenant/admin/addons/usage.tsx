@@ -17,7 +17,7 @@ function AddonsUsage() {
     const { active } = useAddons();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
         { title: t('tenant.addons.usage', { default: 'Usage' }), href: admin.addons.usage.url() },
     ];

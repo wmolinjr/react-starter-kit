@@ -28,8 +28,8 @@ function AdminAddonsIndex({ addons, stats }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.addon_management'), href: admin.addons.index.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.addons.title'), href: admin.addons.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

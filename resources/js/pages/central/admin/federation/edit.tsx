@@ -26,7 +26,7 @@ function FederationEdit({ group, tenants }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
         { title: t('common.edit'), href: admin.federation.edit.url(group.id) },

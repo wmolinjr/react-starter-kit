@@ -65,7 +65,7 @@ function FederationConflicts({ group, conflicts }: Props) {
     const [notes, setNotes] = useState('');
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
         { title: t('admin.federation.conflicts'), href: admin.federation.conflicts.index.url(group.id) },

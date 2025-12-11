@@ -63,7 +63,7 @@ function TenantShow({ tenant, availableFederationGroups }: Props) {
     const addons = tenant.addons ?? [];
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.tenants.title'), href: admin.tenants.index.url() },
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
     ];

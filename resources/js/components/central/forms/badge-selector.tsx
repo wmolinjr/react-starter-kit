@@ -30,7 +30,7 @@ export function BadgeSelector({ label, value, onChange, className }: BadgeSelect
 
             {/* Preview */}
             <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-sm">{t('badges.preview')}:</span>
+                <span className="text-muted-foreground text-sm">{t('components.badge_selector.preview')}:</span>
                 {selectedPreset ? (
                     <span
                         className={cn(
@@ -44,7 +44,7 @@ export function BadgeSelector({ label, value, onChange, className }: BadgeSelect
                         {selectedPreset.label}
                     </span>
                 ) : (
-                    <span className="text-muted-foreground text-sm italic">{t('badges.none')}</span>
+                    <span className="text-muted-foreground text-sm italic">{t('components.badge_selector.none')}</span>
                 )}
             </div>
 
@@ -63,7 +63,7 @@ export function BadgeSelector({ label, value, onChange, className }: BadgeSelect
                     )}
                 >
                     <X className="text-muted-foreground h-5 w-5" />
-                    <span className="text-muted-foreground text-xs">{t('badges.none')}</span>
+                    <span className="text-muted-foreground text-xs">{t('components.badge_selector.none')}</span>
                 </button>
 
                 {/* Badge presets */}

@@ -32,9 +32,9 @@ function ShowRole({ role }: Props) {
     const permissions = role.permissions ?? [];
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.settings'), href: admin.settings.index.url() },
-        { title: t('breadcrumbs.custom_roles'), href: admin.settings.roles.index.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
+        { title: t('roles.title'), href: admin.settings.roles.index.url() },
         { title: role.display_name, href: admin.settings.roles.show.url(role.id) },
     ];
 

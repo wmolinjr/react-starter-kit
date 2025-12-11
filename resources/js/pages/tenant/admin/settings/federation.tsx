@@ -90,7 +90,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
     const { processingId, federateUser, unfederateUser, syncUser, federateAll, federateBulk } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
         { title: t('tenant.federation.title'), href: admin.settings.federation.index.url() },
     ];

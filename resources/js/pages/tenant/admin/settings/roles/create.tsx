@@ -13,10 +13,10 @@ import { type ReactElement } from 'react';
 function useBreadcrumbs() {
     const { t } = useLaravelReactI18n();
     return [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.settings'), href: admin.settings.index.url() },
-        { title: t('breadcrumbs.custom_roles'), href: admin.settings.roles.index.url() },
-        { title: t('breadcrumbs.create_role'), href: admin.settings.roles.create.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
+        { title: t('roles.title'), href: admin.settings.roles.index.url() },
+        { title: t('roles.create_title'), href: admin.settings.roles.create.url() },
     ] as BreadcrumbItem[];
 }
 

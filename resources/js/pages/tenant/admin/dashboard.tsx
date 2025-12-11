@@ -15,7 +15,7 @@ function TenantDashboard() {
     const { tenant, subscription, hasActiveSubscription, isOnTrial } = useTenant();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

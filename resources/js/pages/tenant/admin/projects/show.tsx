@@ -38,7 +38,7 @@ function ProjectShow({ project }: ProjectShowProps) {
   const fileUploadLimit = tenant?.plan?.limits?.fileUploadSize ?? 10;
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+    { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
     { title: t('tenant.projects.title'), href: admin.projects.index.url() },
     { title: project.name, href: admin.projects.show.url(project.id) },
   ];

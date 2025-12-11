@@ -77,7 +77,7 @@ function ConfigSettings({
     }, []);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
         { title: t('tenant.config.title'), href: admin.settings.config.url() },
     ];

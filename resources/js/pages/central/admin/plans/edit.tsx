@@ -26,8 +26,8 @@ function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categori
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.plan_catalog'), href: admin.plans.index.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.plans.title'), href: admin.plans.index.url() },
         { title: plan.name_display, href: admin.plans.edit.url(plan.id) },
     ];
 

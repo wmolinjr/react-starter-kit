@@ -44,8 +44,8 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
     const { impersonatingId, impersonateTenant, impersonateAsUser } = useImpersonation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.tenants'), href: admin.tenants.index.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.tenants.title'), href: admin.tenants.index.url() },
     ];
     useSetBreadcrumbs(breadcrumbs);
 

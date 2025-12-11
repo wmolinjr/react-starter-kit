@@ -98,7 +98,7 @@ function AddonsPageContent({
     const cartTotal = total;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.billing.title'), href: admin.billing.index.url() },
         { title: t('tenant.addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
     ];

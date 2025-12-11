@@ -29,8 +29,8 @@ function TenantEdit({ tenant, plans }: Props) {
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.tenants'), href: admin.tenants.index.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.tenants.title'), href: admin.tenants.index.url() },
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
         { title: t('common.edit'), href: admin.tenants.edit.url(tenant.id) },
     ];

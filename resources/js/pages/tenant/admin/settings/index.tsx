@@ -58,7 +58,7 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
     const { hasFeature } = usePlan();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
     ];
 

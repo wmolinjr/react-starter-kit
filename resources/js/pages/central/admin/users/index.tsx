@@ -23,8 +23,8 @@ function UsersIndex({ users, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.users'), href: admin.users.index.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.users.title'), href: admin.users.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

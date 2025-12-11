@@ -34,7 +34,7 @@ function ProjectEdit({ project }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.projects.title'), href: admin.projects.index.url() },
         { title: project.name, href: admin.projects.show.url(project.id) },
         { title: t('common.edit'), href: admin.projects.edit.url(project.id) },

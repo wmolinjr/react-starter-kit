@@ -508,26 +508,6 @@ export type AuthTranslationKey =
     | 'auth.verify_email';
 
 /**
- * Badges namespace keys (15 keys)
- */
-export type BadgesTranslationKey =
-    | 'badges.best_for_teams'
-    | 'badges.best_value'
-    | 'badges.enterprise'
-    | 'badges.hot'
-    | 'badges.limited_time'
-    | 'badges.most_popular'
-    | 'badges.new'
-    | 'badges.none'
-    | 'badges.one_time'
-    | 'badges.preview'
-    | 'badges.pro'
-    | 'badges.recommended'
-    | 'badges.sale'
-    | 'badges.select_badge'
-    | 'badges.starter';
-
-/**
  * Billing namespace keys (256 keys)
  */
 export type BillingTranslationKey =
@@ -789,25 +769,6 @@ export type BillingTranslationKey =
     | 'billing.you_save';
 
 /**
- * Breadcrumbs namespace keys (14 keys)
- */
-export type BreadcrumbsTranslationKey =
-    | 'breadcrumbs.addon_catalog'
-    | 'breadcrumbs.addon_management'
-    | 'breadcrumbs.bundle_catalog'
-    | 'breadcrumbs.create_addon'
-    | 'breadcrumbs.create_bundle'
-    | 'breadcrumbs.create_plan'
-    | 'breadcrumbs.create_role'
-    | 'breadcrumbs.custom_roles'
-    | 'breadcrumbs.dashboard'
-    | 'breadcrumbs.plan_catalog'
-    | 'breadcrumbs.role_management'
-    | 'breadcrumbs.settings'
-    | 'breadcrumbs.tenants'
-    | 'breadcrumbs.users';
-
-/**
  * Checkout namespace keys (51 keys)
  */
 export type CheckoutTranslationKey =
@@ -942,9 +903,12 @@ export type CommonTranslationKey =
     | 'common.yearly';
 
 /**
- * Components namespace keys (4 keys)
+ * Components namespace keys (7 keys)
  */
 export type ComponentsTranslationKey =
+    | 'components.badge_selector.none'
+    | 'components.badge_selector.preview'
+    | 'components.badge_selector.select_badge'
     | 'components.federated_badge.federated'
     | 'components.federated_badge.master'
     | 'components.federated_badge.tooltip'
@@ -2497,21 +2461,6 @@ export type TranslationKey =
     | 'auth.sign_up'
     | 'auth.verification_link_sent'
     | 'auth.verify_email'
-    | 'badges.best_for_teams'
-    | 'badges.best_value'
-    | 'badges.enterprise'
-    | 'badges.hot'
-    | 'badges.limited_time'
-    | 'badges.most_popular'
-    | 'badges.new'
-    | 'badges.none'
-    | 'badges.one_time'
-    | 'badges.preview'
-    | 'badges.pro'
-    | 'badges.recommended'
-    | 'badges.sale'
-    | 'badges.select_badge'
-    | 'badges.starter'
     | 'billing.access_until'
     | 'billing.active_addons'
     | 'billing.add_more'
@@ -2768,20 +2717,6 @@ export type TranslationKey =
     | 'billing.yearly'
     | 'billing.yearly_savings'
     | 'billing.you_save'
-    | 'breadcrumbs.addon_catalog'
-    | 'breadcrumbs.addon_management'
-    | 'breadcrumbs.bundle_catalog'
-    | 'breadcrumbs.create_addon'
-    | 'breadcrumbs.create_bundle'
-    | 'breadcrumbs.create_plan'
-    | 'breadcrumbs.create_role'
-    | 'breadcrumbs.custom_roles'
-    | 'breadcrumbs.dashboard'
-    | 'breadcrumbs.plan_catalog'
-    | 'breadcrumbs.role_management'
-    | 'breadcrumbs.settings'
-    | 'breadcrumbs.tenants'
-    | 'breadcrumbs.users'
     | 'checkout.benefit_cancel_anytime'
     | 'checkout.benefit_instant_access'
     | 'checkout.benefit_support'
@@ -2901,6 +2836,9 @@ export type TranslationKey =
     | 'common.view'
     | 'common.warning'
     | 'common.yearly'
+    | 'components.badge_selector.none'
+    | 'components.badge_selector.preview'
+    | 'components.badge_selector.select_badge'
     | 'components.federated_badge.federated'
     | 'components.federated_badge.master'
     | 'components.federated_badge.tooltip'

@@ -44,7 +44,7 @@ function FederationUserShow({ group, user }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
         { title: user.synced_data.name || user.global_email, href: admin.federation.users.show.url({ group: group.id, user: user.id }) },

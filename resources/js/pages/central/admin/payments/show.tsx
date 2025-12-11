@@ -111,7 +111,7 @@ function PaymentShow({ payment, purchase }: Props) {
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.payments.title'), href: admin.payments.index.url() },
         { title: t('admin.payments.show_title'), href: admin.payments.show.url({ payment: payment.id }) },
     ];

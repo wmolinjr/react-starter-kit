@@ -18,9 +18,9 @@ function BundleCreate({ addons, plans }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.bundle_catalog'), href: admin.bundles.index.url() },
-        { title: t('breadcrumbs.create_bundle'), href: admin.bundles.create.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.bundles.title'), href: admin.bundles.index.url() },
+        { title: t('admin.bundles.create_bundle'), href: admin.bundles.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

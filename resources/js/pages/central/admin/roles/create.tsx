@@ -17,9 +17,9 @@ function CreateRole({ permissions }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
-        { title: t('breadcrumbs.role_management'), href: admin.roles.index.url() },
-        { title: t('breadcrumbs.create_role'), href: admin.roles.create.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('admin.roles.title'), href: admin.roles.index.url() },
+        { title: t('roles.create_title'), href: admin.roles.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

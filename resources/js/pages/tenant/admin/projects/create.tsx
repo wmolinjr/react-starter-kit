@@ -30,7 +30,7 @@ function ProjectCreate() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.projects.title'), href: admin.projects.index.url() },
         { title: t('tenant.projects.create_project'), href: admin.projects.create.url() },
     ];

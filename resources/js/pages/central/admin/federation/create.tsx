@@ -25,7 +25,7 @@ function FederationCreate({ tenants }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.federation.title'), href: admin.federation.index.url() },
         { title: t('admin.federation.create_group'), href: admin.federation.create.url() },
     ];

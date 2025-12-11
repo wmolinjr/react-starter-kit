@@ -48,7 +48,7 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
     const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDetailResource | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.billing.title'), href: admin.billing.index.url() },
         { title: t('tenant.invoices.title'), href: admin.billing.invoices.url() },
     ];

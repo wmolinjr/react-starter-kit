@@ -45,7 +45,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+    { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
     { title: t('tenant.team.title'), href: admin.team.index.url() },
   ];
 
