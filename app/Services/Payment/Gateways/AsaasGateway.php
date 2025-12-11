@@ -1688,7 +1688,7 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
             'name' => $customer->name ?? $customer->email,
             'email' => $customer->email,
             'cpfCnpj' => $customer->tax_id ?? null,
-            'phone' => $customer->phone ?? null,
+            'phone' => $this->normalizePhoneForAsaas($customer->phone),
             'externalReference' => $customer->id,
         ]);
 
@@ -1700,6 +1700,69 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
         $customer->setProviderId('asaas', $asaasId);
 
         return $asaasId;
+    }
+
+    /**
+     * Normalize phone number for Asaas API.
+     *
+     * Asaas expects Brazilian phone numbers as digits only (10-11 chars).
+     * Format: DDDxxxxxxxx (e.g., 11999999999)
+     *
+     * Valid Brazilian DDDs: 11-99 (all 2-digit codes from 11 to 99)
+     * Mobile phones: 11 digits (DDD + 9 + 8 digits)
+     * Landlines: 10 digits (DDD + 8 digits)
+     *
+     * @param string|null $phone Raw phone number (any format)
+     * @return string|null Normalized phone or null if invalid/non-Brazilian
+     */
+    protected function normalizePhoneForAsaas(?string $phone): ?string
+    {
+        if (empty($phone)) {
+            return null;
+        }
+
+        $trimmed = trim($phone);
+
+        // If phone starts with +, it has a country code
+        // Only accept +55 (Brazil), reject all other country codes
+        if (str_starts_with($trimmed, '+')) {
+            // Remove + and get first digits to check country code
+            $withoutPlus = ltrim($trimmed, '+');
+            $digits = preg_replace('/\D/', '', $withoutPlus);
+
+            if (! str_starts_with($digits, '55')) {
+                return null; // Foreign country code (+1, +34, etc.)
+            }
+            // Remove Brazilian country code (55)
+            $digits = substr($digits, 2);
+        } else {
+            // No country code prefix, just extract digits
+            $digits = preg_replace('/\D/', '', $trimmed);
+
+            // If it's 12+ digits starting with 55, assume it's Brazilian with country code
+            if (strlen($digits) >= 12 && str_starts_with($digits, '55')) {
+                $digits = substr($digits, 2);
+            }
+        }
+
+        // Valid Brazilian phone: 10 digits (landline) or 11 digits (mobile)
+        $length = strlen($digits);
+        if ($length < 10 || $length > 11) {
+            return null;
+        }
+
+        // Validate DDD (area code): must be between 11 and 99
+        $ddd = (int) substr($digits, 0, 2);
+        if ($ddd < 11 || $ddd > 99) {
+            return null;
+        }
+
+        // For 11-digit phones (mobile), the 3rd digit should be 9
+        if ($length === 11 && $digits[2] !== '9') {
+            return null;
+        }
+
+        return $digits;
     }
 
     /**

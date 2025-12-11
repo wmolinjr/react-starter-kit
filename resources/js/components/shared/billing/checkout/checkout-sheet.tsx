@@ -1,13 +1,14 @@
+import { router } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {
     ShoppingCart,
     Trash2,
-    CreditCard,
     Loader2,
     ArrowRight,
     ShoppingBag,
 } from 'lucide-react';
+import { checkoutPage } from '@/routes/tenant/admin/billing';
 import {
     Sheet,
     SheetContent,
@@ -251,7 +252,10 @@ export function CheckoutSheet({
                         <Button
                             className="w-full"
                             size="lg"
-                            onClick={onCheckout}
+                            onClick={() => {
+                                onOpenChange(false);
+                                router.visit(checkoutPage.url());
+                            }}
                             disabled={isCheckingOut || !hasItems}
                         >
                             {isCheckingOut ? (
@@ -261,17 +265,16 @@ export function CheckoutSheet({
                                 </>
                             ) : (
                                 <>
-                                    <CreditCard className="mr-2 h-4 w-4" />
                                     {checkoutLabel ||
-                                        t('billing.checkout', { default: 'Checkout' })}
+                                        t('checkout.proceed_to_checkout', { default: 'Proceed to Checkout' })}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </>
                             )}
                         </Button>
 
                         <p className="text-muted-foreground text-center text-xs">
-                            {t('billing.secure_checkout', {
-                                default: 'Secure checkout powered by Stripe',
+                            {t('checkout.secure_checkout_note', {
+                                default: 'You will be redirected to a secure checkout page',
                             })}
                         </p>
                     </SheetFooter>

@@ -21,10 +21,10 @@ import {
     BundleCard,
     PricingToggle,
     CheckoutCartButton,
-    CheckoutPaymentSheet,
+    CheckoutSheet,
 } from '@/components/shared/billing';
 import { BillingPeriodProvider, useBillingPeriod, useCheckout, createCheckoutItem } from '@/hooks/billing';
-import type { BreadcrumbItem, PlanResource, BundleResource, PaymentConfigResource } from '@/types';
+import type { BreadcrumbItem, PlanResource, BundleResource } from '@/types';
 
 interface ActiveBundle {
     purchase_id: string;
@@ -41,7 +41,6 @@ interface BundlesPageProps {
     activeBundles: ActiveBundle[];
     activeAddonSlugs: string[];
     currentPlan: PlanResource | null;
-    paymentConfig?: PaymentConfigResource;
     [key: string]: unknown;
 }
 
@@ -49,16 +48,12 @@ function BundlesPageContent({
     bundles,
     activeBundles,
     activeAddonSlugs,
-    paymentConfig,
 }: BundlesPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();
     const { items, addItem, removeItem, updateQuantity, clearCart, hasProduct, total } = useCheckout();
     const [purchasingBundle, setPurchasingBundle] = useState<string | null>(null);
     const [isCartOpen, setIsCartOpen] = useState(false);
-
-    // Check if cart has recurring items
-    const hasRecurringItems = items.some((item) => item.isRecurring);
 
     // Cart item count
     const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -269,8 +264,8 @@ function BundlesPageContent({
                 </PageContent>
             </Page>
 
-            {/* Checkout Payment Sheet */}
-            <CheckoutPaymentSheet
+            {/* Checkout Cart Sheet - Redirects to dedicated checkout page */}
+            <CheckoutSheet
                 open={isCartOpen}
                 onOpenChange={setIsCartOpen}
                 items={items}
@@ -282,8 +277,6 @@ function BundlesPageContent({
                 currency="BRL"
                 showBillingToggle={true}
                 yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
-                paymentConfig={paymentConfig}
-                hasRecurring={hasRecurringItems}
             />
         </>
     );

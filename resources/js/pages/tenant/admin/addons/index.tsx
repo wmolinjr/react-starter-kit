@@ -31,10 +31,10 @@ import {
     BundleCard,
     PricingToggle,
     CheckoutCartButton,
-    CheckoutPaymentSheet,
+    CheckoutSheet,
 } from '@/components/shared/billing';
 import { BillingPeriodProvider, useBillingPeriod, useCheckout, createCheckoutItem } from '@/hooks/billing';
-import type { BreadcrumbItem, AddonResource, BundleResource, BillingPeriod, PaymentConfigResource } from '@/types';
+import type { BreadcrumbItem, AddonResource, BundleResource, BillingPeriod } from '@/types';
 
 interface ActiveAddon {
     id: string;
@@ -71,7 +71,6 @@ interface AddonsPageProps {
     monthlyCost: number;
     formattedMonthlyCost: string;
     activeAddonSlugs: string[];
-    paymentConfig?: PaymentConfigResource;
     [key: string]: unknown;
 }
 
@@ -82,7 +81,6 @@ function AddonsPageContent({
     activeBundles,
     formattedMonthlyCost,
     activeAddonSlugs,
-    paymentConfig,
 }: AddonsPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();
@@ -494,8 +492,8 @@ function AddonsPageContent({
                 </PageContent>
             </Page>
 
-            {/* Checkout Payment Sheet */}
-            <CheckoutPaymentSheet
+            {/* Checkout Cart Sheet - Redirects to dedicated checkout page */}
+            <CheckoutSheet
                 open={isCartOpen}
                 onOpenChange={setIsCartOpen}
                 items={items}
@@ -507,8 +505,6 @@ function AddonsPageContent({
                 currency="BRL"
                 showBillingToggle={true}
                 yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
-                paymentConfig={paymentConfig}
-                hasRecurring={hasRecurringItems}
             />
         </>
     );

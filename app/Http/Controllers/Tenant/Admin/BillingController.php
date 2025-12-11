@@ -40,7 +40,7 @@ class BillingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'cartSuccess', 'plans', 'bundles', 'subscription']),
+            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'cartSuccess', 'plans', 'bundles', 'subscription', 'checkoutPage']),
             new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal', 'cartCheckout', 'completeAsaasCardPayment', 'checkCartPaymentStatus', 'refreshPixQrCode', 'cancelSubscription', 'resumeSubscription', 'pauseSubscription', 'unpauseSubscription', 'changePlan']),
             new Middleware('permission:'.TenantPermission::BILLING_INVOICES->value, only: ['invoices', 'invoice']),
         ];
@@ -132,6 +132,21 @@ class BillingController extends Controller implements HasMiddleware
             'activeBundles' => $activeBundles,
             'activeAddonSlugs' => $activeAddonSlugs,
             'currentPlan' => $tenant->plan ? new PlanResource($tenant->plan) : null,
+            'paymentConfig' => new PaymentConfigResource(
+                $this->paymentSettingsService->getAvailablePaymentMethods()
+            ),
+        ]);
+    }
+
+    /**
+     * Display dedicated checkout page for cart.
+     *
+     * Cart items are managed in localStorage via useCheckout() hook.
+     * If cart is empty, frontend will redirect to addons page.
+     */
+    public function checkoutPage(): Response
+    {
+        return Inertia::render('tenant/admin/billing/checkout', [
             'paymentConfig' => new PaymentConfigResource(
                 $this->paymentSettingsService->getAvailablePaymentMethods()
             ),

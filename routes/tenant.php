@@ -280,6 +280,9 @@ Route::middleware([
                 Route::get('/plans', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'plans'])->name('plans');
                 Route::get('/bundles', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'bundles'])->name('bundles');
                 Route::get('/invoices', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'invoices'])->name('invoices');
+                // Cart checkout page (full-page checkout experience)
+                Route::get('/checkout', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'checkoutPage'])->name('checkout-page');
+                // Plan subscription checkout (redirects to Stripe)
                 Route::post('/checkout', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'checkout'])->name('checkout');
                 Route::get('/success', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'success'])->name('success');
                 Route::get('/portal', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'portal'])->name('portal');
