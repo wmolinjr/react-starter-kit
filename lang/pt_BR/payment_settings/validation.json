@@ -1,4 +1,0 @@
-{
-    "payment_settings.validation.invalid_country_code": "Código do país deve ter 2 caracteres.",
-    "payment_settings.validation.invalid_payment_type": "Tipo de pagamento selecionado inválido."
-}

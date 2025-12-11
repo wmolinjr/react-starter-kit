@@ -1,8 +1,0 @@
-{
-    "payment_settings.actions.documentation": "Documentation",
-    "payment_settings.actions.save_settings": "Save Settings",
-    "payment_settings.actions.switch_to_production": "Switch to Production",
-    "payment_settings.actions.switch_to_sandbox": "Switch to Sandbox",
-    "payment_settings.actions.test_connection": "Test Connection",
-    "payment_settings.actions.testing": "Testing..."
-}

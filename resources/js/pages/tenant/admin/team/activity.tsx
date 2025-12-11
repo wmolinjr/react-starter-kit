@@ -86,7 +86,7 @@ function TeamActivity({
     const [localFilters, setLocalFilters] = useState<ActivityFilters>(filters);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('breadcrumbs.dashboard'), href: admin.dashboard.url() },
+        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.team.title'), href: admin.team.index.url() },
         { title: t('tenant.activity.title'), href: admin.team.activity.url() },
     ];

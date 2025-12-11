@@ -1,8 +1,0 @@
-{
-    "payment_settings.errors.access_token_required": "Token de acesso é obrigatório.",
-    "payment_settings.errors.api_key_required": "Chave da API é obrigatória.",
-    "payment_settings.errors.connection_failed": "Falha ao conectar ao gateway de pagamento.",
-    "payment_settings.errors.invalid_credentials": "Credenciais inválidas.",
-    "payment_settings.errors.missing_credentials": "Credenciais obrigatórias faltando.",
-    "payment_settings.errors.stripe_secret_required": "Chave secreta do Stripe é obrigatória."
-}

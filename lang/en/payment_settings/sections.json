@@ -1,9 +1,0 @@
-{
-    "payment_settings.sections.countries": "Available Countries",
-    "payment_settings.sections.countries_help": "Select which countries can use this gateway.",
-    "payment_settings.sections.credentials": "API Credentials",
-    "payment_settings.sections.credentials_help": "Configure separate credentials for sandbox and production environments.",
-    "payment_settings.sections.general": "General Settings",
-    "payment_settings.sections.payment_types": "Payment Types",
-    "payment_settings.sections.payment_types_help": "Select which payment methods are enabled for this gateway."
-}

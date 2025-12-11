@@ -1,7 +1,0 @@
-{
-    "payment_settings.fields.default": "Default Gateway",
-    "payment_settings.fields.default_help": "Use this gateway as the default for new transactions.",
-    "payment_settings.fields.enabled": "Enabled",
-    "payment_settings.fields.enabled_help": "Enable or disable this payment gateway.",
-    "payment_settings.fields.webhook_url": "Webhook URL"
-}

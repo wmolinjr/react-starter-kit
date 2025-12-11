@@ -1,8 +1,0 @@
-{
-    "payment_settings.current_hint": "Current",
-    "payment_settings.description": "Configure payment gateways with separate credentials for sandbox and production environments.",
-    "payment_settings.last_tested": "Last tested: :date",
-    "payment_settings.no_description": "No description available.",
-    "payment_settings.no_gateways": "No payment gateways configured.",
-    "payment_settings.title": "Payment Gateway Settings"
-}
