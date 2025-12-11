@@ -1,0 +1,6 @@
+{
+    "flash.two_factor.confirmed": "Two-factor authentication confirmed.",
+    "flash.two_factor.disabled": "Two-factor authentication disabled.",
+    "flash.two_factor.enabled": "Two-factor authentication enabled.",
+    "flash.two_factor.recovery_codes_regenerated": "Recovery codes regenerated successfully."
+}

@@ -1,0 +1,4 @@
+{
+    "payment_settings.mode.production": "Production",
+    "payment_settings.mode.sandbox": "Sandbox"
+}

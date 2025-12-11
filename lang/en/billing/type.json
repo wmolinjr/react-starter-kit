@@ -1,0 +1,5 @@
+{
+    "billing.type.addon": "Add-on",
+    "billing.type.bundle": "Bundle",
+    "billing.type.plan": "Plan"
+}

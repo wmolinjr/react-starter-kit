@@ -1,0 +1,10 @@
+{
+    "billing.errors.async_no_recurring": ":method does not support recurring payments. Use card for subscriptions.",
+    "billing.errors.card_charge_failed": "Card payment failed. Please check your card details and try again.",
+    "billing.errors.checkout_failed": "Checkout failed. Please try again.",
+    "billing.errors.gateway_not_supported_for_method": "Gateway ':gateway' is not supported for ':method' payments.",
+    "billing.errors.invalid_payment_method": "Invalid payment method for this operation.",
+    "billing.errors.payment_method_unavailable": "Payment method ':method' is not available.",
+    "billing.errors.pix_qr_code_not_found": "PIX QR code not found",
+    "billing.errors.purchase_not_pending": "This purchase is no longer pending."
+}

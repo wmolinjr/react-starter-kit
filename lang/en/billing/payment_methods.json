@@ -1,0 +1,8 @@
+{
+    "billing.payment_methods.boleto": "Bank Slip (Boleto)",
+    "billing.payment_methods.boleto.description": "Up to 3 business days to confirm",
+    "billing.payment_methods.card": "Credit Card",
+    "billing.payment_methods.card.description": "Instant approval",
+    "billing.payment_methods.pix": "PIX",
+    "billing.payment_methods.pix.description": "Confirmed in seconds"
+}

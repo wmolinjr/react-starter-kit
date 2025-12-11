@@ -1,0 +1,5 @@
+{
+    "flash.role.created": "Role ':name' created successfully.",
+    "flash.role.deleted": "Role ':name' deleted successfully.",
+    "flash.role.updated": "Role ':name' updated successfully."
+}

@@ -1,0 +1,11 @@
+{
+    "settings.two_factor.continue_setup": "Continue Setup",
+    "settings.two_factor.description": "Manage your two-factor authentication settings",
+    "settings.two_factor.disable": "Disable 2FA",
+    "settings.two_factor.disabled": "Disabled",
+    "settings.two_factor.disabled_description": "When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.",
+    "settings.two_factor.enable": "Enable 2FA",
+    "settings.two_factor.enabled": "Enabled",
+    "settings.two_factor.enabled_description": "With two-factor authentication enabled, you will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.",
+    "settings.two_factor.title": "Two-Factor Authentication"
+}

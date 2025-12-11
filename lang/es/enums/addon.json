@@ -1,0 +1,11 @@
+{
+    "enums.addon.status.active": "Activo",
+    "enums.addon.status.canceled": "Cancelado",
+    "enums.addon.status.expired": "Expirado",
+    "enums.addon.status.failed": "Fallido",
+    "enums.addon.status.pending": "Pendiente",
+    "enums.addon.type.credit": "Paquete de Créditos",
+    "enums.addon.type.feature": "Funcionalidad",
+    "enums.addon.type.metered": "Basado en Uso",
+    "enums.addon.type.quota": "Aumento de Cuota"
+}

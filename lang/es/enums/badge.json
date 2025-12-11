@@ -1,0 +1,14 @@
+{
+    "enums.badge.preset.best_for_teams": "Mejor para Equipos",
+    "enums.badge.preset.best_value": "Mejor Valor",
+    "enums.badge.preset.enterprise": "Empresarial",
+    "enums.badge.preset.hot": "En Tendencia",
+    "enums.badge.preset.limited_time": "Tiempo Limitado",
+    "enums.badge.preset.most_popular": "Más Popular",
+    "enums.badge.preset.new": "Nuevo",
+    "enums.badge.preset.one_time": "Pago Único",
+    "enums.badge.preset.pro": "Profesional",
+    "enums.badge.preset.recommended": "Recomendado",
+    "enums.badge.preset.sale": "Oferta",
+    "enums.badge.preset.starter": "Inicial"
+}

@@ -1,0 +1,8 @@
+{
+    "settings.appearance.dark": "Dark",
+    "settings.appearance.description": "Update your account's appearance settings",
+    "settings.appearance.light": "Light",
+    "settings.appearance.system": "System",
+    "settings.appearance.title": "Appearance Settings",
+    "settings.appearance.toggle_theme": "Toggle theme"
+}

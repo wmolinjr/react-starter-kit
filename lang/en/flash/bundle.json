@@ -1,0 +1,7 @@
+{
+    "flash.bundle.created": "Bundle ':name' created successfully.",
+    "flash.bundle.deleted": "Bundle ':name' deleted.",
+    "flash.bundle.sync_failed": "Failed to sync bundle: :errors",
+    "flash.bundle.synced": "Bundle ':name' synced with Stripe.",
+    "flash.bundle.updated": "Bundle updated successfully."
+}

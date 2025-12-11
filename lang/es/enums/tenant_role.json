@@ -1,5 +1,0 @@
-{
-    "enums.tenant_role.admin": "Administrador",
-    "enums.tenant_role.member": "Miembro",
-    "enums.tenant_role.owner": "Propietario"
-}

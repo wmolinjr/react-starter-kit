@@ -30,4 +30,4 @@ yarn-error.log
 /playwright-report
 /test-results
 /blob-report
-/lang/php_*.json
+/lang/*.json

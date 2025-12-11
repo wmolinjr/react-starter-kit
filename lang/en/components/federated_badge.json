@@ -1,0 +1,6 @@
+{
+    "components.federated_badge.federated": "Federated",
+    "components.federated_badge.master": "Master",
+    "components.federated_badge.tooltip": "This user is federated across multiple tenants",
+    "components.federated_badge.tooltip_with_group": "Federated with :group"
+}

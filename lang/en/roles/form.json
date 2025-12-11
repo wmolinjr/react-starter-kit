@@ -1,0 +1,21 @@
+{
+    "roles.form.basic_info_description": "Define the role name and description",
+    "roles.form.basic_info_title": "Basic Information",
+    "roles.form.description_label": "Description",
+    "roles.form.description_placeholder": "Describe the responsibilities of this role...",
+    "roles.form.deselect_all": "Deselect All",
+    "roles.form.display_name_hint": "This name will be displayed in the interface.",
+    "roles.form.display_name_label": "Display Name",
+    "roles.form.display_name_placeholder": "e.g., Editor, Moderator, Support",
+    "roles.form.name_hint": "Use lowercase letters, numbers and underscores. This is the technical identifier.",
+    "roles.form.name_label": "Role Name",
+    "roles.form.name_placeholder": "e.g., editor, moderator, support",
+    "roles.form.no_permissions": "No permissions available. Contact support.",
+    "roles.form.permissions_description": "Select the permissions for this role",
+    "roles.form.permissions_title": "Permissions",
+    "roles.form.protected_alert": "This is a protected system role. The role name cannot be changed.",
+    "roles.form.select_all": "Select All",
+    "roles.form.selected": ":count selected",
+    "roles.form.submit_create": "Create Role",
+    "roles.form.submit_update": "Update Role"
+}

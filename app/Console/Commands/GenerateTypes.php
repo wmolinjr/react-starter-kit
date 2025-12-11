@@ -142,7 +142,7 @@ class GenerateTypes extends Command
                     'has_validity' => $case->hasValidity(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.addon_type',
+                'translation_key' => 'enums.addon.type',
             ],
             'AddonStatus' => [
                 'class' => AddonStatus::class,
@@ -167,7 +167,7 @@ class GenerateTypes extends Command
                     'is_terminal' => $case->isTerminal(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.addon_status',
+                'translation_key' => 'enums.addon.status',
             ],
             'BillingPeriod' => [
                 'class' => BillingPeriod::class,
@@ -190,7 +190,7 @@ class GenerateTypes extends Command
                     'is_recurring' => $case->isRecurring(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.billing_period',
+                'translation_key' => 'enums.billing.period',
             ],
             'PlanFeature' => [
                 'class' => PlanFeature::class,
@@ -217,7 +217,7 @@ class GenerateTypes extends Command
                     'is_customizable' => $case->isCustomizable(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.plan_feature',
+                'translation_key' => 'enums.plan.feature',
             ],
             'PlanLimit' => [
                 'class' => PlanLimit::class,
@@ -248,7 +248,7 @@ class GenerateTypes extends Command
                     'is_customizable' => $case->isCustomizable(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.plan_limit',
+                'translation_key' => 'enums.plan.limit',
             ],
             'TenantRole' => [
                 'class' => TenantRole::class,
@@ -271,7 +271,7 @@ class GenerateTypes extends Command
                     'is_system' => $case->isSystemRole(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.tenant_role',
+                'translation_key' => 'enums.tenant.role',
             ],
             'FederatedUserStatus' => [
                 'class' => FederatedUserStatus::class,
@@ -440,7 +440,7 @@ class GenerateTypes extends Command
                     'badge_variant' => $case->badgeVariant(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.permission_category',
+                'translation_key' => 'enums.permission.category',
             ],
             'PermissionAction' => [
                 'class' => PermissionAction::class,
@@ -453,7 +453,7 @@ class GenerateTypes extends Command
                     'label' => $case->label('en'),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.permission_action',
+                'translation_key' => 'enums.permission.action',
             ],
             'BadgePreset' => [
                 'class' => BadgePreset::class,
@@ -480,7 +480,7 @@ class GenerateTypes extends Command
                     'border' => $case->colorClasses()['border'],
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.badge_preset',
+                'translation_key' => 'enums.badge.preset',
             ],
             'TenantConfigKey' => [
                 'class' => TenantConfigKey::class,
@@ -505,7 +505,7 @@ class GenerateTypes extends Command
                     'default_value' => $case->defaultValue(),
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
-                'translation_key' => 'enums.tenant_config_key',
+                'translation_key' => 'enums.tenant.config.key',
             ],
         ];
     }
@@ -1213,7 +1213,7 @@ TS;
      * Update translations in namespace-based structure.
      *
      * Each enum's translation_key prefix determines which file to update.
-     * Supports nested structure: 'enums.addon_type' → enums/addon_type.json or enums.json
+     * Structure: 'enums.addon.type' → enums/addon.json
      */
     protected function updateNamespacedTranslations(string $locale, string $dir): void
     {
@@ -1226,7 +1226,7 @@ TS;
             $prefix = $config['translation_key'];
 
             // Determine target file based on prefix
-            // e.g., 'enums.addon_type' → find enums/addon_type.json OR enums.json
+            // e.g., 'enums.addon.type' → enums/addon.json
             $targetFile = $this->findTranslationFile($dir, $prefix);
 
             foreach ($cases as $case) {
@@ -1267,22 +1267,27 @@ TS;
     /**
      * Find the correct translation file for a key prefix.
      *
-     * Checks for nested structure first (enums/addon_type.json),
-     * then falls back to flat structure (enums.json).
+     * New structure: enums.addon.type → enums/addon.json
+     * The file is determined by the first two parts of the prefix.
+     *
+     * Examples:
+     *   enums.addon.type → enums/addon.json
+     *   enums.addon.status → enums/addon.json
+     *   enums.tenant.role → enums/tenant.json
+     *   enums.tenant.config.key → enums/tenant.json
+     *   enums.plan.feature → enums/plan.json
      */
     protected function findTranslationFile(string $dir, string $prefix): string
     {
         $parts = explode('.', $prefix);
 
-        // Try nested structure first (if prefix has 2+ parts)
+        // New structure: first 2 parts determine the file
+        // enums.addon.type → enums/addon.json
         if (count($parts) >= 2) {
-            $nestedPath = "{$dir}/{$parts[0]}/{$parts[1]}.json";
-            if (File::exists($nestedPath)) {
-                return $nestedPath;
-            }
+            return "{$dir}/{$parts[0]}/{$parts[1]}.json";
         }
 
-        // Fallback to flat structure
+        // Fallback to flat structure for single-part prefixes
         return "{$dir}/{$parts[0]}.json";
     }
 

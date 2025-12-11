@@ -1,0 +1,9 @@
+{
+    "flash.plan.cannot_delete_with_tenants": "Cannot delete plan with active tenants.",
+    "flash.plan.created": "Plan created successfully.",
+    "flash.plan.deleted": "Plan deleted successfully.",
+    "flash.plan.sync_failed": "Stripe sync failed: :error",
+    "flash.plan.synced": "Plan synced with Stripe.",
+    "flash.plan.synced_all": "Synced :count plans with Stripe.",
+    "flash.plan.updated": "Plan updated successfully."
+}

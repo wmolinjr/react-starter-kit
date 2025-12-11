@@ -1,0 +1,14 @@
+{
+    "enums.badge.preset.best_for_teams": "Best for Teams",
+    "enums.badge.preset.best_value": "Best Value",
+    "enums.badge.preset.enterprise": "Enterprise",
+    "enums.badge.preset.hot": "Hot",
+    "enums.badge.preset.limited_time": "Limited Time",
+    "enums.badge.preset.most_popular": "Most Popular",
+    "enums.badge.preset.new": "New",
+    "enums.badge.preset.one_time": "One Time",
+    "enums.badge.preset.pro": "Pro",
+    "enums.badge.preset.recommended": "Recommended",
+    "enums.badge.preset.sale": "Sale",
+    "enums.badge.preset.starter": "Starter"
+}

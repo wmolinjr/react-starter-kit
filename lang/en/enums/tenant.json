@@ -1,0 +1,15 @@
+{
+    "enums.tenant.config.key.app_name": "Application Name",
+    "enums.tenant.config.key.currency": "Currency",
+    "enums.tenant.config.key.currency_locale": "Currency Locale",
+    "enums.tenant.config.key.date_format": "Date Format",
+    "enums.tenant.config.key.locale": "Language",
+    "enums.tenant.config.key.mail_from_address": "From Email",
+    "enums.tenant.config.key.mail_from_name": "From Name",
+    "enums.tenant.config.key.time_format": "Time Format",
+    "enums.tenant.config.key.timezone": "Timezone",
+    "enums.tenant.config.key.week_starts_on": "Week Starts On",
+    "enums.tenant.role.admin": "Administrator",
+    "enums.tenant.role.member": "Member",
+    "enums.tenant.role.owner": "Owner"
+}

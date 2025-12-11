@@ -1,0 +1,4 @@
+{
+    "validation.federation.already_master": "The selected tenant is already the master tenant.",
+    "validation.federation.tenant_not_in_group": "The selected tenant is not a member of this federation group."
+}

@@ -1,0 +1,8 @@
+{
+    "flash.settings.branding_updated": "Branding updated successfully!",
+    "flash.settings.config_updated": "Configuration settings updated successfully!",
+    "flash.settings.domain_added": "Domain added! Configure DNS to point to the server.",
+    "flash.settings.domain_removed": "Domain removed successfully!",
+    "flash.settings.features_updated": "Feature settings updated!",
+    "flash.settings.notifications_updated": "Notification settings updated!"
+}

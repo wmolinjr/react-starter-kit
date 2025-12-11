@@ -1,0 +1,7 @@
+{
+    "billing.period.monthly": "Monthly",
+    "billing.period.monthly_short": "/mo",
+    "billing.period.one_time": "one-time",
+    "billing.period.yearly": "Yearly",
+    "billing.period.yearly_short": "/yr"
+}

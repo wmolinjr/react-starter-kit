@@ -1,0 +1,4 @@
+{
+    "tenant.roles.custom_roles_not_available": "Custom roles are not available in your current plan.",
+    "tenant.roles.limit_reached": "You have reached the maximum number of custom roles allowed by your plan."
+}

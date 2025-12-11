@@ -1,0 +1,17 @@
+{
+    "tenant.invitation.accept_button": "Accept Invitation",
+    "tenant.invitation.accept_title": "Accept Invitation",
+    "tenant.invitation.accepting": "Accepting...",
+    "tenant.invitation.access_info": "By accepting the invitation, you will have full access to the organization's resources according to your role.",
+    "tenant.invitation.auth_required": "You need to be authenticated to accept the invitation.",
+    "tenant.invitation.back_home": "Back to Home",
+    "tenant.invitation.create_account": "create an account",
+    "tenant.invitation.hello_user": "Hello :name, you have received an invitation to join an organization.",
+    "tenant.invitation.invalid_description": "The invitation link you accessed is invalid or has expired.",
+    "tenant.invitation.invalid_title": "Invalid Invitation",
+    "tenant.invitation.login": "Log in",
+    "tenant.invitation.or": "or",
+    "tenant.invitation.ready_to_start": "Ready to get started?",
+    "tenant.invitation.received_invite": "You have received an invitation to join an organization.",
+    "tenant.invitation.you_were_invited": "You've been invited!"
+}

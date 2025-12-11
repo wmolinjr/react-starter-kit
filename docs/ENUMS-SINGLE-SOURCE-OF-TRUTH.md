@@ -709,14 +709,14 @@ public function name(): array
 ```
 
 ```json
-// lang/en.json (auto-gerado)
+// lang/en/enums/tenant.json (auto-gerado)
 {
-    "enums.tenant_role.owner": "Owner"
+    "enums.tenant.role.owner": "Owner"
 }
 
-// lang/pt_BR.json (auto-gerado)
+// lang/pt_BR/enums/tenant.json (auto-gerado)
 {
-    "enums.tenant_role.owner": "Proprietário"
+    "enums.tenant.role.owner": "Proprietário"
 }
 ```
 
@@ -727,7 +727,7 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 function RoleBadge({ role }: { role: TenantRole }) {
     const { t } = useLaravelReactI18n();
 
-    return <Badge>{t(`enums.tenant_role.${role}`)}</Badge>;
+    return <Badge>{t(`enums.tenant.role.${role}`)}</Badge>;
 }
 ```
 

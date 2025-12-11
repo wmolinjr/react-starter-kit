@@ -1,0 +1,11 @@
+{
+    "auth.2fa.auth_code_description": "Enter the authentication code provided by your authenticator application.",
+    "auth.2fa.auth_code_title": "Authentication Code",
+    "auth.2fa.continue": "Continue",
+    "auth.2fa.or_you_can": "or you can",
+    "auth.2fa.page_title": "Two-Factor Authentication",
+    "auth.2fa.recovery_code_description": "Please confirm access to your account by entering one of your emergency recovery codes.",
+    "auth.2fa.recovery_code_title": "Recovery Code",
+    "auth.2fa.toggle_to_auth_code": "login using an authentication code",
+    "auth.2fa.toggle_to_recovery": "login using a recovery code"
+}

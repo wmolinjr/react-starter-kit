@@ -1,0 +1,17 @@
+{
+    "flash.team.auth_required": "You must be authenticated to accept invites.",
+    "flash.team.cannot_change_only_owner": "Cannot change role of the only owner. Promote another member first.",
+    "flash.team.cannot_change_own_role": "You cannot change your own role.",
+    "flash.team.cannot_remove_self": "You cannot remove yourself from the team.",
+    "flash.team.invite_accept_error": "Error accepting invite: :error",
+    "flash.team.invite_accepted": "Invite accepted! Welcome to the team.",
+    "flash.team.invite_error": "Error sending invite: :error",
+    "flash.team.invite_invalid": "Invalid, expired or already accepted invite.",
+    "flash.team.invite_sent": "Invite sent successfully!",
+    "flash.team.invite_wrong_email": "This invite is not for you.",
+    "flash.team.invite_wrong_tenant": "This invite is not for this tenant.",
+    "flash.team.member_removed": "Member removed successfully!",
+    "flash.team.role_updated": "Role updated successfully!",
+    "flash.team.user_already_member": "This user is already a team member.",
+    "flash.team.user_limit_reached": "User limit reached for this plan."
+}

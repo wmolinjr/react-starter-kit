@@ -1,0 +1,11 @@
+{
+    "enums.addon.status.active": "Active",
+    "enums.addon.status.canceled": "Canceled",
+    "enums.addon.status.expired": "Expired",
+    "enums.addon.status.failed": "Failed",
+    "enums.addon.status.pending": "Pending",
+    "enums.addon.type.credit": "Credit Pack",
+    "enums.addon.type.feature": "Feature",
+    "enums.addon.type.metered": "Usage-Based",
+    "enums.addon.type.quota": "Quota Increase"
+}

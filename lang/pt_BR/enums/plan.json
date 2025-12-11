@@ -1,0 +1,21 @@
+{
+    "enums.plan.feature.advancedReports": "Relatórios Avançados",
+    "enums.plan.feature.apiAccess": "Acesso à API",
+    "enums.plan.feature.auditLog": "Log de Auditoria",
+    "enums.plan.feature.base": "Recursos Base",
+    "enums.plan.feature.customRoles": "Roles Personalizados",
+    "enums.plan.feature.federation": "Federação de Usuários",
+    "enums.plan.feature.multiLanguage": "Multi-Idioma",
+    "enums.plan.feature.prioritySupport": "Suporte Prioritário",
+    "enums.plan.feature.projects": "Projetos",
+    "enums.plan.feature.sso": "Single Sign-On (SSO)",
+    "enums.plan.feature.whiteLabel": "White Label",
+    "enums.plan.limit.apiCalls": "Chamadas de API",
+    "enums.plan.limit.customRoles": "Roles Personalizados",
+    "enums.plan.limit.fileUploadSize": "Tamanho Máximo de Arquivo",
+    "enums.plan.limit.locales": "Idiomas",
+    "enums.plan.limit.logRetention": "Retenção de Logs",
+    "enums.plan.limit.projects": "Projetos",
+    "enums.plan.limit.storage": "Armazenamento",
+    "enums.plan.limit.users": "Vagas de Usuário"
+}

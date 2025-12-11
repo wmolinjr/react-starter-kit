@@ -1,7 +1,0 @@
-{
-    "enums.addon_status.active": "Activo",
-    "enums.addon_status.canceled": "Cancelado",
-    "enums.addon_status.expired": "Expirado",
-    "enums.addon_status.failed": "Fallido",
-    "enums.addon_status.pending": "Pendiente"
-}

@@ -1,0 +1,20 @@
+{
+    "tenant.invoices.all_invoices": "All Invoices",
+    "tenant.invoices.all_invoices_description": "Complete history of invoices and payments",
+    "tenant.invoices.column_amount": "Amount",
+    "tenant.invoices.column_date": "Date",
+    "tenant.invoices.column_number": "Invoice #",
+    "tenant.invoices.column_status": "Status",
+    "tenant.invoices.description": "View and download all invoices for :name.",
+    "tenant.invoices.download_pdf": "Download PDF",
+    "tenant.invoices.invoice_details": "Invoice Details",
+    "tenant.invoices.line_items": "Line Items",
+    "tenant.invoices.no_invoices": "No invoices yet.",
+    "tenant.invoices.page_title": "Invoices",
+    "tenant.invoices.quantity": "Qty",
+    "tenant.invoices.status_open": "Open",
+    "tenant.invoices.status_paid": "Paid",
+    "tenant.invoices.status_uncollectible": "Uncollectible",
+    "tenant.invoices.status_void": "Void",
+    "tenant.invoices.title": "Invoices"
+}

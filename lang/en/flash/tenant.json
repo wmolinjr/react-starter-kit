@@ -1,0 +1,5 @@
+{
+    "flash.tenant.deleted": "Tenant deleted successfully.",
+    "flash.tenant.organization_deleted": "Organization deleted successfully.",
+    "flash.tenant.updated": "Tenant updated successfully."
+}

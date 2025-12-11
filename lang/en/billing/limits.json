@@ -1,0 +1,14 @@
+{
+    "billing.limits.api_calls": "API Calls",
+    "billing.limits.api_calls_desc": "API requests per month",
+    "billing.limits.custom_roles": "Custom Roles",
+    "billing.limits.custom_roles_desc": "Number of custom roles",
+    "billing.limits.locales": "Languages",
+    "billing.limits.locales_desc": "Supported interface languages",
+    "billing.limits.projects": "Projects",
+    "billing.limits.projects_desc": "Maximum projects",
+    "billing.limits.storage": "Storage",
+    "billing.limits.storage_desc": "File storage capacity",
+    "billing.limits.users": "Users",
+    "billing.limits.users_desc": "Team members"
+}

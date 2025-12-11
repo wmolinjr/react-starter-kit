@@ -1,0 +1,23 @@
+{
+    "flash.federation.bulk_federated": ":count users federated successfully.",
+    "flash.federation.bulk_federated_partial": ":success users federated successfully, :failed failed.",
+    "flash.federation.cannot_unfederate_master": "Cannot unfederate the master user.",
+    "flash.federation.conflict_dismissed": "Conflict dismissed.",
+    "flash.federation.conflict_resolved": "Conflict resolved successfully.",
+    "flash.federation.group_created": "Federation group ':name' created successfully.",
+    "flash.federation.group_deleted": "Federation group deleted successfully.",
+    "flash.federation.group_updated": "Federation group updated successfully.",
+    "flash.federation.master_changed": "Master tenant changed to :tenant successfully.",
+    "flash.federation.no_local_users": "No local users available to federate.",
+    "flash.federation.no_users_selected": "No users selected for federation.",
+    "flash.federation.retry_sync_queued": "Retry sync has been queued.",
+    "flash.federation.sync_disabled": "Sync disabled for :tenant.",
+    "flash.federation.sync_enabled": "Sync enabled for :tenant.",
+    "flash.federation.tenant_added": "Tenant added to federation group.",
+    "flash.federation.tenant_not_in_group": "Tenant is not in this federation group.",
+    "flash.federation.tenant_removed": "Tenant removed from federation group.",
+    "flash.federation.user_federated": "User ':email' has been federated.",
+    "flash.federation.user_not_federated": "This user is not federated.",
+    "flash.federation.user_synced": "User sync completed successfully.",
+    "flash.federation.user_unfederated": "User ':email' has been unfederated."
+}
