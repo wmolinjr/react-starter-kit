@@ -86,9 +86,9 @@ function TeamActivity({
     const [localFilters, setLocalFilters] = useState<ActivityFilters>(filters);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.team.title'), href: admin.team.index.url() },
-        { title: t('tenant.activity.title'), href: admin.team.activity.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('team.page.title'), href: admin.team.index.url() },
+        { title: t('activity.page.title'), href: admin.team.activity.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -152,14 +152,14 @@ function TeamActivity({
 
     return (
         <>
-            <Head title={t('tenant.activity.page_title')} />
+            <Head title={t('activity.page.page_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Activity}>{t('tenant.activity.page_title')}</PageTitle>
+                        <PageTitle icon={Activity}>{t('activity.page.page_title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.activity.description', { name: tenantData.name })}
+                            {t('activity.description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -187,7 +187,7 @@ function TeamActivity({
                                 {/* User Filter */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">
-                                        {t('tenant.activity.filter_user')}
+                                        {t('activity.page.filter_user')}
                                     </label>
                                     <Select
                                         value={localFilters.user_id || '__all__'}
@@ -210,7 +210,7 @@ function TeamActivity({
                                 {/* Event Type Filter */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">
-                                        {t('tenant.activity.filter_event')}
+                                        {t('activity.page.filter_event')}
                                     </label>
                                     <Select
                                         value={localFilters.event || '__all__'}
@@ -237,7 +237,7 @@ function TeamActivity({
                                 {/* Subject Type Filter */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">
-                                        {t('tenant.activity.filter_subject')}
+                                        {t('activity.page.filter_subject')}
                                     </label>
                                     <Select
                                         value={localFilters.subject_type || '__all__'}
@@ -260,7 +260,7 @@ function TeamActivity({
                                 {/* Date From */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">
-                                        {t('tenant.activity.filter_date_from')}
+                                        {t('activity.page.filter_date_from')}
                                     </label>
                                     <Input
                                         type="date"
@@ -272,7 +272,7 @@ function TeamActivity({
                                 {/* Date To */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">
-                                        {t('tenant.activity.filter_date_to')}
+                                        {t('activity.page.filter_date_to')}
                                     </label>
                                     <Input
                                         type="date"
@@ -300,18 +300,18 @@ function TeamActivity({
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[180px]">{t('tenant.activity.column_date')}</TableHead>
-                                    <TableHead>{t('tenant.activity.column_user')}</TableHead>
-                                    <TableHead>{t('tenant.activity.column_action')}</TableHead>
-                                    <TableHead>{t('tenant.activity.column_subject')}</TableHead>
-                                    <TableHead>{t('tenant.activity.column_description')}</TableHead>
+                                    <TableHead className="w-[180px]">{t('activity.page.column_date')}</TableHead>
+                                    <TableHead>{t('activity.page.column_user')}</TableHead>
+                                    <TableHead>{t('activity.page.column_action')}</TableHead>
+                                    <TableHead>{t('activity.page.column_subject')}</TableHead>
+                                    <TableHead>{t('activity.page.column_description')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {activities.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                            {t('tenant.activity.no_activities')}
+                                            {t('activity.page.no_activities')}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
@@ -342,7 +342,7 @@ function TeamActivity({
                                                     </div>
                                                 ) : (
                                                     <span className="text-muted-foreground">
-                                                        {t('tenant.activity.system')}
+                                                        {t('activity.page.system')}
                                                     </span>
                                                 )}
                                             </TableCell>

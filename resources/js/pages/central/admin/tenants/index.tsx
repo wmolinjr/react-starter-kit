@@ -44,8 +44,8 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
     const { impersonatingId, impersonateTenant, impersonateAsUser } = useImpersonation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.tenants.title'), href: admin.tenants.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('tenants.page.title'), href: admin.tenants.index.url() },
     ];
     useSetBreadcrumbs(breadcrumbs);
 
@@ -62,17 +62,17 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
 
     return (
         <>
-            <Head title={t('admin.tenants.title')} />
+            <Head title={t('tenants.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.tenants.title')}</PageTitle>
-                        <PageDescription>{t('admin.tenants.description')}</PageDescription>
+                        <PageTitle>{t('tenants.page.title')}</PageTitle>
+                        <PageDescription>{t('tenants.page.description')}</PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         {isImpersonating && (
-                            <Badge variant="destructive">{t('admin.tenants.currently_impersonating')}</Badge>
+                            <Badge variant="destructive">{t('tenants.page.currently_impersonating')}</Badge>
                         )}
                     </PageHeaderActions>
                 </PageHeader>
@@ -81,10 +81,10 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
                     <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
-                            <CardTitle>{t('admin.tenants.all_tenants')}</CardTitle>
+                            <CardTitle>{t('tenants.page.all_tenants')}</CardTitle>
                             <form onSubmit={handleSearch} className="flex gap-2">
                                 <Input
-                                    placeholder={t('admin.tenants.search_placeholder')}
+                                    placeholder={t('tenants.page.search_placeholder')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="w-64"
@@ -123,7 +123,7 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
                                             {tenant.plan ? (
                                                 <Badge variant="outline">{tenant.plan.name}</Badge>
                                             ) : (
-                                                <Badge variant="secondary">{t('admin.tenants.no_plan')}</Badge>
+                                                <Badge variant="secondary">{t('tenants.page.no_plan')}</Badge>
                                             )}
                                         </TableCell>
                                         <TableCell>
@@ -143,7 +143,7 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
                                                     onClick={() => impersonateTenant(tenant.id)}
                                                 >
                                                     <LogIn className="mr-1 h-3 w-3" />
-                                                    {t('admin.tenants.impersonate')}
+                                                    {t('tenants.page.impersonate')}
                                                 </Button>
                                                 {tenant.users?.slice(0, 2).map((user) => (
                                                     <Button
@@ -152,7 +152,7 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
                                                         size="sm"
                                                         onClick={() => impersonateAsUser(tenant.id, user.id)}
                                                         disabled={impersonatingId === user.id}
-                                                        title={t('admin.tenants.impersonate_as', { name: user.name })}
+                                                        title={t('tenants.impersonate_as', { name: user.name })}
                                                     >
                                                         <LogIn className="mr-1 h-3 w-3" />
                                                         {impersonatingId === user.id ? '...' : user.name.split(' ')[0]}
@@ -184,7 +184,7 @@ function TenantsIndex({ tenants, filters, isImpersonating }: Props) {
 
                         {tenants.data.length === 0 && (
                             <div className="py-12 text-center">
-                                <p className="text-muted-foreground">{t('admin.tenants.no_tenants')}</p>
+                                <p className="text-muted-foreground">{t('tenants.page.no_tenants')}</p>
                             </div>
                         )}
 

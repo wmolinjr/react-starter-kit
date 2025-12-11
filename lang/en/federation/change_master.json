@@ -1,0 +1,10 @@
+{
+    "federation.change_master.confirm_button": "Change Master Tenant",
+    "federation.change_master.confirm_text": "I understand that this operation will migrate all federated users to the new master tenant and cannot be easily undone.",
+    "federation.change_master.description": "Transfer the master role from the current tenant to another tenant in :group",
+    "federation.change_master.new_master": "New Master Tenant",
+    "federation.change_master.select_tenant": "Select the new master tenant...",
+    "federation.change_master.selected_info": ":tenant will become the new master tenant for this federation group.",
+    "federation.change_master.title": "Change Master Tenant",
+    "federation.change_master.warning": "This is a critical operation. All federated users will be migrated to the new master tenant. This may take some time depending on the number of users."
+}

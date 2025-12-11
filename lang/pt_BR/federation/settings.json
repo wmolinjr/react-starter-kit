@@ -1,0 +1,14 @@
+{
+    "federation.settings.auto_create_on_login": "Auto-Criar no Login",
+    "federation.settings.auto_create_on_login_description": "Criar automaticamente usuário local quando um usuário federado faz login em um tenant filial pela primeira vez",
+    "federation.settings.auto_federate_new_users": "Auto-Federar Novos Usuários",
+    "federation.settings.auto_federate_new_users_description": "Federar automaticamente novos usuários quando criados em tenants membros",
+    "federation.settings.sync_password": "Sincronizar Senha",
+    "federation.settings.sync_password_description": "Sincronizar alterações de senha entre tenants",
+    "federation.settings.sync_profile": "Sincronizar Perfil",
+    "federation.settings.sync_profile_description": "Sincronizar nome e informações de perfil",
+    "federation.settings.sync_roles": "Sincronizar Funções",
+    "federation.settings.sync_roles_description": "Sincronizar atribuições de função (use com cautela)",
+    "federation.settings.sync_two_factor": "Sincronizar 2FA",
+    "federation.settings.sync_two_factor_description": "Sincronizar configurações de 2FA e códigos de recuperação"
+}

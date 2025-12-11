@@ -29,8 +29,8 @@ function TenantEdit({ tenant, plans }: Props) {
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.tenants.title'), href: admin.tenants.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('tenants.page.title'), href: admin.tenants.index.url() },
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
         { title: t('common.edit'), href: admin.tenants.edit.url(tenant.id) },
     ];
@@ -43,12 +43,12 @@ function TenantEdit({ tenant, plans }: Props) {
 
     return (
         <>
-            <Head title={`${t('admin.tenants.edit_tenant')}: ${tenant.name}`} />
+            <Head title={`${t('tenants.page.edit_tenant')}: ${tenant.name}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.tenants.edit_tenant')}</PageTitle>
+                        <PageTitle>{t('tenants.page.edit_tenant')}</PageTitle>
                         <PageDescription>{tenant.name}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -57,7 +57,7 @@ function TenantEdit({ tenant, plans }: Props) {
                     <form onSubmit={handleSubmit}>
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('admin.tenants.tenant_details')}</CardTitle>
+                            <CardTitle>{t('tenants.page.tenant_details')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
@@ -76,7 +76,7 @@ function TenantEdit({ tenant, plans }: Props) {
                                     onValueChange={(v) => setData('plan_id', v)}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder={t('admin.tenants.select_plan')} />
+                                        <SelectValue placeholder={t('tenants.page.select_plan')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {plans.map((plan) => (

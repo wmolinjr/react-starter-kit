@@ -16,8 +16,8 @@ import { type ReactElement } from 'react';
 function useBreadcrumbs() {
     const { t } = useLaravelReactI18n();
     return [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
         { title: t('roles.page.title'), href: admin.settings.roles.index.url() },
     ] as BreadcrumbItem[];
 }
@@ -68,7 +68,7 @@ function RolesIndex({ roles, planInfo }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Shield}>{t('tenant.settings.custom_roles')}</PageTitle>
+                        <PageTitle icon={Shield}>{t('settings.custom_roles')}</PageTitle>
                         <PageDescription>
                             {t('roles.page.description')}
                         </PageDescription>

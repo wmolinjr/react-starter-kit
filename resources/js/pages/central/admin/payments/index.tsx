@@ -151,8 +151,8 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
     const [isExporting, setIsExporting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.payments.title'), href: admin.payments.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('payments.page.title'), href: admin.payments.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -189,14 +189,14 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
 
     return (
         <>
-            <Head title={t('admin.payments.page_title')} />
+            <Head title={t('payments.page.page_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={CreditCard}>{t('admin.payments.page_title')}</PageTitle>
+                        <PageTitle icon={CreditCard}>{t('payments.page.page_title')}</PageTitle>
                         <PageDescription>
-                            {t('admin.payments.description')}
+                            {t('payments.page.description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -206,7 +206,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                             disabled={isExporting}
                         >
                             <Download className="mr-2 h-4 w-4" />
-                            {isExporting ? t('common.loading') : t('admin.payments.export_csv')}
+                            {isExporting ? t('common.loading') : t('payments.page.export_csv')}
                         </Button>
                         <Button
                             variant="outline"
@@ -224,7 +224,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('admin.payments.stats.total')}
+                                    {t('payments.stats.total')}
                                 </CardTitle>
                                 <CreditCard className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
@@ -235,7 +235,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('admin.payments.stats.completed')}
+                                    {t('payments.stats.completed')}
                                 </CardTitle>
                                 <CheckCircle className="h-4 w-4 text-green-500" />
                             </CardHeader>
@@ -246,7 +246,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('admin.payments.stats.pending')}
+                                    {t('payments.stats.pending')}
                                 </CardTitle>
                                 <Clock className="h-4 w-4 text-yellow-500" />
                             </CardHeader>
@@ -257,7 +257,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('admin.payments.stats.failed')}
+                                    {t('payments.stats.failed')}
                                 </CardTitle>
                                 <XCircle className="h-4 w-4 text-red-500" />
                             </CardHeader>
@@ -275,7 +275,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
-                                            placeholder={t('admin.payments.search_placeholder')}
+                                            placeholder={t('payments.page.search_placeholder')}
                                             value={localFilters.search ?? ''}
                                             onChange={(e) => setLocalFilters({ ...localFilters, search: e.target.value || null })}
                                             className="pl-10"
@@ -287,7 +287,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                                     onValueChange={(value) => setLocalFilters({ ...localFilters, status: value || null })}
                                 >
                                     <SelectTrigger className="w-[160px]">
-                                        <SelectValue placeholder={t('admin.payments.filter_status')} />
+                                        <SelectValue placeholder={t('payments.page.filter_status')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {STATUS_OPTIONS.map((option) => (
@@ -302,7 +302,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                                     onValueChange={(value) => setLocalFilters({ ...localFilters, provider: value || null })}
                                 >
                                     <SelectTrigger className="w-[140px]">
-                                        <SelectValue placeholder={t('admin.payments.filter_provider')} />
+                                        <SelectValue placeholder={t('payments.page.filter_provider')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {PROVIDER_OPTIONS.map((option) => (
@@ -317,7 +317,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                                     onValueChange={(value) => setLocalFilters({ ...localFilters, payment_method: value || null })}
                                 >
                                     <SelectTrigger className="w-[160px]">
-                                        <SelectValue placeholder={t('admin.payments.filter_payment_method')} />
+                                        <SelectValue placeholder={t('payments.page.filter_payment_method')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {PAYMENT_METHOD_OPTIONS.map((option) => (
@@ -329,14 +329,14 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                                 </Select>
                                 <Input
                                     type="date"
-                                    placeholder={t('admin.payments.filter_date_from')}
+                                    placeholder={t('payments.page.filter_date_from')}
                                     value={localFilters.from ?? ''}
                                     onChange={(e) => setLocalFilters({ ...localFilters, from: e.target.value || null })}
                                     className="w-[150px]"
                                 />
                                 <Input
                                     type="date"
-                                    placeholder={t('admin.payments.filter_date_to')}
+                                    placeholder={t('payments.page.filter_date_to')}
                                     value={localFilters.to ?? ''}
                                     onChange={(e) => setLocalFilters({ ...localFilters, to: e.target.value || null })}
                                     className="w-[150px]"
@@ -358,13 +358,13 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>{t('admin.payments.date')}</TableHead>
-                                    <TableHead>{t('admin.payments.tenant')}</TableHead>
-                                    <TableHead>{t('admin.payments.customer')}</TableHead>
-                                    <TableHead>{t('admin.payments.amount')}</TableHead>
-                                    <TableHead>{t('admin.payments.status')}</TableHead>
-                                    <TableHead>{t('admin.payments.payment_method')}</TableHead>
-                                    <TableHead>{t('admin.payments.provider')}</TableHead>
+                                    <TableHead>{t('payments.page.date')}</TableHead>
+                                    <TableHead>{t('payments.page.tenant')}</TableHead>
+                                    <TableHead>{t('payments.page.customer')}</TableHead>
+                                    <TableHead>{t('payments.page.amount')}</TableHead>
+                                    <TableHead>{t('payments.page.status')}</TableHead>
+                                    <TableHead>{t('payments.page.payment_method')}</TableHead>
+                                    <TableHead>{t('payments.page.provider')}</TableHead>
                                     <TableHead className="text-right">{t('common.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -372,7 +372,7 @@ function PaymentsIndex({ payments, filters, stats }: Props) {
                                 {payments.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                                            {t('admin.payments.no_payments')}
+                                            {t('payments.page.no_payments')}
                                         </TableCell>
                                     </TableRow>
                                 ) : (

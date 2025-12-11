@@ -34,8 +34,8 @@ function ProjectEdit({ project }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.projects.title'), href: admin.projects.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('projects.page.title'), href: admin.projects.index.url() },
         { title: project.name, href: admin.projects.show.url(project.id) },
         { title: t('common.edit'), href: admin.projects.edit.url(project.id) },
     ];
@@ -55,12 +55,12 @@ function ProjectEdit({ project }: Props) {
 
     return (
         <>
-            <Head title={t('tenant.projects.edit_project', { name: project.name })} />
+            <Head title={t('projects.edit_project', { name: project.name })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={FolderEdit}>{t('tenant.projects.edit_project_title')}</PageTitle>
+                        <PageTitle icon={FolderEdit}>{t('projects.page.edit_project_title')}</PageTitle>
                         <PageDescription>
                             {project.name}
                         </PageDescription>
@@ -70,9 +70,9 @@ function ProjectEdit({ project }: Props) {
                 <PageContent>
                     <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.projects.project_info')}</CardTitle>
+                        <CardTitle>{t('projects.page.project_info')}</CardTitle>
                         <CardDescription>
-                            {t('tenant.projects.update_project_data')}
+                            {t('projects.page.update_project_data')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -85,7 +85,7 @@ function ProjectEdit({ project }: Props) {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
-                                    placeholder={t('tenant.projects.name_placeholder')}
+                                    placeholder={t('projects.page.name_placeholder')}
                                     className={errors.name ? 'border-red-500' : ''}
                                 />
                                 {errors.name && (
@@ -103,7 +103,7 @@ function ProjectEdit({ project }: Props) {
                                     onChange={(e) =>
                                         setData('description', e.target.value)
                                     }
-                                    placeholder={t('tenant.projects.description_placeholder')}
+                                    placeholder={t('projects.page.description_placeholder')}
                                     rows={4}
                                     className={
                                         errors.description ? 'border-red-500' : ''
@@ -129,14 +129,14 @@ function ProjectEdit({ project }: Props) {
                                             errors.status ? 'border-red-500' : ''
                                         }
                                     >
-                                        <SelectValue placeholder={t('tenant.projects.select_status')} />
+                                        <SelectValue placeholder={t('projects.page.select_status')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="active">
-                                            {t('tenant.projects.status_active')}
+                                            {t('projects.page.status_active')}
                                         </SelectItem>
                                         <SelectItem value="archived">
-                                            {t('tenant.projects.status_archived')}
+                                            {t('projects.page.status_archived')}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>

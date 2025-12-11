@@ -18,22 +18,22 @@ function BundleCreate({ addons, plans }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.bundles.title'), href: admin.bundles.index.url() },
-        { title: t('admin.bundles.create_bundle'), href: admin.bundles.create.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('bundles.page.title'), href: admin.bundles.index.url() },
+        { title: t('bundles.page.create_bundle'), href: admin.bundles.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     return (
         <>
-            <Head title={t('admin.bundles.create_bundle')} />
+            <Head title={t('bundles.page.create_bundle')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.bundles.create_bundle')}</PageTitle>
-                        <PageDescription>{t('admin.bundles.description')}</PageDescription>
+                        <PageTitle>{t('bundles.page.create_bundle')}</PageTitle>
+                        <PageDescription>{t('bundles.page.description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

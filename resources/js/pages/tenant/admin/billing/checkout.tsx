@@ -116,8 +116,8 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
 
     // Breadcrumbs
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('billing.page.title'), href: admin.billing.index.url() },
         { title: t('checkout.page.title', { default: 'Checkout' }), href: admin.billing.checkoutPage.url() },
     ];
     useSetBreadcrumbs(breadcrumbs);

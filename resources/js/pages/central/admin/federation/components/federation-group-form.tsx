@@ -69,18 +69,18 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
     const syncStrategyOptions = [
         {
             value: 'master_wins',
-            label: t('admin.federation.sync_strategy.master_wins'),
-            description: t('admin.federation.sync_strategy.master_wins_description'),
+            label: t('federation.sync_strategy.master_wins'),
+            description: t('federation.sync_strategy.master_wins_description'),
         },
         {
             value: 'last_write_wins',
-            label: t('admin.federation.sync_strategy.last_write_wins'),
-            description: t('admin.federation.sync_strategy.last_write_wins_description'),
+            label: t('federation.sync_strategy.last_write_wins'),
+            description: t('federation.sync_strategy.last_write_wins_description'),
         },
         {
             value: 'manual_review',
-            label: t('admin.federation.sync_strategy.manual_review'),
-            description: t('admin.federation.sync_strategy.manual_review_description'),
+            label: t('federation.sync_strategy.manual_review'),
+            description: t('federation.sync_strategy.manual_review_description'),
         },
     ];
 
@@ -90,7 +90,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle>{t('common.basic_info')}</CardTitle>
-                    <CardDescription>{t('admin.federation.form.basic_info_description')}</CardDescription>
+                    <CardDescription>{t('federation.form.basic_info_description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
@@ -100,21 +100,21 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                                 id="name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder={t('admin.federation.form.name_placeholder')}
+                                placeholder={t('federation.form.name_placeholder')}
                                 required
                             />
                             {errors.name && <p className="text-destructive text-sm">{errors.name}</p>}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="master_tenant_id">{t('admin.federation.master_tenant')} *</Label>
+                            <Label htmlFor="master_tenant_id">{t('federation.page.master_tenant')} *</Label>
                             <Select
                                 value={data.master_tenant_id}
                                 onValueChange={(value) => setData('master_tenant_id', value)}
                                 disabled={!!group?.id}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder={t('admin.federation.form.select_master')} />
+                                    <SelectValue placeholder={t('federation.form.select_master')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {tenants.map((tenant) => (
@@ -132,8 +132,8 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                             )}
                             <p className="text-muted-foreground text-xs">
                                 {group?.id
-                                    ? t('admin.federation.form.master_change_hint')
-                                    : t('admin.federation.form.master_hint')}
+                                    ? t('federation.form.master_change_hint')
+                                    : t('federation.form.master_hint')}
                             </p>
                         </div>
                     </div>
@@ -144,7 +144,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                             id="description"
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
-                            placeholder={t('admin.federation.form.description_placeholder')}
+                            placeholder={t('federation.form.description_placeholder')}
                             rows={3}
                         />
                         {errors.description && <p className="text-destructive text-sm">{errors.description}</p>}
@@ -157,7 +157,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                             onCheckedChange={(checked) => setData('is_active', checked)}
                         />
                         <Label htmlFor="is_active" className="cursor-pointer">
-                            {t('admin.federation.form.is_active')}
+                            {t('federation.form.is_active')}
                         </Label>
                     </div>
                 </CardContent>
@@ -168,9 +168,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <RefreshCw className="h-5 w-5" />
-                        {t('admin.federation.sync_strategy.title')}
+                        {t('federation.sync_strategy.title')}
                     </CardTitle>
-                    <CardDescription>{t('admin.federation.sync_strategy.description')}</CardDescription>
+                    <CardDescription>{t('federation.sync_strategy.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <RadioGroup
@@ -206,16 +206,16 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
             {/* Sync Settings */}
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('admin.federation.form.sync_settings')}</CardTitle>
-                    <CardDescription>{t('admin.federation.form.sync_settings_description')}</CardDescription>
+                    <CardTitle>{t('federation.form.sync_settings')}</CardTitle>
+                    <CardDescription>{t('federation.form.sync_settings_description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
-                                <Label className="font-medium">{t('admin.federation.settings.sync_password')}</Label>
+                                <Label className="font-medium">{t('federation.settings.sync_password')}</Label>
                                 <p className="text-muted-foreground text-sm">
-                                    {t('admin.federation.settings.sync_password_description')}
+                                    {t('federation.settings.sync_password_description')}
                                 </p>
                             </div>
                             <Switch
@@ -226,9 +226,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
 
                         <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
-                                <Label className="font-medium">{t('admin.federation.settings.sync_profile')}</Label>
+                                <Label className="font-medium">{t('federation.settings.sync_profile')}</Label>
                                 <p className="text-muted-foreground text-sm">
-                                    {t('admin.federation.settings.sync_profile_description')}
+                                    {t('federation.settings.sync_profile_description')}
                                 </p>
                             </div>
                             <Switch
@@ -239,9 +239,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
 
                         <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
-                                <Label className="font-medium">{t('admin.federation.settings.sync_two_factor')}</Label>
+                                <Label className="font-medium">{t('federation.settings.sync_two_factor')}</Label>
                                 <p className="text-muted-foreground text-sm">
-                                    {t('admin.federation.settings.sync_two_factor_description')}
+                                    {t('federation.settings.sync_two_factor_description')}
                                 </p>
                             </div>
                             <Switch
@@ -252,9 +252,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
 
                         <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
-                                <Label className="font-medium">{t('admin.federation.settings.sync_roles')}</Label>
+                                <Label className="font-medium">{t('federation.settings.sync_roles')}</Label>
                                 <p className="text-muted-foreground text-sm">
-                                    {t('admin.federation.settings.sync_roles_description')}
+                                    {t('federation.settings.sync_roles_description')}
                                 </p>
                             </div>
                             <Switch
@@ -265,9 +265,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
 
                         <div className="flex items-center justify-between rounded-lg border p-4 md:col-span-2">
                             <div>
-                                <Label className="font-medium">{t('admin.federation.settings.auto_create_on_login')}</Label>
+                                <Label className="font-medium">{t('federation.settings.auto_create_on_login')}</Label>
                                 <p className="text-muted-foreground text-sm">
-                                    {t('admin.federation.settings.auto_create_on_login_description')}
+                                    {t('federation.settings.auto_create_on_login_description')}
                                 </p>
                             </div>
                             <Switch
@@ -278,9 +278,9 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
 
                         <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4 md:col-span-2">
                             <div>
-                                <Label className="font-medium">{t('admin.federation.settings.auto_federate_new_users')}</Label>
+                                <Label className="font-medium">{t('federation.settings.auto_federate_new_users')}</Label>
                                 <p className="text-muted-foreground text-sm">
-                                    {t('admin.federation.settings.auto_federate_new_users_description')}
+                                    {t('federation.settings.auto_federate_new_users_description')}
                                 </p>
                             </div>
                             <Switch
@@ -295,7 +295,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
             {/* Warning */}
             <Alert>
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{t('admin.federation.form.warning')}</AlertDescription>
+                <AlertDescription>{t('federation.form.warning')}</AlertDescription>
             </Alert>
 
             {/* Actions */}
@@ -304,7 +304,7 @@ export function FederationGroupForm({ group, tenants, onSubmit }: Props) {
                     {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={processing}>
-                    {group?.id ? t('admin.federation.update_group') : t('admin.federation.create_group')}
+                    {group?.id ? t('federation.page.update_group') : t('federation.page.create_group')}
                 </Button>
             </div>
         </form>

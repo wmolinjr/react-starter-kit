@@ -1,0 +1,7 @@
+{
+    "federation.fields.avatar": "Avatar",
+    "federation.fields.email": "E-mail",
+    "federation.fields.name": "Nome",
+    "federation.fields.password": "Senha",
+    "federation.fields.two_factor": "Dois Fatores"
+}

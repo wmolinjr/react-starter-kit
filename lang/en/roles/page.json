@@ -1,6 +1,22 @@
 {
+    "roles.page.create_description": "Add a new central admin role with specific permissions",
     "roles.page.create_first": "Create First Role",
+    "roles.page.create_role": "Create Role",
+    "roles.page.custom_roles_not_available": "Custom roles are not available in your current plan.",
+    "roles.page.delete_confirm": "Are you sure you want to delete the role \":name\"?",
+    "roles.page.delete_has_users_error": "Cannot delete a role that has users assigned.",
+    "roles.page.delete_protected_error": "Cannot delete a protected system role.",
     "roles.page.description": "Manage roles and permissions for your team",
+    "roles.page.edit_role": "Edit Role",
     "roles.page.info": "System roles (Owner, Admin, Member) are protected and cannot be deleted. You can create custom roles to define specific permission sets for your team.",
-    "roles.page.title": "Roles"
+    "roles.page.limit_reached": "You have reached the maximum number of custom roles allowed by your plan.",
+    "roles.page.new_role": "New Role",
+    "roles.page.no_permissions": "No permissions assigned to this role.",
+    "roles.page.no_roles": "No roles defined yet",
+    "roles.page.no_users": "No users assigned to this role.",
+    "roles.page.permissions_granted": "Permissions granted to users with this role",
+    "roles.page.title": "Role Management",
+    "roles.page.update_description": "Update :name role and permissions",
+    "roles.page.update_role": "Update Role",
+    "roles.page.users_assigned": "Users assigned to this role"
 }

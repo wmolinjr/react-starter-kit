@@ -60,9 +60,9 @@ function BundlesPageContent({
     const cartTotal = total;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
-        { title: t('tenant.billing.bundles', { default: 'Bundles' }), href: admin.billing.bundles.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('billing.page.title'), href: admin.billing.index.url() },
+        { title: t('billing.bundles', { default: 'Bundles' }), href: admin.billing.bundles.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -141,17 +141,17 @@ function BundlesPageContent({
 
     return (
         <>
-            <Head title={t('tenant.billing.browse_bundles', { default: 'Browse Bundles' })} />
+            <Head title={t('billing.browse_bundles', { default: 'Browse Bundles' })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle>
                             <Package className="mr-2 h-6 w-6" />
-                            {t('tenant.billing.browse_bundles', { default: 'Browse Bundles' })}
+                            {t('billing.browse_bundles', { default: 'Browse Bundles' })}
                         </PageTitle>
                         <PageDescription>
-                            {t('tenant.billing.bundles_description', {
+                            {t('billing.bundles_description', {
                                 default: 'Save money by purchasing add-ons together in curated bundles',
                             })}
                         </PageDescription>
@@ -178,7 +178,7 @@ function BundlesPageContent({
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-base">
                                     <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                    {t('tenant.billing.active_bundles', { default: 'Your Active Bundles' })}
+                                    {t('billing.active_bundles', { default: 'Your Active Bundles' })}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -193,7 +193,7 @@ function BundlesPageContent({
                                                 <div>
                                                     <p className="font-medium">{bundle.bundle_name}</p>
                                                     <p className="text-muted-foreground text-sm">
-                                                        {bundle.addon_count} {t('tenant.billing.addons', { default: 'add-ons' })}
+                                                        {bundle.addon_count} {t('billing.addons', { default: 'add-ons' })}
                                                     </p>
                                                 </div>
                                             </div>
@@ -222,10 +222,10 @@ function BundlesPageContent({
                             <CardContent className="py-12 text-center">
                                 <Package className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                                 <h3 className="text-lg font-semibold">
-                                    {t('tenant.billing.no_bundles', { default: 'No bundles available' })}
+                                    {t('billing.no_bundles', { default: 'No bundles available' })}
                                 </h3>
                                 <p className="text-muted-foreground mt-2">
-                                    {t('tenant.billing.no_bundles_description', {
+                                    {t('billing.no_bundles_description', {
                                         default: 'There are no bundles available for your current plan.',
                                     })}
                                 </p>
@@ -247,7 +247,7 @@ function BundlesPageContent({
                                         isInCart={hasProduct(bundle.slug)}
                                         hasConflicts={hasConflicts}
                                         conflictMessage={hasConflicts
-                                            ? t('tenant.billing.bundle_conflict', {
+                                            ? t('billing.bundle_conflict', {
                                                 default: 'You already have: :addons',
                                                 addons: conflicts.join(', '),
                                             }).replace(':addons', conflicts.join(', '))

@@ -38,8 +38,8 @@ function ProjectShow({ project }: ProjectShowProps) {
   const fileUploadLimit = tenant?.plan?.limits?.fileUploadSize ?? 10;
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-    { title: t('tenant.projects.title'), href: admin.projects.index.url() },
+    { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+    { title: t('projects.page.title'), href: admin.projects.index.url() },
     { title: project.name, href: admin.projects.show.url(project.id) },
   ];
 
@@ -98,12 +98,12 @@ function ProjectShow({ project }: ProjectShowProps) {
           <PageHeaderContent>
             <PageTitle>{project.name}</PageTitle>
             <PageDescription>
-              {t('tenant.projects.created_by', { name: project.user?.name ?? t('common.unknown'), date: project.created_at })}
+              {t('projects.created_by', { name: project.user?.name ?? t('common.unknown'), date: project.created_at })}
             </PageDescription>
           </PageHeaderContent>
           <PageHeaderActions>
             <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-              {project.status === 'active' ? t('tenant.projects.status_active') : t('tenant.projects.status_archived')}
+              {project.status === 'active' ? t('projects.page.status_active') : t('projects.page.status_archived')}
             </Badge>
           </PageHeaderActions>
         </PageHeader>
@@ -129,9 +129,9 @@ function ProjectShow({ project }: ProjectShowProps) {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Paperclip className="h-5 w-5" />
-                  {t('tenant.projects.attachments')} ({project.attachments.length})
+                  {t('projects.page.attachments')} ({project.attachments.length})
                 </CardTitle>
-                <CardDescription>{t('tenant.projects.upload_files_limit', { limit: fileUploadLimit })}</CardDescription>
+                <CardDescription>{t('projects.upload_files_limit', { limit: fileUploadLimit })}</CardDescription>
               </div>
               <form onSubmit={(e) => handleFileUpload(e, 'attachments')}>
                 <Input
@@ -147,7 +147,7 @@ function ProjectShow({ project }: ProjectShowProps) {
                   disabled={uploadingAttachment}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  {uploadingAttachment ? t('tenant.projects.uploading') : t('tenant.projects.upload_file')}
+                  {uploadingAttachment ? t('projects.page.uploading') : t('projects.page.upload_file')}
                 </Button>
               </form>
             </div>
@@ -155,15 +155,15 @@ function ProjectShow({ project }: ProjectShowProps) {
           <CardContent>
             {project.attachments.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                {t('tenant.projects.no_attachments')}
+                {t('projects.page.no_attachments')}
               </p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('common.name')}</TableHead>
-                    <TableHead>{t('tenant.projects.size')}</TableHead>
-                    <TableHead>{t('tenant.projects.type')}</TableHead>
+                    <TableHead>{t('projects.page.size')}</TableHead>
+                    <TableHead>{t('projects.page.type')}</TableHead>
                     <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -177,7 +177,7 @@ function ProjectShow({ project }: ProjectShowProps) {
                         <Button variant="ghost" size="sm" asChild>
                           <a href={file.url}>
                             <Download className="mr-2 h-4 w-4" />
-                            {t('tenant.projects.download')}
+                            {t('projects.page.download')}
                           </a>
                         </Button>
                         <Button
@@ -204,9 +204,9 @@ function ProjectShow({ project }: ProjectShowProps) {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <ImageIcon className="h-5 w-5" />
-                  {t('tenant.projects.images')} ({project.images.length})
+                  {t('projects.page.images')} ({project.images.length})
                 </CardTitle>
-                <CardDescription>{t('tenant.projects.upload_images_limit', { limit: fileUploadLimit })}</CardDescription>
+                <CardDescription>{t('projects.upload_images_limit', { limit: fileUploadLimit })}</CardDescription>
               </div>
               <form onSubmit={(e) => handleFileUpload(e, 'images')}>
                 <Input
@@ -223,7 +223,7 @@ function ProjectShow({ project }: ProjectShowProps) {
                   disabled={uploadingImage}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  {uploadingImage ? t('tenant.projects.uploading') : t('tenant.projects.upload_image')}
+                  {uploadingImage ? t('projects.page.uploading') : t('projects.page.upload_image')}
                 </Button>
               </form>
             </div>
@@ -231,7 +231,7 @@ function ProjectShow({ project }: ProjectShowProps) {
           <CardContent>
             {project.images.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                {t('tenant.projects.no_images')}
+                {t('projects.page.no_images')}
               </p>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

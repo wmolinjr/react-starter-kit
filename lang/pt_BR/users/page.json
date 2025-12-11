@@ -1,0 +1,15 @@
+{
+    "users.page.admin_description": "Acesso administrativo limitado",
+    "users.page.all_users": "Todos os Usuários",
+    "users.page.delete_confirm": "Tem certeza que deseja excluir este usuário?",
+    "users.page.description": "Visualize e gerencie todos os usuários da plataforma",
+    "users.page.email_verified": "E-mail Verificado",
+    "users.page.no_users": "Nenhum usuário encontrado",
+    "users.page.pending": "Pendente",
+    "users.page.pending_verification": "Verificação Pendente",
+    "users.page.search_placeholder": "Buscar usuários...",
+    "users.page.super_admin_description": "Acesso total a todos os tenants e configurações do sistema",
+    "users.page.title": "Gerenciamento de Usuários",
+    "users.page.user_details": "Detalhes do Usuário",
+    "users.page.verified": "Verificado"
+}

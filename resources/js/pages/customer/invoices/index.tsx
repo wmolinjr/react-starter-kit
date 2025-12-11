@@ -25,15 +25,15 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'paid':
-                return <Badge variant="default">{t('billing.paid')}</Badge>;
+                return <Badge variant="default">{t('billing.page.paid')}</Badge>;
             case 'open':
-                return <Badge variant="secondary">{t('billing.open')}</Badge>;
+                return <Badge variant="secondary">{t('billing.page.open')}</Badge>;
             case 'failed':
-                return <Badge variant="destructive">{t('billing.failed')}</Badge>;
+                return <Badge variant="destructive">{t('billing.page.failed')}</Badge>;
             case 'refunded':
-                return <Badge variant="outline">{t('billing.refunded')}</Badge>;
+                return <Badge variant="outline">{t('billing.page.refunded')}</Badge>;
             case 'void':
-                return <Badge variant="outline">{t('billing.void')}</Badge>;
+                return <Badge variant="outline">{t('billing.page.void')}</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }

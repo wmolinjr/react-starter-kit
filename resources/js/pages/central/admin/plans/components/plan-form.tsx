@@ -173,7 +173,7 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label>{t('admin.plans.form.price_cents')}</Label>
+                            <Label>{t('plans.form.price_cents')}</Label>
                             <Input
                                 type="number"
                                 value={data.price}
@@ -185,7 +185,7 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                             </p>
                         </div>
                         <div className="space-y-2">
-                            <Label>{t('admin.plans.form.currency')}</Label>
+                            <Label>{t('plans.form.currency')}</Label>
                             <Select value={data.currency} onValueChange={(v) => setData('currency', v)}>
                                 <SelectTrigger>
                                     <SelectValue />
@@ -198,7 +198,7 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label>{t('admin.plans.form.billing_period')}</Label>
+                            <Label>{t('plans.form.billing_period')}</Label>
                             <Select value={data.billing_period} onValueChange={(v) => setData('billing_period', v)}>
                                 <SelectTrigger>
                                     <SelectValue />
@@ -288,11 +288,11 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
 
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('admin.plans.form.available_addons')}</CardTitle>
+                    <CardTitle>{t('plans.form.available_addons')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                     {addons.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">{t('admin.plans.form.no_addons')}</p>
+                        <p className="text-muted-foreground text-sm">{t('plans.form.no_addons')}</p>
                     ) : (
                         addons.map((addon) => (
                             <div key={addon.id} className="flex items-center gap-2">
@@ -382,7 +382,7 @@ export function PlanForm({ plan, addons, featureDefinitions, limitDefinitions, c
                     {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={processing || isSubmitting}>
-                    {plan?.id ? t('admin.plans.update_plan') : t('admin.plans.create_plan')}
+                    {plan?.id ? t('plans.page.update_plan') : t('plans.page.create_plan')}
                 </Button>
             </div>
         </form>

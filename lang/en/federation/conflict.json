@@ -1,0 +1,5 @@
+{
+    "federation.conflict.dismissed": "Dismissed",
+    "federation.conflict.pending": "Pending",
+    "federation.conflict.resolved": "Resolved"
+}

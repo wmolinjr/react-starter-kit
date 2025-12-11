@@ -1,0 +1,10 @@
+{
+    "federation.sync_strategy.description": "Elija cómo deben resolverse los conflictos de datos entre inquilinos",
+    "federation.sync_strategy.last_write_wins": "Última Escritura Gana",
+    "federation.sync_strategy.last_write_wins_description": "El cambio más reciente tiene prioridad sin importar la fuente",
+    "federation.sync_strategy.manual_review": "Revisión Manual",
+    "federation.sync_strategy.manual_review_description": "Todos los conflictos requieren resolución manual por un administrador",
+    "federation.sync_strategy.master_wins": "Maestro Gana",
+    "federation.sync_strategy.master_wins_description": "Los cambios del inquilino principal siempre tienen prioridad sobre otros inquilinos",
+    "federation.sync_strategy.title": "Estrategia de Sincronización"
+}

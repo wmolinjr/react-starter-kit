@@ -90,9 +90,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
     const { processingId, federateUser, unfederateUser, syncUser, federateAll, federateBulk } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('tenant.federation.title'), href: admin.settings.federation.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
+        { title: t('federation.page.title'), href: admin.settings.federation.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -158,22 +158,22 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
 
     const getSyncStrategyLabel = (strategy: string) => {
         const labels: Record<string, string> = {
-            master_wins: t('tenant.federation.sync_strategy.master_wins'),
-            last_write_wins: t('tenant.federation.sync_strategy.last_write_wins'),
-            manual_review: t('tenant.federation.sync_strategy.manual_review'),
+            master_wins: t('federation.sync_strategy.master_wins'),
+            last_write_wins: t('federation.sync_strategy.last_write_wins'),
+            manual_review: t('federation.sync_strategy.manual_review'),
         };
         return labels[strategy] || strategy;
     };
 
     return (
         <>
-            <Head title={t('tenant.federation.title')} />
+            <Head title={t('federation.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Network}>{t('tenant.federation.title')}</PageTitle>
-                        <PageDescription>{t('tenant.federation.description')}</PageDescription>
+                        <PageTitle icon={Network}>{t('federation.page.title')}</PageTitle>
+                        <PageDescription>{t('federation.page.description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -183,9 +183,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                         <Card className="border-dashed">
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <Network className="text-muted-foreground mb-4 h-12 w-12" />
-                                <h3 className="mb-2 text-lg font-medium">{t('tenant.federation.not_federated')}</h3>
+                                <h3 className="mb-2 text-lg font-medium">{t('federation.page.not_federated')}</h3>
                                 <p className="text-muted-foreground mb-4 text-center text-sm">
-                                    {t('tenant.federation.not_federated_description')}
+                                    {t('federation.page.not_federated_description')}
                                 </p>
                             </CardContent>
                         </Card>
@@ -202,23 +202,23 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                 {group.is_master && (
                                                     <Badge variant="default" className="ml-2">
                                                         <Crown className="mr-1 h-3 w-3" />
-                                                        {t('tenant.federation.master')}
+                                                        {t('federation.page.master')}
                                                     </Badge>
                                                 )}
                                             </CardTitle>
                                             <CardDescription>
-                                                {group.description || t('tenant.federation.group_member')}
+                                                {group.description || t('federation.page.group_member')}
                                             </CardDescription>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             {membership?.sync_enabled ? (
                                                 <Badge variant="default">
                                                     <RefreshCw className="mr-1 h-3 w-3" />
-                                                    {t('tenant.federation.sync_active')}
+                                                    {t('federation.page.sync_active')}
                                                 </Badge>
                                             ) : (
                                                 <Badge variant="secondary">
-                                                    {t('tenant.federation.sync_paused')}
+                                                    {t('federation.page.sync_paused')}
                                                 </Badge>
                                             )}
                                         </div>
@@ -228,13 +228,13 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                     <div className="grid gap-4 md:grid-cols-3">
                                         <div>
                                             <p className="text-muted-foreground text-sm">
-                                                {t('tenant.federation.sync_strategy.title')}
+                                                {t('federation.sync_strategy.title')}
                                             </p>
                                             <p className="font-medium">{getSyncStrategyLabel(group.sync_strategy)}</p>
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground text-sm">
-                                                {t('tenant.federation.joined_at')}
+                                                {t('federation.page.joined_at')}
                                             </p>
                                             <p className="font-medium">
                                                 {membership?.joined_at
@@ -244,7 +244,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground text-sm">
-                                                {t('tenant.federation.default_role')}
+                                                {t('federation.page.default_role')}
                                             </p>
                                             <p className="font-medium">{membership?.default_role || 'member'}</p>
                                         </div>
@@ -262,7 +262,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground text-sm">
-                                                    {t('tenant.federation.total_tenants')}
+                                                    {t('federation.page.total_tenants')}
                                                 </p>
                                                 <p className="text-2xl font-bold">{stats.total_group_tenants}</p>
                                             </div>
@@ -277,7 +277,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground text-sm">
-                                                    {t('tenant.federation.federated_users')}
+                                                    {t('federation.page.federated_users')}
                                                 </p>
                                                 <p className="text-2xl font-bold">{stats.federated_users_count}</p>
                                             </div>
@@ -292,7 +292,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground text-sm">
-                                                    {t('tenant.federation.local_only')}
+                                                    {t('federation.page.local_only')}
                                                 </p>
                                                 <p className="text-2xl font-bold">{stats.local_users_count}</p>
                                             </div>
@@ -305,9 +305,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                             {group.is_master && (
                                 <Alert>
                                     <Crown className="h-4 w-4" />
-                                    <AlertTitle>{t('tenant.federation.master_tenant')}</AlertTitle>
+                                    <AlertTitle>{t('federation.page.master_tenant')}</AlertTitle>
                                     <AlertDescription>
-                                        {t('tenant.federation.master_tenant_description')}
+                                        {t('federation.page.master_tenant_description')}
                                     </AlertDescription>
                                 </Alert>
                             )}
@@ -317,9 +317,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <CardTitle>{t('tenant.federation.federated_users')}</CardTitle>
+                                            <CardTitle>{t('federation.page.federated_users')}</CardTitle>
                                             <CardDescription>
-                                                {t('tenant.federation.federated_users_description')}
+                                                {t('federation.page.federated_users_description')}
                                             </CardDescription>
                                         </div>
                                         {localOnlyUsers.length > 0 && (
@@ -327,26 +327,26 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                 <DialogTrigger asChild>
                                                     <Button>
                                                         <LinkIcon className="mr-2 h-4 w-4" />
-                                                        {t('tenant.federation.federate_user')}
+                                                        {t('federation.page.federate_user')}
                                                     </Button>
                                                 </DialogTrigger>
                                                 <DialogContent>
                                                     <DialogHeader>
-                                                        <DialogTitle>{t('tenant.federation.federate_user')}</DialogTitle>
+                                                        <DialogTitle>{t('federation.page.federate_user')}</DialogTitle>
                                                         <DialogDescription>
-                                                            {t('tenant.federation.federate_user_description')}
+                                                            {t('federation.page.federate_user_description')}
                                                         </DialogDescription>
                                                     </DialogHeader>
                                                     <div className="space-y-4 py-4">
                                                         <div className="space-y-2">
-                                                            <Label>{t('tenant.federation.select_user')}</Label>
+                                                            <Label>{t('federation.page.select_user')}</Label>
                                                             <Select
                                                                 value={selectedUserId}
                                                                 onValueChange={setSelectedUserId}
                                                             >
                                                                 <SelectTrigger>
                                                                     <SelectValue
-                                                                        placeholder={t('tenant.federation.select_user_placeholder')}
+                                                                        placeholder={t('federation.page.select_user_placeholder')}
                                                                     />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
@@ -361,7 +361,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                         <Alert>
                                                             <AlertCircle className="h-4 w-4" />
                                                             <AlertDescription>
-                                                                {t('tenant.federation.federate_warning')}
+                                                                {t('federation.page.federate_warning')}
                                                             </AlertDescription>
                                                         </Alert>
                                                     </div>
@@ -370,7 +370,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                             {t('common.cancel')}
                                                         </Button>
                                                         <Button onClick={handleFederateUser} disabled={!selectedUserId || processingId === selectedUserId}>
-                                                            {processingId === selectedUserId ? '...' : t('tenant.federation.federate')}
+                                                            {processingId === selectedUserId ? '...' : t('federation.page.federate')}
                                                         </Button>
                                                     </DialogFooter>
                                                 </DialogContent>
@@ -415,7 +415,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                         <TableCell>
                                                             <Badge variant="default">
                                                                 <LinkIcon className="mr-1 h-3 w-3" />
-                                                                {t('tenant.federation.federated')}
+                                                                {t('federation.page.federated')}
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell>
@@ -424,7 +424,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => handleSyncUser(user.id)}
-                                                                    title={t('tenant.federation.sync')}
+                                                                    title={t('federation.page.sync')}
                                                                 >
                                                                     <RefreshCw className="h-4 w-4" />
                                                                 </Button>
@@ -434,7 +434,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                                     onClick={() =>
                                                                         handleUnfederateUser(user.id, user.name)
                                                                     }
-                                                                    title={t('tenant.federation.unfederate')}
+                                                                    title={t('federation.page.unfederate')}
                                                                 >
                                                                     <Unlink className="h-4 w-4" />
                                                                 </Button>
@@ -448,7 +448,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                         <div className="py-8 text-center">
                                             <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                                             <p className="text-muted-foreground">
-                                                {t('tenant.federation.no_federated_users')}
+                                                {t('federation.page.no_federated_users')}
                                             </p>
                                         </div>
                                     )}
@@ -461,9 +461,9 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <CardTitle>{t('tenant.federation.local_only_users')}</CardTitle>
+                                                <CardTitle>{t('federation.page.local_only_users')}</CardTitle>
                                                 <CardDescription>
-                                                    {t('tenant.federation.local_only_users_description')}
+                                                    {t('federation.page.local_only_users_description')}
                                                 </CardDescription>
                                             </div>
                                             <div className="flex gap-2">
@@ -474,7 +474,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                         disabled={processingId === 'federate-bulk'}
                                                     >
                                                         <LinkIcon className="mr-2 h-4 w-4" />
-                                                        {t('tenant.federation.federate_selected', { count: selectedUsers.size })}
+                                                        {t('federation.federate_selected', { count: selectedUsers.size })}
                                                     </Button>
                                                 )}
                                                 <Button
@@ -482,7 +482,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                     disabled={processingId === 'federate-all'}
                                                 >
                                                     <Users className="mr-2 h-4 w-4" />
-                                                    {t('tenant.federation.federate_all')}
+                                                    {t('federation.page.federate_all')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -533,7 +533,7 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge variant="secondary">
-                                                                {t('tenant.federation.local_only')}
+                                                                {t('federation.page.local_only')}
                                                             </Badge>
                                                         </TableCell>
                                                     </TableRow>
@@ -552,15 +552,15 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
             <AlertDialog open={unfederateDialog.open} onOpenChange={(open) => !open && setUnfederateDialog({ open: false, userId: '', userName: '' })}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{t('tenant.federation.unfederate_title')}</AlertDialogTitle>
+                        <AlertDialogTitle>{t('federation.page.unfederate_title')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('tenant.federation.unfederate_confirm', { name: unfederateDialog.userName })}
+                            {t('federation.unfederate_confirm', { name: unfederateDialog.userName })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={confirmUnfederateUser}>
-                            {t('tenant.federation.unfederate')}
+                            {t('federation.page.unfederate')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -570,15 +570,15 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
             <AlertDialog open={federateAllDialog} onOpenChange={setFederateAllDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{t('tenant.federation.federate_all')}</AlertDialogTitle>
+                        <AlertDialogTitle>{t('federation.page.federate_all')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('tenant.federation.federate_all_confirm', { count: localOnlyUsers.length })}
+                            {t('federation.federate_all_confirm', { count: localOnlyUsers.length })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={confirmFederateAll}>
-                            {t('tenant.federation.federate_all')}
+                            {t('federation.page.federate_all')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -588,15 +588,15 @@ function FederationSettings({ stats, group, membership, federatedUsers, localOnl
             <AlertDialog open={federateBulkDialog} onOpenChange={setFederateBulkDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>{t('tenant.federation.federate_selected_title')}</AlertDialogTitle>
+                        <AlertDialogTitle>{t('federation.page.federate_selected_title')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('tenant.federation.federate_selected_confirm', { count: selectedUsers.size })}
+                            {t('federation.federate_selected_confirm', { count: selectedUsers.size })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={confirmFederateBulk}>
-                            {t('tenant.federation.federate_selected', { count: selectedUsers.size })}
+                            {t('federation.federate_selected', { count: selectedUsers.size })}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

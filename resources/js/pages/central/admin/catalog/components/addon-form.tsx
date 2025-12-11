@@ -196,9 +196,9 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
             {/* Type Selection - Most Important */}
             <Card className="border-2">
                 <CardHeader>
-                    <CardTitle>{t('admin.catalog.form.type')}</CardTitle>
+                    <CardTitle>{t('catalog.form.type')}</CardTitle>
                     <CardDescription>
-                        {t('admin.catalog.form.type_description')}
+                        {t('catalog.form.type_description')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -239,10 +239,10 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
             <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                    {isQuotaType && t('admin.catalog.form.type_hint_quota')}
-                    {isFeatureType && t('admin.catalog.form.type_hint_feature')}
-                    {isMeteredType && t('admin.catalog.form.type_hint_metered')}
-                    {isCreditType && t('admin.catalog.form.type_hint_credit')}
+                    {isQuotaType && t('catalog.form.type_hint_quota')}
+                    {isFeatureType && t('catalog.form.type_hint_feature')}
+                    {isMeteredType && t('catalog.form.type_hint_metered')}
+                    {isCreditType && t('catalog.form.type_hint_credit')}
                 </AlertDescription>
             </Alert>
 
@@ -292,8 +292,8 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                 <CardHeader>
                     <CardTitle>{t('common.pricing')}</CardTitle>
                     <CardDescription>
-                        {showRecurringPricing && t('admin.catalog.form.pricing_recurring_hint')}
-                        {showOneTimePricing && t('admin.catalog.form.pricing_onetime_hint')}
+                        {showRecurringPricing && t('catalog.form.pricing_recurring_hint')}
+                        {showOneTimePricing && t('catalog.form.pricing_onetime_hint')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -308,7 +308,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                     onChange={e => setData('price_monthly', e.target.value)}
                                     placeholder="4900"
                                 />
-                                <p className="text-xs text-muted-foreground">{t('admin.catalog.form.price_in_cents')}</p>
+                                <p className="text-xs text-muted-foreground">{t('catalog.form.price_in_cents')}</p>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="price_yearly">{t('common.yearly')}</Label>
@@ -319,7 +319,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                     onChange={e => setData('price_yearly', e.target.value)}
                                     placeholder="49000"
                                 />
-                                <p className="text-xs text-muted-foreground">{t('admin.catalog.form.price_in_cents')}</p>
+                                <p className="text-xs text-muted-foreground">{t('catalog.form.price_in_cents')}</p>
                             </div>
                         </div>
                     )}
@@ -334,10 +334,10 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                     onChange={e => setData('price_one_time', e.target.value)}
                                     placeholder="7900"
                                 />
-                                <p className="text-xs text-muted-foreground">{t('admin.catalog.form.price_in_cents')}</p>
+                                <p className="text-xs text-muted-foreground">{t('catalog.form.price_in_cents')}</p>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="validity_months">{t('admin.catalog.form.validity_months')}</Label>
+                                <Label htmlFor="validity_months">{t('catalog.form.validity_months')}</Label>
                                 <Input
                                     id="validity_months"
                                     type="number"
@@ -361,27 +361,27 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                             ) : (
                                 <TrendingUp className="h-5 w-5 text-blue-500" />
                             )}
-                            {isCreditType ? t('admin.catalog.form.credit_target') : t('admin.catalog.form.limit_increment')}
+                            {isCreditType ? t('catalog.form.credit_target') : t('catalog.form.limit_increment')}
                         </CardTitle>
                         <CardDescription>
                             {isCreditType
-                                ? t('admin.catalog.form.credit_target_description')
-                                : t('admin.catalog.form.limit_increment_description')}
+                                ? t('catalog.form.credit_target_description')
+                                : t('catalog.form.limit_increment_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="limit_key">{t('admin.catalog.form.target_limit')}</Label>
+                                <Label htmlFor="limit_key">{t('catalog.form.target_limit')}</Label>
                                 <Select
                                     value={data.limit_key || '__none__'}
                                     onValueChange={v => setData('limit_key', v === '__none__' ? '' : v)}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder={t('admin.catalog.form.select_limit')} />
+                                        <SelectValue placeholder={t('catalog.form.select_limit')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="__none__">{t('admin.catalog.form.select_limit')}</SelectItem>
+                                        <SelectItem value="__none__">{t('catalog.form.select_limit')}</SelectItem>
                                         {limitDefinitions.map(limit => (
                                             <SelectItem key={limit.value} value={limit.value}>
                                                 <span className="flex items-center gap-2">
@@ -401,13 +401,13 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                 {!data.limit_key && (
                                     <p className="text-amber-600 text-xs">
                                         {isCreditType
-                                            ? t('admin.catalog.form.credit_limit_required_warning')
-                                            : t('admin.catalog.form.limit_required_warning')}
+                                            ? t('catalog.form.credit_limit_required_warning')
+                                            : t('catalog.form.limit_required_warning')}
                                     </p>
                                 )}
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="unit_value">{t('admin.catalog.form.increment_value')}</Label>
+                                <Label htmlFor="unit_value">{t('catalog.form.increment_value')}</Label>
                                 <Input
                                     id="unit_value"
                                     type="number"
@@ -418,13 +418,13 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                 />
                                 {selectedLimit && (
                                     <p className="text-muted-foreground text-xs">
-                                        {t('admin.catalog.form.adds_to_limit', { limit: selectedLimit.label })}
+                                        {t('catalog.form.adds_to_limit', { limit: selectedLimit.label })}
                                     </p>
                                 )}
                             </div>
                         </div>
                         <TranslatableInput
-                            label={t('admin.catalog.form.unit_label')}
+                            label={t('catalog.form.unit_label')}
                             value={data.unit_label}
                             onChange={v => setData('unit_label', v)}
                             placeholder={{ en: 'GB', pt_BR: 'GB' }}
@@ -439,15 +439,15 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Sparkles className="h-5 w-5 text-purple-500" />
-                            {t('admin.catalog.form.features_enabled')}
+                            {t('catalog.form.features_enabled')}
                         </CardTitle>
                         <CardDescription>
-                            {t('admin.catalog.form.features_enabled_description')}
+                            {t('catalog.form.features_enabled_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {Object.keys(data.features).length === 0 && (
-                            <p className="text-amber-600 text-sm">{t('admin.catalog.form.feature_required_warning')}</p>
+                            <p className="text-amber-600 text-sm">{t('catalog.form.feature_required_warning')}</p>
                         )}
                         {Object.entries(featuresByCategory).map(([category, features]) => (
                             <div key={category} className="space-y-3">
@@ -494,12 +494,12 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
             {showQuantitySection && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('admin.catalog.form.quantity_limits')}</CardTitle>
+                        <CardTitle>{t('catalog.form.quantity_limits')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="min_quantity">{t('admin.catalog.form.min_qty')}</Label>
+                                <Label htmlFor="min_quantity">{t('catalog.form.min_qty')}</Label>
                                 <Input
                                     id="min_quantity"
                                     type="number"
@@ -508,7 +508,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="max_quantity">{t('admin.catalog.form.max_qty')}</Label>
+                                <Label htmlFor="max_quantity">{t('catalog.form.max_qty')}</Label>
                                 <Input
                                     id="max_quantity"
                                     type="number"
@@ -523,7 +523,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                                 checked={data.stackable}
                                 onCheckedChange={v => setData('stackable', !!v)}
                             />
-                            <Label htmlFor="stackable">{t('admin.catalog.form.stackable')}</Label>
+                            <Label htmlFor="stackable">{t('catalog.form.stackable')}</Label>
                         </div>
                     </CardContent>
                 </Card>
@@ -607,7 +607,7 @@ export function AddonForm({ addon, types, plans, featureDefinitions = [], limitD
                     {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={processing}>
-                    {isEdit ? t('admin.catalog.update_addon') : t('admin.catalog.create_addon')}
+                    {isEdit ? t('catalog.page.update_addon') : t('catalog.page.create_addon')}
                 </Button>
             </div>
         </form>

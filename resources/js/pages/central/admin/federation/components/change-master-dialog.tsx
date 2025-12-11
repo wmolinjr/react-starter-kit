@@ -72,10 +72,10 @@ export function ChangeMasterDialog({
                 <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                         <Crown className="h-5 w-5 text-yellow-500" />
-                        {t('admin.federation.change_master.title')}
+                        {t('federation.change_master.title')}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        {t('admin.federation.change_master.description', { group: groupName })}
+                        {t('federation.change_master.description', { group: groupName })}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
@@ -83,18 +83,18 @@ export function ChangeMasterDialog({
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription>
-                            {t('admin.federation.change_master.warning')}
+                            {t('federation.change_master.warning')}
                         </AlertDescription>
                     </Alert>
 
                     <div className="space-y-2">
-                        <Label>{t('admin.federation.change_master.new_master')}</Label>
+                        <Label>{t('federation.change_master.new_master')}</Label>
                         <Select
                             value={data.new_master_tenant_id}
                             onValueChange={(value) => setData('new_master_tenant_id', value)}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={t('admin.federation.change_master.select_tenant')} />
+                                <SelectValue placeholder={t('federation.change_master.select_tenant')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {availableTenants.map((tenant) => (
@@ -109,7 +109,7 @@ export function ChangeMasterDialog({
                         </Select>
                         {selectedTenant && (
                             <p className="text-muted-foreground text-sm">
-                                {t('admin.federation.change_master.selected_info', {
+                                {t('federation.change_master.selected_info', {
                                     tenant: selectedTenant.name,
                                 })}
                             </p>
@@ -123,7 +123,7 @@ export function ChangeMasterDialog({
                             onCheckedChange={(checked) => setData('confirm', checked === true)}
                         />
                         <Label htmlFor="confirm" className="cursor-pointer text-sm leading-tight">
-                            {t('admin.federation.change_master.confirm_text')}
+                            {t('federation.change_master.confirm_text')}
                         </Label>
                     </div>
                 </div>
@@ -137,7 +137,7 @@ export function ChangeMasterDialog({
                     >
                         {processing
                             ? t('common.processing')
-                            : t('admin.federation.change_master.confirm_button')}
+                            : t('federation.change_master.confirm_button')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

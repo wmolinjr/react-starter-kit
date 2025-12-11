@@ -54,9 +54,9 @@ function DomainsSettings({
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('tenant.settings.domains'), href: admin.settings.domains.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
+        { title: t('settings.domains'), href: admin.settings.domains.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -78,14 +78,14 @@ function DomainsSettings({
 
     return (
         <>
-            <Head title={t('tenant.settings.domains')} />
+            <Head title={t('settings.domains')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Globe}>{t('tenant.settings.domains')}</PageTitle>
+                        <PageTitle icon={Globe}>{t('settings.domains')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.settings.domains_page_description', { name: tenantData.name })}
+                            {t('settings.domains_page_description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -95,17 +95,17 @@ function DomainsSettings({
                 {/* Current Domains */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.settings.configured_domains')}</CardTitle>
+                        <CardTitle>{t('settings.configured_domains')}</CardTitle>
                         <CardDescription>
-                            {t('tenant.settings.configured_domains_description')}
+                            {t('settings.configured_domains_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>{t('tenant.settings.domain')}</TableHead>
-                                    <TableHead>{t('tenant.settings.type')}</TableHead>
+                                    <TableHead>{t('settings.domain')}</TableHead>
+                                    <TableHead>{t('settings.type')}</TableHead>
                                     <TableHead className="text-right">
                                         {t('common.actions')}
                                     </TableHead>
@@ -119,10 +119,10 @@ function DomainsSettings({
                                         </TableCell>
                                         <TableCell>
                                             {domain.is_primary ? (
-                                                <Badge>{t('tenant.settings.primary')}</Badge>
+                                                <Badge>{t('settings.primary')}</Badge>
                                             ) : (
                                                 <Badge variant="secondary">
-                                                    {t('tenant.settings.custom')}
+                                                    {t('settings.custom')}
                                                 </Badge>
                                             )}
                                         </TableCell>
@@ -140,10 +140,10 @@ function DomainsSettings({
                                                     <AlertDialogContent>
                                                         <AlertDialogHeader>
                                                             <AlertDialogTitle>
-                                                                {t('tenant.settings.remove_domain_title')}
+                                                                {t('settings.remove_domain_title')}
                                                             </AlertDialogTitle>
                                                             <AlertDialogDescription>
-                                                                {t('tenant.settings.remove_domain_description', { domain: domain.domain })}
+                                                                {t('settings.remove_domain_description', { domain: domain.domain })}
                                                             </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
@@ -175,9 +175,9 @@ function DomainsSettings({
                 {hasCustomDomainFeature ? (
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('tenant.settings.add_domain')}</CardTitle>
+                            <CardTitle>{t('settings.add_domain')}</CardTitle>
                             <CardDescription>
-                                {t('tenant.settings.add_domain_description')}
+                                {t('settings.add_domain_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -187,7 +187,7 @@ function DomainsSettings({
                             >
                                 <div className="flex-1 space-y-2">
                                     <Label htmlFor="domain" className="sr-only">
-                                        {t('tenant.settings.domain')}
+                                        {t('settings.domain')}
                                     </Label>
                                     <Input
                                         id="domain"
@@ -214,20 +214,20 @@ function DomainsSettings({
 
                             <div className="mt-4 p-4 bg-muted rounded-lg">
                                 <p className="text-sm font-medium mb-2">
-                                    {t('tenant.settings.dns_instructions')}:
+                                    {t('settings.dns_instructions')}:
                                 </p>
                                 <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
                                     <li>
-                                        {t('tenant.settings.dns_step_1')}
+                                        {t('settings.dns_step_1')}
                                     </li>
                                     <li>
-                                        {t('tenant.settings.dns_step_2')}{' '}
+                                        {t('settings.dns_step_2')}{' '}
                                         <code className="bg-background px-1 rounded">
                                             app.setor3.app
                                         </code>
                                     </li>
                                     <li>
-                                        {t('tenant.settings.dns_step_3')}
+                                        {t('settings.dns_step_3')}
                                     </li>
                                 </ol>
                             </div>
@@ -238,13 +238,13 @@ function DomainsSettings({
                         <CardContent className="py-8 text-center">
                             <Globe className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                             <h3 className="text-lg font-semibold mb-2">
-                                {t('tenant.settings.custom_domains')}
+                                {t('settings.custom_domains')}
                             </h3>
                             <p className="text-muted-foreground mb-4">
-                                {t('tenant.settings.upgrade_for_domains')}
+                                {t('settings.upgrade_for_domains')}
                             </p>
                             <Button asChild>
-                                <Link href="/billing">{t('tenant.settings.view_plans')}</Link>
+                                <Link href="/billing">{t('settings.view_plans')}</Link>
                             </Button>
                         </CardContent>
                     </Card>

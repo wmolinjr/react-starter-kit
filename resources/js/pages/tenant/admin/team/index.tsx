@@ -45,8 +45,8 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-    { title: t('tenant.team.title'), href: admin.team.index.url() },
+    { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+    { title: t('team.page.title'), href: admin.team.index.url() },
   ];
 
   useSetBreadcrumbs(breadcrumbs);
@@ -63,7 +63,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
   };
 
   const handleUpdateRole = (userId: string, newRole: string) => {
-    if (confirm(t('tenant.team.confirm_role_change', { role: newRole }))) {
+    if (confirm(t('team.confirm_role_change', { role: newRole }))) {
       router.patch(
         `/team/${userId}/role`,
         { role: newRole },
@@ -78,7 +78,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
   };
 
   const handleRemoveMember = (userId: string, userName: string) => {
-    if (confirm(t('tenant.team.confirm_remove', { name: userName }))) {
+    if (confirm(t('team.confirm_remove', { name: userName }))) {
       router.delete(`/team/${userId}`, {
         preserveScroll: true,
         onSuccess: () => {
@@ -90,21 +90,21 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
 
   return (
     <>
-      <Head title={t('tenant.team.page_title')} />
+      <Head title={t('team.page.page_title')} />
 
       <Page>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle icon={Users}>{t('tenant.team.page_title')}</PageTitle>
+            <PageTitle icon={Users}>{t('team.page.page_title')}</PageTitle>
             <PageDescription>
-              {t('tenant.team.description', { name: tenantData?.name ?? '' })}
+              {t('team.description', { name: tenantData?.name ?? '' })}
             </PageDescription>
           </PageHeaderContent>
           <PageHeaderActions>
             <Can permission="team:invite">
               <Button onClick={() => setInviteDialogOpen(true)}>
                 <UserPlus className="mr-2 h-4 w-4" />
-                {t('tenant.team.invite_member')}
+                {t('team.page.invite_member')}
               </Button>
             </Can>
           </PageHeaderActions>
@@ -115,7 +115,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
           {teamStats.max_users && (
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">
-                {t('tenant.team.active_members')}: <strong>{teamStats.current_users}</strong> / {teamStats.max_users}
+                {t('team.page.active_members')}: <strong>{teamStats.current_users}</strong> / {teamStats.max_users}
               </p>
             </div>
           )}
@@ -136,7 +136,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                 {members.length === 0 && pendingInvitations.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      {t('tenant.team.no_members')}
+                      {t('team.page.no_members')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -149,7 +149,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                         <TableCell>{getRoleBadge(member.role)}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                            {t('tenant.team.status_active')}
+                            {t('team.page.status_active')}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -167,15 +167,15 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                                   <>
                                     <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'admin')}>
                                       <Shield className="mr-2 h-4 w-4" />
-                                      {t('tenant.team.promote_to_admin')}
+                                      {t('team.page.promote_to_admin')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'member')}>
                                       <Shield className="mr-2 h-4 w-4" />
-                                      {t('tenant.team.set_as_member')}
+                                      {t('team.page.set_as_member')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleUpdateRole(member.id, 'guest')}>
                                       <Shield className="mr-2 h-4 w-4" />
-                                      {t('tenant.team.set_as_guest')}
+                                      {t('team.page.set_as_guest')}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                   </>
@@ -185,7 +185,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                                   onClick={() => handleRemoveMember(member.id, member.name)}
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />
-                                  {t('tenant.team.remove_from_team')}
+                                  {t('team.page.remove_from_team')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -198,7 +198,7 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                     {pendingInvitations.map((invitation) => (
                       <TableRow key={`inv-${invitation.id}`} className="bg-muted/30">
                         <TableCell className="font-medium text-muted-foreground">
-                          {t('tenant.team.pending_user')}
+                          {t('team.page.pending_user')}
                         </TableCell>
                         <TableCell>{invitation.email}</TableCell>
                         <TableCell>{getRoleBadge(invitation.role)}</TableCell>
@@ -206,10 +206,10 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                           <Badge variant="outline" className="gap-1">
                             <Mail className="h-3 w-3" />
                             {invitation.is_expired ? (
-                              <span className="text-destructive">{t('tenant.team.invite_expired')}</span>
+                              <span className="text-destructive">{t('team.page.invite_expired')}</span>
                             ) : (
                               <>
-                                {t('tenant.team.pending_invite')}
+                                {t('team.page.pending_invite')}
                                 {invitation.expires_in_days !== null && (
                                   <span className="text-muted-foreground ml-1">
                                     ({invitation.expires_in_days}d)
@@ -232,11 +232,11 @@ function TeamIndex({ members, pendingInvitations, teamStats }: Props) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
                                   <Mail className="mr-2 h-4 w-4" />
-                                  {t('tenant.team.resend_invite')}
+                                  {t('team.page.resend_invite')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="text-destructive">
                                   <Trash2 className="mr-2 h-4 w-4" />
-                                  {t('tenant.team.cancel_invite')}
+                                  {t('team.page.cancel_invite')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

@@ -1,0 +1,7 @@
+{
+    "payments.stats.completed": "Completed",
+    "payments.stats.failed": "Failed",
+    "payments.stats.pending": "Pending",
+    "payments.stats.refunded": "Refunded",
+    "payments.stats.total": "Total Revenue"
+}

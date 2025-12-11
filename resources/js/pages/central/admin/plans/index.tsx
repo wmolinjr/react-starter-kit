@@ -37,8 +37,8 @@ function PlansIndex({ plans }: Props) {
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.plans.title'), href: admin.plans.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('plans.page.title'), href: admin.plans.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -52,30 +52,30 @@ function PlansIndex({ plans }: Props) {
     };
 
     const handleDelete = (planId: string) => {
-        if (confirm(t('admin.plans.delete_confirm'))) {
+        if (confirm(t('plans.page.delete_confirm'))) {
             router.delete(destroy.url(planId));
         }
     };
 
     return (
         <>
-            <Head title={t('admin.plans.title')} />
+            <Head title={t('plans.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.plans.title')}</PageTitle>
-                        <PageDescription>{t('admin.plans.description')}</PageDescription>
+                        <PageTitle>{t('plans.page.title')}</PageTitle>
+                        <PageDescription>{t('plans.page.description')}</PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleSyncAll}>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            {t('admin.plans.sync_all')}
+                            {t('plans.page.sync_all')}
                         </Button>
                         <Button asChild>
                             <Link href={create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('admin.plans.new_plan')}
+                                {t('plans.page.new_plan')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -103,7 +103,7 @@ function PlansIndex({ plans }: Props) {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => handleSync(plan.id)}
-                                            title={t('admin.plans.sync_with_stripe')}
+                                            title={t('plans.page.sync_with_stripe')}
                                         >
                                             <RefreshCw className="h-4 w-4" />
                                         </Button>
@@ -151,7 +151,7 @@ function PlansIndex({ plans }: Props) {
                                 <div>
                                     <div className="text-3xl font-bold">{plan.formatted_price}</div>
                                     <div className="text-muted-foreground text-sm">
-                                        {t('admin.plans.per')} {plan.billing_period === 'yearly' ? t('admin.plans.year') : t('admin.plans.month')}
+                                        {t('plans.page.per')} {plan.billing_period === 'yearly' ? t('plans.page.year') : t('plans.page.month')}
                                     </div>
                                 </div>
 
@@ -187,12 +187,12 @@ function PlansIndex({ plans }: Props) {
                                     {plan.stripe_price_id ? (
                                         <Badge variant="outline" className="text-green-600">
                                             <Check className="mr-1 h-3 w-3" />
-                                            {t('admin.plans.synced')}
+                                            {t('plans.page.synced')}
                                         </Badge>
                                     ) : (
                                         <Badge variant="outline" className="text-yellow-600">
                                             <X className="mr-1 h-3 w-3" />
-                                            {t('admin.plans.not_synced')}
+                                            {t('plans.page.not_synced')}
                                         </Badge>
                                     )}
                                     {!plan.is_active && (
@@ -207,11 +207,11 @@ function PlansIndex({ plans }: Props) {
                 {plans.length === 0 && (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
-                            <p className="text-muted-foreground mb-4">{t('admin.plans.no_plans')}</p>
+                            <p className="text-muted-foreground mb-4">{t('plans.page.no_plans')}</p>
                             <Button asChild>
                                 <Link href={create.url()}>
                                     <Plus className="mr-2 h-4 w-4" />
-                                    {t('admin.plans.create_first')}
+                                    {t('plans.page.create_first')}
                                 </Link>
                             </Button>
                         </CardContent>

@@ -1,0 +1,14 @@
+{
+    "federation.settings.auto_create_on_login": "Auto-Create on Login",
+    "federation.settings.auto_create_on_login_description": "Automatically create local user when a federated user logs into a branch tenant for the first time",
+    "federation.settings.auto_federate_new_users": "Auto-Federate New Users",
+    "federation.settings.auto_federate_new_users_description": "Automatically federate new users when they are created in member tenants",
+    "federation.settings.sync_password": "Sync Password",
+    "federation.settings.sync_password_description": "Synchronize password changes across tenants",
+    "federation.settings.sync_profile": "Sync Profile",
+    "federation.settings.sync_profile_description": "Synchronize name and profile information",
+    "federation.settings.sync_roles": "Sync Roles",
+    "federation.settings.sync_roles_description": "Synchronize role assignments (use with caution)",
+    "federation.settings.sync_two_factor": "Sync Two-Factor",
+    "federation.settings.sync_two_factor_description": "Synchronize 2FA settings and recovery codes"
+}

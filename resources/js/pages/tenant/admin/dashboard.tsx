@@ -15,7 +15,7 @@ function TenantDashboard() {
     const { tenant, subscription, hasActiveSubscription, isOnTrial } = useTenant();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -28,7 +28,7 @@ function TenantDashboard() {
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle>Dashboard</PageTitle>
-                        <PageDescription>{t('tenant.dashboard.welcome', { name: tenant?.name ?? '' })}</PageDescription>
+                        <PageDescription>{t('dashboard.welcome', { name: tenant?.name ?? '' })}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -39,7 +39,7 @@ function TenantDashboard() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <CreditCard className="h-5 w-5" />
-                                    {t('tenant.dashboard.subscription_status')}
+                                    {t('dashboard.page.subscription_status')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -47,11 +47,11 @@ function TenantDashboard() {
                                     <div className={`h-3 w-3 rounded-full ${hasActiveSubscription ? 'bg-green-500' : 'bg-yellow-500'}`} />
                                     <div>
                                         <p className="font-medium">
-                                            {isOnTrial ? t('tenant.dashboard.trial_period') : subscription.active ? t('tenant.dashboard.active') : t('tenant.dashboard.inactive')}
+                                            {isOnTrial ? t('dashboard.page.trial_period') : subscription.active ? t('dashboard.page.active') : t('dashboard.page.inactive')}
                                         </p>
                                         {subscription.trial_ends_at && (
                                             <p className="text-sm text-muted-foreground">
-                                                {t('tenant.dashboard.trial_ends_at', { date: new Date(subscription.trial_ends_at).toLocaleDateString('pt-BR') })}
+                                                {t('dashboard.trial_ends_at', { date: new Date(subscription.trial_ends_at).toLocaleDateString('pt-BR') })}
                                             </p>
                                         )}
                                     </div>
@@ -65,14 +65,14 @@ function TenantDashboard() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('tenant.dashboard.members')}
+                                    {t('dashboard.page.members')}
                                 </CardTitle>
                                 <Users className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">-</div>
                                 <p className="text-xs text-muted-foreground">
-                                    {t('tenant.dashboard.manage_team')}
+                                    {t('dashboard.page.manage_team')}
                                 </p>
                             </CardContent>
                         </Card>
@@ -80,14 +80,14 @@ function TenantDashboard() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('tenant.dashboard.projects')}
+                                    {t('dashboard.page.projects')}
                                 </CardTitle>
                                 <FolderOpen className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">-</div>
                                 <p className="text-xs text-muted-foreground">
-                                    {t('tenant.dashboard.view_all_projects')}
+                                    {t('dashboard.page.view_all_projects')}
                                 </p>
                             </CardContent>
                         </Card>
@@ -95,14 +95,14 @@ function TenantDashboard() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('tenant.dashboard.activity')}
+                                    {t('dashboard.page.activity')}
                                 </CardTitle>
                                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">-</div>
                                 <p className="text-xs text-muted-foreground">
-                                    {t('tenant.dashboard.last_7_days')}
+                                    {t('dashboard.page.last_7_days')}
                                 </p>
                             </CardContent>
                         </Card>
@@ -110,14 +110,14 @@ function TenantDashboard() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    {t('tenant.dashboard.reports')}
+                                    {t('dashboard.page.reports')}
                                 </CardTitle>
                                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">-</div>
                                 <p className="text-xs text-muted-foreground">
-                                    {t('tenant.dashboard.view_reports')}
+                                    {t('dashboard.page.view_reports')}
                                 </p>
                             </CardContent>
                         </Card>
@@ -126,27 +126,27 @@ function TenantDashboard() {
                     {/* Quick Actions */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('tenant.dashboard.quick_access')}</CardTitle>
+                            <CardTitle>{t('dashboard.page.quick_access')}</CardTitle>
                             <CardDescription>
-                                {t('tenant.dashboard.quick_access_description')}
+                                {t('dashboard.page.quick_access_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 <a href={admin.projects.index.url()} className="block p-4 border rounded-lg hover:bg-accent transition-colors">
                                     <FolderOpen className="h-8 w-8 mb-2 text-primary" />
-                                    <h3 className="font-semibold">{t('tenant.dashboard.projects')}</h3>
-                                    <p className="text-sm text-muted-foreground">{t('tenant.dashboard.manage_projects')}</p>
+                                    <h3 className="font-semibold">{t('dashboard.page.projects')}</h3>
+                                    <p className="text-sm text-muted-foreground">{t('dashboard.page.manage_projects')}</p>
                                 </a>
                                 <a href={admin.team.index.url()} className="block p-4 border rounded-lg hover:bg-accent transition-colors">
                                     <Users className="h-8 w-8 mb-2 text-primary" />
-                                    <h3 className="font-semibold">{t('tenant.dashboard.team')}</h3>
-                                    <p className="text-sm text-muted-foreground">{t('tenant.dashboard.manage_members')}</p>
+                                    <h3 className="font-semibold">{t('dashboard.page.team')}</h3>
+                                    <p className="text-sm text-muted-foreground">{t('dashboard.page.manage_members')}</p>
                                 </a>
                                 <a href={admin.billing.index.url()} className="block p-4 border rounded-lg hover:bg-accent transition-colors">
                                     <CreditCard className="h-8 w-8 mb-2 text-primary" />
-                                    <h3 className="font-semibold">{t('tenant.dashboard.billing')}</h3>
-                                    <p className="text-sm text-muted-foreground">{t('tenant.dashboard.plans_and_invoices')}</p>
+                                    <h3 className="font-semibold">{t('dashboard.page.billing')}</h3>
+                                    <p className="text-sm text-muted-foreground">{t('dashboard.page.plans_and_invoices')}</p>
                                 </a>
                             </div>
                         </CardContent>

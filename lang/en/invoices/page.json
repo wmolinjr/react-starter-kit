@@ -1,0 +1,20 @@
+{
+    "invoices.page.all_invoices": "All Invoices",
+    "invoices.page.all_invoices_description": "Complete history of invoices and payments",
+    "invoices.page.column_amount": "Amount",
+    "invoices.page.column_date": "Date",
+    "invoices.page.column_number": "Invoice #",
+    "invoices.page.column_status": "Status",
+    "invoices.page.description": "View and download all invoices for :name.",
+    "invoices.page.download_pdf": "Download PDF",
+    "invoices.page.invoice_details": "Invoice Details",
+    "invoices.page.line_items": "Line Items",
+    "invoices.page.no_invoices": "No invoices yet.",
+    "invoices.page.page_title": "Invoices",
+    "invoices.page.quantity": "Qty",
+    "invoices.page.status_open": "Open",
+    "invoices.page.status_paid": "Paid",
+    "invoices.page.status_uncollectible": "Uncollectible",
+    "invoices.page.status_void": "Void",
+    "invoices.page.title": "Invoices"
+}

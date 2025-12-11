@@ -1,0 +1,20 @@
+{
+    "plans.page.add_new_plan": "Adicionar um novo plano ao catálogo",
+    "plans.page.create_first": "Criar Primeiro Plano",
+    "plans.page.create_plan": "Criar Plano",
+    "plans.page.delete_confirm": "Tem certeza que deseja excluir este plano?",
+    "plans.page.description": "Gerencie os planos disponíveis para assinatura",
+    "plans.page.edit_plan": "Editar Plano",
+    "plans.page.month": "mês",
+    "plans.page.new_plan": "Novo Plano",
+    "plans.page.no_plans": "Nenhum plano ainda.",
+    "plans.page.not_synced": "Não sincronizado",
+    "plans.page.per": "por",
+    "plans.page.sync_all": "Sincronizar Todos",
+    "plans.page.sync_with_stripe": "Sincronizar com Stripe",
+    "plans.page.synced": "Sincronizado",
+    "plans.page.title": "Catálogo de Planos",
+    "plans.page.update": "Atualizar",
+    "plans.page.update_plan": "Atualizar Plano",
+    "plans.page.year": "ano"
+}

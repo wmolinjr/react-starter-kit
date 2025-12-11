@@ -19,22 +19,22 @@ function RolesIndex({ centralRoles }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.roles.title'), href: admin.roles.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('roles.page.title'), href: admin.roles.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = (role: RoleResource) => {
         if (role.is_protected) {
-            alert(t('admin.roles.delete_protected_error'));
+            alert(t('roles.page.delete_protected_error'));
             return;
         }
         if (role.users_count > 0) {
-            alert(t('admin.roles.delete_has_users_error'));
+            alert(t('roles.page.delete_has_users_error'));
             return;
         }
-        if (confirm(t('admin.roles.delete_confirm', { name: role.display_name }))) {
+        if (confirm(t('roles.delete_confirm', { name: role.display_name }))) {
             router.delete(admin.roles.destroy.url(role.id));
         }
     };
@@ -107,21 +107,21 @@ function RolesIndex({ centralRoles }: Props) {
 
     return (
         <>
-            <Head title={t('admin.roles.title')} />
+            <Head title={t('roles.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.roles.title')}</PageTitle>
+                        <PageTitle>{t('roles.page.title')}</PageTitle>
                         <PageDescription>
-                            {t('admin.roles.description')}
+                            {t('roles.page.description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         <Button asChild>
                             <Link href={admin.roles.create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('admin.roles.new_role')}
+                                {t('roles.page.new_role')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -138,11 +138,11 @@ function RolesIndex({ centralRoles }: Props) {
                         <Card className="border-dashed">
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <Shield className="text-muted-foreground mb-4 h-12 w-12" />
-                                <p className="text-muted-foreground mb-4">{t('admin.roles.no_roles')}</p>
+                                <p className="text-muted-foreground mb-4">{t('roles.page.no_roles')}</p>
                                 <Button asChild>
                                     <Link href={admin.roles.create.url()}>
                                         <Plus className="mr-2 h-4 w-4" />
-                                        {t('admin.roles.create_first')}
+                                        {t('roles.page.create_first')}
                                     </Link>
                                 </Button>
                             </CardContent>

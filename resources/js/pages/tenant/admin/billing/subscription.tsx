@@ -84,7 +84,7 @@ function SubscriptionPage({
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('sidebar.group.billing'), href: '/admin/billing' },
-        { title: t('billing.subscription_management'), href: '/admin/billing/subscription' },
+        { title: t('billing.page.subscription_management'), href: '/admin/billing/subscription' },
     ];
 
     // Format date
@@ -102,7 +102,7 @@ function SubscriptionPage({
         if (!subscription) {
             return (
                 <Badge variant="outline">
-                    {t('billing.no_subscription')}
+                    {t('billing.page.no_subscription')}
                 </Badge>
             );
         }
@@ -202,16 +202,16 @@ function SubscriptionPage({
 
     return (
         <>
-            <Head title={t('billing.subscription_management')} />
+            <Head title={t('billing.page.subscription_management')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle icon={CreditCard}>
-                            {t('billing.subscription_management')}
+                            {t('billing.page.subscription_management')}
                         </PageTitle>
                         <PageDescription>
-                            {t('billing.subscription_management_description')}
+                            {t('billing.page.subscription_management_description')}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -224,7 +224,7 @@ function SubscriptionPage({
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="flex items-center gap-2">
                                         <Crown className="h-5 w-5" />
-                                        {t('billing.current_subscription')}
+                                        {t('billing.page.current_subscription')}
                                     </CardTitle>
                                     {getStatusBadge()}
                                 </div>
@@ -238,7 +238,7 @@ function SubscriptionPage({
                                         <div className="bg-muted/50 rounded-lg p-4">
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                                                 <Calendar className="h-4 w-4" />
-                                                {t('billing.billing_period')}
+                                                {t('billing.page.billing_period')}
                                             </div>
                                             <p className="font-medium">
                                                 {formatDate(subscription.currentPeriodStart)} - {formatDate(subscription.currentPeriodEnd)}
@@ -249,7 +249,7 @@ function SubscriptionPage({
                                             <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
                                                 <div className="flex items-center gap-2 text-sm text-amber-600 mb-1">
                                                     <Clock className="h-4 w-4" />
-                                                    {t('billing.trial_ends')}
+                                                    {t('billing.page.trial_ends')}
                                                 </div>
                                                 <p className="font-medium text-amber-700 dark:text-amber-400">
                                                     {formatDate(subscription.trialEndsAt)}
@@ -261,13 +261,13 @@ function SubscriptionPage({
                                             <div className="bg-red-50 dark:bg-red-950/20 rounded-lg p-4 border border-red-200 dark:border-red-800 sm:col-span-2">
                                                 <div className="flex items-center gap-2 text-sm text-red-600 mb-1">
                                                     <AlertTriangle className="h-4 w-4" />
-                                                    {t('billing.access_ends')}
+                                                    {t('billing.page.access_ends')}
                                                 </div>
                                                 <p className="font-medium text-red-700 dark:text-red-400">
                                                     {formatDate(subscription.endsAt)}
                                                 </p>
                                                 <p className="text-sm text-red-600 mt-2">
-                                                    {t('billing.grace_period_message')}
+                                                    {t('billing.page.grace_period_message')}
                                                 </p>
                                             </div>
                                         )}
@@ -280,9 +280,9 @@ function SubscriptionPage({
                         {subscription && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>{t('billing.subscription_actions')}</CardTitle>
+                                    <CardTitle>{t('billing.page.subscription_actions')}</CardTitle>
                                     <CardDescription>
-                                        {t('billing.subscription_actions_description')}
+                                        {t('billing.page.subscription_actions_description')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
@@ -292,14 +292,14 @@ function SubscriptionPage({
                                             <div>
                                                 <h4 className="font-medium">
                                                     {isPaused
-                                                        ? t('billing.resume_subscription')
-                                                        : t('billing.pause_subscription')
+                                                        ? t('billing.page.resume_subscription')
+                                                        : t('billing.page.pause_subscription')
                                                     }
                                                 </h4>
                                                 <p className="text-sm text-muted-foreground">
                                                     {isPaused
-                                                        ? t('billing.resume_subscription_description')
-                                                        : t('billing.pause_subscription_description')
+                                                        ? t('billing.page.resume_subscription_description')
+                                                        : t('billing.page.pause_subscription_description')
                                                     }
                                                 </p>
                                             </div>
@@ -313,12 +313,12 @@ function SubscriptionPage({
                                                 ) : isPaused ? (
                                                     <>
                                                         <Play className="mr-2 h-4 w-4" />
-                                                        {t('billing.resume')}
+                                                        {t('billing.page.resume')}
                                                     </>
                                                 ) : (
                                                     <>
                                                         <Pause className="mr-2 h-4 w-4" />
-                                                        {t('billing.pause')}
+                                                        {t('billing.page.pause')}
                                                     </>
                                                 )}
                                             </Button>
@@ -330,10 +330,10 @@ function SubscriptionPage({
                                         <div className="flex items-center justify-between p-4 border rounded-lg border-green-200 bg-green-50 dark:bg-green-950/20">
                                             <div>
                                                 <h4 className="font-medium text-green-700 dark:text-green-400">
-                                                    {t('billing.resume_subscription')}
+                                                    {t('billing.page.resume_subscription')}
                                                 </h4>
                                                 <p className="text-sm text-green-600">
-                                                    {t('billing.resume_before_expiry')}
+                                                    {t('billing.page.resume_before_expiry')}
                                                 </p>
                                             </div>
                                             <Button
@@ -347,7 +347,7 @@ function SubscriptionPage({
                                                 ) : (
                                                     <>
                                                         <Play className="mr-2 h-4 w-4" />
-                                                        {t('billing.resume_subscription')}
+                                                        {t('billing.page.resume_subscription')}
                                                     </>
                                                 )}
                                             </Button>
@@ -359,10 +359,10 @@ function SubscriptionPage({
                                         <div className="flex items-center justify-between p-4 border rounded-lg border-red-200">
                                             <div>
                                                 <h4 className="font-medium">
-                                                    {t('billing.cancel_subscription')}
+                                                    {t('billing.page.cancel_subscription')}
                                                 </h4>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {t('billing.cancel_subscription_description')}
+                                                    {t('billing.page.cancel_subscription_description')}
                                                 </p>
                                             </div>
                                             <AlertDialog>
@@ -375,10 +375,10 @@ function SubscriptionPage({
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>
-                                                            {t('billing.cancel_subscription_confirm_title')}
+                                                            {t('billing.page.cancel_subscription_confirm_title')}
                                                         </AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            {t('billing.cancel_subscription_confirm_description')}
+                                                            {t('billing.page.cancel_subscription_confirm_description')}
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <div className="py-4">
@@ -389,18 +389,18 @@ function SubscriptionPage({
                                                             <div className="flex items-start space-x-3 p-3 border rounded-lg">
                                                                 <RadioGroupItem value="end_of_period" id="end_of_period" className="mt-1" />
                                                                 <Label htmlFor="end_of_period" className="cursor-pointer">
-                                                                    <div className="font-medium">{t('billing.cancel_at_period_end')}</div>
+                                                                    <div className="font-medium">{t('billing.page.cancel_at_period_end')}</div>
                                                                     <div className="text-sm text-muted-foreground">
-                                                                        {t('billing.cancel_at_period_end_description')}
+                                                                        {t('billing.page.cancel_at_period_end_description')}
                                                                     </div>
                                                                 </Label>
                                                             </div>
                                                             <div className="flex items-start space-x-3 p-3 border rounded-lg border-red-200">
                                                                 <RadioGroupItem value="immediately" id="immediately" className="mt-1" />
                                                                 <Label htmlFor="immediately" className="cursor-pointer">
-                                                                    <div className="font-medium text-red-600">{t('billing.cancel_immediately')}</div>
+                                                                    <div className="font-medium text-red-600">{t('billing.page.cancel_immediately')}</div>
                                                                     <div className="text-sm text-muted-foreground">
-                                                                        {t('billing.cancel_immediately_description')}
+                                                                        {t('billing.page.cancel_immediately_description')}
                                                                     </div>
                                                                 </Label>
                                                             </div>
@@ -412,7 +412,7 @@ function SubscriptionPage({
                                                             onClick={handleCancel}
                                                             className="bg-red-600 hover:bg-red-700"
                                                         >
-                                                            {t('billing.confirm_cancellation')}
+                                                            {t('billing.page.confirm_cancellation')}
                                                         </AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
@@ -427,9 +427,9 @@ function SubscriptionPage({
                         {canChangePlan && plans.length > 0 && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>{t('billing.change_plan')}</CardTitle>
+                                    <CardTitle>{t('billing.page.change_plan')}</CardTitle>
                                     <CardDescription>
-                                        {t('billing.change_plan_description')}
+                                        {t('billing.page.change_plan_description')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -447,14 +447,14 @@ function SubscriptionPage({
                                                 >
                                                     {plan?.slug === p.slug && (
                                                         <Badge className="absolute -top-2 -right-2" variant="secondary">
-                                                            {t('billing.current')}
+                                                            {t('billing.page.current')}
                                                         </Badge>
                                                     )}
                                                     <h4 className="font-semibold">{p.name}</h4>
                                                     <p className="text-2xl font-bold mt-2">
                                                         {p.formatted_price}
                                                         <span className="text-sm font-normal text-muted-foreground">
-                                                            /{p.billing_period === 'yearly' ? t('billing.year') : t('billing.month')}
+                                                            /{p.billing_period === 'yearly' ? t('billing.page.year') : t('billing.page.month')}
                                                         </span>
                                                     </p>
                                                     {p.description && (
@@ -477,7 +477,7 @@ function SubscriptionPage({
                                         ) : (
                                             <ArrowRight className="h-4 w-4 mr-2" />
                                         )}
-                                        {t('billing.change_to_plan')}
+                                        {t('billing.page.change_to_plan')}
                                     </Button>
                                 </CardFooter>
                             </Card>
@@ -487,9 +487,9 @@ function SubscriptionPage({
                         {!subscription && (
                             <Alert>
                                 <AlertTriangle className="h-4 w-4" />
-                                <AlertTitle>{t('billing.no_subscription')}</AlertTitle>
+                                <AlertTitle>{t('billing.page.no_subscription')}</AlertTitle>
                                 <AlertDescription>
-                                    {t('billing.no_subscription_description')}
+                                    {t('billing.page.no_subscription_description')}
                                 </AlertDescription>
                             </Alert>
                         )}

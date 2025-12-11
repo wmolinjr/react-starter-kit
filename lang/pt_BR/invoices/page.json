@@ -1,0 +1,20 @@
+{
+    "invoices.page.all_invoices": "Todas as Faturas",
+    "invoices.page.all_invoices_description": "Histórico completo de faturas e pagamentos",
+    "invoices.page.column_amount": "Valor",
+    "invoices.page.column_date": "Data",
+    "invoices.page.column_number": "Fatura #",
+    "invoices.page.column_status": "Status",
+    "invoices.page.description": "Visualize e baixe todas as faturas de :name.",
+    "invoices.page.download_pdf": "Baixar PDF",
+    "invoices.page.invoice_details": "Detalhes da Fatura",
+    "invoices.page.line_items": "Itens",
+    "invoices.page.no_invoices": "Nenhuma fatura ainda.",
+    "invoices.page.page_title": "Faturas",
+    "invoices.page.quantity": "Qtd",
+    "invoices.page.status_open": "Em Aberto",
+    "invoices.page.status_paid": "Pago",
+    "invoices.page.status_uncollectible": "Não Coletável",
+    "invoices.page.status_void": "Cancelada",
+    "invoices.page.title": "Faturas"
+}

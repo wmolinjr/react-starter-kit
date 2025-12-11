@@ -1,0 +1,7 @@
+{
+    "payments.stats.completed": "Concluídos",
+    "payments.stats.failed": "Falhas",
+    "payments.stats.pending": "Pendentes",
+    "payments.stats.refunded": "Reembolsados",
+    "payments.stats.total": "Receita Total"
+}

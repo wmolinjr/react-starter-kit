@@ -26,8 +26,8 @@ function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categori
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.plans.title'), href: admin.plans.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('plans.page.title'), href: admin.plans.index.url() },
         { title: plan.name_display, href: admin.plans.edit.url(plan.id) },
     ];
 
@@ -39,13 +39,13 @@ function EditPlan({ plan, addons, featureDefinitions, limitDefinitions, categori
 
     return (
         <>
-            <Head title={`${t('admin.plans.edit_plan')}: ${plan.name_display}`} />
+            <Head title={`${t('plans.page.edit_plan')}: ${plan.name_display}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.plans.edit_plan')}</PageTitle>
-                        <PageDescription>{t('admin.plans.update')} {plan.name_display}</PageDescription>
+                        <PageTitle>{t('plans.page.edit_plan')}</PageTitle>
+                        <PageDescription>{t('plans.page.update')} {plan.name_display}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

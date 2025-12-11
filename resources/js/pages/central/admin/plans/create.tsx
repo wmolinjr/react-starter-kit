@@ -20,9 +20,9 @@ function CreatePlan({ addons, featureDefinitions, limitDefinitions, categories }
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.plans.title'), href: admin.plans.index.url() },
-        { title: t('admin.plans.create_plan'), href: admin.plans.create.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('plans.page.title'), href: admin.plans.index.url() },
+        { title: t('plans.page.create_plan'), href: admin.plans.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -33,13 +33,13 @@ function CreatePlan({ addons, featureDefinitions, limitDefinitions, categories }
 
     return (
         <>
-            <Head title={t('admin.plans.create_plan')} />
+            <Head title={t('plans.page.create_plan')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.plans.create_plan')}</PageTitle>
-                        <PageDescription>{t('admin.plans.add_new_plan')}</PageDescription>
+                        <PageTitle>{t('plans.page.create_plan')}</PageTitle>
+                        <PageDescription>{t('plans.page.add_new_plan')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

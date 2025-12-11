@@ -19,8 +19,8 @@ function BundleEdit({ bundle, addons, plans }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.bundles.title'), href: admin.bundles.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('bundles.page.title'), href: admin.bundles.index.url() },
         { title: bundle.name_display, href: admin.bundles.edit.url(bundle.id) },
     ];
 
@@ -37,12 +37,12 @@ function BundleEdit({ bundle, addons, plans }: Props) {
 
     return (
         <>
-            <Head title={`${t('admin.bundles.edit_bundle')} - ${bundle.name_display}`} />
+            <Head title={`${t('bundles.page.edit_bundle')} - ${bundle.name_display}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.bundles.edit_bundle')}</PageTitle>
+                        <PageTitle>{t('bundles.page.edit_bundle')}</PageTitle>
                         <PageDescription>{bundle.name_display}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>

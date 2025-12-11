@@ -70,7 +70,7 @@ function AuditLogIndex({
     const [isExporting, setIsExporting] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
         { title: t('audit.page.title'), href: admin.audit.index.url() },
     ];
 

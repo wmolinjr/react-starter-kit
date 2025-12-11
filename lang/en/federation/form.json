@@ -1,0 +1,12 @@
+{
+    "federation.form.basic_info_description": "Configure the federation group details",
+    "federation.form.description_placeholder": "Describe the purpose of this federation group...",
+    "federation.form.is_active": "Active (syncing enabled)",
+    "federation.form.master_change_hint": "To change the master tenant, use the Change Master option on the group detail page",
+    "federation.form.master_hint": "The master tenant is the authoritative source for user data",
+    "federation.form.name_placeholder": "e.g., ACME Corporation",
+    "federation.form.select_master": "Select master tenant...",
+    "federation.form.sync_settings": "Sync Settings",
+    "federation.form.sync_settings_description": "Choose which user data should be synchronized",
+    "federation.form.warning": "Changes to sync settings will affect all federated users. Some changes may trigger data sync operations."
+}

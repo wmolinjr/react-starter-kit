@@ -60,10 +60,10 @@ function FederationConflict({ group, conflict }: Props) {
     const [notes, setNotes] = useState('');
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.federation.title'), href: admin.federation.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('federation.page.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
-        { title: t('admin.federation.conflicts'), href: admin.federation.conflicts.index.url(group.id) },
+        { title: t('federation.page.conflicts'), href: admin.federation.conflicts.index.url(group.id) },
         { title: conflict.field, href: admin.federation.conflicts.show.url({ group: group.id, conflict: conflict.id }) },
     ];
 
@@ -71,11 +71,11 @@ function FederationConflict({ group, conflict }: Props) {
 
     const getFieldLabel = (field: string) => {
         const labels: Record<string, string> = {
-            password_hash: t('admin.federation.fields.password'),
-            name: t('admin.federation.fields.name'),
-            email: t('admin.federation.fields.email'),
-            two_factor_secret: t('admin.federation.fields.two_factor'),
-            avatar: t('admin.federation.fields.avatar'),
+            password_hash: t('federation.fields.password'),
+            name: t('federation.fields.name'),
+            email: t('federation.fields.email'),
+            two_factor_secret: t('federation.fields.two_factor'),
+            avatar: t('federation.fields.avatar'),
         };
         return labels[field] || field;
     };
@@ -102,14 +102,14 @@ function FederationConflict({ group, conflict }: Props) {
     };
 
     const handleDismiss = () => {
-        if (confirm(t('admin.federation.dismiss_confirm'))) {
+        if (confirm(t('federation.page.dismiss_confirm'))) {
             router.post(admin.federation.conflicts.dismiss.url({ group: group.id, conflict: conflict.id }));
         }
     };
 
     return (
         <>
-            <Head title={`${t('admin.federation.conflict_detail')} - ${getFieldLabel(conflict.field)}`} />
+            <Head title={`${t('federation.page.conflict_detail')} - ${getFieldLabel(conflict.field)}`} />
 
             <Page>
                 <PageHeader>
@@ -121,9 +121,9 @@ function FederationConflict({ group, conflict }: Props) {
                                 </Link>
                             </Button>
                             <div>
-                                <PageTitle icon={AlertTriangle}>{t('admin.federation.conflict_detail')}</PageTitle>
+                                <PageTitle icon={AlertTriangle}>{t('federation.page.conflict_detail')}</PageTitle>
                                 <PageDescription>
-                                    {t('admin.federation.conflict_for_field', { field: getFieldLabel(conflict.field) })}
+                                    {t('federation.conflict_for_field', { field: getFieldLabel(conflict.field) })}
                                 </PageDescription>
                             </div>
                         </div>
@@ -137,7 +137,7 @@ function FederationConflict({ group, conflict }: Props) {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                                    {t('admin.federation.conflict_info')}
+                                    {t('federation.page.conflict_info')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -146,7 +146,7 @@ function FederationConflict({ group, conflict }: Props) {
                                     <FederationConflictStatusBadge status={conflict.status} />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">{t('admin.federation.field')}</span>
+                                    <span className="text-muted-foreground">{t('federation.page.field')}</span>
                                     <Badge variant="outline">{getFieldLabel(conflict.field)}</Badge>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -158,7 +158,7 @@ function FederationConflict({ group, conflict }: Props) {
                                 </div>
                                 {conflict.resolved_at && (
                                     <div className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">{t('admin.federation.resolved_at')}</span>
+                                        <span className="text-muted-foreground">{t('federation.page.resolved_at')}</span>
                                         <span className="text-sm">{new Date(conflict.resolved_at).toLocaleString()}</span>
                                     </div>
                                 )}
@@ -170,7 +170,7 @@ function FederationConflict({ group, conflict }: Props) {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <User className="h-5 w-5" />
-                                    {t('admin.federation.affected_user')}
+                                    {t('federation.page.affected_user')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -188,7 +188,7 @@ function FederationConflict({ group, conflict }: Props) {
                                 </div>
                                 {conflict.source_tenant && (
                                     <div className="flex items-center justify-between pt-2">
-                                        <span className="text-muted-foreground">{t('admin.federation.source_tenant')}</span>
+                                        <span className="text-muted-foreground">{t('federation.page.source_tenant')}</span>
                                         <span className="flex items-center gap-1 text-sm">
                                             <Building2 className="h-3 w-3" />
                                             {conflict.source_tenant.name}
@@ -202,15 +202,15 @@ function FederationConflict({ group, conflict }: Props) {
                     {/* Conflicting Values */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('admin.federation.conflicting_values')}</CardTitle>
-                            <CardDescription>{t('admin.federation.conflicting_values_description')}</CardDescription>
+                            <CardTitle>{t('federation.page.conflicting_values')}</CardTitle>
+                            <CardDescription>{t('federation.page.conflicting_values_description')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="grid gap-4 md:grid-cols-2">
                                 {conflict.source_value !== undefined && (
                                     <div className="rounded-lg border p-4">
                                         <p className="text-muted-foreground mb-2 text-sm font-medium">
-                                            {t('admin.federation.source_value')}
+                                            {t('federation.page.source_value')}
                                         </p>
                                         <code className="bg-muted block rounded p-2 text-sm">
                                             {conflict.source_value || '(empty)'}
@@ -220,7 +220,7 @@ function FederationConflict({ group, conflict }: Props) {
                                 {conflict.target_value !== undefined && (
                                     <div className="rounded-lg border p-4">
                                         <p className="text-muted-foreground mb-2 text-sm font-medium">
-                                            {t('admin.federation.target_value')}
+                                            {t('federation.page.target_value')}
                                         </p>
                                         <code className="bg-muted block rounded p-2 text-sm">
                                             {conflict.target_value || '(empty)'}
@@ -235,10 +235,10 @@ function FederationConflict({ group, conflict }: Props) {
                     {conflict.status === 'pending' && (
                         <div className="flex gap-2">
                             <Button onClick={() => setShowResolveDialog(true)}>
-                                {t('admin.federation.resolve')}
+                                {t('federation.page.resolve')}
                             </Button>
                             <Button variant="outline" onClick={handleDismiss}>
-                                {t('admin.federation.dismiss')}
+                                {t('federation.page.dismiss')}
                             </Button>
                         </div>
                     )}
@@ -249,9 +249,9 @@ function FederationConflict({ group, conflict }: Props) {
             <Dialog open={showResolveDialog} onOpenChange={setShowResolveDialog}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>{t('admin.federation.resolve_conflict')}</DialogTitle>
+                        <DialogTitle>{t('federation.page.resolve_conflict')}</DialogTitle>
                         <DialogDescription>
-                            {t('admin.federation.resolve_conflict_description', {
+                            {t('federation.resolve_conflict_description', {
                                 field: getFieldLabel(conflict.field),
                                 user: conflict.federated_user?.global_email ?? '-',
                             })}
@@ -268,7 +268,7 @@ function FederationConflict({ group, conflict }: Props) {
                                     <RadioGroupItem value="source" id="source" className="mt-1" />
                                     <div className="flex-1">
                                         <Label htmlFor="source" className="cursor-pointer font-medium">
-                                            {t('admin.federation.use_source_value')}
+                                            {t('federation.page.use_source_value')}
                                         </Label>
                                         <code className="bg-muted mt-1 block rounded px-2 py-1 text-xs">
                                             {conflict.source_value || '(empty)'}
@@ -282,7 +282,7 @@ function FederationConflict({ group, conflict }: Props) {
                                     <RadioGroupItem value="target" id="target" className="mt-1" />
                                     <div className="flex-1">
                                         <Label htmlFor="target" className="cursor-pointer font-medium">
-                                            {t('admin.federation.use_target_value')}
+                                            {t('federation.page.use_target_value')}
                                         </Label>
                                         <code className="bg-muted mt-1 block rounded px-2 py-1 text-xs">
                                             {conflict.target_value || '(empty)'}
@@ -296,13 +296,13 @@ function FederationConflict({ group, conflict }: Props) {
                                     <RadioGroupItem value="custom" id="custom" className="mt-1" />
                                     <div className="flex-1">
                                         <Label htmlFor="custom" className="cursor-pointer font-medium">
-                                            {t('admin.federation.use_custom_value')}
+                                            {t('federation.page.use_custom_value')}
                                         </Label>
                                         {resolution === 'custom' && (
                                             <Textarea
                                                 value={customValue}
                                                 onChange={(e) => setCustomValue(e.target.value)}
-                                                placeholder={t('admin.federation.enter_custom_value')}
+                                                placeholder={t('federation.page.enter_custom_value')}
                                                 className="mt-2"
                                                 rows={2}
                                             />
@@ -313,11 +313,11 @@ function FederationConflict({ group, conflict }: Props) {
                         </RadioGroup>
 
                         <div className="space-y-2">
-                            <Label>{t('admin.federation.notes')}</Label>
+                            <Label>{t('federation.page.notes')}</Label>
                             <Textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                placeholder={t('admin.federation.notes_placeholder')}
+                                placeholder={t('federation.page.notes_placeholder')}
                                 rows={2}
                             />
                         </div>
@@ -327,7 +327,7 @@ function FederationConflict({ group, conflict }: Props) {
                         <Button variant="outline" onClick={() => setShowResolveDialog(false)}>
                             {t('common.cancel')}
                         </Button>
-                        <Button onClick={handleResolve}>{t('admin.federation.apply_resolution')}</Button>
+                        <Button onClick={handleResolve}>{t('federation.page.apply_resolution')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

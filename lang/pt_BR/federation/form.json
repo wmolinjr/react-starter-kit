@@ -1,0 +1,12 @@
+{
+    "federation.form.basic_info_description": "Configure os detalhes do grupo de federação",
+    "federation.form.description_placeholder": "Descreva o propósito deste grupo de federação...",
+    "federation.form.is_active": "Ativo (sincronização habilitada)",
+    "federation.form.master_change_hint": "Para trocar o tenant mestre, use a opção Trocar Mestre na página de detalhes do grupo",
+    "federation.form.master_hint": "O tenant mestre é a fonte autoritativa para dados de usuário",
+    "federation.form.name_placeholder": "ex., Corporação ACME",
+    "federation.form.select_master": "Selecione o tenant mestre...",
+    "federation.form.sync_settings": "Configurações de Sincronização",
+    "federation.form.sync_settings_description": "Escolha quais dados de usuário devem ser sincronizados",
+    "federation.form.warning": "Alterações nas configurações de sincronização afetarão todos os usuários federados. Algumas mudanças podem acionar operações de sincronização de dados."
+}

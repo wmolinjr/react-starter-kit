@@ -60,10 +60,10 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            {t('tenant.team.invite.title')}
+            {t('team.invite.title')}
           </DialogTitle>
           <DialogDescription>
-            {t('tenant.team.invite.description')}
+            {t('team.invite.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -71,7 +71,7 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {t('tenant.team.invite.max_users_reached')}
+              {t('team.invite.max_users_reached')}
             </AlertDescription>
           </Alert>
         )}
@@ -79,7 +79,7 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">
-              {t('tenant.team.invite.email_label')} <span className="text-destructive">*</span>
+              {t('team.invite.email_label')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="email"
@@ -95,7 +95,7 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
 
           <div className="space-y-2">
             <Label htmlFor="role">
-              {t('tenant.team.invite.role_label')} <span className="text-destructive">*</span>
+              {t('team.invite.role_label')} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={data.role}
@@ -106,16 +106,16 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
                 <SelectValue placeholder={t('common.placeholder.select_role')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="admin">{t('tenant.team.role_admin')}</SelectItem>
-                <SelectItem value="member">{t('tenant.team.role_member')}</SelectItem>
-                <SelectItem value="guest">{t('tenant.team.role_guest')}</SelectItem>
+                <SelectItem value="admin">{t('team.page.role_admin')}</SelectItem>
+                <SelectItem value="member">{t('team.page.role_member')}</SelectItem>
+                <SelectItem value="guest">{t('team.page.role_guest')}</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
             <p className="text-xs text-muted-foreground">
-              {data.role === 'admin' && t('tenant.team.invite.role_admin_desc')}
-              {data.role === 'member' && t('tenant.team.invite.role_member_desc')}
-              {data.role === 'guest' && t('tenant.team.invite.role_guest_desc')}
+              {data.role === 'admin' && t('team.invite.role_admin_desc')}
+              {data.role === 'member' && t('team.invite.role_member_desc')}
+              {data.role === 'guest' && t('team.invite.role_guest_desc')}
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={maxUsersReached || processing}>
-              {processing ? t('tenant.team.invite.sending') : t('tenant.team.invite.send')}
+              {processing ? t('team.invite.sending') : t('team.invite.send')}
             </Button>
           </DialogFooter>
         </form>

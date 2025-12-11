@@ -17,9 +17,9 @@ function AddonsUsage() {
     const { active } = useAddons();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
-        { title: t('tenant.addons.usage', { default: 'Usage' }), href: admin.addons.usage.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
+        { title: t('addons.usage', { default: 'Usage' }), href: admin.addons.usage.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -28,17 +28,17 @@ function AddonsUsage() {
 
     return (
         <>
-            <Head title={t('tenant.addons.usage', { default: 'Usage' })} />
+            <Head title={t('addons.usage', { default: 'Usage' })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle>
                             <Activity className="mr-2 h-6 w-6" />
-                            {t('tenant.addons.usage_dashboard', { default: 'Usage Dashboard' })}
+                            {t('addons.usage_dashboard', { default: 'Usage Dashboard' })}
                         </PageTitle>
                         <PageDescription>
-                            {t('tenant.addons.usage_description', {
+                            {t('addons.usage_description', {
                                 default: 'Track your metered addon usage for the current billing period',
                             })}
                         </PageDescription>
@@ -51,10 +51,10 @@ function AddonsUsage() {
                             <CardContent className="py-12 text-center">
                                 <Activity className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                                 <h3 className="text-lg font-semibold">
-                                    {t('tenant.addons.no_metered_addons', { default: 'No metered add-ons' })}
+                                    {t('addons.no_metered_addons', { default: 'No metered add-ons' })}
                                 </h3>
                                 <p className="text-muted-foreground mt-2">
-                                    {t('tenant.addons.no_metered_description', {
+                                    {t('addons.no_metered_description', {
                                         default: 'You don\'t have any metered add-ons to track.',
                                     })}
                                 </p>
@@ -67,14 +67,14 @@ function AddonsUsage() {
                                     <CardHeader>
                                         <CardTitle className="text-lg">{addon.name}</CardTitle>
                                         <CardDescription>
-                                            {t('tenant.addons.current_billing_period', {
+                                            {t('addons.current_billing_period', {
                                                 default: 'Current billing period',
                                             })}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
                                         <UsageProgress
-                                            label={t('tenant.addons.usage', { default: 'Usage' })}
+                                            label={t('addons.usage', { default: 'Usage' })}
                                             used={addon.metered_usage || 0}
                                             limit={addon.quantity * 1000}
                                             showPercentage

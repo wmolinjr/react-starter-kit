@@ -73,8 +73,8 @@ function BillingDashboard({
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('billing.page.title'), href: admin.billing.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -101,14 +101,14 @@ function BillingDashboard({
 
     return (
         <BillingPeriodProvider>
-            <Head title={t('tenant.billing.title')} />
+            <Head title={t('billing.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('tenant.billing.title')}</PageTitle>
+                        <PageTitle>{t('billing.page.title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.billing.dashboard_description', {
+                            {t('billing.dashboard_description', {
                                 default: 'Manage your subscription, add-ons, and billing',
                             })}
                         </PageDescription>
@@ -116,7 +116,7 @@ function BillingDashboard({
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleManageSubscription}>
                             <Settings className="mr-2 h-4 w-4" />
-                            {t('tenant.billing.billing_portal', { default: 'Billing Portal' })}
+                            {t('billing.billing_portal', { default: 'Billing Portal' })}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -166,10 +166,10 @@ function BillingDashboard({
                                 </div>
                                 <div>
                                     <p className="font-medium">
-                                        {t('tenant.billing.upgrade_plan', { default: 'Upgrade Plan' })}
+                                        {t('billing.upgrade_plan', { default: 'Upgrade Plan' })}
                                     </p>
                                     <p className="text-muted-foreground text-sm">
-                                        {t('tenant.billing.compare_plans', { default: 'Compare plans and features' })}
+                                        {t('billing.compare_plans', { default: 'Compare plans and features' })}
                                     </p>
                                 </div>
                             </CardContent>
@@ -185,10 +185,10 @@ function BillingDashboard({
                                 </div>
                                 <div>
                                     <p className="font-medium">
-                                        {t('tenant.billing.browse_addons', { default: 'Browse Add-ons' })}
+                                        {t('billing.browse_addons', { default: 'Browse Add-ons' })}
                                     </p>
                                     <p className="text-muted-foreground text-sm">
-                                        {t('tenant.billing.extend_capabilities', { default: 'Extend your capabilities' })}
+                                        {t('billing.extend_capabilities', { default: 'Extend your capabilities' })}
                                     </p>
                                 </div>
                             </CardContent>
@@ -204,10 +204,10 @@ function BillingDashboard({
                                 </div>
                                 <div>
                                     <p className="font-medium">
-                                        {t('tenant.billing.view_bundles', { default: 'View Bundles' })}
+                                        {t('billing.view_bundles', { default: 'View Bundles' })}
                                     </p>
                                     <p className="text-muted-foreground text-sm">
-                                        {t('tenant.billing.save_with_bundles', { default: 'Save with bundle deals' })}
+                                        {t('billing.save_with_bundles', { default: 'Save with bundle deals' })}
                                     </p>
                                 </div>
                             </CardContent>
@@ -219,7 +219,7 @@ function BillingDashboard({
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <CardTitle className="text-base">
-                                    {t('tenant.billing.active_subscriptions', { default: 'Active Subscriptions' })}
+                                    {t('billing.active_subscriptions', { default: 'Active Subscriptions' })}
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" onClick={handleManageAddons}>
                                     {t('common.manage', { default: 'Manage' })}
@@ -238,7 +238,7 @@ function BillingDashboard({
                                                     <p className="font-medium">{bundle.name}</p>
                                                     <p className="text-muted-foreground text-xs">
                                                         {bundle.addonCount}{' '}
-                                                        {t('tenant.billing.addons_included', { default: 'add-ons' })}
+                                                        {t('billing.addons_included', { default: 'add-ons' })}
                                                     </p>
                                                 </div>
                                             </div>
@@ -275,7 +275,7 @@ function BillingDashboard({
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <CardTitle className="flex items-center gap-2 text-base">
                                     <FileText className="h-4 w-4" />
-                                    {t('tenant.billing.recent_invoices', { default: 'Recent Invoices' })}
+                                    {t('billing.recent_invoices', { default: 'Recent Invoices' })}
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" onClick={handleViewInvoices}>
                                     {t('common.view_all', { default: 'View All' })}
@@ -285,8 +285,8 @@ function BillingDashboard({
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>{t('tenant.billing.date', { default: 'Date' })}</TableHead>
-                                            <TableHead>{t('tenant.billing.amount', { default: 'Amount' })}</TableHead>
+                                            <TableHead>{t('billing.date', { default: 'Date' })}</TableHead>
+                                            <TableHead>{t('billing.amount', { default: 'Amount' })}</TableHead>
                                             <TableHead className="text-right">
                                                 {t('common.actions', { default: 'Actions' })}
                                             </TableHead>
@@ -301,7 +301,7 @@ function BillingDashboard({
                                                     <Button variant="ghost" size="sm" asChild>
                                                         <a href={invoice.download_url}>
                                                             <Download className="mr-2 h-4 w-4" />
-                                                            {t('tenant.billing.download', { default: 'Download' })}
+                                                            {t('billing.download', { default: 'Download' })}
                                                         </a>
                                                     </Button>
                                                 </TableCell>

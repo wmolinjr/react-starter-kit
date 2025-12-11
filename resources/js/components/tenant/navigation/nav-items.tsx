@@ -163,7 +163,7 @@ export function useTenantAdminNavItems(): NavItem[] {
         // Branding (Enterprise feature)
         if (has('branding:view') && hasFeature('whiteLabel')) {
             settingsItems.push({
-                title: t('tenant.settings.branding'),
+                title: t('settings.branding'),
                 href: admin.settings.branding.url(),
             });
         }
@@ -171,7 +171,7 @@ export function useTenantAdminNavItems(): NavItem[] {
         // Domains
         if (has('settings:edit')) {
             settingsItems.push({
-                title: t('tenant.settings.domains'),
+                title: t('settings.domains'),
                 href: admin.settings.domains.url(),
             });
         }
@@ -179,14 +179,14 @@ export function useTenantAdminNavItems(): NavItem[] {
         // Config
         if (has('settings:edit')) {
             settingsItems.push({
-                title: t('tenant.config.title'),
+                title: t('config.page.title'),
                 href: admin.settings.config.url(),
             });
         }
 
         if (has('apiTokens:view')) {
             settingsItems.push({
-                title: t('tenant.settings.api_tokens'),
+                title: t('settings.api_tokens'),
                 href: admin.settings.apiTokens.url(),
             });
         }
@@ -194,7 +194,7 @@ export function useTenantAdminNavItems(): NavItem[] {
         // Custom Roles (Pro+ feature)
         if (has('roles:view') && hasFeature('customRoles')) {
             settingsItems.push({
-                title: t('tenant.settings.custom_roles'),
+                title: t('settings.custom_roles'),
                 href: admin.settings.roles.index.url(),
             });
         }
@@ -202,14 +202,14 @@ export function useTenantAdminNavItems(): NavItem[] {
         // Federation (Enterprise feature)
         if (has('federation:view') && hasFeature('federation')) {
             settingsItems.push({
-                title: t('tenant.settings.federation'),
+                title: t('settings.federation'),
                 href: admin.settings.federation.index.url(),
             });
         }
 
         if (has('settings:danger')) {
             settingsItems.push({
-                title: t('tenant.settings.danger_zone'),
+                title: t('settings.danger_zone'),
                 href: admin.settings.danger.url(),
             });
         }

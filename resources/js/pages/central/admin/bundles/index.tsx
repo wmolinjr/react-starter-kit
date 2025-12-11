@@ -37,14 +37,14 @@ function BundleIndex({ bundles }: Props) {
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.bundles.title'), href: admin.bundles.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('bundles.page.title'), href: admin.bundles.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = (bundle: BundleResource) => {
-        if (confirm(t('admin.bundles.delete_confirm', { name: bundle.name_display }))) {
+        if (confirm(t('bundles.delete_confirm', { name: bundle.name_display }))) {
             router.delete(destroy.url(bundle.id));
         }
     };
@@ -59,23 +59,23 @@ function BundleIndex({ bundles }: Props) {
 
     return (
         <>
-            <Head title={t('admin.bundles.title')} />
+            <Head title={t('bundles.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.bundles.title')}</PageTitle>
-                        <PageDescription>{t('admin.bundles.description')}</PageDescription>
+                        <PageTitle>{t('bundles.page.title')}</PageTitle>
+                        <PageDescription>{t('bundles.page.description')}</PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleSyncAll}>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            {t('admin.bundles.sync_all')}
+                            {t('bundles.page.sync_all')}
                         </Button>
                         <Button asChild>
                             <Link href={create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('admin.bundles.new_bundle')}
+                                {t('bundles.page.new_bundle')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -115,7 +115,7 @@ function BundleIndex({ bundles }: Props) {
                                         })()}
                                         {bundle.discount_percent > 0 && (
                                             <Badge variant="default">
-                                                {t('admin.bundles.discount', { percent: bundle.discount_percent })}
+                                                {t('bundles.discount', { percent: bundle.discount_percent })}
                                             </Badge>
                                         )}
                                         {!bundle.active && (
@@ -127,7 +127,7 @@ function BundleIndex({ bundles }: Props) {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => handleSync(bundle)}
-                                            title={t('admin.bundles.sync_with_stripe')}
+                                            title={t('bundles.page.sync_with_stripe')}
                                         >
                                             <RefreshCw className="h-4 w-4" />
                                         </Button>
@@ -146,7 +146,7 @@ function BundleIndex({ bundles }: Props) {
                                     </div>
                                 </div>
                                 <CardDescription>
-                                    {bundle.slug} &bull; {t('admin.bundles.addons_count', { count: bundle.addon_count })}
+                                    {bundle.slug} &bull; {t('bundles.addons_count', { count: bundle.addon_count })}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -165,31 +165,31 @@ function BundleIndex({ bundles }: Props) {
                                     <div className="flex items-center justify-between text-sm">
                                         <div className="flex gap-4">
                                             <span className="text-muted-foreground">
-                                                {t('admin.bundles.base_price', { price: formatPrice(bundle.base_price_monthly) })}
+                                                {t('bundles.base_price', { price: formatPrice(bundle.base_price_monthly) })}
                                             </span>
                                             <span className="font-medium">
-                                                {t('admin.bundles.effective_price', { price: formatPrice(bundle.price_monthly_effective) })}
+                                                {t('bundles.effective_price', { price: formatPrice(bundle.price_monthly_effective) })}
                                             </span>
                                             {bundle.savings_monthly > 0 && (
                                                 <span className="text-green-600">
-                                                    {t('admin.bundles.savings', { amount: formatPrice(bundle.savings_monthly) })}
+                                                    {t('bundles.savings', { amount: formatPrice(bundle.savings_monthly) })}
                                                 </span>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <span className="text-muted-foreground">
-                                                {t('admin.catalog.plans')}: {bundle.plans.map((p) => p.name).join(', ') || t('common.none')}
+                                                {t('catalog.page.plans')}: {bundle.plans.map((p) => p.name).join(', ') || t('common.none')}
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 {bundle.is_synced ? (
                                                     <>
                                                         <CheckCircle className="h-4 w-4 text-green-500" />
-                                                        <span className="text-green-600">{t('admin.catalog.synced')}</span>
+                                                        <span className="text-green-600">{t('catalog.page.synced')}</span>
                                                     </>
                                                 ) : (
                                                     <>
                                                         <XCircle className="h-4 w-4 text-yellow-500" />
-                                                        <span className="text-yellow-600">{t('admin.catalog.not_synced')}</span>
+                                                        <span className="text-yellow-600">{t('catalog.page.not_synced')}</span>
                                                     </>
                                                 )}
                                             </span>
@@ -204,9 +204,9 @@ function BundleIndex({ bundles }: Props) {
                         <Card>
                             <CardContent className="py-8 text-center">
                                 <Package className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <p className="mt-4 text-muted-foreground">{t('admin.bundles.no_bundles')}</p>
+                                <p className="mt-4 text-muted-foreground">{t('bundles.page.no_bundles')}</p>
                                 <Button asChild className="mt-4">
-                                    <Link href={create.url()}>{t('admin.bundles.create_first')}</Link>
+                                    <Link href={create.url()}>{t('bundles.page.create_first')}</Link>
                                 </Button>
                             </CardContent>
                         </Card>

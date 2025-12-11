@@ -38,8 +38,8 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
         { title: 'Branding', href: admin.settings.branding.url() },
     ];
 
@@ -71,9 +71,9 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Palette}>{t('tenant.settings.branding')}</PageTitle>
+                        <PageTitle icon={Palette}>{t('settings.branding')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.settings.branding_page_description', { name: tenantData.name })}
+                            {t('settings.branding_page_description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -85,7 +85,7 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
                         <CardHeader>
                             <CardTitle>Logo</CardTitle>
                             <CardDescription>
-                                {t('tenant.settings.logo_description')}
+                                {t('settings.logo_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -93,7 +93,7 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
                                 {branding.logo_url && (
                                     <img
                                         src={branding.logo_url}
-                                        alt={t('tenant.settings.current_logo')}
+                                        alt={t('settings.current_logo')}
                                         className="h-16 w-16 object-contain rounded border"
                                     />
                                 )}
@@ -115,7 +115,7 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
                                         <Upload className="mr-2 h-4 w-4" />
                                         {data.logo
                                             ? data.logo.name
-                                            : t('tenant.settings.choose_file')}
+                                            : t('settings.choose_file')}
                                     </Button>
                                     {errors.logo && (
                                         <p className="text-sm text-red-500 mt-1">
@@ -130,16 +130,16 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
                     {/* Colors */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('tenant.settings.colors')}</CardTitle>
+                            <CardTitle>{t('settings.colors')}</CardTitle>
                             <CardDescription>
-                                {t('tenant.settings.colors_description')}
+                                {t('settings.colors_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="primary_color">
-                                        {t('tenant.settings.primary_color')}
+                                        {t('settings.primary_color')}
                                     </Label>
                                     <div className="flex gap-2">
                                         <Input
@@ -174,7 +174,7 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="secondary_color">
-                                        {t('tenant.settings.secondary_color')}
+                                        {t('settings.secondary_color')}
                                     </Label>
                                     <div className="flex gap-2">
                                         <Input
@@ -214,9 +214,9 @@ function BrandingSettingsPage({ tenant: tenantData, branding }: Props) {
                     {/* Custom CSS */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('tenant.settings.custom_css')}</CardTitle>
+                            <CardTitle>{t('settings.custom_css')}</CardTitle>
                             <CardDescription>
-                                {t('tenant.settings.custom_css_description')}
+                                {t('settings.custom_css_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

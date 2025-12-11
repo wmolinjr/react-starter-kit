@@ -19,8 +19,8 @@ function EditRole({ role, permissions }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.roles.title'), href: admin.roles.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('roles.page.title'), href: admin.roles.index.url() },
         { title: role.display_name_display, href: admin.roles.edit.url(role.id) },
     ];
 
@@ -32,13 +32,13 @@ function EditRole({ role, permissions }: Props) {
 
     return (
         <>
-            <Head title={`${t('admin.roles.edit_role')}: ${role.display_name_display}`} />
+            <Head title={`${t('roles.page.edit_role')}: ${role.display_name_display}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.roles.edit_role')}</PageTitle>
-                        <PageDescription>{t('admin.roles.update_description', { name: role.display_name_display })}</PageDescription>
+                        <PageTitle>{t('roles.page.edit_role')}</PageTitle>
+                        <PageDescription>{t('roles.update_description', { name: role.display_name_display })}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

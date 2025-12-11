@@ -41,9 +41,9 @@ function DangerSettings({ tenant: tenantData }: Props) {
     const isConfirmed = confirmText === tenantData.slug;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('tenant.settings.danger_zone'), href: admin.settings.danger.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
+        { title: t('settings.danger_zone'), href: admin.settings.danger.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -60,16 +60,16 @@ function DangerSettings({ tenant: tenantData }: Props) {
 
     return (
         <>
-            <Head title={t('tenant.settings.danger_zone')} />
+            <Head title={t('settings.danger_zone')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle icon={AlertTriangle} className="text-red-600 dark:text-red-400">
-                            {t('tenant.settings.danger_zone')}
+                            {t('settings.danger_zone')}
                         </PageTitle>
                         <PageDescription>
-                            {t('tenant.settings.danger_zone_page_description', { name: tenantData.name })}
+                            {t('settings.danger_zone_page_description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -83,10 +83,10 @@ function DangerSettings({ tenant: tenantData }: Props) {
                             <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 flex-shrink-0" />
                             <div>
                                 <p className="font-medium text-red-600 dark:text-red-400">
-                                    {t('tenant.settings.attention')}
+                                    {t('settings.attention')}
                                 </p>
                                 <p className="text-sm text-red-600/80 dark:text-red-400/80">
-                                    {t('tenant.settings.danger_warning')}
+                                    {t('settings.danger_warning')}
                                 </p>
                             </div>
                         </div>
@@ -97,25 +97,25 @@ function DangerSettings({ tenant: tenantData }: Props) {
                 <Card className="border-red-200 dark:border-red-900">
                     <CardHeader>
                         <CardTitle className="text-red-600 dark:text-red-400">
-                            {t('tenant.settings.delete_organization')}
+                            {t('settings.delete_organization')}
                         </CardTitle>
                         <CardDescription>
-                            {t('tenant.settings.delete_description', { name: tenantData.name })}
+                            {t('settings.delete_description', { name: tenantData.name })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                            <li>{t('tenant.settings.delete_item_projects')}</li>
-                            <li>{t('tenant.settings.delete_item_members')}</li>
-                            <li>{t('tenant.settings.delete_item_settings')}</li>
-                            <li>{t('tenant.settings.delete_item_history')}</li>
-                            <li>{t('tenant.settings.delete_item_tokens')}</li>
+                            <li>{t('settings.delete_item_projects')}</li>
+                            <li>{t('settings.delete_item_members')}</li>
+                            <li>{t('settings.delete_item_settings')}</li>
+                            <li>{t('settings.delete_item_history')}</li>
+                            <li>{t('settings.delete_item_tokens')}</li>
                         </ul>
 
                         <div className="space-y-4 pt-4 border-t">
                             <div className="space-y-2">
                                 <Label htmlFor="confirm">
-                                    {t('tenant.settings.confirm_type')}{' '}
+                                    {t('settings.confirm_type')}{' '}
                                     <code className="bg-muted px-1 rounded font-bold">
                                         {tenantData.slug}
                                     </code>
@@ -138,16 +138,16 @@ function DangerSettings({ tenant: tenantData }: Props) {
                                         disabled={!isConfirmed || processing}
                                     >
                                         <Trash2 className="mr-2 h-4 w-4" />
-                                        {t('tenant.settings.delete_permanently')}
+                                        {t('settings.delete_permanently')}
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>
-                                            {t('tenant.settings.are_you_sure')}
+                                            {t('settings.are_you_sure')}
                                         </AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            {t('tenant.settings.delete_final_warning', { name: tenantData.name })}
+                                            {t('settings.delete_final_warning', { name: tenantData.name })}
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
@@ -159,8 +159,8 @@ function DangerSettings({ tenant: tenantData }: Props) {
                                             className="bg-red-600 hover:bg-red-700"
                                         >
                                             {processing
-                                                ? t('tenant.settings.deleting')
-                                                : t('tenant.settings.yes_delete_all')}
+                                                ? t('settings.deleting')
+                                                : t('settings.yes_delete_all')}
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>

@@ -44,8 +44,8 @@ function FederationUserShow({ group, user }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.federation.title'), href: admin.federation.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('federation.page.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
         { title: user.synced_data.name || user.global_email, href: admin.federation.users.show.url({ group: group.id, user: user.id }) },
     ];
@@ -62,7 +62,7 @@ function FederationUserShow({ group, user }: Props) {
 
     return (
         <>
-            <Head title={`${t('admin.federation.federated_user')}: ${user.synced_data.name || user.global_email}`} />
+            <Head title={`${t('federation.page.federated_user')}: ${user.synced_data.name || user.global_email}`} />
 
             <Page>
                 <PageHeader>
@@ -79,7 +79,7 @@ function FederationUserShow({ group, user }: Props) {
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleSyncUser}>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            {t('admin.federation.sync_now')}
+                            {t('federation.page.sync_now')}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -94,7 +94,7 @@ function FederationUserShow({ group, user }: Props) {
                                         <Building2 className="text-primary h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.linked_tenants')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.linked_tenants')}</p>
                                         <p className="text-2xl font-bold">{user.links_count}</p>
                                     </div>
                                 </div>
@@ -107,7 +107,7 @@ function FederationUserShow({ group, user }: Props) {
                                         <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.synced')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.synced')}</p>
                                         <p className="text-2xl font-bold">{syncedLinks}</p>
                                     </div>
                                 </div>
@@ -121,7 +121,7 @@ function FederationUserShow({ group, user }: Props) {
                                             <AlertTriangle className="text-destructive h-5 w-5" />
                                         </div>
                                         <div>
-                                            <p className="text-muted-foreground text-sm">{t('admin.federation.failed')}</p>
+                                            <p className="text-muted-foreground text-sm">{t('federation.page.failed')}</p>
                                             <p className="text-2xl font-bold">{failedLinks}</p>
                                         </div>
                                     </div>
@@ -135,7 +135,7 @@ function FederationUserShow({ group, user }: Props) {
                                         <RefreshCw className="text-primary h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.sync_version')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.sync_version')}</p>
                                         <p className="text-2xl font-bold">v{user.sync_version}</p>
                                     </div>
                                 </div>
@@ -147,7 +147,7 @@ function FederationUserShow({ group, user }: Props) {
                     <div className="grid gap-6 md:grid-cols-2">
                         <Card>
                             <CardHeader>
-                                <CardTitle>{t('admin.federation.user_info')}</CardTitle>
+                                <CardTitle>{t('federation.page.user_info')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
@@ -164,7 +164,7 @@ function FederationUserShow({ group, user }: Props) {
                                         <p className="font-medium">{user.synced_data.locale || '-'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.two_factor')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.two_factor')}</p>
                                         <p className="font-medium">
                                             {user.synced_data.two_factor_enabled ? (
                                                 <span className="flex items-center gap-1 text-green-600">
@@ -182,12 +182,12 @@ function FederationUserShow({ group, user }: Props) {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>{t('admin.federation.sync_info')}</CardTitle>
+                                <CardTitle>{t('federation.page.sync_info')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.master_tenant')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.master_tenant')}</p>
                                         <p className="font-medium">
                                             {user.master_tenant ? (
                                                 <span className="flex items-center gap-1">
@@ -200,11 +200,11 @@ function FederationUserShow({ group, user }: Props) {
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.last_sync_source')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.last_sync_source')}</p>
                                         <p className="font-medium">{user.last_sync_source || '-'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.last_synced')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.last_synced')}</p>
                                         <p className="font-medium">
                                             {user.last_synced_at
                                                 ? new Date(user.last_synced_at).toLocaleString()
@@ -225,10 +225,10 @@ function FederationUserShow({ group, user }: Props) {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Network className="h-5 w-5" />
-                                {t('admin.federation.tenant_links')}
+                                {t('federation.page.tenant_links')}
                             </CardTitle>
                             <CardDescription>
-                                {t('admin.federation.tenant_links_description')}
+                                {t('federation.page.tenant_links_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -236,10 +236,10 @@ function FederationUserShow({ group, user }: Props) {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>{t('admin.federation.tenant')}</TableHead>
-                                            <TableHead>{t('admin.federation.sync_status')}</TableHead>
-                                            <TableHead>{t('admin.federation.last_synced')}</TableHead>
-                                            <TableHead>{t('admin.federation.created_via')}</TableHead>
+                                            <TableHead>{t('federation.page.tenant')}</TableHead>
+                                            <TableHead>{t('federation.page.sync_status')}</TableHead>
+                                            <TableHead>{t('federation.page.last_synced')}</TableHead>
+                                            <TableHead>{t('federation.page.created_via')}</TableHead>
                                             <TableHead>{t('common.actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -285,7 +285,7 @@ function FederationUserShow({ group, user }: Props) {
                             ) : (
                                 <div className="py-8 text-center">
                                     <Network className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                                    <p className="text-muted-foreground">{t('admin.federation.no_tenant_links')}</p>
+                                    <p className="text-muted-foreground">{t('federation.page.no_tenant_links')}</p>
                                 </div>
                             )}
                         </CardContent>

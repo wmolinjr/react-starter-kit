@@ -1,8 +1,17 @@
 {
+    "roles.form.basic_info_description": "Defina o nome e descrição da regra de acesso",
     "roles.form.create_description": "Adicione uma nova regra de acesso com permissões específicas para sua equipe",
     "roles.form.create_title": "Criar Regra de Acesso",
     "roles.form.delete_confirm": "Tem certeza que deseja excluir a regra de acesso \":name\"?",
+    "roles.form.display_name_label": "Nome de Exibição",
     "roles.form.edit_description": "Atualizar regra de acesso :name e permissões",
     "roles.form.edit_title": "Editar Regra de Acesso",
-    "roles.form.new": "Nova Regra de Acesso"
+    "roles.form.name_hint": "Usado internamente, minúsculas com hífens",
+    "roles.form.name_label": "Nome da Regra de Acesso (identificador)",
+    "roles.form.name_placeholder": "central-admin",
+    "roles.form.new": "Nova Regra de Acesso",
+    "roles.form.no_permissions": "Nenhuma permissão disponível. Execute o comando de sincronização de permissões.",
+    "roles.form.permissions_description": "Selecione quais permissões esta regra de acesso deve ter.",
+    "roles.form.protected_alert": "Esta é uma regra de acesso protegida do sistema. O nome não pode ser alterado.",
+    "roles.form.selected": ":count selecionadas"
 }

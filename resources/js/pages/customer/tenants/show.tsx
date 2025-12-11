@@ -46,13 +46,13 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'active':
-                return <Badge variant="default">{t('billing.active')}</Badge>;
+                return <Badge variant="default">{t('billing.page.active')}</Badge>;
             case 'trialing':
-                return <Badge variant="secondary">{t('billing.trialing')}</Badge>;
+                return <Badge variant="secondary">{t('billing.page.trialing')}</Badge>;
             case 'past_due':
-                return <Badge variant="destructive">{t('billing.past_due')}</Badge>;
+                return <Badge variant="destructive">{t('billing.page.past_due')}</Badge>;
             case 'canceled':
-                return <Badge variant="outline">{t('billing.canceled')}</Badge>;
+                return <Badge variant="outline">{t('billing.page.canceled')}</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
@@ -106,7 +106,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                                     {getStatusBadge(subscription.status)}
                                     {subscription.cancel_at_period_end && (
                                         <span className="text-xs text-muted-foreground">
-                                            {t('billing.cancels_at_period_end')}
+                                            {t('billing.page.cancels_at_period_end')}
                                         </span>
                                     )}
                                 </div>
@@ -165,7 +165,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                                         <p className="text-sm text-muted-foreground">
                                             {subscription.current_period_end && (
                                                 <>
-                                                    {t('billing.renews_on')}{' '}
+                                                    {t('billing.page.renews_on')}{' '}
                                                     {new Date(subscription.current_period_end).toLocaleDateString()}
                                                 </>
                                             )}

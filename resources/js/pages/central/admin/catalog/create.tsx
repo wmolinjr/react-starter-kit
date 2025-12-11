@@ -21,22 +21,22 @@ function CatalogCreate({ types, plans, featureDefinitions, limitDefinitions, cat
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.catalog.title'), href: admin.catalog.index.url() },
-        { title: t('admin.catalog.create_addon'), href: admin.catalog.create.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('catalog.page.title'), href: admin.catalog.index.url() },
+        { title: t('catalog.page.create_addon'), href: admin.catalog.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     return (
         <>
-            <Head title={t('admin.catalog.create_addon')} />
+            <Head title={t('catalog.page.create_addon')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.catalog.create_addon')}</PageTitle>
-                        <PageDescription>{t('admin.catalog.add_new_item')}</PageDescription>
+                        <PageTitle>{t('catalog.page.create_addon')}</PageTitle>
+                        <PageDescription>{t('catalog.page.add_new_item')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

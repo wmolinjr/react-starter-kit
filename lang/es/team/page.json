@@ -1,0 +1,19 @@
+{
+    "team.page.active_members": "Miembros activos",
+    "team.page.confirm_remove": "¿Estás seguro de que deseas eliminar a :name del equipo?",
+    "team.page.confirm_role_change": "¿Estás seguro de que deseas cambiar el rol de este miembro a :role?",
+    "team.page.description": "Gestiona los miembros de tu equipo",
+    "team.page.invite_member": "Invitar Miembro",
+    "team.page.no_members": "No hay miembros",
+    "team.page.page_title": "Administrar equipo",
+    "team.page.pending_invite": "Invitación pendiente",
+    "team.page.promote_to_admin": "Promover a administrador",
+    "team.page.remove_from_team": "Eliminar del equipo",
+    "team.page.role_admin": "Administrador",
+    "team.page.role_guest": "Invitado",
+    "team.page.role_member": "Miembro",
+    "team.page.set_as_guest": "Establecer como invitado",
+    "team.page.set_as_member": "Establecer como miembro",
+    "team.page.status_active": "Activo",
+    "team.page.title": "Equipo"
+}

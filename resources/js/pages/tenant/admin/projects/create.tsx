@@ -30,9 +30,9 @@ function ProjectCreate() {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.projects.title'), href: admin.projects.index.url() },
-        { title: t('tenant.projects.create_project'), href: admin.projects.create.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('projects.page.title'), href: admin.projects.index.url() },
+        { title: t('projects.page.create_project'), href: admin.projects.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -50,14 +50,14 @@ function ProjectCreate() {
 
     return (
         <>
-            <Head title={t('tenant.projects.new_project')} />
+            <Head title={t('projects.page.new_project')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={FolderPlus}>{t('tenant.projects.new_project')}</PageTitle>
+                        <PageTitle icon={FolderPlus}>{t('projects.page.new_project')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.projects.new_project_description')}
+                            {t('projects.page.new_project_description')}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -65,9 +65,9 @@ function ProjectCreate() {
                 <PageContent>
                     <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.projects.project_info')}</CardTitle>
+                        <CardTitle>{t('projects.page.project_info')}</CardTitle>
                         <CardDescription>
-                            {t('tenant.projects.fill_project_data')}
+                            {t('projects.page.fill_project_data')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -80,7 +80,7 @@ function ProjectCreate() {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
-                                    placeholder={t('tenant.projects.name_placeholder')}
+                                    placeholder={t('projects.page.name_placeholder')}
                                     className={errors.name ? 'border-red-500' : ''}
                                 />
                                 {errors.name && (
@@ -98,7 +98,7 @@ function ProjectCreate() {
                                     onChange={(e) =>
                                         setData('description', e.target.value)
                                     }
-                                    placeholder={t('tenant.projects.description_placeholder')}
+                                    placeholder={t('projects.page.description_placeholder')}
                                     rows={4}
                                     className={
                                         errors.description ? 'border-red-500' : ''
@@ -124,14 +124,14 @@ function ProjectCreate() {
                                             errors.status ? 'border-red-500' : ''
                                         }
                                     >
-                                        <SelectValue placeholder={t('tenant.projects.select_status')} />
+                                        <SelectValue placeholder={t('projects.page.select_status')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="active">
-                                            {t('tenant.projects.status_active')}
+                                            {t('projects.page.status_active')}
                                         </SelectItem>
                                         <SelectItem value="archived">
-                                            {t('tenant.projects.status_archived')}
+                                            {t('projects.page.status_archived')}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -147,7 +147,7 @@ function ProjectCreate() {
                                     <Link href={admin.projects.index.url()}>{t('common.cancel')}</Link>
                                 </Button>
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? t('tenant.projects.creating') : t('tenant.projects.create_project')}
+                                    {processing ? t('projects.page.creating') : t('projects.page.create_project')}
                                 </Button>
                             </div>
                         </form>

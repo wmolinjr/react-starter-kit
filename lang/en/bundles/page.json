@@ -1,0 +1,18 @@
+{
+    "bundles.page.addons_count": ":count add-ons",
+    "bundles.page.base_price": "Base: :price",
+    "bundles.page.create_bundle": "Create Bundle",
+    "bundles.page.create_first": "Create your first bundle",
+    "bundles.page.delete_confirm": "Delete bundle \":name\"?",
+    "bundles.page.description": "Manage addon bundles (packages) available for purchase",
+    "bundles.page.discount": ":percent% off",
+    "bundles.page.edit_bundle": "Edit Bundle",
+    "bundles.page.effective_price": "Price: :price",
+    "bundles.page.new_bundle": "New Bundle",
+    "bundles.page.no_bundles": "No bundles yet.",
+    "bundles.page.savings": "Save :amount",
+    "bundles.page.sync_all": "Sync All with Stripe",
+    "bundles.page.sync_with_stripe": "Sync with Stripe",
+    "bundles.page.title": "Bundle Catalog",
+    "bundles.page.update_bundle": "Update Bundle"
+}

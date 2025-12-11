@@ -184,7 +184,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                             value={data.slug}
                             onChange={e => setData('slug', e.target.value)}
                             disabled={isEdit}
-                            placeholder={t('admin.bundles.form.slug_placeholder')}
+                            placeholder={t('bundles.form.slug_placeholder')}
                             className="max-w-xs"
                         />
                         {errors.slug && <p className="text-sm text-red-500">{errors.slug}</p>}
@@ -204,7 +204,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                         value={data.description}
                         onChange={v => setData('description', v)}
                         placeholder={{
-                            en: t('admin.bundles.form.description_placeholder'),
+                            en: t('bundles.form.description_placeholder'),
                             pt_BR: 'Obtenha mais armazenamento, usuários e relatórios com desconto...',
                         }}
                         multiline
@@ -214,8 +214,8 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('admin.bundles.form.addons')}</CardTitle>
-                    <CardDescription>{t('admin.bundles.form.addons_description')}</CardDescription>
+                    <CardTitle>{t('bundles.form.addons')}</CardTitle>
+                    <CardDescription>{t('bundles.form.addons_description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {data.addons.map((bundleAddon, index) => {
@@ -223,13 +223,13 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                         return (
                             <div key={index} className="flex items-center gap-4 rounded-lg border p-4">
                                 <div className="flex-1">
-                                    <Label>{t('admin.bundles.form.addon')}</Label>
+                                    <Label>{t('bundles.form.addon')}</Label>
                                     <Select
                                         value={bundleAddon.addon_id}
                                         onValueChange={v => updateAddon(index, 'addon_id', v)}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder={t('admin.bundles.form.select_addon')} />
+                                            <SelectValue placeholder={t('bundles.form.select_addon')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {selectedAddon && (
@@ -269,7 +269,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
 
                     {data.addons.length < 2 && (
                         <p className="text-sm text-muted-foreground">
-                            {t('admin.bundles.form.no_addons')}
+                            {t('bundles.form.no_addons')}
                         </p>
                     )}
 
@@ -280,7 +280,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                         disabled={availableAddons.length === 0}
                     >
                         <Plus className="mr-2 h-4 w-4" />
-                        {t('admin.bundles.form.add_addon')}
+                        {t('bundles.form.add_addon')}
                     </Button>
 
                     {errors.addons && <p className="text-sm text-red-500">{errors.addons}</p>}
@@ -294,7 +294,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="discount_percent">{t('admin.bundles.form.discount_percent')}</Label>
+                            <Label htmlFor="discount_percent">{t('bundles.form.discount_percent')}</Label>
                             <div className="flex items-center gap-2">
                                 <Input
                                     id="discount_percent"
@@ -313,7 +313,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="price_monthly">
-                                {t('admin.bundles.form.price_override')} ({t('common.monthly')})
+                                {t('bundles.form.price_override')} ({t('common.monthly')})
                             </Label>
                             <Input
                                 id="price_monthly"
@@ -325,7 +325,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="price_yearly">
-                                {t('admin.bundles.form.price_override')} ({t('common.yearly')})
+                                {t('bundles.form.price_override')} ({t('common.yearly')})
                             </Label>
                             <Input
                                 id="price_yearly"
@@ -339,7 +339,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
 
                     {/* Calculated price preview */}
                     <div className="rounded-lg border bg-muted/50 p-4">
-                        <h4 className="mb-2 font-medium">{t('admin.bundles.form.calculated_price')}</h4>
+                        <h4 className="mb-2 font-medium">{t('bundles.form.calculated_price')}</h4>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span className="text-muted-foreground">{t('common.monthly')}: </span>
@@ -416,15 +416,15 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('admin.bundles.form.features')}</CardTitle>
-                    <CardDescription>{t('admin.bundles.form.features_description')}</CardDescription>
+                    <CardTitle>{t('bundles.form.features')}</CardTitle>
+                    <CardDescription>{t('bundles.form.features_description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {data.features.map((feature, index) => (
                         <div key={index} className="flex items-start gap-2">
                             <div className="flex-1">
                                 <TranslatableInput
-                                    label={`${t('admin.bundles.form.feature')} ${index + 1}`}
+                                    label={`${t('bundles.form.feature')} ${index + 1}`}
                                     value={feature}
                                     onChange={v => updateFeature(index, v)}
                                     placeholder={{
@@ -446,7 +446,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                     ))}
                     <Button type="button" variant="outline" onClick={addFeature}>
                         <Plus className="mr-2 h-4 w-4" />
-                        {t('admin.bundles.form.add_feature')}
+                        {t('bundles.form.add_feature')}
                     </Button>
                 </CardContent>
             </Card>
@@ -487,7 +487,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                     {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={processing || data.addons.length < 2}>
-                    {isEdit ? t('admin.bundles.update_bundle') : t('admin.bundles.create_bundle')}
+                    {isEdit ? t('bundles.page.update_bundle') : t('bundles.page.create_bundle')}
                 </Button>
             </div>
         </form>

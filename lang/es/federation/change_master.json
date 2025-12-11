@@ -1,0 +1,10 @@
+{
+    "federation.change_master.confirm_button": "Cambiar Inquilino Principal",
+    "federation.change_master.confirm_text": "Entiendo que esta operación migrará todos los usuarios federados al nuevo inquilino principal y no se puede deshacer fácilmente.",
+    "federation.change_master.description": "Transferir el rol principal del inquilino actual a otro inquilino en :group",
+    "federation.change_master.new_master": "Nuevo Inquilino Principal",
+    "federation.change_master.select_tenant": "Seleccione el nuevo inquilino principal...",
+    "federation.change_master.selected_info": ":tenant se convertirá en el nuevo inquilino principal de este grupo de federación.",
+    "federation.change_master.title": "Cambiar Inquilino Principal",
+    "federation.change_master.warning": "Esta es una operación crítica. Todos los usuarios federados serán migrados al nuevo inquilino principal. Esto puede tomar algún tiempo dependiendo del número de usuarios."
+}

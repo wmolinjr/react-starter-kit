@@ -42,8 +42,8 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.team.title'), href: admin.team.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('team.page.title'), href: admin.team.index.url() },
         { title: user.name, href: admin.settings.federation.show.url(user.id) },
     ];
 
@@ -54,7 +54,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
     };
 
     const handleUnfederate = () => {
-        if (confirm(t('tenant.federation.unfederate_confirm', { name: user.name }))) {
+        if (confirm(t('federation.unfederate_confirm', { name: user.name }))) {
             router.delete(admin.settings.federation.users.unfederate.url(user.id));
         }
     };
@@ -75,16 +75,16 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
 
     return (
         <>
-            <Head title={`${t('tenant.federation.title')} - ${user.name}`} />
+            <Head title={`${t('federation.page.title')} - ${user.name}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle icon={Network}>
-                            {t('tenant.federation.user_info_title', { name: user.name })}
+                            {t('federation.user_info_title', { name: user.name })}
                         </PageTitle>
                         <PageDescription>
-                            {t('tenant.federation.user_info_description')}
+                            {t('federation.page.user_info_description')}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -95,7 +95,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <User className="h-5 w-5" />
-                                {t('tenant.federation.user_details')}
+                                {t('federation.page.user_details')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -133,23 +133,23 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                 <div>
                                     <CardTitle className="flex items-center gap-2">
                                         <Network className="h-5 w-5" />
-                                        {t('tenant.federation.status')}
+                                        {t('federation.page.status')}
                                     </CardTitle>
                                     <CardDescription>
                                         {federationInfo.is_federated
-                                            ? t('tenant.federation.user_is_federated')
-                                            : t('tenant.federation.user_not_federated')}
+                                            ? t('federation.page.user_is_federated')
+                                            : t('federation.page.user_not_federated')}
                                     </CardDescription>
                                 </div>
                                 <div>
                                     {federationInfo.is_federated ? (
                                         <Badge variant="default">
                                             <LinkIcon className="mr-1 h-3 w-3" />
-                                            {t('tenant.federation.federated')}
+                                            {t('federation.page.federated')}
                                         </Badge>
                                     ) : (
                                         <Badge variant="secondary">
-                                            {t('tenant.federation.local_only')}
+                                            {t('federation.page.local_only')}
                                         </Badge>
                                     )}
                                 </div>
@@ -162,9 +162,9 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                     {federationInfo.is_master_user && (
                                         <Alert>
                                             <Crown className="h-4 w-4" />
-                                            <AlertTitle>{t('tenant.federation.master_user')}</AlertTitle>
+                                            <AlertTitle>{t('federation.page.master_user')}</AlertTitle>
                                             <AlertDescription>
-                                                {t('tenant.federation.master_user_description')}
+                                                {t('federation.page.master_user_description')}
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -173,14 +173,14 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div>
                                             <p className="text-muted-foreground text-sm">
-                                                {t('tenant.federation.federation_id')}
+                                                {t('federation.page.federation_id')}
                                             </p>
                                             <p className="font-mono text-sm">{federationInfo.federation_id}</p>
                                         </div>
                                         {federationInfo.group && (
                                             <div>
                                                 <p className="text-muted-foreground text-sm">
-                                                    {t('tenant.federation.group')}
+                                                    {t('federation.page.group')}
                                                 </p>
                                                 <p className="font-medium">{federationInfo.group.name}</p>
                                             </div>
@@ -189,7 +189,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                             <>
                                                 <div>
                                                     <p className="text-muted-foreground text-sm">
-                                                        {t('tenant.federation.link_status')}
+                                                        {t('federation.page.link_status')}
                                                     </p>
                                                     <Badge
                                                         variant={
@@ -203,7 +203,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                                 </div>
                                                 <div>
                                                     <p className="text-muted-foreground text-sm">
-                                                        {t('tenant.federation.sync_enabled')}
+                                                        {t('federation.page.sync_enabled')}
                                                     </p>
                                                     <p className="font-medium">
                                                         {federationInfo.link.sync_enabled
@@ -213,7 +213,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                                 </div>
                                                 <div>
                                                     <p className="text-muted-foreground text-sm">
-                                                        {t('tenant.federation.last_synced')}
+                                                        {t('federation.page.last_synced')}
                                                     </p>
                                                     <p className="font-medium">
                                                         {formatDateTime(federationInfo.link.last_synced_at)}
@@ -221,7 +221,7 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                                 </div>
                                                 <div>
                                                     <p className="text-muted-foreground text-sm">
-                                                        {t('tenant.federation.linked_at')}
+                                                        {t('federation.page.linked_at')}
                                                     </p>
                                                     <p className="font-medium">
                                                         {formatDate(federationInfo.link.linked_at)}
@@ -235,12 +235,12 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                                     <div className="flex gap-2">
                                         <Button onClick={handleSync} variant="outline">
                                             <RefreshCw className="mr-2 h-4 w-4" />
-                                            {t('tenant.federation.sync_now')}
+                                            {t('federation.page.sync_now')}
                                         </Button>
                                         {canUnfederate && (
                                             <Button onClick={handleUnfederate} variant="destructive">
                                                 <Unlink className="mr-2 h-4 w-4" />
-                                                {t('tenant.federation.unfederate')}
+                                                {t('federation.page.unfederate')}
                                             </Button>
                                         )}
                                     </div>
@@ -248,12 +248,12 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                             ) : (
                                 <div className="space-y-4">
                                     <p className="text-muted-foreground">
-                                        {t('tenant.federation.user_not_federated_description')}
+                                        {t('federation.page.user_not_federated_description')}
                                     </p>
                                     {canFederate && (
                                         <Button onClick={handleFederate}>
                                             <LinkIcon className="mr-2 h-4 w-4" />
-                                            {t('tenant.federation.federate_user')}
+                                            {t('federation.page.federate_user')}
                                         </Button>
                                     )}
                                 </div>
@@ -267,10 +267,10 @@ function FederationInfoPage({ user, federationInfo, canFederate, canUnfederate }
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Calendar className="h-5 w-5" />
-                                    {t('tenant.federation.synced_data')}
+                                    {t('federation.page.synced_data')}
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('tenant.federation.synced_data_description')}
+                                    {t('federation.page.synced_data_description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

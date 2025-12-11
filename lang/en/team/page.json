@@ -1,0 +1,19 @@
+{
+    "team.page.active_members": "Active members",
+    "team.page.confirm_remove": "Are you sure you want to remove :name from the team?",
+    "team.page.confirm_role_change": "Are you sure you want to change this member's role to :role?",
+    "team.page.description": "Invite members, manage permissions, and control access to :name.",
+    "team.page.invite_member": "Invite Member",
+    "team.page.no_members": "No members found.",
+    "team.page.page_title": "Manage Team",
+    "team.page.pending_invite": "Pending Invite",
+    "team.page.promote_to_admin": "Promote to Admin",
+    "team.page.remove_from_team": "Remove from Team",
+    "team.page.role_admin": "Admin",
+    "team.page.role_guest": "Guest",
+    "team.page.role_member": "Member",
+    "team.page.set_as_guest": "Set as Guest",
+    "team.page.set_as_member": "Set as Member",
+    "team.page.status_active": "Active",
+    "team.page.title": "Team"
+}

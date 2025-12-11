@@ -1,0 +1,17 @@
+{
+    "bundles.form.add_addon": "Add Add-on",
+    "bundles.form.add_feature": "Add Feature",
+    "bundles.form.addon": "Add-on",
+    "bundles.form.addons": "Bundle Add-ons",
+    "bundles.form.addons_description": "Select at least 2 add-ons for this bundle",
+    "bundles.form.calculated_price": "Calculated Price",
+    "bundles.form.description_placeholder": "Get more storage, users and reports at a discounted price...",
+    "bundles.form.discount_percent": "Discount Percentage",
+    "bundles.form.feature": "Feature",
+    "bundles.form.features": "Marketing Features",
+    "bundles.form.features_description": "Bullet points shown to users",
+    "bundles.form.no_addons": "Add at least 2 add-ons to create a bundle",
+    "bundles.form.price_override": "Price Override (optional, in cents)",
+    "bundles.form.select_addon": "Select an add-on...",
+    "bundles.form.slug_placeholder": "power_pack"
+}

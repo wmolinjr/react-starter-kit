@@ -57,8 +57,8 @@ function CatalogIndex({ addons }: Props) {
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.catalog.title'), href: admin.catalog.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('catalog.page.title'), href: admin.catalog.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -72,30 +72,30 @@ function CatalogIndex({ addons }: Props) {
     };
 
     const handleDelete = (addon: Addon) => {
-        if (confirm(t('admin.catalog.delete_confirm', { name: addon.name_display }))) {
+        if (confirm(t('catalog.delete_confirm', { name: addon.name_display }))) {
             router.delete(destroy.url(addon.id));
         }
     };
 
     return (
         <>
-            <Head title={t('admin.catalog.title')} />
+            <Head title={t('catalog.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.catalog.title')}</PageTitle>
-                        <PageDescription>{t('admin.catalog.description')}</PageDescription>
+                        <PageTitle>{t('catalog.page.title')}</PageTitle>
+                        <PageDescription>{t('catalog.page.description')}</PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleSyncAll}>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            {t('admin.catalog.sync_all')}
+                            {t('catalog.page.sync_all')}
                         </Button>
                         <Button asChild>
                             <Link href={create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('admin.catalog.new_addon')}
+                                {t('catalog.page.new_addon')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -142,7 +142,7 @@ function CatalogIndex({ addons }: Props) {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => handleSync(addon)}
-                                            title={t('admin.catalog.sync_with_stripe')}
+                                            title={t('catalog.page.sync_with_stripe')}
                                         >
                                             <RefreshCw className="h-4 w-4" />
                                         </Button>
@@ -179,18 +179,18 @@ function CatalogIndex({ addons }: Props) {
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <span className="text-muted-foreground">
-                                            {t('admin.catalog.plans')}: {addon.plans.map((p) => p.name).join(', ') || t('common.none')}
+                                            {t('catalog.page.plans')}: {addon.plans.map((p) => p.name).join(', ') || t('common.none')}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             {addon.is_synced ? (
                                                 <>
                                                     <CheckCircle className="h-4 w-4 text-green-500" />
-                                                    <span className="text-green-600">{t('admin.catalog.synced')}</span>
+                                                    <span className="text-green-600">{t('catalog.page.synced')}</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <XCircle className="h-4 w-4 text-yellow-500" />
-                                                    <span className="text-yellow-600">{t('admin.catalog.not_synced')}</span>
+                                                    <span className="text-yellow-600">{t('catalog.page.not_synced')}</span>
                                                 </>
                                             )}
                                         </span>
@@ -203,9 +203,9 @@ function CatalogIndex({ addons }: Props) {
                     {addons.length === 0 && (
                         <Card>
                             <CardContent className="py-8 text-center">
-                                <p className="text-muted-foreground">{t('admin.catalog.no_addons')}</p>
+                                <p className="text-muted-foreground">{t('catalog.page.no_addons')}</p>
                                 <Button asChild className="mt-4">
-                                    <Link href={create.url()}>{t('admin.catalog.create_first')}</Link>
+                                    <Link href={create.url()}>{t('catalog.page.create_first')}</Link>
                                 </Button>
                             </CardContent>
                         </Card>

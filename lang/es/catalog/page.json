@@ -1,0 +1,22 @@
+{
+    "catalog.page.add_new_item": "Agregar un nuevo elemento al catálogo",
+    "catalog.page.create_addon": "Crear Complemento",
+    "catalog.page.create_first": "Cree su primer complemento",
+    "catalog.page.delete_confirm": "¿Eliminar \":name\"?",
+    "catalog.page.description": "Administrar complementos disponibles para compra",
+    "catalog.page.edit_addon": "Editar Complemento",
+    "catalog.page.monthly_price": "Precio Mensual",
+    "catalog.page.new_addon": "Nuevo Complemento",
+    "catalog.page.no_addons": "Aún no hay complementos.",
+    "catalog.page.not_synced": "No sincronizado",
+    "catalog.page.one_time_price": "Precio Único",
+    "catalog.page.plans": "Planes",
+    "catalog.page.product": "Producto",
+    "catalog.page.stripe_integration": "Integración con Stripe",
+    "catalog.page.sync_all": "Sincronizar Todo",
+    "catalog.page.sync_with_stripe": "Sincronizar con Stripe",
+    "catalog.page.synced": "Sincronizado",
+    "catalog.page.title": "Catálogo de Complementos",
+    "catalog.page.update_addon": "Actualizar Complemento",
+    "catalog.page.yearly_price": "Precio Anual"
+}

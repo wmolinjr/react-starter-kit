@@ -41,7 +41,7 @@ function UserShow({ user }: Props) {
                     <div className="grid gap-6 md:grid-cols-2">
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('admin.users.user_details')}</CardTitle>
+                            <CardTitle>{t('users.page.user_details')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-center gap-3">
@@ -63,9 +63,9 @@ function UserShow({ user }: Props) {
                             <div>
                                 <p className="text-sm font-medium">{t('common.status')}</p>
                                 {user.email_verified_at ? (
-                                    <Badge variant="default">{t('admin.users.email_verified')}</Badge>
+                                    <Badge variant="default">{t('users.page.email_verified')}</Badge>
                                 ) : (
-                                    <Badge variant="secondary">{t('admin.users.pending_verification')}</Badge>
+                                    <Badge variant="secondary">{t('users.page.pending_verification')}</Badge>
                                 )}
                             </div>
                         </CardContent>
@@ -87,8 +87,8 @@ function UserShow({ user }: Props) {
                                         </p>
                                         <p className="text-muted-foreground text-xs">
                                             {user.is_super_admin
-                                                ? t('admin.users.super_admin_description')
-                                                : t('admin.users.admin_description')}
+                                                ? t('users.page.super_admin_description')
+                                                : t('users.page.admin_description')}
                                         </p>
                                     </div>
                                     <Badge variant={user.is_super_admin ? 'default' : 'secondary'}>

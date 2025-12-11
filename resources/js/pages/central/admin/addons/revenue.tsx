@@ -29,8 +29,8 @@ function AdminAddonsRevenue({
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: admin.dashboard.url() },
-        { title: t('admin.addons.title'), href: admin.addons.index.url() },
-        { title: t('admin.addons.revenue'), href: admin.addons.revenue.url() },
+        { title: t('addons.page.title'), href: admin.addons.index.url() },
+        { title: t('addons.page.revenue'), href: admin.addons.revenue.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -40,13 +40,13 @@ function AdminAddonsRevenue({
 
     return (
         <>
-            <Head title={t('admin.addons.revenue_dashboard')} />
+            <Head title={t('addons.page.revenue_dashboard')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.addons.revenue_dashboard')}</PageTitle>
-                        <PageDescription>{t('admin.addons.revenue_description')}</PageDescription>
+                        <PageTitle>{t('addons.page.revenue_dashboard')}</PageTitle>
+                        <PageDescription>{t('addons.page.revenue_description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -54,37 +54,37 @@ function AdminAddonsRevenue({
                     <div className="grid gap-4 md:grid-cols-3">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.monthly_recurring')}</CardDescription>
+                            <CardDescription>{t('addons.page.monthly_recurring')}</CardDescription>
                             <CardTitle className="text-3xl">{formatted_monthly}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground text-xs">{t('admin.addons.from_monthly')}</p>
+                            <p className="text-muted-foreground text-xs">{t('addons.page.from_monthly')}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.annual_revenue')}</CardDescription>
+                            <CardDescription>{t('addons.page.annual_revenue')}</CardDescription>
                             <CardTitle className="text-3xl">{formatted_yearly}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground text-xs">{t('admin.addons.from_yearly')}</p>
+                            <p className="text-muted-foreground text-xs">{t('addons.page.from_yearly')}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.estimated_mrr')}</CardDescription>
+                            <CardDescription>{t('addons.page.estimated_mrr')}</CardDescription>
                             <CardTitle className="text-3xl">{formattedTotal}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground text-xs">{t('admin.addons.combined_monthly')}</p>
+                            <p className="text-muted-foreground text-xs">{t('addons.page.combined_monthly')}</p>
                         </CardContent>
                     </Card>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('admin.addons.revenue_by_type')}</CardTitle>
-                        <CardDescription>{t('admin.addons.revenue_breakdown')}</CardDescription>
+                        <CardTitle>{t('addons.page.revenue_by_type')}</CardTitle>
+                        <CardDescription>{t('addons.page.revenue_breakdown')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
@@ -103,7 +103,7 @@ function AdminAddonsRevenue({
                             ))}
                             {revenue_by_type.length === 0 && (
                                 <p className="text-muted-foreground text-center py-4">
-                                    {t('admin.addons.no_revenue_data')}
+                                    {t('addons.page.no_revenue_data')}
                                 </p>
                             )}
                         </div>

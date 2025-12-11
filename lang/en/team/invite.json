@@ -1,0 +1,12 @@
+{
+    "team.invite.description": "Send an email invite to add a new member to your team.",
+    "team.invite.email_label": "E-mail",
+    "team.invite.max_users_reached": "You have reached the maximum number of users for your plan. Upgrade to add more members.",
+    "team.invite.role_admin_desc": "Can manage members and team settings.",
+    "team.invite.role_guest_desc": "View-only access, no editing permissions.",
+    "team.invite.role_label": "Role",
+    "team.invite.role_member_desc": "Can create and edit resources, but cannot manage members.",
+    "team.invite.send": "Send Invite",
+    "team.invite.sending": "Sending...",
+    "team.invite.title": "Invite New Member"
+}

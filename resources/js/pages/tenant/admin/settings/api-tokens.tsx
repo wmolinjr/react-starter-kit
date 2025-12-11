@@ -51,8 +51,8 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
     const [copied, setCopied] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
         { title: 'API Tokens', href: admin.settings.apiTokens.url() },
     ];
 
@@ -91,9 +91,9 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Key}>{t('tenant.settings.api_tokens')}</PageTitle>
+                        <PageTitle icon={Key}>{t('settings.api_tokens')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.settings.api_tokens_description')}
+                            {t('settings.api_tokens_description')}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -105,10 +105,10 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                     <Card className="border-green-500 bg-green-50 dark:bg-green-950">
                         <CardHeader>
                             <CardTitle className="text-green-700 dark:text-green-400">
-                                {t('tenant.settings.token_created')}
+                                {t('settings.token_created')}
                             </CardTitle>
                             <CardDescription>
-                                {t('tenant.settings.token_copy_warning')}
+                                {t('settings.token_copy_warning')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -123,7 +123,7 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                                     onClick={copyToClipboard}
                                 >
                                     <Copy className="mr-2 h-4 w-4" />
-                                    {copied ? t('tenant.settings.copied') : t('tenant.settings.copy')}
+                                    {copied ? t('settings.copied') : t('settings.copy')}
                                 </Button>
                             </div>
                         </CardContent>
@@ -133,16 +133,16 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                 {/* Create Token */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.settings.create_new_token')}</CardTitle>
+                        <CardTitle>{t('settings.create_new_token')}</CardTitle>
                         <CardDescription>
-                            {t('tenant.settings.create_token_description')}
+                            {t('settings.create_token_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="flex gap-4">
                             <div className="flex-1 space-y-2">
                                 <Label htmlFor="name" className="sr-only">
-                                    {t('tenant.settings.token_name')}
+                                    {t('settings.token_name')}
                                 </Label>
                                 <Input
                                     id="name"
@@ -150,7 +150,7 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
-                                    placeholder={t('tenant.settings.token_name_placeholder')}
+                                    placeholder={t('settings.token_name_placeholder')}
                                     className={
                                         errors.name ? 'border-red-500' : ''
                                     }
@@ -163,7 +163,7 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                             </div>
                             <Button type="submit" disabled={processing}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('tenant.settings.create_token')}
+                                {t('settings.create_token')}
                             </Button>
                         </form>
                     </CardContent>
@@ -172,11 +172,11 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                 {/* Tokens List */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.settings.active_tokens')}</CardTitle>
+                        <CardTitle>{t('settings.active_tokens')}</CardTitle>
                         <CardDescription>
                             {tokens.length === 0
-                                ? t('tenant.settings.no_tokens')
-                                : t('tenant.settings.tokens_count', { count: tokens.length })}
+                                ? t('settings.no_tokens')
+                                : t('settings.tokens_count', { count: tokens.length })}
                         </CardDescription>
                     </CardHeader>
                     {tokens.length > 0 && (
@@ -185,8 +185,8 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>{t('common.name')}</TableHead>
-                                        <TableHead>{t('tenant.settings.last_used')}</TableHead>
-                                        <TableHead>{t('tenant.settings.created_at')}</TableHead>
+                                        <TableHead>{t('settings.last_used')}</TableHead>
+                                        <TableHead>{t('settings.created_at')}</TableHead>
                                         <TableHead className="text-right">
                                             {t('common.actions')}
                                         </TableHead>
@@ -205,7 +205,7 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                                                       ).toLocaleDateString(
                                                           'pt-BR',
                                                       )
-                                                    : t('tenant.settings.never_used')}
+                                                    : t('settings.never_used')}
                                             </TableCell>
                                             <TableCell>
                                                 {new Date(
@@ -225,10 +225,10 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                                                     <AlertDialogContent>
                                                         <AlertDialogHeader>
                                                             <AlertDialogTitle>
-                                                                {t('tenant.settings.revoke_token_title')}
+                                                                {t('settings.revoke_token_title')}
                                                             </AlertDialogTitle>
                                                             <AlertDialogDescription>
-                                                                {t('tenant.settings.revoke_token_description', { name: token.name })}
+                                                                {t('settings.revoke_token_description', { name: token.name })}
                                                             </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
@@ -242,7 +242,7 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                                                                     )
                                                                 }
                                                             >
-                                                                {t('tenant.settings.revoke')}
+                                                                {t('settings.revoke')}
                                                             </AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
@@ -259,14 +259,14 @@ function ApiTokensSettings({ tokens, newToken }: Props) {
                 {/* Documentation */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.settings.api_usage')}</CardTitle>
+                        <CardTitle>{t('settings.api_usage')}</CardTitle>
                         <CardDescription>
-                            {t('tenant.settings.api_usage_description')}
+                            {t('settings.api_usage_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                            {t('tenant.settings.api_usage_instructions')}
+                            {t('settings.api_usage_instructions')}
                         </p>
                         <pre className="bg-muted p-4 rounded-lg text-sm overflow-x-auto">
                             {`curl -X GET \\

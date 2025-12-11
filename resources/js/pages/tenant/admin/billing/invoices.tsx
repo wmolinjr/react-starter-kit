@@ -48,9 +48,9 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
     const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDetailResource | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
-        { title: t('tenant.invoices.title'), href: admin.billing.invoices.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('billing.page.title'), href: admin.billing.index.url() },
+        { title: t('invoices.page.title'), href: admin.billing.invoices.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -66,7 +66,7 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
             return (
                 <Badge variant="default" className="bg-green-500">
                     <CheckCircle className="mr-1 h-3 w-3" />
-                    {t('tenant.invoices.status_paid')}
+                    {t('invoices.page.status_paid')}
                 </Badge>
             );
         }
@@ -76,20 +76,20 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                 return (
                     <Badge variant="secondary">
                         <Clock className="mr-1 h-3 w-3" />
-                        {t('tenant.invoices.status_open')}
+                        {t('invoices.page.status_open')}
                     </Badge>
                 );
             case 'void':
                 return (
                     <Badge variant="outline">
-                        {t('tenant.invoices.status_void')}
+                        {t('invoices.page.status_void')}
                     </Badge>
                 );
             case 'uncollectible':
                 return (
                     <Badge variant="destructive">
                         <AlertCircle className="mr-1 h-3 w-3" />
-                        {t('tenant.invoices.status_uncollectible')}
+                        {t('invoices.page.status_uncollectible')}
                     </Badge>
                 );
             default:
@@ -103,14 +103,14 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
 
     return (
         <>
-            <Head title={t('tenant.invoices.page_title')} />
+            <Head title={t('invoices.page.page_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={FileText}>{t('tenant.invoices.page_title')}</PageTitle>
+                        <PageTitle icon={FileText}>{t('invoices.page.page_title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.invoices.description', { name: tenantData.name })}
+                            {t('invoices.description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -118,24 +118,24 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                 <PageContent>
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('tenant.invoices.all_invoices')}</CardTitle>
+                            <CardTitle>{t('invoices.page.all_invoices')}</CardTitle>
                             <CardDescription>
-                                {t('tenant.invoices.all_invoices_description')}
+                                {t('invoices.page.all_invoices_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             {invoices.length === 0 ? (
                                 <div className="py-8 text-center text-muted-foreground">
-                                    {t('tenant.invoices.no_invoices')}
+                                    {t('invoices.page.no_invoices')}
                                 </div>
                             ) : (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>{t('tenant.invoices.column_number')}</TableHead>
-                                            <TableHead>{t('tenant.invoices.column_date')}</TableHead>
-                                            <TableHead>{t('tenant.invoices.column_amount')}</TableHead>
-                                            <TableHead>{t('tenant.invoices.column_status')}</TableHead>
+                                            <TableHead>{t('invoices.page.column_number')}</TableHead>
+                                            <TableHead>{t('invoices.page.column_date')}</TableHead>
+                                            <TableHead>{t('invoices.page.column_amount')}</TableHead>
+                                            <TableHead>{t('invoices.page.column_status')}</TableHead>
                                             <TableHead className="text-right">{t('common.actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -170,7 +170,7 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                                                         >
                                                             <a href={invoice.download_url}>
                                                                 <Download className="mr-2 h-4 w-4" />
-                                                                {t('tenant.billing.download')}
+                                                                {t('billing.page.download')}
                                                             </a>
                                                         </Button>
                                                     </div>
@@ -190,7 +190,7 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>
-                            {t('tenant.invoices.invoice_details')} {selectedInvoice?.number || selectedInvoice?.id.slice(0, 8)}
+                            {t('invoices.page.invoice_details')} {selectedInvoice?.number || selectedInvoice?.id.slice(0, 8)}
                         </DialogTitle>
                         <DialogDescription>
                             {selectedInvoice && formatDate(selectedInvoice.date)}
@@ -200,26 +200,26 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-muted-foreground">{t('tenant.invoices.column_status')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('invoices.page.column_status')}</p>
                                     <div className="mt-1">
                                         {getStatusBadge(selectedInvoice.status, selectedInvoice.paid)}
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm text-muted-foreground">{t('tenant.invoices.column_amount')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('invoices.page.column_amount')}</p>
                                     <p className="text-2xl font-bold">{selectedInvoice.total}</p>
                                 </div>
                             </div>
 
                             {selectedInvoice.lines.length > 0 && (
                                 <div>
-                                    <h4 className="mb-2 font-medium">{t('tenant.invoices.line_items')}</h4>
+                                    <h4 className="mb-2 font-medium">{t('invoices.page.line_items')}</h4>
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead>{t('common.description')}</TableHead>
-                                                <TableHead className="text-center">{t('tenant.invoices.quantity')}</TableHead>
-                                                <TableHead className="text-right">{t('tenant.invoices.column_amount')}</TableHead>
+                                                <TableHead className="text-center">{t('invoices.page.quantity')}</TableHead>
+                                                <TableHead className="text-right">{t('invoices.page.column_amount')}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -239,7 +239,7 @@ function InvoicesIndex({ invoices, tenant: tenantData }: Props) {
                                 <Button asChild>
                                     <a href={selectedInvoice.download_url}>
                                         <Download className="mr-2 h-4 w-4" />
-                                        {t('tenant.invoices.download_pdf')}
+                                        {t('invoices.page.download_pdf')}
                                     </a>
                                 </Button>
                             </div>

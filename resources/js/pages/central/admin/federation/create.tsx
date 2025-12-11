@@ -25,9 +25,9 @@ function FederationCreate({ tenants }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.federation.title'), href: admin.federation.index.url() },
-        { title: t('admin.federation.create_group'), href: admin.federation.create.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('federation.page.title'), href: admin.federation.index.url() },
+        { title: t('federation.page.create_group'), href: admin.federation.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -38,13 +38,13 @@ function FederationCreate({ tenants }: Props) {
 
     return (
         <>
-            <Head title={t('admin.federation.create_group')} />
+            <Head title={t('federation.page.create_group')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Network}>{t('admin.federation.create_group')}</PageTitle>
-                        <PageDescription>{t('admin.federation.create_description')}</PageDescription>
+                        <PageTitle icon={Network}>{t('federation.page.create_group')}</PageTitle>
+                        <PageDescription>{t('federation.page.create_description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

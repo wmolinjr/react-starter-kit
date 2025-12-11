@@ -91,8 +91,8 @@ function FederationShow({ group, availableTenants }: Props) {
     } = federation;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.federation.title'), href: admin.federation.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('federation.page.title'), href: admin.federation.index.url() },
         { title: group.name, href: admin.federation.show.url(group.id) },
     ];
 
@@ -107,7 +107,7 @@ function FederationShow({ group, availableTenants }: Props) {
     };
 
     const handleRetryAllSync = () => {
-        if (confirm(t('admin.federation.retry_sync_confirm'))) {
+        if (confirm(t('federation.page.retry_sync_confirm'))) {
             retryAllSync(group.id);
         }
     };
@@ -126,7 +126,7 @@ function FederationShow({ group, availableTenants }: Props) {
 
     return (
         <>
-            <Head title={`${t('admin.federation.title')}: ${group.name}`} />
+            <Head title={`${t('federation.page.title')}: ${group.name}`} />
 
             <Page>
                 <PageHeader>
@@ -140,7 +140,7 @@ function FederationShow({ group, availableTenants }: Props) {
                             )}
                         </PageTitle>
                         <PageDescription>
-                            {group.description || t('admin.federation.no_description')}
+                            {group.description || t('federation.page.no_description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -163,7 +163,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                         <Building2 className="text-primary h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.tenants')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.tenants')}</p>
                                         <p className="text-2xl font-bold">{group.tenants_count}</p>
                                     </div>
                                 </div>
@@ -177,7 +177,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground text-sm">
-                                            {t('admin.federation.federated_users')}
+                                            {t('federation.page.federated_users')}
                                         </p>
                                         <p className="text-2xl font-bold">{group.federated_users_count}</p>
                                     </div>
@@ -191,7 +191,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                         <RefreshCw className="text-primary h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-muted-foreground text-sm">{t('admin.federation.strategy')}</p>
+                                        <p className="text-muted-foreground text-sm">{t('federation.page.strategy')}</p>
                                         <p className="text-sm font-medium">{FEDERATION_SYNC_STRATEGY[group.sync_strategy].label}</p>
                                     </div>
                                 </div>
@@ -206,7 +206,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground text-sm">
-                                                {t('admin.federation.conflicts')}
+                                                {t('federation.page.conflicts')}
                                             </p>
                                             <p className="text-2xl font-bold">{group.stats.pending_conflicts}</p>
                                         </div>
@@ -219,12 +219,12 @@ function FederationShow({ group, availableTenants }: Props) {
                     {/* Info Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('admin.federation.group_info')}</CardTitle>
+                            <CardTitle>{t('federation.page.group_info')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <p className="text-muted-foreground text-sm">{t('admin.federation.master')}</p>
+                                    <p className="text-muted-foreground text-sm">{t('federation.page.master')}</p>
                                     <div className="flex items-center gap-2">
                                         <p className="font-medium">
                                             {group.master_tenant ? (
@@ -233,7 +233,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                     {group.master_tenant.name}
                                                 </span>
                                             ) : (
-                                                t('admin.federation.no_master')
+                                                t('federation.page.no_master')
                                             )}
                                         </p>
                                         {group.tenants && group.tenants.filter(t => !t.left_at).length > 1 && (
@@ -241,7 +241,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => setChangeMasterOpen(true)}
-                                                title={t('admin.federation.change_master.title')}
+                                                title={t('federation.change_master.title')}
                                             >
                                                 <ArrowRightLeft className="h-4 w-4" />
                                             </Button>
@@ -273,16 +273,16 @@ function FederationShow({ group, availableTenants }: Props) {
                         <TabsList>
                             <TabsTrigger value="tenants">
                                 <Building2 className="mr-2 h-4 w-4" />
-                                {t('admin.federation.tenants')} ({group.tenants?.length || 0})
+                                {t('federation.page.tenants')} ({group.tenants?.length || 0})
                             </TabsTrigger>
                             <TabsTrigger value="users">
                                 <Users className="mr-2 h-4 w-4" />
-                                {t('admin.federation.federated_users')} ({group.federated_users?.length || 0})
+                                {t('federation.page.federated_users')} ({group.federated_users?.length || 0})
                             </TabsTrigger>
                             {group.stats && group.stats.pending_conflicts > 0 && (
                                 <TabsTrigger value="conflicts">
                                     <AlertTriangle className="mr-2 h-4 w-4" />
-                                    {t('admin.federation.conflicts')} ({group.stats.pending_conflicts})
+                                    {t('federation.page.conflicts')} ({group.stats.pending_conflicts})
                                 </TabsTrigger>
                             )}
                         </TabsList>
@@ -292,9 +292,9 @@ function FederationShow({ group, availableTenants }: Props) {
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <CardTitle>{t('admin.federation.member_tenants')}</CardTitle>
+                                            <CardTitle>{t('federation.page.member_tenants')}</CardTitle>
                                             <CardDescription>
-                                                {t('admin.federation.member_tenants_description')}
+                                                {t('federation.page.member_tenants_description')}
                                             </CardDescription>
                                         </div>
                                         {availableTenants.length > 0 && (
@@ -304,7 +304,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                     onChange={(e) => e.target.value && handleAddTenant(e.target.value)}
                                                     defaultValue=""
                                                 >
-                                                    <option value="">{t('admin.federation.add_tenant')}</option>
+                                                    <option value="">{t('federation.page.add_tenant')}</option>
                                                     {availableTenants.map((tenant) => (
                                                         <option key={tenant.id} value={tenant.id}>
                                                             {tenant.name}
@@ -322,8 +322,8 @@ function FederationShow({ group, availableTenants }: Props) {
                                                 <TableRow>
                                                     <TableHead>{t('common.name')}</TableHead>
                                                     <TableHead>Slug</TableHead>
-                                                    <TableHead>{t('admin.federation.sync_status')}</TableHead>
-                                                    <TableHead>{t('admin.federation.joined_at')}</TableHead>
+                                                    <TableHead>{t('federation.page.sync_status')}</TableHead>
+                                                    <TableHead>{t('federation.page.joined_at')}</TableHead>
                                                     <TableHead>{t('common.actions')}</TableHead>
                                                 </TableRow>
                                             </TableHeader>
@@ -347,17 +347,17 @@ function FederationShow({ group, availableTenants }: Props) {
                                                             {tenant.left_at ? (
                                                                 <Badge variant="outline">
                                                                     <XCircle className="mr-1 h-3 w-3" />
-                                                                    {t('admin.federation.left')}
+                                                                    {t('federation.page.left')}
                                                                 </Badge>
                                                             ) : tenant.sync_enabled ? (
                                                                 <Badge variant="default">
                                                                     <CheckCircle className="mr-1 h-3 w-3" />
-                                                                    {t('admin.federation.sync_enabled')}
+                                                                    {t('federation.page.sync_enabled')}
                                                                 </Badge>
                                                             ) : (
                                                                 <Badge variant="secondary">
                                                                     <XCircle className="mr-1 h-3 w-3" />
-                                                                    {t('admin.federation.sync_disabled')}
+                                                                    {t('federation.page.sync_disabled')}
                                                                 </Badge>
                                                             )}
                                                         </TableCell>
@@ -377,7 +377,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                             <Button
                                                                                 variant="ghost"
                                                                                 size="icon"
-                                                                                title={t('admin.federation.rejoin')}
+                                                                                title={t('federation.page.rejoin')}
                                                                             >
                                                                                 <LogIn className="h-4 w-4 text-green-600" />
                                                                             </Button>
@@ -385,10 +385,10 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                         <AlertDialogContent>
                                                                             <AlertDialogHeader>
                                                                                 <AlertDialogTitle>
-                                                                                    {t('admin.federation.rejoin_title')}
+                                                                                    {t('federation.page.rejoin_title')}
                                                                                 </AlertDialogTitle>
                                                                                 <AlertDialogDescription>
-                                                                                    {t('admin.federation.rejoin_confirm', { name: tenant.name })}
+                                                                                    {t('federation.rejoin_confirm', { name: tenant.name })}
                                                                                 </AlertDialogDescription>
                                                                             </AlertDialogHeader>
                                                                             <AlertDialogFooter>
@@ -398,7 +398,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                                 <AlertDialogAction
                                                                                     onClick={() => handleRejoinTenant(tenant.id)}
                                                                                 >
-                                                                                    {t('admin.federation.rejoin')}
+                                                                                    {t('federation.page.rejoin')}
                                                                                 </AlertDialogAction>
                                                                             </AlertDialogFooter>
                                                                         </AlertDialogContent>
@@ -412,8 +412,8 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                                 variant="ghost"
                                                                                 size="icon"
                                                                                 title={tenant.sync_enabled
-                                                                                    ? t('admin.federation.disable_sync')
-                                                                                    : t('admin.federation.enable_sync')
+                                                                                    ? t('federation.page.disable_sync')
+                                                                                    : t('federation.page.enable_sync')
                                                                                 }
                                                                             >
                                                                                 {tenant.sync_enabled ? (
@@ -427,14 +427,14 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                             <AlertDialogHeader>
                                                                                 <AlertDialogTitle>
                                                                                     {tenant.sync_enabled
-                                                                                        ? t('admin.federation.disable_sync_title')
-                                                                                        : t('admin.federation.enable_sync_title')
+                                                                                        ? t('federation.page.disable_sync_title')
+                                                                                        : t('federation.page.enable_sync_title')
                                                                                     }
                                                                                 </AlertDialogTitle>
                                                                                 <AlertDialogDescription>
                                                                                     {tenant.sync_enabled
-                                                                                        ? t('admin.federation.disable_sync_confirm', { name: tenant.name })
-                                                                                        : t('admin.federation.enable_sync_confirm', { name: tenant.name })
+                                                                                        ? t('federation.disable_sync_confirm', { name: tenant.name })
+                                                                                        : t('federation.enable_sync_confirm', { name: tenant.name })
                                                                                     }
                                                                                 </AlertDialogDescription>
                                                                             </AlertDialogHeader>
@@ -463,7 +463,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                             <Button
                                                                                 variant="ghost"
                                                                                 size="icon"
-                                                                                title={t('admin.federation.remove_tenant')}
+                                                                                title={t('federation.page.remove_tenant')}
                                                                             >
                                                                                 <Trash2 className="text-destructive h-4 w-4" />
                                                                             </Button>
@@ -471,10 +471,10 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                         <AlertDialogContent>
                                                                             <AlertDialogHeader>
                                                                                 <AlertDialogTitle>
-                                                                                    {t('admin.federation.remove_tenant_title')}
+                                                                                    {t('federation.page.remove_tenant_title')}
                                                                                 </AlertDialogTitle>
                                                                                 <AlertDialogDescription>
-                                                                                    {t('admin.federation.remove_tenant_confirm', { name: tenant.name })}
+                                                                                    {t('federation.remove_tenant_confirm', { name: tenant.name })}
                                                                                 </AlertDialogDescription>
                                                                             </AlertDialogHeader>
                                                                             <AlertDialogFooter>
@@ -500,7 +500,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                     ) : (
                                         <div className="py-8 text-center">
                                             <Building2 className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                                            <p className="text-muted-foreground">{t('admin.federation.no_tenants')}</p>
+                                            <p className="text-muted-foreground">{t('federation.page.no_tenants')}</p>
                                         </div>
                                     )}
                                 </CardContent>
@@ -512,15 +512,15 @@ function FederationShow({ group, availableTenants }: Props) {
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <CardTitle>{t('admin.federation.federated_users')}</CardTitle>
+                                            <CardTitle>{t('federation.page.federated_users')}</CardTitle>
                                             <CardDescription>
-                                                {t('admin.federation.federated_users_description')}
+                                                {t('federation.page.federated_users_description')}
                                             </CardDescription>
                                         </div>
                                         {group.stats && group.stats.failed_syncs > 0 && (
                                             <Button variant="outline" onClick={handleRetryAllSync}>
                                                 <RefreshCw className="mr-2 h-4 w-4" />
-                                                {t('admin.federation.retry_failed_syncs')}
+                                                {t('federation.page.retry_failed_syncs')}
                                             </Button>
                                         )}
                                     </div>
@@ -531,8 +531,8 @@ function FederationShow({ group, availableTenants }: Props) {
                                             <TableHeader>
                                                 <TableRow>
                                                     <TableHead>{t('common.user')}</TableHead>
-                                                    <TableHead>{t('admin.federation.master_tenant')}</TableHead>
-                                                    <TableHead>{t('admin.federation.linked_tenants')}</TableHead>
+                                                    <TableHead>{t('federation.page.master_tenant')}</TableHead>
+                                                    <TableHead>{t('federation.page.linked_tenants')}</TableHead>
                                                     <TableHead>{t('common.status')}</TableHead>
                                                     <TableHead>{t('common.actions')}</TableHead>
                                                 </TableRow>
@@ -576,7 +576,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() => handleSyncUser(user.id)}
-                                                                    title={t('admin.federation.sync_user')}
+                                                                    title={t('federation.page.sync_user')}
                                                                 >
                                                                     <RefreshCw className="h-4 w-4" />
                                                                 </Button>
@@ -600,7 +600,7 @@ function FederationShow({ group, availableTenants }: Props) {
                                         <div className="py-8 text-center">
                                             <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                                             <p className="text-muted-foreground">
-                                                {t('admin.federation.no_federated_users')}
+                                                {t('federation.page.no_federated_users')}
                                             </p>
                                         </div>
                                     )}
@@ -614,15 +614,15 @@ function FederationShow({ group, availableTenants }: Props) {
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <CardTitle>{t('admin.federation.conflicts')}</CardTitle>
+                                                <CardTitle>{t('federation.page.conflicts')}</CardTitle>
                                                 <CardDescription>
-                                                    {t('admin.federation.conflicts_description')}
+                                                    {t('federation.page.conflicts_description')}
                                                 </CardDescription>
                                             </div>
                                             <Button asChild>
                                                 <Link href={admin.federation.conflicts.index.url(group.id)}>
                                                     <AlertTriangle className="mr-2 h-4 w-4" />
-                                                    {t('admin.federation.view_all_conflicts')}
+                                                    {t('federation.page.view_all_conflicts')}
                                                 </Link>
                                             </Button>
                                         </div>
@@ -631,13 +631,13 @@ function FederationShow({ group, availableTenants }: Props) {
                                         <div className="py-8 text-center">
                                             <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-yellow-500" />
                                             <p className="text-muted-foreground">
-                                                {t('admin.federation.conflicts_pending', {
+                                                {t('federation.conflicts_pending', {
                                                     count: group.stats.pending_conflicts,
                                                 })}
                                             </p>
                                             <Button asChild className="mt-4">
                                                 <Link href={admin.federation.conflicts.index.url(group.id)}>
-                                                    {t('admin.federation.resolve_conflicts')}
+                                                    {t('federation.page.resolve_conflicts')}
                                                 </Link>
                                             </Button>
                                         </div>

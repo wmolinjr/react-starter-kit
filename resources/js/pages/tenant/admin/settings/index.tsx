@@ -58,16 +58,16 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
     const { hasFeature } = usePlan();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     const allSettingsLinks: SettingsLink[] = [
         {
-            title: t('tenant.settings.branding'),
-            description: t('tenant.settings.branding_description'),
+            title: t('settings.branding'),
+            description: t('settings.branding_description'),
             href: admin.settings.branding.url(),
             icon: Palette,
             permission: 'branding:view',
@@ -75,30 +75,30 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
             badge: 'Enterprise',
         },
         {
-            title: t('tenant.settings.domains'),
-            description: t('tenant.settings.domains_description'),
+            title: t('settings.domains'),
+            description: t('settings.domains_description'),
             href: admin.settings.domains.url(),
             icon: Globe,
-            badge: t('tenant.settings.domains_count', { count: domains.length }),
+            badge: t('settings.domains_count', { count: domains.length }),
             permission: 'settings:edit',
         },
         {
-            title: t('tenant.config.title'),
-            description: t('tenant.config.description', { name: tenantData.name }),
+            title: t('config.page.title'),
+            description: t('config.description', { name: tenantData.name }),
             href: admin.settings.config.url(),
             icon: Settings2,
             permission: 'settings:edit',
         },
         {
-            title: t('tenant.settings.api_tokens'),
-            description: t('tenant.settings.api_tokens_description'),
+            title: t('settings.api_tokens'),
+            description: t('settings.api_tokens_description'),
             href: admin.settings.apiTokens.url(),
             icon: Key,
             permission: 'apiTokens:view',
         },
         {
-            title: t('tenant.settings.custom_roles'),
-            description: t('tenant.settings.custom_roles_description'),
+            title: t('settings.custom_roles'),
+            description: t('settings.custom_roles_description'),
             href: admin.settings.roles.index.url(),
             icon: Shield,
             badge: 'Pro+',
@@ -106,8 +106,8 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
             feature: 'customRoles',
         },
         {
-            title: t('tenant.settings.federation'),
-            description: t('tenant.settings.federation_description'),
+            title: t('settings.federation'),
+            description: t('settings.federation_description'),
             href: admin.settings.federation.index.url(),
             icon: Network,
             badge: 'Enterprise',
@@ -115,8 +115,8 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
             feature: 'federation',
         },
         {
-            title: t('tenant.settings.danger_zone'),
-            description: t('tenant.settings.danger_zone_description'),
+            title: t('settings.danger_zone'),
+            description: t('settings.danger_zone_description'),
             href: admin.settings.danger.url(),
             icon: AlertTriangle,
             variant: 'destructive',
@@ -139,14 +139,14 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
 
     return (
         <>
-            <Head title={t('tenant.settings.title')} />
+            <Head title={t('settings.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Settings}>{t('tenant.settings.title')}</PageTitle>
+                        <PageTitle icon={Settings}>{t('settings.title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.settings.description', { name: tenantData.name })}
+                            {t('settings.description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -157,9 +157,9 @@ function SettingsIndex({ tenant: tenantData, domains }: Props) {
                 {/* Tenant Info */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('tenant.settings.tenant_info')}</CardTitle>
+                        <CardTitle>{t('settings.tenant_info')}</CardTitle>
                         <CardDescription>
-                            {t('tenant.settings.tenant_info_description')}
+                            {t('settings.tenant_info_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">

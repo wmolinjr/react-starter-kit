@@ -1,0 +1,19 @@
+{
+    "team.page.active_members": "Membros ativos",
+    "team.page.confirm_remove": "Tem certeza que deseja remover :name do time?",
+    "team.page.confirm_role_change": "Tem certeza que deseja alterar a regra de acesso deste membro para :role?",
+    "team.page.description": "Convide membros, gerencie permissões e controle o acesso ao :name.",
+    "team.page.invite_member": "Convidar Membro",
+    "team.page.no_members": "Nenhum membro encontrado.",
+    "team.page.page_title": "Gerenciar Time",
+    "team.page.pending_invite": "Convite Pendente",
+    "team.page.promote_to_admin": "Promover para Admin",
+    "team.page.remove_from_team": "Remover do Time",
+    "team.page.role_admin": "Administrador",
+    "team.page.role_guest": "Convidado",
+    "team.page.role_member": "Membro",
+    "team.page.set_as_guest": "Definir como Convidado",
+    "team.page.set_as_member": "Definir como Membro",
+    "team.page.status_active": "Ativo",
+    "team.page.title": "Equipe"
+}

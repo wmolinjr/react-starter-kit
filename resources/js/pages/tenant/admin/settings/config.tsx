@@ -77,9 +77,9 @@ function ConfigSettings({
     }, []);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('tenant.config.title'), href: admin.settings.config.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('settings.title'), href: admin.settings.index.url() },
+        { title: t('config.page.title'), href: admin.settings.config.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -156,14 +156,14 @@ function ConfigSettings({
 
     return (
         <>
-            <Head title={t('tenant.config.title')} />
+            <Head title={t('config.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Settings2}>{t('tenant.config.title')}</PageTitle>
+                        <PageTitle icon={Settings2}>{t('config.page.title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.config.description', { name: tenantData.name })}
+                            {t('config.description', { name: tenantData.name })}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -175,21 +175,21 @@ function ConfigSettings({
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Building2 className="h-5 w-5" />
-                                    {t('tenant.config.branding')}
+                                    {t('config.page.branding')}
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('tenant.config.branding_description')}
+                                    {t('config.page.branding_description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2 max-w-md">
                                     <Label htmlFor="app_name">
-                                        {t('tenant.config.app_name_label')}
+                                        {t('config.page.app_name_label')}
                                     </Label>
                                     <Input
                                         id="app_name"
                                         type="text"
-                                        placeholder={t('tenant.config.app_name_placeholder')}
+                                        placeholder={t('config.page.app_name_placeholder')}
                                         value={data.app_name}
                                         onChange={(e) => setData('app_name', e.target.value)}
                                     />
@@ -197,7 +197,7 @@ function ConfigSettings({
                                         <p className="text-sm text-destructive">{errors.app_name}</p>
                                     )}
                                     <p className="text-sm text-muted-foreground">
-                                        {t('tenant.config.app_name_note')}
+                                        {t('config.page.app_name_note')}
                                     </p>
                                 </div>
                             </CardContent>
@@ -208,10 +208,10 @@ function ConfigSettings({
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Globe className="h-5 w-5" />
-                                    {t('tenant.config.regional_settings')}
+                                    {t('config.page.regional_settings')}
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('tenant.config.regional_settings_description')}
+                                    {t('config.page.regional_settings_description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
@@ -219,13 +219,13 @@ function ConfigSettings({
                                 <div className="grid gap-6 md:grid-cols-2">
                                     {/* Language */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="locale">{t('tenant.config.language')}</Label>
+                                        <Label htmlFor="locale">{t('config.page.language')}</Label>
                                         <Select
                                             value={data.locale}
                                             onValueChange={(value) => setData('locale', value)}
                                         >
                                             <SelectTrigger id="locale">
-                                                <SelectValue placeholder={t('tenant.config.select_language')} />
+                                                <SelectValue placeholder={t('config.page.select_language')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {availableLocales.map((locale) => (
@@ -242,13 +242,13 @@ function ConfigSettings({
 
                                     {/* Currency */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="currency">{t('tenant.config.currency')}</Label>
+                                        <Label htmlFor="currency">{t('config.page.currency')}</Label>
                                         <Select
                                             value={data.currency}
                                             onValueChange={(value) => setData('currency', value)}
                                         >
                                             <SelectTrigger id="currency">
-                                                <SelectValue placeholder={t('tenant.config.select_currency')} />
+                                                <SelectValue placeholder={t('config.page.select_currency')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {Object.entries(availableCurrencies).map(([code, name]) => (
@@ -270,18 +270,18 @@ function ConfigSettings({
                                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                                     {/* Timezone */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="timezone">{t('tenant.config.timezone')}</Label>
+                                        <Label htmlFor="timezone">{t('config.page.timezone')}</Label>
                                         <Select
                                             value={data.timezone}
                                             onValueChange={(value) => setData('timezone', value)}
                                         >
                                             <SelectTrigger id="timezone">
-                                                <SelectValue placeholder={t('tenant.config.select_timezone')} />
+                                                <SelectValue placeholder={t('config.page.select_timezone')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <div className="px-2 pb-2">
                                                     <Input
-                                                        placeholder={t('tenant.config.search_timezone')}
+                                                        placeholder={t('config.page.search_timezone')}
                                                         value={timezoneSearch}
                                                         onChange={(e) => setTimezoneSearch(e.target.value)}
                                                         className="h-8"
@@ -294,7 +294,7 @@ function ConfigSettings({
                                                 ))}
                                                 {filteredTimezones.length > 50 && (
                                                     <p className="px-2 py-1 text-xs text-muted-foreground">
-                                                        {t('tenant.config.more_timezones', { count: filteredTimezones.length - 50 })}
+                                                        {t('config.more_timezones', { count: filteredTimezones.length - 50 })}
                                                     </p>
                                                 )}
                                             </SelectContent>
@@ -306,13 +306,13 @@ function ConfigSettings({
 
                                     {/* Date Format */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="date_format">{t('tenant.config.date_format')}</Label>
+                                        <Label htmlFor="date_format">{t('config.page.date_format')}</Label>
                                         <Select
                                             value={data.date_format}
                                             onValueChange={(value) => setData('date_format', value)}
                                         >
                                             <SelectTrigger id="date_format">
-                                                <SelectValue placeholder={t('tenant.config.select_date_format')} />
+                                                <SelectValue placeholder={t('config.page.select_date_format')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {Object.entries(availableDateFormats).map(([format, label]) => (
@@ -329,13 +329,13 @@ function ConfigSettings({
 
                                     {/* Time Format */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="time_format">{t('tenant.config.time_format')}</Label>
+                                        <Label htmlFor="time_format">{t('config.page.time_format')}</Label>
                                         <Select
                                             value={data.time_format}
                                             onValueChange={(value) => setData('time_format', value)}
                                         >
                                             <SelectTrigger id="time_format">
-                                                <SelectValue placeholder={t('tenant.config.select_time_format')} />
+                                                <SelectValue placeholder={t('config.page.select_time_format')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {Object.entries(availableTimeFormats).map(([format, label]) => (
@@ -352,13 +352,13 @@ function ConfigSettings({
 
                                     {/* Week Starts On */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="week_starts_on">{t('tenant.config.week_starts_on')}</Label>
+                                        <Label htmlFor="week_starts_on">{t('config.page.week_starts_on')}</Label>
                                         <Select
                                             value={String(data.week_starts_on)}
                                             onValueChange={(value) => setData('week_starts_on', parseInt(value, 10))}
                                         >
                                             <SelectTrigger id="week_starts_on">
-                                                <SelectValue placeholder={t('tenant.config.select_week_start')} />
+                                                <SelectValue placeholder={t('config.page.select_week_start')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {Object.entries(availableWeekdays).map(([day, label]) => (
@@ -377,11 +377,11 @@ function ConfigSettings({
                                 {/* Timezone Helper & Preview */}
                                 <div className="rounded-md border bg-muted/50 p-4 space-y-3">
                                     <p className="text-sm text-muted-foreground">
-                                        {t('tenant.config.timezone_helper')}
+                                        {t('config.page.timezone_helper')}
                                     </p>
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between text-sm">
-                                            <span className="text-muted-foreground">{t('tenant.config.universal_time')}</span>
+                                            <span className="text-muted-foreground">{t('config.page.universal_time')}</span>
                                             <span className="font-mono">
                                                 {(() => {
                                                     const utc = formatForTimezone(currentTime, 'UTC', data.date_format, data.time_format);
@@ -390,7 +390,7 @@ function ConfigSettings({
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between text-sm">
-                                            <span className="text-muted-foreground">{t('tenant.config.local_time')}</span>
+                                            <span className="text-muted-foreground">{t('config.page.local_time')}</span>
                                             <span className="font-mono font-medium">
                                                 {(() => {
                                                     const local = formatForTimezone(currentTime, data.timezone, data.date_format, data.time_format);
@@ -408,17 +408,17 @@ function ConfigSettings({
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Mail className="h-5 w-5" />
-                                    {t('tenant.config.email_settings')}
+                                    {t('config.page.email_settings')}
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('tenant.config.email_settings_description')}
+                                    {t('config.page.email_settings_description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-6 md:grid-cols-2">
                                 {/* From Address */}
                                 <div className="space-y-2">
                                     <Label htmlFor="mail_from_address">
-                                        {t('tenant.config.from_address')}
+                                        {t('config.page.from_address')}
                                     </Label>
                                     <Input
                                         id="mail_from_address"
@@ -431,14 +431,14 @@ function ConfigSettings({
                                         <p className="text-sm text-destructive">{errors.mail_from_address}</p>
                                     )}
                                     <p className="text-sm text-muted-foreground">
-                                        {t('tenant.config.from_address_note')}
+                                        {t('config.page.from_address_note')}
                                     </p>
                                 </div>
 
                                 {/* From Name */}
                                 <div className="space-y-2">
                                     <Label htmlFor="mail_from_name">
-                                        {t('tenant.config.from_name')}
+                                        {t('config.page.from_name')}
                                     </Label>
                                     <Input
                                         id="mail_from_name"

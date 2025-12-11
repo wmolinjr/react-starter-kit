@@ -1,0 +1,22 @@
+{
+    "activity.page.column_action": "Ação",
+    "activity.page.column_date": "Data",
+    "activity.page.column_description": "Descrição",
+    "activity.page.column_subject": "Objeto",
+    "activity.page.column_user": "Usuário",
+    "activity.page.description": "Visualize todas as atividades e alterações em :name.",
+    "activity.page.event_created": "Criado",
+    "activity.page.event_deleted": "Deletado",
+    "activity.page.event_login": "Login",
+    "activity.page.event_logout": "Logout",
+    "activity.page.event_updated": "Atualizado",
+    "activity.page.filter_date_from": "Data Inicial",
+    "activity.page.filter_date_to": "Data Final",
+    "activity.page.filter_event": "Tipo de Evento",
+    "activity.page.filter_subject": "Tipo de Objeto",
+    "activity.page.filter_user": "Usuário",
+    "activity.page.no_activities": "Nenhuma atividade registrada ainda.",
+    "activity.page.page_title": "Atividade do Time",
+    "activity.page.system": "Sistema",
+    "activity.page.title": "Atividades"
+}

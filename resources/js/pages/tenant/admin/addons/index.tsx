@@ -98,9 +98,9 @@ function AddonsPageContent({
     const cartTotal = total;
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
-        { title: t('tenant.addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('billing.page.title'), href: admin.billing.index.url() },
+        { title: t('addons.title', { default: 'Add-ons' }), href: admin.addons.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -286,17 +286,17 @@ function AddonsPageContent({
 
     return (
         <>
-            <Head title={t('tenant.addons.title', { default: 'Add-ons' })} />
+            <Head title={t('addons.title', { default: 'Add-ons' })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle>
                             <Puzzle className="mr-2 h-6 w-6" />
-                            {t('tenant.addons.title', { default: 'Add-ons' })}
+                            {t('addons.title', { default: 'Add-ons' })}
                         </PageTitle>
                         <PageDescription>
-                            {t('tenant.addons.description', {
+                            {t('addons.description', {
                                 default: 'Extend your capabilities with additional features and quotas',
                             })}
                         </PageDescription>
@@ -311,7 +311,7 @@ function AddonsPageContent({
                         />
                         <Button variant="outline" onClick={() => router.visit(admin.billing.index.url())}>
                             <CreditCard className="mr-2 h-4 w-4" />
-                            {t('tenant.billing.title', { default: 'Billing' })}
+                            {t('billing.title', { default: 'Billing' })}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -332,7 +332,7 @@ function AddonsPageContent({
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="flex items-center gap-2 text-base">
                                         <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                        {t('tenant.addons.active_subscriptions', { default: 'Active Subscriptions' })}
+                                        {t('addons.active_subscriptions', { default: 'Active Subscriptions' })}
                                     </CardTitle>
                                     <Badge variant="secondary" className="text-sm">
                                         {formattedMonthlyCost}
@@ -355,7 +355,7 @@ function AddonsPageContent({
                                                 <div>
                                                     <p className="font-medium">{bundle.bundle_name}</p>
                                                     <p className="text-muted-foreground text-xs">
-                                                        {bundle.addon_count} {t('tenant.addons.addons_included', { default: 'add-ons' })}
+                                                        {bundle.addon_count} {t('addons.addons_included', { default: 'add-ons' })}
                                                     </p>
                                                 </div>
                                             </div>
@@ -393,11 +393,11 @@ function AddonsPageContent({
                         <TabsList className="grid w-full max-w-md grid-cols-2">
                             <TabsTrigger value="addons" className="gap-2">
                                 <Puzzle className="h-4 w-4" />
-                                {t('tenant.addons.individual', { default: 'Individual Add-ons' })}
+                                {t('addons.individual', { default: 'Individual Add-ons' })}
                             </TabsTrigger>
                             <TabsTrigger value="bundles" className="gap-2">
                                 <Package className="h-4 w-4" />
-                                {t('tenant.addons.bundles', { default: 'Bundles' })}
+                                {t('addons.bundles', { default: 'Bundles' })}
                                 {availableBundles.length > 0 && (
                                     <Badge variant="secondary" className="ml-1">
                                         {t('billing.price.save', { default: 'Save' })}
@@ -413,10 +413,10 @@ function AddonsPageContent({
                                     <CardContent className="py-12 text-center">
                                         <Puzzle className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                                         <h3 className="text-lg font-semibold">
-                                            {t('tenant.addons.no_addons', { default: 'No add-ons available' })}
+                                            {t('addons.no_addons', { default: 'No add-ons available' })}
                                         </h3>
                                         <p className="text-muted-foreground mt-2">
-                                            {t('tenant.addons.no_addons_description', {
+                                            {t('addons.no_addons_description', {
                                                 default: 'There are no add-ons available for your current plan.',
                                             })}
                                         </p>
@@ -448,10 +448,10 @@ function AddonsPageContent({
                                     <CardContent className="py-12 text-center">
                                         <Package className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                                         <h3 className="text-lg font-semibold">
-                                            {t('tenant.addons.no_bundles', { default: 'No bundles available' })}
+                                            {t('addons.no_bundles', { default: 'No bundles available' })}
                                         </h3>
                                         <p className="text-muted-foreground mt-2">
-                                            {t('tenant.addons.no_bundles_description', {
+                                            {t('addons.no_bundles_description', {
                                                 default: 'There are no bundles available for your current plan.',
                                             })}
                                         </p>
@@ -473,7 +473,7 @@ function AddonsPageContent({
                                                 isInCart={hasProduct(bundle.slug)}
                                                 hasConflicts={hasConflicts}
                                                 conflictMessage={hasConflicts
-                                                    ? t('tenant.addons.bundle_conflict', {
+                                                    ? t('addons.bundle_conflict', {
                                                         default: 'You already own: :addons',
                                                         addons: conflicts.join(', '),
                                                     }).replace(':addons', conflicts.join(', '))

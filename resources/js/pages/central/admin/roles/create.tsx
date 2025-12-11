@@ -17,8 +17,8 @@ function CreateRole({ permissions }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.roles.title'), href: admin.roles.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('roles.page.title'), href: admin.roles.index.url() },
         { title: t('roles.form.create_title'), href: admin.roles.create.url() },
     ];
 
@@ -30,13 +30,13 @@ function CreateRole({ permissions }: Props) {
 
     return (
         <>
-            <Head title={t('admin.roles.create_role')} />
+            <Head title={t('roles.page.create_role')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.roles.create_role')}</PageTitle>
-                        <PageDescription>{t('admin.roles.create_description')}</PageDescription>
+                        <PageTitle>{t('roles.page.create_role')}</PageTitle>
+                        <PageDescription>{t('roles.page.create_description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

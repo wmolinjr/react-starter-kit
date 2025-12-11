@@ -68,8 +68,8 @@ function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.catalog.title'), href: admin.catalog.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('catalog.page.title'), href: admin.catalog.index.url() },
         { title: addon.name_display, href: admin.catalog.edit.url(addon.id) },
     ];
 
@@ -81,18 +81,18 @@ function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions
 
     return (
         <>
-            <Head title={`${t('admin.catalog.edit_addon')}: ${addon.name_display}`} />
+            <Head title={`${t('catalog.page.edit_addon')}: ${addon.name_display}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.catalog.edit_addon')}</PageTitle>
+                        <PageTitle>{t('catalog.page.edit_addon')}</PageTitle>
                         <PageDescription>{addon.slug}</PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         <Button variant="outline" onClick={handleSync}>
                             <RefreshCw className="mr-2 h-4 w-4" />
-                            {t('admin.catalog.sync_with_stripe')}
+                            {t('catalog.page.sync_with_stripe')}
                         </Button>
                     </PageHeaderActions>
                 </PageHeader>
@@ -100,40 +100,40 @@ function CatalogEdit({ addon, types, plans, featureDefinitions, limitDefinitions
                 <PageContent>
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('admin.catalog.stripe_integration')}</CardTitle>
+                            <CardTitle>{t('catalog.page.stripe_integration')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center gap-4">
                                 {addon.is_synced ? (
                                     <Badge variant="default" className="bg-green-600">
                                         <CheckCircle className="mr-1 h-3 w-3" />
-                                        {t('admin.catalog.synced')}
+                                        {t('catalog.page.synced')}
                                     </Badge>
                                 ) : (
                                     <Badge variant="secondary">
                                         <XCircle className="mr-1 h-3 w-3" />
-                                        {t('admin.catalog.not_synced')}
+                                        {t('catalog.page.not_synced')}
                                     </Badge>
                                 )}
                                 {addon.stripe_product_id && (
                                     <span className="text-sm text-muted-foreground">
-                                        {t('admin.catalog.product')}: {addon.stripe_product_id}
+                                        {t('catalog.page.product')}: {addon.stripe_product_id}
                                     </span>
                                 )}
                             </div>
                             {addon.stripe_price_monthly_id && (
                                 <p className="mt-2 text-sm text-muted-foreground">
-                                    {t('admin.catalog.monthly_price')}: {addon.stripe_price_monthly_id}
+                                    {t('catalog.page.monthly_price')}: {addon.stripe_price_monthly_id}
                                 </p>
                             )}
                             {addon.stripe_price_yearly_id && (
                                 <p className="text-sm text-muted-foreground">
-                                    {t('admin.catalog.yearly_price')}: {addon.stripe_price_yearly_id}
+                                    {t('catalog.page.yearly_price')}: {addon.stripe_price_yearly_id}
                                 </p>
                             )}
                             {addon.stripe_price_one_time_id && (
                                 <p className="text-sm text-muted-foreground">
-                                    {t('admin.catalog.one_time_price')}: {addon.stripe_price_one_time_id}
+                                    {t('catalog.page.one_time_price')}: {addon.stripe_price_one_time_id}
                                 </p>
                             )}
                         </CardContent>

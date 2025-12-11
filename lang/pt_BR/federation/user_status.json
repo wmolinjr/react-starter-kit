@@ -1,0 +1,6 @@
+{
+    "federation.user_status.active": "Ativo",
+    "federation.user_status.pending_master_sync": "Aguardando Sincronização do Mestre",
+    "federation.user_status.pending_review": "Aguardando Revisão",
+    "federation.user_status.suspended": "Suspenso"
+}

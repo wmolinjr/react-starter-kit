@@ -28,7 +28,7 @@ function ShowRole({ role }: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: admin.dashboard.url() },
-        { title: t('admin.roles.title'), href: admin.roles.index.url() },
+        { title: t('roles.page.title'), href: admin.roles.index.url() },
         { title: role.display_name, href: admin.roles.show.url(role.id) },
     ];
 
@@ -36,14 +36,14 @@ function ShowRole({ role }: Props) {
 
     const handleDelete = () => {
         if (role.is_protected) {
-            alert(t('admin.roles.delete_protected_error'));
+            alert(t('roles.page.delete_protected_error'));
             return;
         }
         if ((role.users?.length ?? 0) > 0) {
-            alert(t('admin.roles.delete_has_users_error'));
+            alert(t('roles.page.delete_has_users_error'));
             return;
         }
-        if (confirm(t('admin.roles.delete_confirm', { name: role.display_name }))) {
+        if (confirm(t('roles.delete_confirm', { name: role.display_name }))) {
             router.delete(admin.roles.destroy.url(role.id));
         }
     };
@@ -110,7 +110,7 @@ function ShowRole({ role }: Props) {
                                     <Badge variant="outline">{permissions.length}</Badge>
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('admin.roles.permissions_granted')}
+                                    {t('roles.page.permissions_granted')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -138,7 +138,7 @@ function ShowRole({ role }: Props) {
                                     </div>
                                 ) : (
                                     <p className="text-muted-foreground text-sm">
-                                        {t('admin.roles.no_permissions')}
+                                        {t('roles.page.no_permissions')}
                                     </p>
                                 )}
                             </CardContent>
@@ -153,7 +153,7 @@ function ShowRole({ role }: Props) {
                                     <Badge variant="outline">{users.length}</Badge>
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('admin.roles.users_assigned')}
+                                    {t('roles.page.users_assigned')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -185,7 +185,7 @@ function ShowRole({ role }: Props) {
                                     </Table>
                                 ) : (
                                     <p className="text-muted-foreground text-sm">
-                                        {t('admin.roles.no_users')}
+                                        {t('roles.page.no_users')}
                                     </p>
                                 )}
                             </CardContent>

@@ -1,0 +1,12 @@
+{
+    "team.invite.description": "Envía una invitación por correo para agregar un nuevo miembro a tu equipo.",
+    "team.invite.email_label": "Correo electrónico",
+    "team.invite.max_users_reached": "Has alcanzado el número máximo de usuarios para tu plan. Actualiza para agregar más miembros.",
+    "team.invite.role_admin_desc": "Puede administrar miembros y configuración del equipo.",
+    "team.invite.role_guest_desc": "Acceso de solo lectura, sin permisos de edición.",
+    "team.invite.role_label": "Rol",
+    "team.invite.role_member_desc": "Puede crear y editar recursos, pero no puede administrar miembros.",
+    "team.invite.send": "Enviar invitación",
+    "team.invite.sending": "Enviando...",
+    "team.invite.title": "Invitar nuevo miembro"
+}

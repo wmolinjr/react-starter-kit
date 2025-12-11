@@ -1,0 +1,7 @@
+{
+    "federation.link_status.conflict": "Conflicto",
+    "federation.link_status.disabled": "Deshabilitado",
+    "federation.link_status.pending_sync": "Sincronización Pendiente",
+    "federation.link_status.sync_failed": "Sincronización Fallida",
+    "federation.link_status.synced": "Sincronizado"
+}

@@ -1,0 +1,21 @@
+{
+    "roles.page.create_description": "Crea un nuevo rol con permisos personalizados",
+    "roles.page.create_first": "Crear primer rol",
+    "roles.page.create_role": "Crear Rol",
+    "roles.page.custom_roles_not_available": "Los roles personalizados no están disponibles en tu plan actual.",
+    "roles.page.delete_confirm": "¿Estás seguro de que deseas eliminar este rol?",
+    "roles.page.delete_has_users_error": "No se puede eliminar un rol que tiene usuarios asignados.",
+    "roles.page.delete_protected_error": "No se puede eliminar un rol protegido del sistema.",
+    "roles.page.description": "Gestiona los roles del sistema",
+    "roles.page.edit_role": "Editar Rol",
+    "roles.page.limit_reached": "Has alcanzado el número máximo de roles personalizados permitidos por tu plan.",
+    "roles.page.new_role": "Nuevo Rol",
+    "roles.page.no_permissions": "No hay permisos asignados a este rol.",
+    "roles.page.no_roles": "No hay roles personalizados",
+    "roles.page.no_users": "No hay usuarios asignados a este rol.",
+    "roles.page.permissions_granted": "Permisos otorgados a usuarios con este rol",
+    "roles.page.title": "Roles",
+    "roles.page.update_description": "Actualizar rol :name y permisos",
+    "roles.page.update_role": "Actualizar Rol",
+    "roles.page.users_assigned": "Usuarios asignados a este rol"
+}

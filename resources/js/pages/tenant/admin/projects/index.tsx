@@ -21,22 +21,22 @@ function ProjectsIndex({ projects: projectsList }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.projects.title'), href: admin.projects.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('projects.page.title'), href: admin.projects.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     return (
         <>
-            <Head title={t('tenant.projects.title')} />
+            <Head title={t('projects.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={FolderOpen}>{t('tenant.projects.title')}</PageTitle>
+                        <PageTitle icon={FolderOpen}>{t('projects.page.title')}</PageTitle>
                         <PageDescription>
-                            {t('tenant.projects.description')}
+                            {t('projects.page.description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -44,7 +44,7 @@ function ProjectsIndex({ projects: projectsList }: Props) {
                             <Link href={admin.projects.create.url()}>
                                 <Button>
                                     <Plus className="mr-2 h-4 w-4" />
-                                    {t('tenant.projects.new_project')}
+                                    {t('projects.page.new_project')}
                                 </Button>
                             </Link>
                         </Can>
@@ -57,7 +57,7 @@ function ProjectsIndex({ projects: projectsList }: Props) {
                         <div className="relative flex-1 max-w-md">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder={t('tenant.projects.search_placeholder')}
+                                placeholder={t('projects.page.search_placeholder')}
                                 className="pl-9"
                             />
                         </div>
@@ -68,15 +68,15 @@ function ProjectsIndex({ projects: projectsList }: Props) {
                         <Card>
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" />
-                                <h3 className="text-lg font-semibold mb-2">{t('tenant.projects.no_projects')}</h3>
+                                <h3 className="text-lg font-semibold mb-2">{t('projects.page.no_projects')}</h3>
                                 <p className="text-muted-foreground text-center mb-4">
-                                    {t('tenant.projects.no_projects_description')}
+                                    {t('projects.page.no_projects_description')}
                                 </p>
                                 <Can permission="projects:create">
                                     <Link href={admin.projects.create.url()}>
                                         <Button>
                                             <Plus className="mr-2 h-4 w-4" />
-                                            {t('tenant.projects.create_project')}
+                                            {t('projects.page.create_project')}
                                         </Button>
                                     </Link>
                                 </Can>
@@ -91,7 +91,7 @@ function ProjectsIndex({ projects: projectsList }: Props) {
                                             <div className="flex items-start justify-between">
                                                 <CardTitle className="text-lg">{project.name}</CardTitle>
                                                 <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-                                                    {project.status === 'active' ? t('tenant.projects.status_active') : t('tenant.projects.status_archived')}
+                                                    {project.status === 'active' ? t('projects.page.status_active') : t('projects.page.status_archived')}
                                                 </Badge>
                                             </div>
                                             {project.description && (
@@ -102,7 +102,7 @@ function ProjectsIndex({ projects: projectsList }: Props) {
                                         </CardHeader>
                                         <CardContent>
                                             <p className="text-xs text-muted-foreground">
-                                                {t('tenant.projects.created_at', { date: new Date(project.created_at).toLocaleDateString('pt-BR') })}
+                                                {t('projects.created_at', { date: new Date(project.created_at).toLocaleDateString('pt-BR') })}
                                             </p>
                                         </CardContent>
                                     </Card>

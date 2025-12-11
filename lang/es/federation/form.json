@@ -1,0 +1,12 @@
+{
+    "federation.form.basic_info_description": "Configure los detalles del grupo de federación",
+    "federation.form.description_placeholder": "Describa el propósito de este grupo de federación...",
+    "federation.form.is_active": "Activo (sincronización habilitada)",
+    "federation.form.master_change_hint": "Para cambiar el inquilino principal, use la opción Cambiar Principal en la página de detalles del grupo",
+    "federation.form.master_hint": "El inquilino principal es la fuente autorizada para datos de usuario",
+    "federation.form.name_placeholder": "ej., ACME Corporation",
+    "federation.form.select_master": "Seleccione inquilino principal...",
+    "federation.form.sync_settings": "Configuración de Sincronización",
+    "federation.form.sync_settings_description": "Elija qué datos de usuario deben sincronizarse",
+    "federation.form.warning": "Los cambios en la configuración de sincronización afectarán a todos los usuarios federados. Algunos cambios pueden activar operaciones de sincronización de datos."
+}

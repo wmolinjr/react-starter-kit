@@ -1,0 +1,20 @@
+{
+    "invoices.page.all_invoices": "Todas las facturas",
+    "invoices.page.all_invoices_description": "Historial completo de facturas y pagos",
+    "invoices.page.column_amount": "Monto",
+    "invoices.page.column_date": "Fecha",
+    "invoices.page.column_number": "Factura #",
+    "invoices.page.column_status": "Estado",
+    "invoices.page.description": "Historial de facturas y pagos",
+    "invoices.page.download_pdf": "Descargar PDF",
+    "invoices.page.invoice_details": "Detalles de la Factura",
+    "invoices.page.line_items": "Conceptos",
+    "invoices.page.no_invoices": "No hay facturas disponibles",
+    "invoices.page.page_title": "Facturas",
+    "invoices.page.quantity": "Cant.",
+    "invoices.page.status_open": "Abierta",
+    "invoices.page.status_paid": "Pagado",
+    "invoices.page.status_uncollectible": "Incobrable",
+    "invoices.page.status_void": "Anulada",
+    "invoices.page.title": "Facturas"
+}

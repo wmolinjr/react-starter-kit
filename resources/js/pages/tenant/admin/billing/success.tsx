@@ -23,7 +23,7 @@ function BillingSuccess({ plan, message }: Props) {
 
     return (
         <>
-            <Head title={t('tenant.billing.payment_confirmed')} />
+            <Head title={t('billing.page.payment_confirmed')} />
 
             <div className="flex items-center justify-center min-h-[60vh]">
                 <Card className="animate-in fade-in-0 zoom-in-95 duration-500 max-w-md w-full text-center">
@@ -43,28 +43,28 @@ function BillingSuccess({ plan, message }: Props) {
                             />
                         </div>
                         <CardTitle className="animate-in fade-in-0 slide-in-from-bottom-4 delay-200 duration-500 text-2xl">
-                            {t('tenant.billing.payment_confirmed')}
+                            {t('billing.page.payment_confirmed')}
                         </CardTitle>
                         <CardDescription className="animate-in fade-in-0 slide-in-from-bottom-4 delay-300 duration-500">
-                            {message || t('tenant.billing.subscription_activated', { plan: plan || '' })}
+                            {message || t('billing.subscription_activated', { plan: plan || '' })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="animate-in fade-in-0 slide-in-from-bottom-4 delay-400 duration-500 text-sm text-muted-foreground">
-                            {t('tenant.billing.success_message')}
+                            {t('billing.page.success_message')}
                         </p>
 
                         <div className="animate-in fade-in-0 slide-in-from-bottom-4 delay-500 duration-500 flex flex-col gap-2 pt-4">
                             <Button asChild>
                                 <Link href={admin.dashboard.url()}>
                                     <LayoutGrid className="mr-2 h-4 w-4" />
-                                    {t('tenant.billing.go_to_dashboard')}
+                                    {t('billing.page.go_to_dashboard')}
                                 </Link>
                             </Button>
                             <Button variant="outline" asChild>
                                 <Link href={admin.billing.index.url()}>
                                     <CreditCard className="mr-2 h-4 w-4" />
-                                    {t('tenant.billing.view_subscription')}
+                                    {t('billing.page.view_subscription')}
                                 </Link>
                             </Button>
                         </div>

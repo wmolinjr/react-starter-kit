@@ -81,7 +81,7 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
                 <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                        {t('admin.roles.form.protected_alert')}
+                        {t('roles.form.protected_alert')}
                     </AlertDescription>
                 </Alert>
             )}
@@ -89,17 +89,17 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle>{t('common.basic_info')}</CardTitle>
-                    <CardDescription>{t('admin.roles.form.basic_info_description')}</CardDescription>
+                    <CardDescription>{t('roles.form.basic_info_description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name">{t('admin.roles.form.name_label')}</Label>
+                            <Label htmlFor="name">{t('roles.form.name_label')}</Label>
                             <Input
                                 id="name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder={t('admin.roles.form.name_placeholder')}
+                                placeholder={t('roles.form.name_placeholder')}
                                 disabled={role?.is_protected}
                                 required
                             />
@@ -107,11 +107,11 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
                                 <p className="text-destructive text-sm">{errors.name}</p>
                             )}
                             <p className="text-muted-foreground text-xs">
-                                {t('admin.roles.form.name_hint')}
+                                {t('roles.form.name_hint')}
                             </p>
                         </div>
                         <TranslatableInput
-                            label={t('admin.roles.form.display_name_label')}
+                            label={t('roles.form.display_name_label')}
                             value={data.display_name}
                             onChange={(v) => setData('display_name', v)}
                             placeholder={{ en: 'Project Manager', pt_BR: 'Gerente de Projetos' }}
@@ -133,9 +133,9 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
                 <CardHeader>
                     <CardTitle>{t('common.permissions')}</CardTitle>
                     <CardDescription>
-                        {t('admin.roles.form.permissions_description')}
+                        {t('roles.form.permissions_description')}
                         <Badge variant="secondary" className="ml-2">
-                            {t('admin.roles.form.selected', { count: data.permissions.length })}
+                            {t('roles.form.selected', { count: data.permissions.length })}
                         </Badge>
                     </CardDescription>
                 </CardHeader>
@@ -193,7 +193,7 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
 
                     {Object.keys(permissions).length === 0 && (
                         <p className="text-muted-foreground text-sm">
-                            {t('admin.roles.form.no_permissions')}
+                            {t('roles.form.no_permissions')}
                         </p>
                     )}
                 </CardContent>
@@ -204,7 +204,7 @@ export function RoleForm({ role, permissions, onSubmit }: Props) {
                     {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={processing}>
-                    {role?.id ? t('admin.roles.update_role') : t('admin.roles.create_role')}
+                    {role?.id ? t('roles.page.update_role') : t('roles.page.create_role')}
                 </Button>
             </div>
         </form>

@@ -41,9 +41,9 @@ function PlansPageContent({
     const { period, setPeriod } = useBillingPeriod();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('tenant.billing.title'), href: admin.billing.index.url() },
-        { title: t('tenant.billing.plans', { default: 'Plans' }), href: admin.billing.plans.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('billing.page.title'), href: admin.billing.index.url() },
+        { title: t('billing.plans', { default: 'Plans' }), href: admin.billing.plans.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -58,14 +58,14 @@ function PlansPageContent({
 
     return (
         <>
-            <Head title={t('tenant.billing.compare_plans', { default: 'Compare Plans' })} />
+            <Head title={t('billing.compare_plans', { default: 'Compare Plans' })} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('tenant.billing.compare_plans', { default: 'Compare Plans' })}</PageTitle>
+                        <PageTitle>{t('billing.compare_plans', { default: 'Compare Plans' })}</PageTitle>
                         <PageDescription>
-                            {t('tenant.billing.compare_plans_description', {
+                            {t('billing.compare_plans_description', {
                                 default: 'Choose the plan that best fits your needs',
                             })}
                         </PageDescription>
@@ -114,7 +114,7 @@ function PlansPageContent({
                     {/* Plan Comparison Table */}
                     <div className="mt-12">
                         <h2 className="mb-6 text-center text-2xl font-bold">
-                            {t('tenant.billing.detailed_comparison', { default: 'Detailed Comparison' })}
+                            {t('billing.detailed_comparison', { default: 'Detailed Comparison' })}
                         </h2>
                         <PlanComparisonTable
                             plans={plans}

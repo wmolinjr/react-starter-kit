@@ -1,0 +1,12 @@
+{
+    "team.invite.description": "Envie um convite por e-mail para adicionar um novo membro ao seu time.",
+    "team.invite.email_label": "E-mail",
+    "team.invite.max_users_reached": "Você atingiu o limite máximo de usuários para o seu plano. Faça upgrade para adicionar mais membros.",
+    "team.invite.role_admin_desc": "Pode gerenciar membros e configurações do time.",
+    "team.invite.role_guest_desc": "Acesso apenas para visualização, sem permissões de edição.",
+    "team.invite.role_label": "Função",
+    "team.invite.role_member_desc": "Pode criar e editar recursos, mas não gerenciar membros.",
+    "team.invite.send": "Enviar Convite",
+    "team.invite.sending": "Enviando...",
+    "team.invite.title": "Convidar Novo Membro"
+}

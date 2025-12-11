@@ -28,21 +28,21 @@ function AdminAddonsIndex({ addons, stats }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.addons.title'), href: admin.addons.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('addons.page.title'), href: admin.addons.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     return (
         <>
-            <Head title={t('admin.addons.title')} />
+            <Head title={t('addons.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.addons.title')}</PageTitle>
-                        <PageDescription>{t('admin.addons.description')}</PageDescription>
+                        <PageTitle>{t('addons.page.title')}</PageTitle>
+                        <PageDescription>{t('addons.page.description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -50,19 +50,19 @@ function AdminAddonsIndex({ addons, stats }: Props) {
                     <div className="grid gap-4 md:grid-cols-4">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.total_addons')}</CardDescription>
+                            <CardDescription>{t('addons.page.total_addons')}</CardDescription>
                             <CardTitle className="text-2xl">{stats.total_addons}</CardTitle>
                         </CardHeader>
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.active_addons')}</CardDescription>
+                            <CardDescription>{t('addons.page.active_addons')}</CardDescription>
                             <CardTitle className="text-2xl">{stats.active_addons}</CardTitle>
                         </CardHeader>
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.total_revenue')}</CardDescription>
+                            <CardDescription>{t('addons.page.total_revenue')}</CardDescription>
                             <CardTitle className="text-2xl">
                                 {formatPrice(stats.total_revenue)}
                             </CardTitle>
@@ -70,7 +70,7 @@ function AdminAddonsIndex({ addons, stats }: Props) {
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>{t('admin.addons.tenants_with_addons')}</CardDescription>
+                            <CardDescription>{t('addons.page.tenants_with_addons')}</CardDescription>
                             <CardTitle className="text-2xl">{stats.tenants_with_addons}</CardTitle>
                         </CardHeader>
                     </Card>
@@ -78,18 +78,18 @@ function AdminAddonsIndex({ addons, stats }: Props) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('admin.addons.all_addons')}</CardTitle>
+                        <CardTitle>{t('addons.page.all_addons')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>{t('admin.addons.tenant')}</TableHead>
-                                    <TableHead>{t('admin.addons.addon')}</TableHead>
-                                    <TableHead>{t('admin.addons.quantity')}</TableHead>
-                                    <TableHead>{t('admin.addons.price')}</TableHead>
+                                    <TableHead>{t('addons.page.tenant')}</TableHead>
+                                    <TableHead>{t('addons.page.addon')}</TableHead>
+                                    <TableHead>{t('addons.page.quantity')}</TableHead>
+                                    <TableHead>{t('addons.page.price')}</TableHead>
                                     <TableHead>{t('common.status')}</TableHead>
-                                    <TableHead>{t('admin.addons.billing')}</TableHead>
+                                    <TableHead>{t('addons.page.billing')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

@@ -1,0 +1,22 @@
+{
+    "activity.page.column_action": "Acción",
+    "activity.page.column_date": "Fecha",
+    "activity.page.column_description": "Descripción",
+    "activity.page.column_subject": "Asunto",
+    "activity.page.column_user": "Usuario",
+    "activity.page.description": "Actividad reciente de tu organización",
+    "activity.page.event_created": "Creado",
+    "activity.page.event_deleted": "Eliminado",
+    "activity.page.event_login": "Iniciar Sesión",
+    "activity.page.event_logout": "Cerrar Sesión",
+    "activity.page.event_updated": "Actualizado",
+    "activity.page.filter_date_from": "Desde Fecha",
+    "activity.page.filter_date_to": "Hasta Fecha",
+    "activity.page.filter_event": "Tipo de evento",
+    "activity.page.filter_subject": "Tipo de sujeto",
+    "activity.page.filter_user": "Usuario",
+    "activity.page.no_activities": "Aún no hay actividad registrada.",
+    "activity.page.page_title": "Actividad del Equipo",
+    "activity.page.system": "Sistema",
+    "activity.page.title": "Actividad"
+}

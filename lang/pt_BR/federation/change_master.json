@@ -1,0 +1,10 @@
+{
+    "federation.change_master.confirm_button": "Trocar Tenant Mestre",
+    "federation.change_master.confirm_text": "Eu entendo que esta operação irá migrar todos os usuários federados para o novo tenant mestre e não pode ser facilmente desfeita.",
+    "federation.change_master.description": "Transferir o papel de mestre do tenant atual para outro tenant em :group",
+    "federation.change_master.new_master": "Novo Tenant Mestre",
+    "federation.change_master.select_tenant": "Selecione o novo tenant mestre...",
+    "federation.change_master.selected_info": ":tenant se tornará o novo tenant mestre deste grupo de federação.",
+    "federation.change_master.title": "Trocar Tenant Mestre",
+    "federation.change_master.warning": "Esta é uma operação crítica. Todos os usuários federados serão migrados para o novo tenant mestre. Isso pode levar algum tempo dependendo do número de usuários."
+}

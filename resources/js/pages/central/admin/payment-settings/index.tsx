@@ -108,9 +108,9 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
     );
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
         {
-            title: t('admin.payments.settings.title'),
+            title: t('payments.settings.title'),
             href: admin.paymentSettings.index.url(),
         },
     ];
@@ -171,7 +171,7 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                 </h3>
                                 <p className="text-muted-foreground text-sm">
                                     {meta?.description ||
-                                        t('admin.payments.settings.no_description')}
+                                        t('payments.settings.no_description')}
                                 </p>
                             </div>
                         </div>
@@ -194,8 +194,8 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                 }
                             >
                                 {setting.is_sandbox
-                                    ? t('admin.payments.settings.mode.sandbox')
-                                    : t('admin.payments.settings.mode.production')}
+                                    ? t('payments.settings.mode.sandbox')
+                                    : t('payments.settings.mode.production')}
                             </Badge>
                             {setting.is_default && (
                                 <Badge variant="secondary">
@@ -244,12 +244,12 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                 {testingGateway === setting.gateway ? (
                                     <>
                                         <span className="animate-spin">...</span>
-                                        {t('admin.payments.settings.actions.testing')}
+                                        {t('payments.settings.actions.testing')}
                                     </>
                                 ) : (
                                     <>
                                         <CheckCircle className="h-4 w-4" />
-                                        {t('admin.payments.settings.actions.test_connection')}
+                                        {t('payments.settings.actions.test_connection')}
                                     </>
                                 )}
                             </Button>
@@ -266,7 +266,7 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                         rel="noopener noreferrer"
                                     >
                                         <ExternalLink className="h-4 w-4" />
-                                        {t('admin.payments.settings.actions.documentation')}
+                                        {t('payments.settings.actions.documentation')}
                                     </a>
                                 </Button>
                             )}
@@ -289,11 +289,11 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                 <div className="flex flex-col gap-1">
                                     <span className="text-sm">
                                         {setting.last_test_success
-                                            ? t('admin.payments.settings.test.success')
+                                            ? t('payments.settings.test.success')
                                             : setting.last_test_error}
                                     </span>
                                     <span className="text-xs opacity-75">
-                                        {t('admin.payments.settings.last_tested', {
+                                        {t('payments.settings.last_tested', {
                                             date: new Date(
                                                 setting.last_tested_at
                                             ).toLocaleString(),
@@ -312,8 +312,8 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                         'admin.payments.settings.warnings.no_credentials',
                                         {
                                             mode: setting.is_sandbox
-                                                ? t('admin.payments.settings.mode.sandbox')
-                                                : t('admin.payments.settings.mode.production'),
+                                                ? t('payments.settings.mode.sandbox')
+                                                : t('payments.settings.mode.production'),
                                         }
                                     )}
                                 </span>
@@ -330,14 +330,14 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
 
     return (
         <>
-            <Head title={t('admin.payments.settings.title')} />
+            <Head title={t('payments.settings.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.payments.settings.title')}</PageTitle>
+                        <PageTitle>{t('payments.settings.title')}</PageTitle>
                         <PageDescription>
-                            {t('admin.payments.settings.description')}
+                            {t('payments.settings.description')}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
@@ -360,7 +360,7 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <CreditCard className="text-muted-foreground mb-4 h-12 w-12" />
                                 <p className="text-muted-foreground">
-                                    {t('admin.payments.settings.no_gateways')}
+                                    {t('payments.settings.no_gateways')}
                                 </p>
                             </CardContent>
                         </Card>

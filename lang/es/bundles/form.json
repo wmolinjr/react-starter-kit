@@ -1,0 +1,17 @@
+{
+    "bundles.form.add_addon": "Agregar Complemento",
+    "bundles.form.add_feature": "Agregar Característica",
+    "bundles.form.addon": "Complemento",
+    "bundles.form.addons": "Complementos del Paquete",
+    "bundles.form.addons_description": "Seleccione al menos 2 complementos para este paquete",
+    "bundles.form.calculated_price": "Precio Calculado",
+    "bundles.form.description_placeholder": "Obtenga más almacenamiento, usuarios e informes a precio con descuento...",
+    "bundles.form.discount_percent": "Porcentaje de Descuento",
+    "bundles.form.feature": "Característica",
+    "bundles.form.features": "Características de Marketing",
+    "bundles.form.features_description": "Puntos mostrados a los usuarios",
+    "bundles.form.no_addons": "Agregue al menos 2 complementos para crear un paquete",
+    "bundles.form.price_override": "Precio Personalizado (opcional, en centavos)",
+    "bundles.form.select_addon": "Seleccione un complemento...",
+    "bundles.form.slug_placeholder": "paquete_potente"
+}

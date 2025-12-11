@@ -1,0 +1,18 @@
+{
+    "bundles.page.addons_count": ":count add-ons",
+    "bundles.page.base_price": "Base: :price",
+    "bundles.page.create_bundle": "Criar Pacote",
+    "bundles.page.create_first": "Crie seu primeiro pacote",
+    "bundles.page.delete_confirm": "Excluir pacote \":name\"?",
+    "bundles.page.description": "Gerencie pacotes de add-ons disponíveis para compra",
+    "bundles.page.discount": ":percent% de desconto",
+    "bundles.page.edit_bundle": "Editar Pacote",
+    "bundles.page.effective_price": "Preço: :price",
+    "bundles.page.new_bundle": "Novo Pacote",
+    "bundles.page.no_bundles": "Nenhum pacote ainda.",
+    "bundles.page.savings": "Economize :amount",
+    "bundles.page.sync_all": "Sincronizar Todos com Stripe",
+    "bundles.page.sync_with_stripe": "Sincronizar com Stripe",
+    "bundles.page.title": "Catálogo de Pacotes",
+    "bundles.page.update_bundle": "Atualizar Pacote"
+}

@@ -1,0 +1,10 @@
+{
+    "federation.sync_strategy.description": "Escolha como os conflitos de dados entre tenants devem ser resolvidos",
+    "federation.sync_strategy.last_write_wins": "Última Escrita Vence",
+    "federation.sync_strategy.last_write_wins_description": "A alteração mais recente tem precedência independente da origem",
+    "federation.sync_strategy.manual_review": "Revisão Manual",
+    "federation.sync_strategy.manual_review_description": "Todos os conflitos requerem resolução manual por um administrador",
+    "federation.sync_strategy.master_wins": "Mestre Vence",
+    "federation.sync_strategy.master_wins_description": "Alterações do tenant mestre sempre têm precedência sobre outros tenants",
+    "federation.sync_strategy.title": "Estratégia de Sincronização"
+}

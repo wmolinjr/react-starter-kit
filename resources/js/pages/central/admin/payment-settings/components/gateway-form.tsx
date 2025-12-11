@@ -196,7 +196,7 @@ export function GatewayForm({ setting }: Props) {
                 </div>
                 {hint && (
                     <p className="text-xs text-muted-foreground">
-                        {t('admin.payments.settings.current_hint')}: {hint}
+                        {t('payments.settings.current_hint')}: {hint}
                     </p>
                 )}
             </div>
@@ -235,15 +235,15 @@ export function GatewayForm({ setting }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">
-                        {t('admin.payments.settings.sections.general')}
+                        {t('payments.settings.sections.general')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <Label>{t('admin.payments.settings.fields.enabled')}</Label>
+                            <Label>{t('payments.settings.fields.enabled')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                {t('admin.payments.settings.fields.enabled_help')}
+                                {t('payments.settings.fields.enabled_help')}
                             </p>
                         </div>
                         <Switch
@@ -253,9 +253,9 @@ export function GatewayForm({ setting }: Props) {
                     </div>
                     <div className="flex items-center justify-between">
                         <div>
-                            <Label>{t('admin.payments.settings.fields.default')}</Label>
+                            <Label>{t('payments.settings.fields.default')}</Label>
                             <p className="text-sm text-muted-foreground">
-                                {t('admin.payments.settings.fields.default_help')}
+                                {t('payments.settings.fields.default_help')}
                             </p>
                         </div>
                         <Switch
@@ -270,10 +270,10 @@ export function GatewayForm({ setting }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">
-                        {t('admin.payments.settings.sections.payment_types')}
+                        {t('payments.settings.sections.payment_types')}
                     </CardTitle>
                     <CardDescription>
-                        {t('admin.payments.settings.sections.payment_types_help')}
+                        {t('payments.settings.sections.payment_types_help')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -300,10 +300,10 @@ export function GatewayForm({ setting }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">
-                        {t('admin.payments.settings.sections.countries')}
+                        {t('payments.settings.sections.countries')}
                     </CardTitle>
                     <CardDescription>
-                        {t('admin.payments.settings.sections.countries_help')}
+                        {t('payments.settings.sections.countries_help')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -330,23 +330,23 @@ export function GatewayForm({ setting }: Props) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">
-                        {t('admin.payments.settings.sections.credentials')}
+                        {t('payments.settings.sections.credentials')}
                     </CardTitle>
                     <CardDescription>
-                        {t('admin.payments.settings.sections.credentials_help')}
+                        {t('payments.settings.sections.credentials_help')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Tabs defaultValue="production" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="production">
-                                {t('admin.payments.settings.mode.production')}
+                                {t('payments.settings.mode.production')}
                                 {setting.has_production_credentials && (
                                     <Check className="ml-2 h-4 w-4 text-green-500" />
                                 )}
                             </TabsTrigger>
                             <TabsTrigger value="sandbox">
-                                {t('admin.payments.settings.mode.sandbox')}
+                                {t('payments.settings.mode.sandbox')}
                                 {setting.has_sandbox_credentials && (
                                     <Check className="ml-2 h-4 w-4 text-green-500" />
                                 )}
@@ -363,7 +363,7 @@ export function GatewayForm({ setting }: Props) {
                             ))}
                             {setting.webhook_urls.production && (
                                 <div className="space-y-2 pt-4 border-t">
-                                    <Label>{t('admin.payments.settings.fields.webhook_url')}</Label>
+                                    <Label>{t('payments.settings.fields.webhook_url')}</Label>
                                     <WebhookUrlDisplay
                                         mode="production"
                                         url={setting.webhook_urls.production}
@@ -382,7 +382,7 @@ export function GatewayForm({ setting }: Props) {
                             ))}
                             {setting.webhook_urls.sandbox && (
                                 <div className="space-y-2 pt-4 border-t">
-                                    <Label>{t('admin.payments.settings.fields.webhook_url')}</Label>
+                                    <Label>{t('payments.settings.fields.webhook_url')}</Label>
                                     <WebhookUrlDisplay
                                         mode="sandbox"
                                         url={setting.webhook_urls.sandbox}
@@ -399,7 +399,7 @@ export function GatewayForm({ setting }: Props) {
                 <Button type="submit" disabled={processing}>
                     {processing
                         ? t('common.saving')
-                        : t('admin.payments.settings.actions.save_settings')}
+                        : t('payments.settings.actions.save_settings')}
                 </Button>
             </div>
         </form>

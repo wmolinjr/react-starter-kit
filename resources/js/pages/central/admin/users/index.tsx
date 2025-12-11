@@ -23,8 +23,8 @@ function UsersIndex({ users, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.users.title'), href: admin.users.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('users.page.title'), href: admin.users.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -35,20 +35,20 @@ function UsersIndex({ users, filters }: Props) {
     };
 
     const handleDelete = (userId: string) => {
-        if (confirm(t('admin.users.delete_confirm'))) {
+        if (confirm(t('users.page.delete_confirm'))) {
             router.delete(`/admin/users/${userId}`);
         }
     };
 
     return (
         <>
-            <Head title={t('admin.users.title')} />
+            <Head title={t('users.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('admin.users.title')}</PageTitle>
-                        <PageDescription>{t('admin.users.description')}</PageDescription>
+                        <PageTitle>{t('users.page.title')}</PageTitle>
+                        <PageDescription>{t('users.page.description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -56,10 +56,10 @@ function UsersIndex({ users, filters }: Props) {
                     <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
-                            <CardTitle>{t('admin.users.all_users')}</CardTitle>
+                            <CardTitle>{t('users.page.all_users')}</CardTitle>
                             <form onSubmit={handleSearch} className="flex gap-2">
                                 <Input
-                                    placeholder={t('admin.users.search_placeholder')}
+                                    placeholder={t('users.page.search_placeholder')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="w-64"
@@ -77,7 +77,7 @@ function UsersIndex({ users, filters }: Props) {
                                     <TableHead>{t('common.name')}</TableHead>
                                     <TableHead>{t('common.email')}</TableHead>
                                     <TableHead>{t('common.role')}</TableHead>
-                                    <TableHead>{t('admin.users.verified')}</TableHead>
+                                    <TableHead>{t('users.page.verified')}</TableHead>
                                     <TableHead>{t('common.created')}</TableHead>
                                     <TableHead className="w-24">{t('common.actions')}</TableHead>
                                 </TableRow>
@@ -98,9 +98,9 @@ function UsersIndex({ users, filters }: Props) {
                                         </TableCell>
                                         <TableCell>
                                             {user.email_verified_at ? (
-                                                <Badge variant="default">{t('admin.users.verified')}</Badge>
+                                                <Badge variant="default">{t('users.page.verified')}</Badge>
                                             ) : (
-                                                <Badge variant="secondary">{t('admin.users.pending')}</Badge>
+                                                <Badge variant="secondary">{t('users.page.pending')}</Badge>
                                             )}
                                         </TableCell>
                                         <TableCell>
@@ -129,7 +129,7 @@ function UsersIndex({ users, filters }: Props) {
 
                         {users.data.length === 0 && (
                             <div className="py-12 text-center">
-                                <p className="text-muted-foreground">{t('admin.users.no_users')}</p>
+                                <p className="text-muted-foreground">{t('users.page.no_users')}</p>
                             </div>
                         )}
 

@@ -31,18 +31,18 @@ export default function AcceptInvitation({ token }: Props) {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-        <Head title={t('tenant.invitation.invalid_title')} />
+        <Head title={t('invitation.page.invalid_title')} />
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
               <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
-            <CardTitle>{t('tenant.invitation.invalid_title')}</CardTitle>
-            <CardDescription>{t('tenant.invitation.invalid_description')}</CardDescription>
+            <CardTitle>{t('invitation.page.invalid_title')}</CardTitle>
+            <CardDescription>{t('invitation.page.invalid_description')}</CardDescription>
           </CardHeader>
           <CardFooter className="flex justify-center">
             <Button asChild>
-              <Link href="/">{t('tenant.invitation.back_home')}</Link>
+              <Link href="/">{t('invitation.page.back_home')}</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -52,18 +52,18 @@ export default function AcceptInvitation({ token }: Props) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Head title={t('tenant.invitation.accept_title')} />
+      <Head title={t('invitation.page.accept_title')} />
 
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Mail className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>{t('tenant.invitation.you_were_invited')}</CardTitle>
+          <CardTitle>{t('invitation.page.you_were_invited')}</CardTitle>
           <CardDescription>
             {isAuthenticated
-              ? t('tenant.invitation.hello_user', { name: auth.user?.name ?? '' })
-              : t('tenant.invitation.received_invite')}
+              ? t('invitation.hello_user', { name: auth.user?.name ?? '' })
+              : t('invitation.page.received_invite')}
           </CardDescription>
         </CardHeader>
 
@@ -72,13 +72,13 @@ export default function AcceptInvitation({ token }: Props) {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {t('tenant.invitation.auth_required')}{' '}
+                {t('invitation.page.auth_required')}{' '}
                 <Link href={`/login?redirect=/accept-invitation?token=${token}`} className="underline font-medium">
-                  {t('tenant.invitation.login')}
+                  {t('invitation.page.login')}
                 </Link>{' '}
-                {t('tenant.invitation.or')}{' '}
+                {t('invitation.page.or')}{' '}
                 <Link href={`/register?redirect=/accept-invitation?token=${token}`} className="underline font-medium">
-                  {t('tenant.invitation.create_account')}
+                  {t('invitation.page.create_account')}
                 </Link>
                 .
               </AlertDescription>
@@ -90,9 +90,9 @@ export default function AcceptInvitation({ token }: Props) {
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-medium text-sm">{t('tenant.invitation.ready_to_start')}</p>
+                  <p className="font-medium text-sm">{t('invitation.page.ready_to_start')}</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {t('tenant.invitation.access_info')}
+                    {t('invitation.page.access_info')}
                   </p>
                 </div>
               </div>
@@ -106,7 +106,7 @@ export default function AcceptInvitation({ token }: Props) {
           </Button>
           {isAuthenticated && (
             <Button onClick={handleAccept} disabled={processing} className="flex-1">
-              {processing ? t('tenant.invitation.accepting') : t('tenant.invitation.accept_button')}
+              {processing ? t('invitation.page.accepting') : t('invitation.page.accept_button')}
             </Button>
           )}
         </CardFooter>

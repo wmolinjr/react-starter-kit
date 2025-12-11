@@ -19,27 +19,27 @@ function FederationIndex({ groups }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.federation.title'), href: admin.federation.index.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('federation.page.title'), href: admin.federation.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
 
     const handleDelete = (group: FederationGroupResource) => {
         if (group.federated_users_count > 0) {
-            alert(t('admin.federation.delete_has_users_error'));
+            alert(t('federation.page.delete_has_users_error'));
             return;
         }
-        if (confirm(t('admin.federation.delete_confirm', { name: group.name }))) {
+        if (confirm(t('federation.delete_confirm', { name: group.name }))) {
             router.delete(admin.federation.destroy.url(group.id));
         }
     };
 
     const getSyncStrategyLabel = (strategy: string) => {
         const labels: Record<string, string> = {
-            master_wins: t('admin.federation.sync_strategy.master_wins'),
-            last_write_wins: t('admin.federation.sync_strategy.last_write_wins'),
-            manual_review: t('admin.federation.sync_strategy.manual_review'),
+            master_wins: t('federation.sync_strategy.master_wins'),
+            last_write_wins: t('federation.sync_strategy.last_write_wins'),
+            manual_review: t('federation.sync_strategy.manual_review'),
         };
         return labels[strategy] || strategy;
     };
@@ -69,7 +69,7 @@ function FederationIndex({ groups }: Props) {
                         </CardTitle>
                         {group.master_tenant && (
                             <p className="text-muted-foreground text-xs">
-                                {t('admin.federation.master')}: {group.master_tenant.name}
+                                {t('federation.page.master')}: {group.master_tenant.name}
                             </p>
                         )}
                     </div>
@@ -106,11 +106,11 @@ function FederationIndex({ groups }: Props) {
                     </Badge>
                     <Badge variant="outline" className="gap-1">
                         <Network className="h-3 w-3" />
-                        {t('admin.federation.tenants_count', { count: group.tenants_count })}
+                        {t('federation.tenants_count', { count: group.tenants_count })}
                     </Badge>
                     <Badge variant="outline" className="gap-1">
                         <Users className="h-3 w-3" />
-                        {t('admin.federation.users_count', { count: group.federated_users_count })}
+                        {t('federation.users_count', { count: group.federated_users_count })}
                     </Badge>
                 </div>
                 {group.created_at && (
@@ -124,19 +124,19 @@ function FederationIndex({ groups }: Props) {
 
     return (
         <>
-            <Head title={t('admin.federation.title')} />
+            <Head title={t('federation.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Network}>{t('admin.federation.title')}</PageTitle>
-                        <PageDescription>{t('admin.federation.description')}</PageDescription>
+                        <PageTitle icon={Network}>{t('federation.page.title')}</PageTitle>
+                        <PageDescription>{t('federation.page.description')}</PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
                         <Button asChild>
                             <Link href={admin.federation.create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('admin.federation.new_group')}
+                                {t('federation.page.new_group')}
                             </Link>
                         </Button>
                     </PageHeaderActions>
@@ -153,14 +153,14 @@ function FederationIndex({ groups }: Props) {
                         <Card className="border-dashed">
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <Network className="text-muted-foreground mb-4 h-12 w-12" />
-                                <h3 className="mb-2 text-lg font-medium">{t('admin.federation.no_groups')}</h3>
+                                <h3 className="mb-2 text-lg font-medium">{t('federation.page.no_groups')}</h3>
                                 <p className="text-muted-foreground mb-4 text-center text-sm">
-                                    {t('admin.federation.no_groups_description')}
+                                    {t('federation.page.no_groups_description')}
                                 </p>
                                 <Button asChild>
                                     <Link href={admin.federation.create.url()}>
                                         <Plus className="mr-2 h-4 w-4" />
-                                        {t('admin.federation.create_first')}
+                                        {t('federation.page.create_first')}
                                     </Link>
                                 </Button>
                             </CardContent>
@@ -171,16 +171,16 @@ function FederationIndex({ groups }: Props) {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <AlertCircle className="h-4 w-4" />
-                                {t('admin.federation.about_title')}
+                                {t('federation.page.about_title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-muted-foreground space-y-2 text-sm">
-                            <p>{t('admin.federation.about_description')}</p>
+                            <p>{t('federation.page.about_description')}</p>
                             <ul className="list-inside list-disc space-y-1">
-                                <li>{t('admin.federation.feature_sync_credentials')}</li>
-                                <li>{t('admin.federation.feature_sync_profile')}</li>
-                                <li>{t('admin.federation.feature_sync_2fa')}</li>
-                                <li>{t('admin.federation.feature_conflict_resolution')}</li>
+                                <li>{t('federation.page.feature_sync_credentials')}</li>
+                                <li>{t('federation.page.feature_sync_profile')}</li>
+                                <li>{t('federation.page.feature_sync_2fa')}</li>
+                                <li>{t('federation.page.feature_conflict_resolution')}</li>
                             </ul>
                         </CardContent>
                     </Card>

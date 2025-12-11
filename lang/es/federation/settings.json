@@ -1,0 +1,14 @@
+{
+    "federation.settings.auto_create_on_login": "Creación Automática al Iniciar Sesión",
+    "federation.settings.auto_create_on_login_description": "Crear automáticamente un usuario local cuando un usuario federado inicia sesión en un inquilino sucursal por primera vez",
+    "federation.settings.auto_federate_new_users": "Federar Nuevos Usuarios Automáticamente",
+    "federation.settings.auto_federate_new_users_description": "Federar automáticamente nuevos usuarios cuando se crean en inquilinos miembros",
+    "federation.settings.sync_password": "Sincronizar Contraseña",
+    "federation.settings.sync_password_description": "Sincronizar cambios de contraseña entre inquilinos",
+    "federation.settings.sync_profile": "Sincronizar Perfil",
+    "federation.settings.sync_profile_description": "Sincronizar nombre e información del perfil",
+    "federation.settings.sync_roles": "Sincronizar Roles",
+    "federation.settings.sync_roles_description": "Sincronizar asignaciones de roles (usar con precaución)",
+    "federation.settings.sync_two_factor": "Sincronizar Dos Factores",
+    "federation.settings.sync_two_factor_description": "Sincronizar configuración de 2FA y códigos de recuperación"
+}

@@ -111,9 +111,9 @@ function PaymentShow({ payment, purchase }: Props) {
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.payments.title'), href: admin.payments.index.url() },
-        { title: t('admin.payments.show_title'), href: admin.payments.show.url({ payment: payment.id }) },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
+        { title: t('payments.page.title'), href: admin.payments.index.url() },
+        { title: t('payments.page.show_title'), href: admin.payments.show.url({ payment: payment.id }) },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -130,12 +130,12 @@ function PaymentShow({ payment, purchase }: Props) {
 
     return (
         <>
-            <Head title={t('admin.payments.show_title')} />
+            <Head title={t('payments.page.show_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={CreditCard}>{t('admin.payments.show_title')}</PageTitle>
+                        <PageTitle icon={CreditCard}>{t('payments.page.show_title')}</PageTitle>
                         <PageDescription>
                             ID: {payment.id}
                         </PageDescription>
@@ -152,19 +152,19 @@ function PaymentShow({ payment, purchase }: Props) {
                                 <DialogTrigger asChild>
                                     <Button variant="destructive">
                                         <RotateCcw className="mr-2 h-4 w-4" />
-                                        {t('admin.payments.refund')}
+                                        {t('payments.page.refund')}
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>{t('admin.payments.refund_confirm')}</DialogTitle>
+                                        <DialogTitle>{t('payments.page.refund_confirm')}</DialogTitle>
                                         <DialogDescription>
-                                            {t('admin.payments.refund_amount')}: {payment.formatted_refundable_amount}
+                                            {t('payments.page.refund_amount')}: {payment.formatted_refundable_amount}
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="amount">{t('admin.payments.refund_amount')}</Label>
+                                            <Label htmlFor="amount">{t('payments.page.refund_amount')}</Label>
                                             <Input
                                                 id="amount"
                                                 type="number"
@@ -178,7 +178,7 @@ function PaymentShow({ payment, purchase }: Props) {
                                             </p>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="reason">{t('admin.payments.refund_reason')}</Label>
+                                            <Label htmlFor="reason">{t('payments.page.refund_reason')}</Label>
                                             <Textarea
                                                 id="reason"
                                                 value={refundForm.data.reason}
@@ -196,7 +196,7 @@ function PaymentShow({ payment, purchase }: Props) {
                                             onClick={handleRefund}
                                             disabled={refundForm.processing}
                                         >
-                                            {refundForm.processing ? t('common.loading') : t('admin.payments.refund_confirm')}
+                                            {refundForm.processing ? t('common.loading') : t('payments.page.refund_confirm')}
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>
@@ -212,7 +212,7 @@ function PaymentShow({ payment, purchase }: Props) {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     {getStatusIcon(payment.status)}
-                                    {t('admin.payments.status')}
+                                    {t('payments.page.status')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -223,21 +223,21 @@ function PaymentShow({ payment, purchase }: Props) {
                                     </Badge>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">{t('admin.payments.amount')}</span>
+                                    <span className="text-muted-foreground">{t('payments.page.amount')}</span>
                                     <span className="font-mono text-lg font-bold">{payment.formatted_amount}</span>
                                 </div>
                                 {payment.refunded_amount > 0 && (
                                     <div className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">{t('admin.payments.stats.refunded')}</span>
+                                        <span className="text-muted-foreground">{t('payments.stats.refunded')}</span>
                                         <span className="font-mono text-red-500">{payment.formatted_refunded_amount}</span>
                                     </div>
                                 )}
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">{t('admin.payments.payment_method')}</span>
+                                    <span className="text-muted-foreground">{t('payments.page.payment_method')}</span>
                                     <Badge variant="outline">{payment.payment_method_label}</Badge>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">{t('admin.payments.provider')}</span>
+                                    <span className="text-muted-foreground">{t('payments.page.provider')}</span>
                                     <Badge variant="secondary">{payment.provider}</Badge>
                                 </div>
                             </CardContent>
@@ -291,7 +291,7 @@ function PaymentShow({ payment, purchase }: Props) {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <Building2 className="h-5 w-5" />
-                                        {t('admin.payments.tenant')}
+                                        {t('payments.page.tenant')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
@@ -319,7 +319,7 @@ function PaymentShow({ payment, purchase }: Props) {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <User className="h-5 w-5" />
-                                        {t('admin.payments.customer')}
+                                        {t('payments.page.customer')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">

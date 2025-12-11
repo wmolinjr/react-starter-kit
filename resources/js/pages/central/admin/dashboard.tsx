@@ -24,22 +24,22 @@ function AdminDashboard({ stats }: Props) {
     const { t } = useLaravelReactI18n();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
+        { title: t('dashboard.page.title'), href: admin.dashboard.url() },
     ];
     useSetBreadcrumbs(breadcrumbs);
 
     return (
         <>
-            <Head title={t('admin.dashboard.title')} />
+            <Head title={t('dashboard.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle className="flex items-center gap-2 text-3xl">
                             <Shield className="h-8 w-8" />
-                            {t('admin.dashboard.title')}
+                            {t('dashboard.page.title')}
                         </PageTitle>
-                        <PageDescription>{t('admin.dashboard.description')}</PageDescription>
+                        <PageDescription>{t('dashboard.page.description')}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 
@@ -47,52 +47,52 @@ function AdminDashboard({ stats }: Props) {
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">{t('admin.dashboard.tenants')}</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('dashboard.page.tenants')}</CardTitle>
                             <Building2 className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.total_tenants}</div>
                             <Link href={admin.tenants.index.url()} className="text-muted-foreground text-xs hover:underline">
-                                {t('admin.dashboard.view_all_tenants')}
+                                {t('dashboard.page.view_all_tenants')}
                             </Link>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">{t('admin.dashboard.admins')}</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('dashboard.page.admins')}</CardTitle>
                             <Shield className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.total_admins}</div>
                             <p className="text-muted-foreground text-xs">
-                                {t('admin.dashboard.central_admins')}
+                                {t('dashboard.page.central_admins')}
                             </p>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">{t('admin.dashboard.active_addons')}</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('dashboard.page.active_addons')}</CardTitle>
                             <Package className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.total_addons}</div>
                             <Link href={admin.addons.index.url()} className="text-muted-foreground text-xs hover:underline">
-                                {t('admin.dashboard.view_addons')}
+                                {t('dashboard.page.view_addons')}
                             </Link>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">{t('admin.dashboard.plans')}</CardTitle>
+                            <CardTitle className="text-sm font-medium">{t('dashboard.page.plans')}</CardTitle>
                             <CreditCard className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.total_plans}</div>
                             <Link href={admin.plans.index.url()} className="text-muted-foreground text-xs hover:underline">
-                                {t('admin.dashboard.manage_plans')}
+                                {t('dashboard.page.manage_plans')}
                             </Link>
                         </CardContent>
                     </Card>
@@ -100,8 +100,8 @@ function AdminDashboard({ stats }: Props) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('admin.dashboard.quick_actions')}</CardTitle>
-                        <CardDescription>{t('admin.dashboard.quick_actions_description')}</CardDescription>
+                        <CardTitle>{t('dashboard.page.quick_actions')}</CardTitle>
+                        <CardDescription>{t('dashboard.page.quick_actions_description')}</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-2 md:grid-cols-2">
                         <Link
@@ -110,8 +110,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <Building2 className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.manage_tenants')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_tenants_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.manage_tenants')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.manage_tenants_description')}</p>
                             </div>
                         </Link>
                         <Link
@@ -120,8 +120,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <Users className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.manage_users')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_users_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.manage_users')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.manage_users_description')}</p>
                             </div>
                         </Link>
                         <Link
@@ -130,8 +130,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <CreditCard className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.plan_catalog')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.plan_catalog_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.plan_catalog')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.plan_catalog_description')}</p>
                             </div>
                         </Link>
                         <Link
@@ -140,8 +140,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <Package className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.addon_catalog')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.addon_catalog_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.addon_catalog')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.addon_catalog_description')}</p>
                             </div>
                         </Link>
                         <Link
@@ -150,8 +150,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <Layers className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.bundle_catalog')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.bundle_catalog_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.bundle_catalog')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.bundle_catalog_description')}</p>
                             </div>
                         </Link>
                         <Link
@@ -160,8 +160,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <Shield className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.manage_roles')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.manage_roles_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.manage_roles')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.manage_roles_description')}</p>
                             </div>
                         </Link>
                         <Link
@@ -170,8 +170,8 @@ function AdminDashboard({ stats }: Props) {
                         >
                             <Network className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('admin.dashboard.federation_groups')}</p>
-                                <p className="text-muted-foreground text-xs">{t('admin.dashboard.federation_groups_description')}</p>
+                                <p className="font-medium">{t('dashboard.page.federation_groups')}</p>
+                                <p className="text-muted-foreground text-xs">{t('dashboard.page.federation_groups_description')}</p>
                             </div>
                         </Link>
                     </CardContent>

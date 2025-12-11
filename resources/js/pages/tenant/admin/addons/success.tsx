@@ -18,14 +18,14 @@ function AddonsSuccess({ addon_name, quantity, amount }: Props) {
 
     return (
         <>
-            <Head title={t('tenant.addons.purchase_successful')} />
+            <Head title={t('addons.page.purchase_successful')} />
 
             <div className="flex items-center justify-center py-12">
                 <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
                         <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                        <CardTitle className="mt-4">{t('tenant.addons.purchase_successful')}</CardTitle>
-                        <CardDescription>{t('tenant.addons.addon_activated')}</CardDescription>
+                        <CardTitle className="mt-4">{t('addons.page.purchase_successful')}</CardTitle>
+                        <CardDescription>{t('addons.page.addon_activated')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {addon_name && (
@@ -36,20 +36,20 @@ function AddonsSuccess({ addon_name, quantity, amount }: Props) {
                                 </div>
                                 {quantity && (
                                     <div className="flex justify-between text-sm">
-                                        <span>{t('tenant.addons.quantity')}</span>
+                                        <span>{t('addons.page.quantity')}</span>
                                         <span className="font-medium">{quantity}</span>
                                     </div>
                                 )}
                                 {amount && (
                                     <div className="flex justify-between text-sm">
-                                        <span>{t('tenant.addons.amount')}</span>
+                                        <span>{t('addons.page.amount')}</span>
                                         <span className="font-medium">{amount}</span>
                                     </div>
                                 )}
                             </div>
                         )}
                         <Button asChild className="w-full">
-                            <Link href={admin.addons.index.url()}>{t('tenant.addons.view_addons')}</Link>
+                            <Link href={admin.addons.index.url()}>{t('addons.page.view_addons')}</Link>
                         </Button>
                     </CardContent>
                 </Card>

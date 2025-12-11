@@ -1,8 +1,17 @@
 {
+    "roles.form.basic_info_description": "Define the role name and description",
     "roles.form.create_description": "Add a new role with specific permissions for your team",
     "roles.form.create_title": "Create Role",
     "roles.form.delete_confirm": "Are you sure you want to delete the role \":name\"?",
+    "roles.form.display_name_label": "Display Name",
     "roles.form.edit_description": "Update :name role and permissions",
     "roles.form.edit_title": "Edit Role",
-    "roles.form.new": "New Role"
+    "roles.form.name_hint": "Used internally, lowercase with hyphens",
+    "roles.form.name_label": "Role Name (identifier)",
+    "roles.form.name_placeholder": "central-admin",
+    "roles.form.new": "New Role",
+    "roles.form.no_permissions": "No permissions available. Run the permissions sync command.",
+    "roles.form.permissions_description": "Select which permissions this role should have.",
+    "roles.form.protected_alert": "This is a protected system role. The role name cannot be changed.",
+    "roles.form.selected": ":count selected"
 }

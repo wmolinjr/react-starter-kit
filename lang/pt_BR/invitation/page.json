@@ -1,0 +1,17 @@
+{
+    "invitation.page.accept_button": "Aceitar Convite",
+    "invitation.page.accept_title": "Aceitar Convite",
+    "invitation.page.accepting": "Aceitando...",
+    "invitation.page.access_info": "Ao aceitar o convite, você terá acesso completo aos recursos da organização de acordo com sua função.",
+    "invitation.page.auth_required": "Você precisa estar autenticado para aceitar o convite.",
+    "invitation.page.back_home": "Voltar para Home",
+    "invitation.page.create_account": "crie uma conta",
+    "invitation.page.hello_user": "Olá :name, você recebeu um convite para participar de uma organização.",
+    "invitation.page.invalid_description": "O link de convite que você acessou é inválido ou expirou.",
+    "invitation.page.invalid_title": "Convite Inválido",
+    "invitation.page.login": "Faça login",
+    "invitation.page.or": "ou",
+    "invitation.page.ready_to_start": "Pronto para começar?",
+    "invitation.page.received_invite": "Você recebeu um convite para participar de uma organização.",
+    "invitation.page.you_were_invited": "Você foi convidado!"
+}

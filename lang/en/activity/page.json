@@ -1,0 +1,22 @@
+{
+    "activity.page.column_action": "Action",
+    "activity.page.column_date": "Date",
+    "activity.page.column_description": "Description",
+    "activity.page.column_subject": "Subject",
+    "activity.page.column_user": "User",
+    "activity.page.description": "View all activity and changes in :name.",
+    "activity.page.event_created": "Created",
+    "activity.page.event_deleted": "Deleted",
+    "activity.page.event_login": "Login",
+    "activity.page.event_logout": "Logout",
+    "activity.page.event_updated": "Updated",
+    "activity.page.filter_date_from": "From Date",
+    "activity.page.filter_date_to": "To Date",
+    "activity.page.filter_event": "Event Type",
+    "activity.page.filter_subject": "Subject Type",
+    "activity.page.filter_user": "User",
+    "activity.page.no_activities": "No activity recorded yet.",
+    "activity.page.page_title": "Team Activity",
+    "activity.page.system": "System",
+    "activity.page.title": "Activity"
+}
