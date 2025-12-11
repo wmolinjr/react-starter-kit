@@ -1,0 +1,13 @@
+{
+    "billing.boleto.amount": "Valor",
+    "billing.boleto.barcode_copied": "Código de barras copiado!",
+    "billing.boleto.barcode_line": "Linha digitável:",
+    "billing.boleto.bank_slip": "Boleto Bancário",
+    "billing.boleto.copy_barcode": "Copiar linha digitável",
+    "billing.boleto.copy_error": "Erro ao copiar",
+    "billing.boleto.copied": "Copiado!",
+    "billing.boleto.download_pdf": "Baixar Boleto PDF",
+    "billing.boleto.due_date": "Vencimento",
+    "billing.boleto.instruction_1": "O boleto pode levar até 3 dias úteis para compensar.",
+    "billing.boleto.instruction_2": "Após o pagamento, seu acesso será liberado automaticamente."
+}

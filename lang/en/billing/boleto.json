@@ -1,0 +1,13 @@
+{
+    "billing.boleto.amount": "Amount",
+    "billing.boleto.barcode_copied": "Barcode copied!",
+    "billing.boleto.barcode_line": "Barcode line:",
+    "billing.boleto.bank_slip": "Bank Slip (Boleto)",
+    "billing.boleto.copy_barcode": "Copy barcode line",
+    "billing.boleto.copy_error": "Error copying",
+    "billing.boleto.copied": "Copied!",
+    "billing.boleto.download_pdf": "Download Boleto PDF",
+    "billing.boleto.due_date": "Due Date",
+    "billing.boleto.instruction_1": "The boleto may take up to 3 business days to clear.",
+    "billing.boleto.instruction_2": "After payment, your access will be activated automatically."
+}

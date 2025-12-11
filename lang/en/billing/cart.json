@@ -1,6 +1,9 @@
 {
     "billing.cart.add": "Add to Cart",
+    "billing.cart.added": "Added to cart",
+    "billing.cart.all_items_removed": "All items have been removed",
     "billing.cart.clear": "Clear",
+    "billing.cart.cleared": "Cart cleared",
     "billing.cart.description": "Review your items before checkout",
     "billing.cart.empty": "Your cart is empty",
     "billing.cart.expires_soon": "Cart expires in :minutes minutes",
@@ -11,5 +14,10 @@
     "billing.cart.items_count": ":count item(s) in cart",
     "billing.cart.no_items": "No items",
     "billing.cart.open": "Open Cart",
+    "billing.cart.quantity_increased": ":name quantity increased",
+    "billing.cart.quantity_updated": "Quantity updated",
+    "billing.cart.removed": "Removed from cart",
+    "billing.cart.restored": "Cart restored with :count item(s)",
+    "billing.cart.restored_description": "Your previous cart has been restored.",
     "billing.cart.title": "Cart"
 }

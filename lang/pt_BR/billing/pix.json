@@ -1,0 +1,18 @@
+{
+    "billing.pix.code_copied": "Código PIX copiado!",
+    "billing.pix.copy_code": "Copiar código PIX",
+    "billing.pix.copy_error": "Erro ao copiar",
+    "billing.pix.copied": "Copiado!",
+    "billing.pix.expires_in": "Expira em :time",
+    "billing.pix.instruction_1": "1. Abra o app do seu banco",
+    "billing.pix.instruction_2": "2. Escolha pagar com PIX",
+    "billing.pix.instruction_3": "3. Escaneie o QR Code ou cole o código",
+    "billing.pix.or_copy": "Ou copie o código PIX:",
+    "billing.pix.payment_confirmed": "Pagamento confirmado!",
+    "billing.pix.payment_failed": "Pagamento falhou",
+    "billing.pix.pay_with_pix": "Pague com PIX",
+    "billing.pix.qr_code_alt": "QR Code PIX",
+    "billing.pix.qr_expired": "QR Code expirado",
+    "billing.pix.generate_new": "Gerar novo QR Code",
+    "billing.pix.try_again": "Tentar novamente"
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Copy, CheckCircle2, XCircle, Clock } from 'lucide-react';
@@ -42,6 +43,7 @@ export function PixPayment({
     statusEndpoint,
     pollInterval = 3000,
 }: PixPaymentProps) {
+    const { t } = useLaravelReactI18n();
     const [status, setStatus] = useState<PaymentStatus>('pending');
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [copied, setCopied] = useState(false);
@@ -90,10 +92,10 @@ export function PixPayment({
                 if (data.status === 'completed') {
                     setStatus('completed');
                     onSuccess?.();
-                    toast.success('Pagamento confirmado!');
+                    toast.success(t('billing.pix.payment_confirmed'));
                 } else if (data.status === 'failed') {
                     setStatus('failed');
-                    toast.error('Pagamento falhou');
+                    toast.error(t('billing.pix.payment_failed'));
                 }
             } catch (error) {
                 console.error('Failed to check payment status', error);
@@ -109,10 +111,10 @@ export function PixPayment({
         try {
             await navigator.clipboard.writeText(qrCodeData);
             setCopied(true);
-            toast.success('Codigo PIX copiado!');
+            toast.success(t('billing.pix.code_copied'));
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            toast.error('Erro ao copiar');
+            toast.error(t('billing.pix.copy_error'));
         }
     };
 
@@ -129,7 +131,7 @@ export function PixPayment({
                 <CardContent className="flex flex-col items-center py-8">
                     <CheckCircle2 className="mb-4 h-16 w-16 text-green-600 dark:text-green-400" />
                     <p className="text-lg font-semibold text-green-800 dark:text-green-200">
-                        Pagamento confirmado!
+                        {t('billing.pix.payment_confirmed')}
                     </p>
                 </CardContent>
             </Card>
@@ -143,14 +145,14 @@ export function PixPayment({
                 <CardContent className="flex flex-col items-center py-8">
                     <XCircle className="mb-4 h-16 w-16 text-red-600 dark:text-red-400" />
                     <p className="text-lg font-semibold text-red-800 dark:text-red-200">
-                        QR Code expirado
+                        {t('billing.pix.qr_expired')}
                     </p>
                     <Button
                         variant="outline"
                         className="mt-4"
                         onClick={() => window.location.reload()}
                     >
-                        Gerar novo QR Code
+                        {t('billing.pix.generate_new')}
                     </Button>
                 </CardContent>
             </Card>
@@ -164,14 +166,14 @@ export function PixPayment({
                 <CardContent className="flex flex-col items-center py-8">
                     <XCircle className="mb-4 h-16 w-16 text-red-600 dark:text-red-400" />
                     <p className="text-lg font-semibold text-red-800 dark:text-red-200">
-                        Pagamento falhou
+                        {t('billing.pix.payment_failed')}
                     </p>
                     <Button
                         variant="outline"
                         className="mt-4"
                         onClick={() => window.location.reload()}
                     >
-                        Tentar novamente
+                        {t('billing.pix.try_again')}
                     </Button>
                 </CardContent>
             </Card>
@@ -184,7 +186,7 @@ export function PixPayment({
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
-                    Pague com PIX
+                    {t('billing.pix.pay_with_pix')}
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-4">
@@ -195,7 +197,7 @@ export function PixPayment({
                 >
                     <img
                         src={qrCodeUrl}
-                        alt="QR Code PIX"
+                        alt={t('billing.pix.qr_code_alt')}
                         className="h-48 w-48"
                     />
                 </div>
@@ -211,13 +213,13 @@ export function PixPayment({
                     data-testid="pix-timer"
                 >
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Expira em {formatTime(timeLeft)}
+                    {t('billing.pix.expires_in', { time: formatTime(timeLeft) })}
                 </div>
 
                 {/* Copy button */}
                 <div className="w-full space-y-2">
                     <p className="text-center text-sm text-muted-foreground">
-                        Ou copie o codigo PIX:
+                        {t('billing.pix.or_copy')}
                     </p>
                     <Button
                         variant="outline"
@@ -230,15 +232,15 @@ export function PixPayment({
                         ) : (
                             <Copy className="mr-2 h-4 w-4" />
                         )}
-                        {copied ? 'Copiado!' : 'Copiar codigo PIX'}
+                        {copied ? t('billing.pix.copied') : t('billing.pix.copy_code')}
                     </Button>
                 </div>
 
                 {/* Instructions */}
                 <div className="space-y-1 text-center text-sm text-muted-foreground">
-                    <p>1. Abra o app do seu banco</p>
-                    <p>2. Escolha pagar com PIX</p>
-                    <p>3. Escaneie o QR Code ou cole o codigo</p>
+                    <p>{t('billing.pix.instruction_1')}</p>
+                    <p>{t('billing.pix.instruction_2')}</p>
+                    <p>{t('billing.pix.instruction_3')}</p>
                 </div>
             </CardContent>
         </Card>

@@ -8,6 +8,7 @@ import {
     type ReactNode,
 } from 'react';
 import { toast } from 'sonner';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import type { BillingPeriod } from '@/types/enums';
 import type { BillingProduct, CheckoutItem } from '@/types/billing';
 
@@ -157,6 +158,7 @@ function loadStoredCart(): { items: CheckoutItem[]; timestamp: number } {
  * </CheckoutProvider>
  */
 export function CheckoutProvider({ children }: { children: ReactNode }) {
+    const { t } = useLaravelReactI18n();
     const [items, setItems] = useState<CheckoutItem[]>([]);
     const [cartTimestamp, setCartTimestamp] = useState<number>(Date.now());
     const [isRestoring, setIsRestoring] = useState(true);
@@ -177,12 +179,12 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         // Show notification if cart was restored with items
         if (storedItems.length > 0) {
             const itemCount = storedItems.reduce((sum, item) => sum + item.quantity, 0);
-            toast.info(`Cart restored with ${itemCount} item${itemCount > 1 ? 's' : ''}`, {
-                description: 'Your previous cart has been restored.',
+            toast.info(t('billing.cart.restored', { count: itemCount }), {
+                description: t('billing.cart.restored_description'),
                 duration: 3000,
             });
         }
-    }, []);
+    }, [t]);
 
     // Persist to localStorage with timestamp
     useEffect(() => {
@@ -207,8 +209,8 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
             if (existingItem && item.product.type !== 'plan') {
                 // Update quantity for existing addon/bundle
                 if (showToast) {
-                    toast.success('Quantity updated', {
-                        description: `${item.product.name} quantity increased`,
+                    toast.success(t('billing.cart.quantity_updated'), {
+                        description: t('billing.cart.quantity_increased', { name: item.product.name }),
                         duration: 2000,
                     });
                 }
@@ -228,7 +230,7 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
 
             // Add new item
             if (showToast) {
-                toast.success('Added to cart', {
+                toast.success(t('billing.cart.added'), {
                     description: item.product.name,
                     duration: 2000,
                 });
@@ -239,20 +241,20 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         // Update timestamp when adding items
         setCartTimestamp(Date.now());
         setIsOpen(true);
-    }, []);
+    }, [t]);
 
     const removeItem = useCallback((id: string, showToast = true) => {
         setItems((prev) => {
             const item = prev.find((i) => i.id === id);
             if (item && showToast) {
-                toast.info('Removed from cart', {
+                toast.info(t('billing.cart.removed'), {
                     description: item.product.name,
                     duration: 2000,
                 });
             }
             return prev.filter((i) => i.id !== id);
         });
-    }, []);
+    }, [t]);
 
     const updateQuantity = useCallback((id: string, quantity: number) => {
         setItems((prev) =>
@@ -279,12 +281,12 @@ export function CheckoutProvider({ children }: { children: ReactNode }) {
         setItems([]);
         setCartTimestamp(Date.now());
         if (showToast) {
-            toast.info('Cart cleared', {
-                description: 'All items have been removed',
+            toast.info(t('billing.cart.cleared'), {
+                description: t('billing.cart.all_items_removed'),
                 duration: 2000,
             });
         }
-    }, []);
+    }, [t]);
 
     const open = useCallback(() => setIsOpen(true), []);
     const close = useCallback(() => setIsOpen(false), []);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, Download, FileText, CheckCircle2 } from 'lucide-react';
@@ -27,16 +28,17 @@ export function BoletoPayment({
     dueDate,
     amount,
 }: BoletoPaymentProps) {
+    const { t } = useLaravelReactI18n();
     const [copied, setCopied] = useState(false);
 
     const copyBarcode = async () => {
         try {
             await navigator.clipboard.writeText(barcode);
             setCopied(true);
-            toast.success('Codigo de barras copiado!');
+            toast.success(t('billing.boleto.barcode_copied'));
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            toast.error('Erro ao copiar');
+            toast.error(t('billing.boleto.copy_error'));
         }
     };
 
@@ -50,19 +52,19 @@ export function BoletoPayment({
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Boleto Bancario
+                    {t('billing.boleto.bank_slip')}
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 {/* Info */}
                 <div className="grid grid-cols-2 gap-4 rounded-lg bg-muted p-4">
                     <div>
-                        <p className="text-sm text-muted-foreground">Valor</p>
+                        <p className="text-sm text-muted-foreground">{t('billing.boleto.amount')}</p>
                         <p className="font-semibold">{amount}</p>
                     </div>
                     <div>
                         <p className="text-sm text-muted-foreground">
-                            Vencimento
+                            {t('billing.boleto.due_date')}
                         </p>
                         <p
                             className="font-semibold"
@@ -76,7 +78,7 @@ export function BoletoPayment({
                 {/* Barcode */}
                 <div className="space-y-2">
                     <p className="text-sm text-muted-foreground">
-                        Linha digitavel:
+                        {t('billing.boleto.barcode_line')}
                     </p>
                     <div
                         className="break-all rounded bg-muted p-3 font-mono text-sm"
@@ -94,7 +96,7 @@ export function BoletoPayment({
                         ) : (
                             <Copy className="mr-2 h-4 w-4" />
                         )}
-                        {copied ? 'Copiado!' : 'Copiar linha digitavel'}
+                        {copied ? t('billing.boleto.copied') : t('billing.boleto.copy_barcode')}
                     </Button>
                 </div>
 
@@ -106,17 +108,14 @@ export function BoletoPayment({
                         rel="noopener noreferrer"
                     >
                         <Download className="mr-2 h-4 w-4" />
-                        Baixar Boleto PDF
+                        {t('billing.boleto.download_pdf')}
                     </a>
                 </Button>
 
                 {/* Instructions */}
                 <div className="space-y-1 text-center text-sm text-muted-foreground">
-                    <p>O boleto pode levar ate 3 dias uteis para compensar.</p>
-                    <p>
-                        Apos o pagamento, seu acesso sera liberado
-                        automaticamente.
-                    </p>
+                    <p>{t('billing.boleto.instruction_1')}</p>
+                    <p>{t('billing.boleto.instruction_2')}</p>
                 </div>
             </CardContent>
         </Card>

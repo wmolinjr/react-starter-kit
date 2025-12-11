@@ -1,6 +1,9 @@
 {
     "billing.cart.add": "Adicionar ao Carrinho",
+    "billing.cart.added": "Adicionado ao carrinho",
+    "billing.cart.all_items_removed": "Todos os itens foram removidos",
     "billing.cart.clear": "Limpar",
+    "billing.cart.cleared": "Carrinho limpo",
     "billing.cart.description": "Revise seus itens antes de pagar",
     "billing.cart.empty": "Seu carrinho está vazio",
     "billing.cart.expires_soon": "Carrinho expira em :minutes minutos",
@@ -11,5 +14,10 @@
     "billing.cart.items_count": ":count item(ns) no carrinho",
     "billing.cart.no_items": "Sem itens",
     "billing.cart.open": "Abrir Carrinho",
+    "billing.cart.quantity_increased": "Quantidade de :name aumentada",
+    "billing.cart.quantity_updated": "Quantidade atualizada",
+    "billing.cart.removed": "Removido do carrinho",
+    "billing.cart.restored": "Carrinho restaurado com :count item(ns)",
+    "billing.cart.restored_description": "Seu carrinho anterior foi restaurado.",
     "billing.cart.title": "Carrinho"
 }

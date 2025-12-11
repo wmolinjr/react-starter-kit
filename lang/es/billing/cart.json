@@ -1,0 +1,23 @@
+{
+    "billing.cart.add": "Agregar al Carrito",
+    "billing.cart.added": "Agregado al carrito",
+    "billing.cart.all_items_removed": "Todos los artículos han sido eliminados",
+    "billing.cart.clear": "Vaciar",
+    "billing.cart.cleared": "Carrito vaciado",
+    "billing.cart.description": "Revisa tus artículos antes de pagar",
+    "billing.cart.empty": "Tu carrito está vacío",
+    "billing.cart.expires_soon": "El carrito expira en :minutes minutos",
+    "billing.cart.expiring": "Tu carrito expirará en :minutes minutos. Completa tu compra para guardar tus artículos.",
+    "billing.cart.expiring_urgent": "¡Tu carrito expirará pronto! Completa tu compra para no perder tus artículos.",
+    "billing.cart.in_cart": "En el Carrito",
+    "billing.cart.items": "Artículos",
+    "billing.cart.items_count": ":count artículo(s) en el carrito",
+    "billing.cart.no_items": "Sin artículos",
+    "billing.cart.open": "Abrir Carrito",
+    "billing.cart.quantity_increased": "Cantidad de :name aumentada",
+    "billing.cart.quantity_updated": "Cantidad actualizada",
+    "billing.cart.removed": "Eliminado del carrito",
+    "billing.cart.restored": "Carrito restaurado con :count artículo(s)",
+    "billing.cart.restored_description": "Tu carrito anterior ha sido restaurado.",
+    "billing.cart.title": "Carrito"
+}
