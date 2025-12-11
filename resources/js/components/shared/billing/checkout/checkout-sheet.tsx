@@ -149,7 +149,7 @@ export function CheckoutSheet({
                     <div className="flex items-center justify-between pr-8">
                         <SheetTitle className="flex items-center gap-2">
                             <ShoppingCart className="h-5 w-5" />
-                            {t('billing.cart', { default: 'Cart' })}
+                            {t('billing.cart.title', { default: 'Cart' })}
                             {itemCount > 0 && (
                                 <Badge variant="secondary" className="ml-1">
                                     {itemCount}
@@ -164,16 +164,16 @@ export function CheckoutSheet({
                                 onClick={onClearCart}
                             >
                                 <Trash2 className="mr-1 h-4 w-4" />
-                                {t('billing.clear', { default: 'Clear' })}
+                                {t('billing.cart.clear', { default: 'Clear' })}
                             </Button>
                         )}
                     </div>
                     <SheetDescription>
                         {hasItems
-                            ? t('billing.cart_description', {
+                            ? t('billing.cart.description', {
                                   default: 'Review your items before checkout',
                               })
-                            : t('billing.cart_empty', { default: 'Your cart is empty' })}
+                            : t('billing.cart.empty', { default: 'Your cart is empty' })}
                     </SheetDescription>
                 </SheetHeader>
 
@@ -219,16 +219,16 @@ export function CheckoutSheet({
                         </div>
                         <div>
                             <p className="font-medium">
-                                {t('billing.no_items', { default: 'No items in cart' })}
+                                {t('billing.cart.no_items', { default: 'No items in cart' })}
                             </p>
                             <p className="text-muted-foreground mt-1 text-sm">
-                                {t('billing.browse_products', {
+                                {t('common.browse_products', {
                                     default: 'Browse our plans and add-ons to get started',
                                 })}
                             </p>
                         </div>
                         <Button variant="outline" onClick={() => onOpenChange(false)}>
-                            {t('billing.continue_shopping', { default: 'Continue Shopping' })}
+                            {t('common.continue_shopping', { default: 'Continue Shopping' })}
                         </Button>
                     </div>
                 )}
@@ -261,19 +261,19 @@ export function CheckoutSheet({
                             {isCheckingOut ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    {t('billing.processing', { default: 'Processing...' })}
+                                    {t('billing.payment.processing', { default: 'Processing...' })}
                                 </>
                             ) : (
                                 <>
                                     {checkoutLabel ||
-                                        t('checkout.proceed_to_checkout', { default: 'Proceed to Checkout' })}
+                                        t('checkout.summary.proceed_to_checkout', { default: 'Proceed to Checkout' })}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </>
                             )}
                         </Button>
 
                         <p className="text-muted-foreground text-center text-xs">
-                            {t('checkout.secure_checkout_note', {
+                            {t('checkout.summary.secure_checkout_note', {
                                 default: 'You will be redirected to a secure checkout page',
                             })}
                         </p>
@@ -342,7 +342,7 @@ export function CheckoutCartButton({
                     </Badge>
                 )}
                 <span className="sr-only">
-                    {t('billing.open_cart', { default: 'Open cart' })}
+                    {t('billing.cart.open', { default: 'Open cart' })}
                 </span>
             </Button>
         );
@@ -351,7 +351,7 @@ export function CheckoutCartButton({
     return (
         <Button variant={variant} size={size} onClick={onClick} className={className}>
             <ShoppingCart className="mr-2 h-4 w-4" />
-            {t('billing.cart', { default: 'Cart' })}
+            {t('billing.cart.title', { default: 'Cart' })}
             {itemCount > 0 && (
                 <>
                     <Badge variant="secondary" className="ml-2">

@@ -1,0 +1,10 @@
+{
+    "customer.billing.address": "Endereço de Cobrança",
+    "customer.billing.address_description": "Este endereço aparecerá nas suas faturas.",
+    "customer.billing.description": "Gerencie a assinatura e cobrança deste workspace.",
+    "customer.billing.manage": "Gerenciar Cobrança",
+    "customer.billing.monthly": "Cobrança Mensal",
+    "customer.billing.portal": "Portal de Cobrança",
+    "customer.billing.title": "Cobrança",
+    "customer.billing.updated": "Informações de cobrança atualizadas com sucesso."
+}

@@ -93,7 +93,7 @@ function PlansPageContent({
                         <PricingToggle
                             value={period}
                             onChange={setPeriod}
-                            savings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                            savings={t('billing.price.yearly_savings', { default: 'Save 20%' })}
                         />
                     </div>
 

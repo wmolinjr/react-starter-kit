@@ -56,7 +56,7 @@ export function UsageProgress({
 
     const getUsageText = (): string => {
         if (isUnlimited) {
-            return `${formatNumber(used)} / ${t('billing.unlimited', { default: 'Unlimited' })}`;
+            return `${formatNumber(used)} / ${t('billing.usage.unlimited', { default: 'Unlimited' })}`;
         }
         return `${formatNumber(used)} / ${formatNumber(limit)}`;
     };
@@ -139,7 +139,7 @@ export function UsageProgress({
 
             {isOverLimit && (
                 <p className="text-xs text-red-500">
-                    {t('billing.over_limit', {
+                    {t('billing.usage.over_limit', {
                         default: 'You have exceeded your limit by :amount',
                         amount: formatNumber(used - limit),
                     })}
@@ -192,7 +192,7 @@ export function UsageProgressCompact({
             {formatNumber(used)}
             {' / '}
             {isUnlimited
-                ? t('billing.unlimited', { default: 'Unlimited' })
+                ? t('billing.usage.unlimited', { default: 'Unlimited' })
                 : formatNumber(limit)}
         </span>
     );

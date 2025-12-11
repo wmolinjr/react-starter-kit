@@ -1,0 +1,6 @@
+{
+    "roles.page.create_first": "Create First Role",
+    "roles.page.description": "Manage roles and permissions for your team",
+    "roles.page.info": "System roles (Owner, Admin, Member) are protected and cannot be deleted. You can create custom roles to define specific permission sets for your team.",
+    "roles.page.title": "Roles"
+}

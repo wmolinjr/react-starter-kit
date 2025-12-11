@@ -375,19 +375,19 @@ export function CheckoutPaymentSheet({
     const getTitle = () => {
         switch (step) {
             case 'cart':
-                return t('billing.cart', { default: 'Cart' });
+                return t('billing.cart.title', { default: 'Cart' });
             case 'payment':
-                return t('billing.payment_method', {
+                return t('billing.payment.method', {
                     default: 'Payment Method',
                 });
             case 'async-payment':
                 return asyncPaymentResult?.type === 'pix'
-                    ? t('billing.pix_payment', { default: 'PIX Payment' })
-                    : t('billing.boleto_payment', {
+                    ? t('billing.payment.pix', { default: 'PIX Payment' })
+                    : t('billing.payment.boleto', {
                           default: 'Boleto Payment',
                       });
             case 'asaas-card':
-                return t('billing.card_payment', {
+                return t('billing.payment.card', {
                     default: 'Card Payment',
                 });
             case 'success':
@@ -491,7 +491,7 @@ export function CheckoutPaymentSheet({
                         onClick={() => onOpenChange(false)}
                         className="w-full"
                     >
-                        {t('billing.continue_shopping', { default: 'Continue Shopping' })}
+                        {t('common.continue_shopping', { default: 'Continue Shopping' })}
                     </Button>
                 </div>
             </div>
@@ -535,26 +535,26 @@ export function CheckoutPaymentSheet({
                                 onClick={onClearCart}
                             >
                                 <Trash2 className="mr-1 h-4 w-4" />
-                                {t('billing.clear', { default: 'Clear' })}
+                                {t('billing.cart.clear', { default: 'Clear' })}
                             </Button>
                         )}
                     </div>
                     <SheetDescription>
                         {step === 'cart' &&
                             (hasItems
-                                ? t('billing.cart_description', {
+                                ? t('billing.cart.description', {
                                       default:
                                           'Review your items before checkout',
                                   })
-                                : t('billing.cart_empty', {
+                                : t('billing.cart.empty', {
                                       default: 'Your cart is empty',
                                   }))}
                         {step === 'payment' &&
-                            t('billing.select_payment_method', {
+                            t('billing.payment.select_method', {
                                 default: 'Select how you want to pay',
                             })}
                         {step === 'async-payment' &&
-                            t('billing.complete_payment', {
+                            t('billing.payment.complete', {
                                 default:
                                     'Complete your payment to finish the purchase',
                             })}
@@ -624,12 +624,12 @@ export function CheckoutPaymentSheet({
                                 </div>
                                 <div>
                                     <p className="font-medium">
-                                        {t('billing.no_items', {
+                                        {t('billing.cart.no_items', {
                                             default: 'No items in cart',
                                         })}
                                     </p>
                                     <p className="mt-1 text-sm text-muted-foreground">
-                                        {t('billing.browse_products', {
+                                        {t('common.browse_products', {
                                             default:
                                                 'Browse our plans and add-ons to get started',
                                         })}
@@ -639,7 +639,7 @@ export function CheckoutPaymentSheet({
                                     variant="outline"
                                     onClick={() => handleOpenChange(false)}
                                 >
-                                    {t('billing.continue_shopping', {
+                                    {t('common.continue_shopping', {
                                         default: 'Continue Shopping',
                                     })}
                                 </Button>
@@ -668,7 +668,7 @@ export function CheckoutPaymentSheet({
                                     onClick={handleProceedToPayment}
                                     disabled={!hasItems}
                                 >
-                                    {t('billing.proceed_to_payment', {
+                                    {t('billing.payment.proceed', {
                                         default: 'Proceed to Payment',
                                     })}
                                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -692,7 +692,7 @@ export function CheckoutPaymentSheet({
                             {hasRecurring &&
                                 effectiveAvailableMethods.length === 1 && (
                                     <p className="text-sm text-muted-foreground">
-                                        {t('billing.recurring_card_only', {
+                                        {t('billing.payment.recurring_card_only', {
                                             default:
                                                 'Credit card is required for recurring subscriptions.',
                                         })}
@@ -702,14 +702,14 @@ export function CheckoutPaymentSheet({
                             {/* Order summary */}
                             <div className="rounded-lg border p-4">
                                 <h4 className="mb-2 font-medium">
-                                    {t('billing.order_summary', {
+                                    {t('billing.price.order_summary', {
                                         default: 'Order Summary',
                                     })}
                                 </h4>
                                 <div className="space-y-1 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">
-                                            {t('billing.items', {
+                                            {t('billing.cart.items', {
                                                 default: 'Items',
                                             })}
                                         </span>
@@ -717,7 +717,7 @@ export function CheckoutPaymentSheet({
                                     </div>
                                     <div className="flex justify-between font-semibold">
                                         <span>
-                                            {t('billing.total', {
+                                            {t('billing.price.total', {
                                                 default: 'Total',
                                             })}
                                         </span>
@@ -737,21 +737,21 @@ export function CheckoutPaymentSheet({
                                 {isCheckingOut ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        {t('billing.processing', {
+                                        {t('billing.payment.processing', {
                                             default: 'Processing...',
                                         })}
                                     </>
                                 ) : (
                                     <>
                                         {selectedPaymentMethod === 'card'
-                                            ? t('billing.pay_with_card', {
+                                            ? t('billing.payment.pay_with_card', {
                                                   default: 'Pay with Card',
                                               })
                                             : selectedPaymentMethod === 'pix'
-                                              ? t('billing.generate_pix', {
+                                              ? t('billing.payment.generate_pix', {
                                                     default: 'Generate PIX',
                                                 })
-                                              : t('billing.generate_boleto', {
+                                              : t('billing.payment.generate_boleto', {
                                                     default: 'Generate Boleto',
                                                 })}
                                         <ArrowRight className="ml-2 h-4 w-4" />

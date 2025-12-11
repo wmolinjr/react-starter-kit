@@ -195,7 +195,7 @@ export function PlanCard({
                         const label = limitLabels[key] || key;
                         const displayValue =
                             value === -1
-                                ? t('billing.unlimited', { default: 'Unlimited' })
+                                ? t('billing.usage.unlimited', { default: 'Unlimited' })
                                 : key === 'storage'
                                   ? `${value} GB`
                                   : value.toString();
@@ -260,7 +260,7 @@ export function PlanCard({
         if (isCurrent) {
             return {
                 label:
-                    ctaLabel || t('billing.current_plan', { default: 'Current Plan' }),
+                    ctaLabel || t('billing.plan.current', { default: 'Current Plan' }),
                 variant: 'outline' as const,
                 disabled: true,
                 icon: <Crown className="mr-2 h-4 w-4" />,
@@ -277,7 +277,7 @@ export function PlanCard({
 
         if (isUpgrade) {
             return {
-                label: ctaLabel || t('billing.upgrade', { default: 'Upgrade' }),
+                label: ctaLabel || t('billing.plan.upgrade', { default: 'Upgrade' }),
                 variant: 'default' as const,
                 disabled: false,
                 icon: <ArrowUp className="mr-2 h-4 w-4" />,
@@ -286,7 +286,7 @@ export function PlanCard({
 
         return {
             label:
-                ctaLabel || t('billing.select_plan', { default: 'Select Plan' }),
+                ctaLabel || t('billing.plan.select', { default: 'Select Plan' }),
             variant: (isHighlighted ? 'default' : 'outline') as 'default' | 'outline',
             disabled: false,
             icon: null,
@@ -344,7 +344,7 @@ export function PlanCard({
 
                     {billingPeriod === 'yearly' && price.amount > 0 && (
                         <p className="text-muted-foreground mt-1 text-sm">
-                            {t('billing.billed_yearly', { default: 'Billed yearly' })}
+                            {t('billing.subscription.billed_yearly', { default: 'Billed yearly' })}
                         </p>
                     )}
                 </div>
@@ -371,7 +371,7 @@ export function PlanCard({
                         {hasMoreFeatures && (
                             <li className="text-muted-foreground text-sm">
                                 +{features.length - maxFeatures}{' '}
-                                {t('billing.more_features', { default: 'more features' })}
+                                {t('common.more_features', { default: 'more features' })}
                             </li>
                         )}
                     </ul>

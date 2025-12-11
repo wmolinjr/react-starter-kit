@@ -1,0 +1,9 @@
+{
+    "impersonation.user.button": "Impersonate",
+    "impersonation.user.entering": "Entering...",
+    "impersonation.user.no_users": "No users found in this tenant.",
+    "impersonation.user.select": "Select User",
+    "impersonation.user.select_description": "Select a user to impersonate and see the system as they would see it.",
+    "impersonation.user.tenant_users": "Tenant Users",
+    "impersonation.user.title": "Impersonate Tenant"
+}

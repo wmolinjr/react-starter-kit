@@ -1,0 +1,7 @@
+{
+    "billing.trial.days_remaining": ":days days remaining",
+    "billing.trial.ending_soon": "Trial ending soon",
+    "billing.trial.ends_in": "Trial ends in :days days",
+    "billing.trial.ends_on": "Trial ends on :date",
+    "billing.trial.ends_today": "Trial ends today"
+}

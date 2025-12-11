@@ -92,19 +92,19 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.invoices'), href: '/account/invoices' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.invoices.title'), href: '/account/invoices' },
                 { title: invoice.number, href: `/account/invoices/${invoice.id}` },
             ]}
         >
-            <Head title={`${t('customer.invoice')} ${invoice.number}`} />
+            <Head title={`${t('customer.invoice.title')} ${invoice.number}`} />
 
             <div className="space-y-6 max-w-3xl">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
                             <Receipt className="h-6 w-6" />
-                            {t('customer.invoice')} {invoice.number}
+                            {t('customer.invoice.title')} {invoice.number}
                         </h1>
                         <p className="text-muted-foreground">
                             {new Date(invoice.date).toLocaleDateString()}
@@ -115,7 +115,7 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                         <Button asChild variant="outline">
                             <a href={`/account/invoices/${invoice.id}/download`}>
                                 <Download className="mr-2 h-4 w-4" />
-                                {t('customer.download_pdf')}
+                                {t('customer.invoice.download_pdf')}
                             </a>
                         </Button>
                     </div>
@@ -130,16 +130,16 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.invoice_details')}</CardTitle>
+                        <CardTitle>{t('customer.invoice.details')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <p className="text-muted-foreground">{t('customer.invoice_number')}</p>
+                                <p className="text-muted-foreground">{t('customer.invoice.number')}</p>
                                 <p className="font-medium">{invoice.number}</p>
                             </div>
                             <div>
-                                <p className="text-muted-foreground">{t('customer.date')}</p>
+                                <p className="text-muted-foreground">{t('customer.invoice.date')}</p>
                                 <p className="font-medium">{new Date(invoice.date).toLocaleDateString()}</p>
                             </div>
                             {invoice.paid_at && (
@@ -150,7 +150,7 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                             )}
                             {invoice.due_date && invoice.status === 'open' && (
                                 <div>
-                                    <p className="text-muted-foreground">{t('customer.due_date')}</p>
+                                    <p className="text-muted-foreground">{t('customer.invoice.due_date')}</p>
                                     <p className="font-medium">{new Date(invoice.due_date).toLocaleDateString()}</p>
                                 </div>
                             )}
@@ -186,7 +186,7 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                         <Separator />
 
                         <div>
-                            <h3 className="font-medium mb-4">{t('customer.line_items')}</h3>
+                            <h3 className="font-medium mb-4">{t('customer.invoice.line_items')}</h3>
                             <div className="space-y-3">
                                 {invoice.lines.map((line, index) => (
                                     <div key={index} className="flex justify-between items-center py-2 border-b last:border-0">
@@ -194,7 +194,7 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                                             <p className="font-medium">{line.description}</p>
                                             {line.quantity > 1 && (
                                                 <p className="text-sm text-muted-foreground">
-                                                    {t('customer.quantity')}: {line.quantity}
+                                                    {t('customer.invoice.quantity')}: {line.quantity}
                                                 </p>
                                             )}
                                         </div>
@@ -208,7 +208,7 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
 
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">{t('customer.subtotal')}</span>
+                                <span className="text-muted-foreground">{t('customer.invoice.subtotal')}</span>
                                 <span>{invoice.amount_formatted}</span>
                             </div>
                             {invoice.fee > 0 && (
@@ -225,7 +225,7 @@ export default function InvoiceShow({ invoice }: InvoiceShowProps) {
                             )}
                             <Separator />
                             <div className="flex justify-between font-medium text-lg">
-                                <span>{t('customer.total')}</span>
+                                <span>{t('customer.invoice.total')}</span>
                                 <span>{invoice.amount_formatted}</span>
                             </div>
                         </div>

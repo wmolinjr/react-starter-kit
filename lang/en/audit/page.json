@@ -1,0 +1,8 @@
+{
+    "audit.page.description": "Track all changes and actions.",
+    "audit.page.empty": "No audit entries found.",
+    "audit.page.export_csv": "Export CSV",
+    "audit.page.search": "Search by description or user...",
+    "audit.page.system": "System",
+    "audit.page.title": "Audit Log"
+}

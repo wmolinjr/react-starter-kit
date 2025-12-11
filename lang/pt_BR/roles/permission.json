@@ -1,0 +1,5 @@
+{
+    "roles.permission.description": "Permissões concedidas a usuários com esta regra de acesso",
+    "roles.permission.none": "Nenhuma permissão atribuída a esta regra de acesso.",
+    "roles.permission.title": "Permissões"
+}

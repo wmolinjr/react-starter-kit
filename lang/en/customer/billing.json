@@ -1,0 +1,10 @@
+{
+    "customer.billing.address": "Billing Address",
+    "customer.billing.address_description": "This address will appear on your invoices.",
+    "customer.billing.description": "Manage the subscription and billing for this workspace.",
+    "customer.billing.manage": "Manage Billing",
+    "customer.billing.monthly": "Monthly Billing",
+    "customer.billing.portal": "Billing Portal",
+    "customer.billing.title": "Billing",
+    "customer.billing.updated": "Billing information updated successfully."
+}

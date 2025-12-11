@@ -20,20 +20,20 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.workspaces'), href: '/account/tenants' },
-                { title: t('customer.create_workspace'), href: '/account/tenants/create' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.workspace.title'), href: '/account/tenants' },
+                { title: t('customer.workspace.create'), href: '/account/tenants/create' },
             ]}
         >
-            <Head title={t('customer.create_workspace')} />
+            <Head title={t('customer.workspace.create')} />
 
             <div className="space-y-6 max-w-2xl">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {t('customer.create_workspace')}
+                        {t('customer.workspace.create')}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('customer.create_workspace_description')}
+                        {t('customer.workspace.create_description')}
                     </p>
                 </div>
 
@@ -42,14 +42,14 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
                         <CardContent className="flex items-center gap-4 py-4">
                             <AlertCircle className="h-5 w-5 text-warning" />
                             <div>
-                                <p className="font-medium">{t('customer.payment_method_required')}</p>
+                                <p className="font-medium">{t('customer.payment.method_required')}</p>
                                 <p className="text-sm text-muted-foreground">
-                                    {t('customer.add_payment_method_first')}
+                                    {t('customer.payment.add_method_first')}
                                 </p>
                             </div>
                             <Button asChild variant="outline" className="ml-auto">
                                 <a href="/account/payment-methods/create">
-                                    {t('customer.add_payment_method')}
+                                    {t('customer.payment.add_method')}
                                 </a>
                             </Button>
                         </CardContent>
@@ -58,9 +58,9 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.workspace_details')}</CardTitle>
+                        <CardTitle>{t('customer.workspace.details')}</CardTitle>
                         <CardDescription>
-                            {t('customer.workspace_details_description')}
+                            {t('customer.workspace.details_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -72,19 +72,19 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
                             {({ processing }) => (
                                 <>
                                     <div className="space-y-2">
-                                        <Label htmlFor="name">{t('customer.workspace_name')}</Label>
+                                        <Label htmlFor="name">{t('customer.workspace.name')}</Label>
                                         <Input
                                             id="name"
                                             name="name"
                                             required
                                             autoFocus
-                                            placeholder={t('customer.workspace_name_placeholder')}
+                                            placeholder={t('customer.workspace.name_placeholder')}
                                         />
                                         <InputError message={errors?.name} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="slug">{t('customer.workspace_slug')}</Label>
+                                        <Label htmlFor="slug">{t('customer.workspace.slug')}</Label>
                                         <div className="flex items-center">
                                             <Input
                                                 id="slug"
@@ -98,7 +98,7 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
                                             </span>
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            {t('customer.workspace_slug_help')}
+                                            {t('customer.workspace.slug_help')}
                                         </p>
                                         <InputError message={errors?.slug} />
                                     </div>
@@ -109,7 +109,7 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
                                             disabled={processing || !hasPaymentMethod}
                                         >
                                             {processing && <Spinner />}
-                                            {t('customer.create_workspace')}
+                                            {t('customer.workspace.create')}
                                         </Button>
                                         <Button
                                             type="button"

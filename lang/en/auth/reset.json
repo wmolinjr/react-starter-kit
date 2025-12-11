@@ -1,0 +1,5 @@
+{
+    "auth.reset.button": "Reset password",
+    "auth.reset.email_link": "Email password reset link",
+    "auth.reset.enter_new": "Please enter your new password below"
+}

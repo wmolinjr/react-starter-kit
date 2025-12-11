@@ -57,7 +57,7 @@ export function CostBreakdownWidget({
                 <div className="flex items-center gap-2">
                     <Receipt className="text-muted-foreground h-5 w-5" />
                     <span className="font-medium">
-                        {t('billing.monthly_total', { default: 'Monthly Total' })}
+                        {t('billing.price.monthly_total', { default: 'Monthly Total' })}
                     </span>
                 </div>
                 <span className="text-2xl font-bold">{costs.formattedTotal}</span>
@@ -72,7 +72,7 @@ export function CostBreakdownWidget({
                         <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
                                 <Crown className="h-4 w-4 text-purple-500" />
-                                <span>{t('billing.plan', { default: 'Plan' })}</span>
+                                <span>{t('billing.plan.title', { default: 'Plan' })}</span>
                             </div>
                             <span className="font-medium">{costs.formattedPlanCost}</span>
                         </div>
@@ -87,7 +87,7 @@ export function CostBreakdownWidget({
                             <div className="flex items-center justify-between text-sm">
                                 <div className="flex items-center gap-2">
                                     <Puzzle className="h-4 w-4 text-blue-500" />
-                                    <span>{t('billing.addons', { default: 'Add-ons' })}</span>
+                                    <span>{t('billing.addon.title', { default: 'Add-ons' })}</span>
                                 </div>
                                 <span className="font-medium">{costs.formattedAddonsCost}</span>
                             </div>
@@ -103,7 +103,7 @@ export function CostBreakdownWidget({
                             <div className="flex items-center justify-between text-sm">
                                 <div className="flex items-center gap-2">
                                     <Package className="h-4 w-4 text-amber-500" />
-                                    <span>{t('billing.bundles', { default: 'Bundles' })}</span>
+                                    <span>{t('billing.bundle.title', { default: 'Bundles' })}</span>
                                 </div>
                                 <span className="font-medium">{costs.formattedBundlesCost}</span>
                             </div>
@@ -126,10 +126,10 @@ export function CostBreakdownWidget({
             <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-base">
                     <TrendingUp className="h-4 w-4" />
-                    {t('billing.cost_breakdown', { default: 'Cost Breakdown' })}
+                    {t('billing.price.cost_breakdown', { default: 'Cost Breakdown' })}
                 </CardTitle>
                 <CardDescription>
-                    {t('billing.monthly_billing', { default: 'Your monthly billing' })}
+                    {t('billing.price.monthly_billing', { default: 'Your monthly billing' })}
                 </CardDescription>
             </CardHeader>
             <CardContent>{content}</CardContent>

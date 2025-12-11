@@ -50,8 +50,8 @@ export default function CentralUserSettingsLayout({ children }: PropsWithChildre
     return (
         <div className="px-4 py-6">
             <Heading
-                title={t('settings.title')}
-                description={t('settings.description')}
+                title={t('settings.page.title')}
+                description={t('settings.page.description')}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

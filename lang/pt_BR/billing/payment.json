@@ -1,0 +1,18 @@
+{
+    "billing.payment.boleto": "Pagamento Boleto",
+    "billing.payment.card": "Pagamento com Cartão",
+    "billing.payment.complete": "Complete o pagamento para finalizar a compra",
+    "billing.payment.failed": "Pagamento falhou. Por favor atualize seu método de pagamento.",
+    "billing.payment.generate_boleto": "Gerar Boleto",
+    "billing.payment.generate_pix": "Gerar PIX",
+    "billing.payment.method": "Forma de Pagamento",
+    "billing.payment.pay_now": "Pagar Agora",
+    "billing.payment.pay_with_card": "Pagar com Cartão",
+    "billing.payment.pix": "Pagamento PIX",
+    "billing.payment.proceed": "Ir para Pagamento",
+    "billing.payment.processing": "Processando...",
+    "billing.payment.recurring_card_only": "Cartão de crédito é obrigatório para assinaturas recorrentes.",
+    "billing.payment.select_method": "Selecione como deseja pagar",
+    "billing.payment.update": "Atualizar Pagamento",
+    "billing.payment.update_method": "Atualizar Método de Pagamento"
+}

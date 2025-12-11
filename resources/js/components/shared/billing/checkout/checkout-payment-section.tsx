@@ -60,11 +60,11 @@ export function CheckoutPaymentSection({
                 <div className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5 text-muted-foreground" />
                     <CardTitle className="text-lg">
-                        {t('checkout.payment_method', { default: 'Payment Method' })}
+                        {t('checkout.payment.method', { default: 'Payment Method' })}
                     </CardTitle>
                 </div>
                 <CardDescription>
-                    {t('checkout.select_payment_method', {
+                    {t('checkout.payment.select_method', {
                         default: 'Select how you want to pay',
                     })}
                 </CardDescription>
@@ -81,7 +81,7 @@ export function CheckoutPaymentSection({
                 {/* Recurring notice */}
                 {hasRecurring && effectiveAvailableMethods.length === 1 && (
                     <p className="text-sm text-muted-foreground">
-                        {t('checkout.recurring_card_only', {
+                        {t('checkout.payment.recurring_card_only', {
                             default: 'Credit card is required for recurring subscriptions.',
                         })}
                     </p>

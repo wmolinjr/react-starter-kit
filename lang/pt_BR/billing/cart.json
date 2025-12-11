@@ -1,0 +1,15 @@
+{
+    "billing.cart.add": "Adicionar ao Carrinho",
+    "billing.cart.clear": "Limpar",
+    "billing.cart.description": "Revise seus itens antes de pagar",
+    "billing.cart.empty": "Seu carrinho está vazio",
+    "billing.cart.expires_soon": "Carrinho expira em :minutes minutos",
+    "billing.cart.expiring": "Seu carrinho expira em :minutes minutos. Complete a compra para salvar seus itens.",
+    "billing.cart.expiring_urgent": "Seu carrinho vai expirar em breve! Complete a compra para não perder seus itens.",
+    "billing.cart.in_cart": "No Carrinho",
+    "billing.cart.items": "Itens",
+    "billing.cart.items_count": ":count item(ns) no carrinho",
+    "billing.cart.no_items": "Sem itens",
+    "billing.cart.open": "Abrir Carrinho",
+    "billing.cart.title": "Carrinho"
+}

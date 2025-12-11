@@ -1,0 +1,21 @@
+{
+    "checkout.summary.billed_monthly_note": "You will be billed monthly. Cancel anytime.",
+    "checkout.summary.billed_yearly_note": "You will be billed annually. Cancel anytime.",
+    "checkout.summary.bundle_savings": "Bundle discount applied automatically",
+    "checkout.summary.includes_addons": "Includes: :addons",
+    "checkout.summary.next_billing": "Next billing",
+    "checkout.summary.one_time_purchases": "One-time Purchases",
+    "checkout.summary.one_time_subtotal": "One-time",
+    "checkout.summary.order_summary": "Order Summary",
+    "checkout.summary.per_month": "/month",
+    "checkout.summary.per_year": "/year",
+    "checkout.summary.plan_change": "Plan Change",
+    "checkout.summary.proceed_to_checkout": "Proceed to Checkout",
+    "checkout.summary.proration": "Proration",
+    "checkout.summary.quantity_benefit": ":quantity units of :name",
+    "checkout.summary.recurring_subtotal": "Recurring",
+    "checkout.summary.secure_checkout_note": "You will be redirected to a secure checkout page",
+    "checkout.summary.subscriptions": "Subscriptions",
+    "checkout.summary.total_today": "Total Today",
+    "checkout.summary.what_you_get": "What You'll Get"
+}

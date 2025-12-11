@@ -74,9 +74,9 @@ export function BundleSavings({
 
     // Period suffix
     const periodSuffix = period === 'yearly'
-        ? t('billing.per_year', { default: '/yr' })
+        ? t('billing.price.per_year', { default: '/yr' })
         : period === 'monthly'
-          ? t('billing.per_month', { default: '/mo' })
+          ? t('billing.price.per_month', { default: '/mo' })
           : '';
 
     // Size classes
@@ -97,7 +97,7 @@ export function BundleSavings({
                 )}
             >
                 <TrendingDown className="h-3 w-3" />
-                {t('billing.save', { default: 'Save' })} {savingsPercent}%
+                {t('billing.price.save', { default: 'Save' })} {savingsPercent}%
             </Badge>
         );
     }
@@ -113,7 +113,7 @@ export function BundleSavings({
                 )}
             >
                 <TrendingDown className="h-3.5 w-3.5" />
-                {t('billing.save', { default: 'Save' })} {formatPrice(savingsAmount)}
+                {t('billing.price.save', { default: 'Save' })} {formatPrice(savingsAmount)}
                 {periodSuffix}
             </span>
         );
@@ -126,10 +126,10 @@ export function BundleSavings({
             <div className="flex items-center gap-2">
                 <Badge className="gap-1 bg-green-500 text-white hover:bg-green-600">
                     <Percent className="h-3 w-3" />
-                    {savingsPercent}% {t('billing.off', { default: 'OFF' })}
+                    {savingsPercent}% {t('billing.price.off', { default: 'OFF' })}
                 </Badge>
                 <span className="text-muted-foreground text-sm">
-                    {t('billing.bundle_discount', { default: 'Bundle Discount' })}
+                    {t('billing.bundle.discount', { default: 'Bundle Discount' })}
                 </span>
             </div>
 
@@ -153,7 +153,7 @@ export function BundleSavings({
 
             {/* Savings amount */}
             <p className="text-sm text-green-600">
-                {t('billing.you_save', { default: 'You save' })}{' '}
+                {t('billing.price.you_save', { default: 'You save' })}{' '}
                 <span className="font-semibold">{formatPrice(savingsAmount)}</span>
                 {periodSuffix}
             </p>

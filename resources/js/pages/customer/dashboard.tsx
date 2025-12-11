@@ -45,18 +45,18 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
 
     return (
         <CustomerLayout
-            breadcrumbs={[{ title: t('customer.dashboard'), href: '/account' }]}
+            breadcrumbs={[{ title: t('customer.dashboard.title'), href: '/account' }]}
         >
-            <Head title={t('customer.dashboard')} />
+            <Head title={t('customer.dashboard.title')} />
 
             <div className="space-y-6">
                 {/* Welcome Section */}
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {t('customer.welcome_back', { name: customer.name })}
+                        {t('customer.dashboard.welcome', { name: customer.name })}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('customer.dashboard_description')}
+                        {t('customer.dashboard.description')}
                     </p>
                 </div>
 
@@ -65,14 +65,14 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.workspaces')}
+                                {t('customer.workspace.title')}
                             </CardTitle>
                             <Building2 className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.tenant_count}</div>
                             <p className="text-xs text-muted-foreground">
-                                {t('customer.active_workspaces')}
+                                {t('customer.workspace.active_workspaces')}
                             </p>
                         </CardContent>
                     </Card>
@@ -80,14 +80,14 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.subscriptions')}
+                                {t('customer.subscription.title')}
                             </CardTitle>
                             <Receipt className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.active_subscriptions}</div>
                             <p className="text-xs text-muted-foreground">
-                                {t('customer.active_subscriptions')}
+                                {t('customer.subscription.active')}
                             </p>
                         </CardContent>
                     </Card>
@@ -95,7 +95,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.monthly_billing')}
+                                {t('customer.billing.monthly')}
                             </CardTitle>
                             <CreditCard className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
@@ -104,7 +104,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                                 {formatCurrency(stats.total_monthly_billing)}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                {t('customer.per_month')}
+                                {t('customer.subscription.per_month')}
                             </p>
                         </CardContent>
                     </Card>
@@ -112,14 +112,14 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.pending_transfers')}
+                                {t('customer.transfer.pending')}
                             </CardTitle>
                             <ArrowRight className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.pending_transfers}</div>
                             <p className="text-xs text-muted-foreground">
-                                {t('customer.awaiting_action')}
+                                {t('customer.status.awaiting_action')}
                             </p>
                         </CardContent>
                     </Card>
@@ -130,17 +130,17 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                     <Card className="border-warning bg-warning/10">
                         <CardHeader>
                             <CardTitle className="text-warning">
-                                {t('customer.add_payment_method')}
+                                {t('customer.payment.add_method')}
                             </CardTitle>
                             <CardDescription>
-                                {t('customer.no_payment_method_warning')}
+                                {t('customer.payment.no_warning')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Button asChild>
                                 <Link href="/account/payment-methods/create">
                                     <CreditCard className="mr-2 h-4 w-4" />
-                                    {t('customer.add_payment_method')}
+                                    {t('customer.payment.add_method')}
                                 </Link>
                             </Button>
                         </CardContent>
@@ -151,15 +151,15 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div>
-                            <CardTitle>{t('customer.your_workspaces')}</CardTitle>
+                            <CardTitle>{t('customer.workspace.your_workspaces')}</CardTitle>
                             <CardDescription>
-                                {t('customer.workspaces_description')}
+                                {t('customer.workspace.workspaces_description')}
                             </CardDescription>
                         </div>
                         <Button asChild variant="outline" size="sm">
                             <Link href="/account/tenants/create">
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('customer.create_workspace')}
+                                {t('customer.workspace.create')}
                             </Link>
                         </Button>
                     </CardHeader>
@@ -167,10 +167,10 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                         {tenants.length === 0 ? (
                             <div className="text-center py-8 text-muted-foreground">
                                 <Building2 className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                                <p>{t('customer.no_workspaces')}</p>
+                                <p>{t('customer.workspace.no_workspaces')}</p>
                                 <Button asChild className="mt-4">
                                     <Link href="/account/tenants/create">
-                                        {t('customer.create_first_workspace')}
+                                        {t('customer.workspace.create_first')}
                                     </Link>
                                 </Button>
                             </div>

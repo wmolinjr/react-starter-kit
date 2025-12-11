@@ -1,0 +1,7 @@
+{
+    "billing.trial.days_remaining": ":days dias restantes",
+    "billing.trial.ending_soon": "Teste terminando em breve",
+    "billing.trial.ends_in": "O teste termina em :days dias",
+    "billing.trial.ends_on": "O teste termina em :date",
+    "billing.trial.ends_today": "O teste termina hoje"
+}

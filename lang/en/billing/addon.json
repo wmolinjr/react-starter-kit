@@ -1,0 +1,13 @@
+{
+    "billing.addon.access_until": "Access until :date",
+    "billing.addon.active": "Active Add-ons",
+    "billing.addon.add_more": "Add More",
+    "billing.addon.already_owned": "Already Owned",
+    "billing.addon.already_purchased": "Already Purchased",
+    "billing.addon.browse": "Browse Add-ons",
+    "billing.addon.included": "add-ons included",
+    "billing.addon.more": "More add-ons",
+    "billing.addon.owned": "Owned",
+    "billing.addon.purchased": "Purchased",
+    "billing.addon.title": "Add-ons"
+}

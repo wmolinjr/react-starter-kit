@@ -1,0 +1,4 @@
+{
+    "roles.limit.info": "Custom roles: :count \/ :limit",
+    "roles.limit.reached": "You've reached the maximum of :limit custom roles on the :plan plan."
+}

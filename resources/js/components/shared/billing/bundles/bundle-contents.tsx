@@ -81,9 +81,9 @@ export function BundleContents({
     const getUnitValue = (addon: BundleAddonItem | BundleAddonResource): string | null => {
         if ('unitValue' in addon && addon.unitValue) {
             const type = getAddonType(addon);
-            if (type === 'users') return `+${addon.unitValue} ${t('billing.users', { default: 'users' })}`;
+            if (type === 'users') return `+${addon.unitValue} ${t('billing.usage.users', { default: 'users' })}`;
             if (type === 'storage') return `+${addon.unitValue} GB`;
-            if (type === 'api_calls') return `+${addon.unitValue.toLocaleString()} ${t('billing.calls', { default: 'calls' })}`;
+            if (type === 'api_calls') return `+${addon.unitValue.toLocaleString()} ${t('billing.usage.calls', { default: 'calls' })}`;
             return `+${addon.unitValue}`;
         }
         return null;
@@ -110,7 +110,7 @@ export function BundleContents({
                 ))}
                 {remainingCount > 0 && (
                     <Badge variant="outline" className="text-xs font-normal">
-                        +{remainingCount} {t('billing.more', { default: 'more' })}
+                        +{remainingCount} {t('common.more', { default: 'more' })}
                     </Badge>
                 )}
             </div>
@@ -147,7 +147,7 @@ export function BundleContents({
                 ))}
                 {remainingCount > 0 && (
                     <div className="text-muted-foreground flex items-center justify-center rounded-md border border-dashed p-2 text-sm">
-                        +{remainingCount} {t('billing.more', { default: 'more' })}
+                        +{remainingCount} {t('common.more', { default: 'more' })}
                     </div>
                 )}
             </div>
@@ -178,7 +178,7 @@ export function BundleContents({
             {remainingCount > 0 && (
                 <li className="text-muted-foreground flex items-center gap-2 text-sm">
                     <span className="h-4 w-4" />
-                    +{remainingCount} {t('billing.more_addons', { default: 'more add-ons' })}
+                    +{remainingCount} {t('billing.addon.more', { default: 'more add-ons' })}
                 </li>
             )}
         </ul>

@@ -1,0 +1,8 @@
+{
+    "impersonation.admin.active": "Voce esta no Modo Admin.",
+    "impersonation.admin.description": "Entre no tenant como administrador sem fazer login como um usuario especifico. Util para suporte e inspecao.",
+    "impersonation.admin.enter": "Entrar como Admin",
+    "impersonation.admin.notice": "Voce esta visualizando este tenant sem uma sessao de usuario especifica.",
+    "impersonation.admin.title": "Modo Admin",
+    "impersonation.admin.use_instead": "Use o Modo Admin para acessar o tenant."
+}

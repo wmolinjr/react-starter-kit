@@ -100,7 +100,7 @@ export function UsageDashboard({
             return (
                 <Badge variant="outline" className="gap-1 text-xs">
                     <InfinityIcon className="h-3 w-3" />
-                    {t('billing.unlimited', { default: 'Unlimited' })}
+                    {t('billing.usage.unlimited', { default: 'Unlimited' })}
                 </Badge>
             );
         }
@@ -109,7 +109,7 @@ export function UsageDashboard({
             return (
                 <Badge variant="destructive" className="gap-1 text-xs">
                     <AlertTriangle className="h-3 w-3" />
-                    {t('billing.over_limit', { default: 'Over limit' })}
+                    {t('billing.usage.over_limit', { default: 'Over limit' })}
                 </Badge>
             );
         }
@@ -121,7 +121,7 @@ export function UsageDashboard({
                     className="gap-1 border-amber-500 text-xs text-amber-600"
                 >
                     <AlertTriangle className="h-3 w-3" />
-                    {t('billing.near_limit', { default: 'Near limit' })}
+                    {t('billing.usage.near_limit', { default: 'Near limit' })}
                 </Badge>
             );
         }
@@ -167,8 +167,8 @@ export function UsageDashboard({
                 {metrics.length === 0 ? (
                     <div className="text-muted-foreground flex items-center justify-center py-4 text-sm">
                         {showOnlyAlerts
-                            ? t('billing.no_alerts', { default: 'No usage alerts' })
-                            : t('billing.no_usage_data', { default: 'No usage data available' })}
+                            ? t('billing.usage.no_alerts', { default: 'No usage alerts' })
+                            : t('billing.usage.no_data', { default: 'No usage data available' })}
                     </div>
                 ) : (
                     metrics.map((metric) => (
@@ -196,16 +196,16 @@ export function UsageDashboard({
                 <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2 text-base">
                         <TrendingUp className="h-4 w-4" />
-                        {t('billing.usage', { default: 'Usage' })}
+                        {t('billing.usage.title', { default: 'Usage' })}
                     </CardTitle>
                     {alertCount > 0 && (
                         <Badge variant="destructive" className="text-xs">
-                            {alertCount} {t('billing.alerts', { default: 'alerts' })}
+                            {alertCount} {t('billing.usage.alerts', { default: 'alerts' })}
                         </Badge>
                     )}
                 </div>
                 <CardDescription>
-                    {t('billing.resource_usage', { default: 'Your resource usage' })}
+                    {t('billing.usage.resource_usage', { default: 'Your resource usage' })}
                 </CardDescription>
             </CardHeader>
             <CardContent>{content}</CardContent>
@@ -288,8 +288,8 @@ function UsageMetricItem({
                     </TooltipTrigger>
                     <TooltipContent>
                         {metric.isUnlimited
-                            ? t('billing.unlimited_usage', { default: 'Unlimited usage' })
-                            : `${metric.percentage}% ${t('billing.used', { default: 'used' })}`}
+                            ? t('billing.usage.unlimited_usage', { default: 'Unlimited usage' })
+                            : `${metric.percentage}% ${t('billing.usage.used', { default: 'used' })}`}
                     </TooltipContent>
                 </Tooltip>
             </div>
@@ -379,7 +379,7 @@ export function UsageAlert({ usage, className }: UsageAlertProps) {
             <div className="min-w-0 flex-1 text-sm">
                 {overLimit.length > 0 && (
                     <p>
-                        {t('billing.over_limit_alert', {
+                        {t('billing.usage.over_limit_alert', {
                             default: ':count resource(s) over limit',
                             count: overLimit.length,
                         }).replace(':count', String(overLimit.length))}
@@ -387,7 +387,7 @@ export function UsageAlert({ usage, className }: UsageAlertProps) {
                 )}
                 {nearLimit.length > 0 && (
                     <p>
-                        {t('billing.near_limit_alert', {
+                        {t('billing.usage.near_limit_alert', {
                             default: ':count resource(s) near limit',
                             count: nearLimit.length,
                         }).replace(':count', String(nearLimit.length))}

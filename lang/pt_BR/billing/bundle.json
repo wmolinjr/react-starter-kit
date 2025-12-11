@@ -1,0 +1,6 @@
+{
+    "billing.bundle.conflict": "Você já possui: :addons",
+    "billing.bundle.discount": ":percent% de desconto no pacote",
+    "billing.bundle.replace_and_purchase": "Substituir e Comprar",
+    "billing.bundle.title": "Pacotes"
+}

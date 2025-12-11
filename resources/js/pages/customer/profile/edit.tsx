@@ -39,36 +39,36 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.profile'), href: '/account/profile' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.profile.title'), href: '/account/profile' },
             ]}
         >
-            <Head title={t('customer.profile')} />
+            <Head title={t('customer.profile.title')} />
 
             <div className="space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {t('customer.profile')}
+                        {t('customer.profile.title')}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('customer.profile_description')}
+                        {t('customer.profile.description')}
                     </p>
                 </div>
 
                 {status && (
                     <div className="rounded-lg bg-green-50 p-4 text-green-700">
-                        {status === 'profile-updated' && t('customer.profile_updated')}
-                        {status === 'password-updated' && t('customer.password_updated')}
-                        {status === 'billing-updated' && t('customer.billing_updated')}
+                        {status === 'profile-updated' && t('customer.profile.updated')}
+                        {status === 'password-updated' && t('customer.security.password_updated')}
+                        {status === 'billing-updated' && t('customer.billing.updated')}
                     </div>
                 )}
 
                 {/* Profile Information */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.profile_information')}</CardTitle>
+                        <CardTitle>{t('customer.profile.information')}</CardTitle>
                         <CardDescription>
-                            {t('customer.profile_information_description')}
+                            {t('customer.profile.information_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -81,7 +81,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                 <>
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="name">{t('auth.name')}</Label>
+                                            <Label htmlFor="name">{t('auth.field.name')}</Label>
                                             <Input
                                                 id="name"
                                                 name="name"
@@ -92,7 +92,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="email">{t('auth.email_address')}</Label>
+                                            <Label htmlFor="email">{t('auth.field.email_address')}</Label>
                                             <Input
                                                 id="email"
                                                 name="email"
@@ -104,7 +104,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="phone">{t('customer.phone')}</Label>
+                                            <Label htmlFor="phone">{t('customer.address.phone')}</Label>
                                             <Input
                                                 id="phone"
                                                 name="phone"
@@ -115,7 +115,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="locale">{t('customer.language')}</Label>
+                                            <Label htmlFor="locale">{t('customer.profile.language')}</Label>
                                             <Input
                                                 id="locale"
                                                 name="locale"
@@ -138,9 +138,9 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                 {/* Password */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.update_password')}</CardTitle>
+                        <CardTitle>{t('customer.security.update_password')}</CardTitle>
                         <CardDescription>
-                            {t('customer.update_password_description')}
+                            {t('customer.security.update_password_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -154,7 +154,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
                                             <Label htmlFor="current_password">
-                                                {t('auth.current_password')}
+                                                {t('auth.field.current_password')}
                                             </Label>
                                             <Input
                                                 id="current_password"
@@ -169,7 +169,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="password">
-                                                {t('auth.new_password')}
+                                                {t('auth.field.new_password')}
                                             </Label>
                                             <Input
                                                 id="password"
@@ -182,7 +182,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="password_confirmation">
-                                                {t('auth.confirm_password')}
+                                                {t('auth.field.confirm_password')}
                                             </Label>
                                             <Input
                                                 id="password_confirmation"
@@ -195,7 +195,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                     <Button type="submit" disabled={processing}>
                                         {processing && <Spinner />}
-                                        {t('customer.update_password')}
+                                        {t('customer.security.update_password')}
                                     </Button>
                                 </>
                             )}
@@ -206,9 +206,9 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                 {/* Billing Address */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.billing_address')}</CardTitle>
+                        <CardTitle>{t('customer.billing.address')}</CardTitle>
                         <CardDescription>
-                            {t('customer.billing_address_description')}
+                            {t('customer.billing.address_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -222,7 +222,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="billing_address.line1">
-                                                {t('customer.address_line1')}
+                                                {t('customer.address.line1')}
                                             </Label>
                                             <Input
                                                 id="billing_address.line1"
@@ -233,7 +233,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="billing_address.line2">
-                                                {t('customer.address_line2')}
+                                                {t('customer.address.line2')}
                                             </Label>
                                             <Input
                                                 id="billing_address.line2"
@@ -244,7 +244,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="billing_address.city">
-                                                {t('customer.city')}
+                                                {t('customer.address.city')}
                                             </Label>
                                             <Input
                                                 id="billing_address.city"
@@ -255,7 +255,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="billing_address.state">
-                                                {t('customer.state')}
+                                                {t('customer.address.state')}
                                             </Label>
                                             <Input
                                                 id="billing_address.state"
@@ -266,7 +266,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="billing_address.postal_code">
-                                                {t('customer.postal_code')}
+                                                {t('customer.address.postal_code')}
                                             </Label>
                                             <Input
                                                 id="billing_address.postal_code"
@@ -277,7 +277,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="billing_address.country">
-                                                {t('customer.country')}
+                                                {t('customer.address.country')}
                                             </Label>
                                             <Input
                                                 id="billing_address.country"
@@ -303,10 +303,10 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                 <Card className="border-destructive">
                     <CardHeader>
                         <CardTitle className="text-destructive">
-                            {t('customer.delete_account')}
+                            {t('customer.account.delete')}
                         </CardTitle>
                         <CardDescription>
-                            {t('customer.delete_account_warning')}
+                            {t('customer.account.delete_warning')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -319,7 +319,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                 <>
                                     <div className="space-y-2">
                                         <Label htmlFor="delete_password">
-                                            {t('auth.password')}
+                                            {t('auth.field.password')}
                                         </Label>
                                         <Input
                                             id="delete_password"
@@ -337,7 +337,7 @@ export default function ProfileEdit({ customer, status }: ProfileEditProps) {
                                         disabled={processing}
                                     >
                                         {processing && <Spinner />}
-                                        {t('customer.delete_account')}
+                                        {t('customer.account.delete')}
                                     </Button>
                                 </>
                             )}

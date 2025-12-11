@@ -1,0 +1,5 @@
+{
+    "roles.list.all": "Todas as Regras de Acesso",
+    "roles.list.no_roles": "Nenhuma regra de acesso encontrada",
+    "roles.list.no_roles_description": "Regras de acesso permitem criar conjuntos específicos de permissões para diferentes membros da equipe."
+}

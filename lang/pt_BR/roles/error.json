@@ -1,0 +1,4 @@
+{
+    "roles.error.delete_has_users": "Não é possível excluir uma regra de acesso que tem usuários atribuídos.",
+    "roles.error.delete_protected": "Não é possível excluir uma regra de acesso protegida do sistema."
+}

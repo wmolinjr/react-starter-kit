@@ -1,0 +1,14 @@
+{
+    "billing.subscription.billed_monthly": "Cobrado mensalmente",
+    "billing.subscription.billed_yearly": "Cobrado anualmente",
+    "billing.subscription.canceled": "Sua assinatura terminará em :date",
+    "billing.subscription.effective": "Efetivo :date",
+    "billing.subscription.expires": "Expira",
+    "billing.subscription.expires_hours": "Expira em :hours h :minutes min",
+    "billing.subscription.expires_minutes": "Expira em :minutes min",
+    "billing.subscription.expires_soon": "Expira em breve",
+    "billing.subscription.manage": "Gerenciar",
+    "billing.subscription.new": "Novo",
+    "billing.subscription.next_billing": "Próxima Cobrança",
+    "billing.subscription.will_not_renew": "Não será renovado"
+}

@@ -42,7 +42,7 @@ function TwoFactor({
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: t('settings.title'),
+            title: t('settings.page.title'),
             href: settings.profile.edit().url,
         },
         {

@@ -1,0 +1,8 @@
+{
+    "checkout.success.confirmed": "Pagamento Confirmado!",
+    "checkout.success.continue_shopping": "Continuar Comprando",
+    "checkout.success.description": "Obrigado pela sua compra",
+    "checkout.success.message": "Sua compra foi concluída com sucesso. Seus add-ons já estão ativos.",
+    "checkout.success.title": "Pedido Concluído",
+    "checkout.success.view_billing": "Ver Faturamento"
+}

@@ -24,7 +24,7 @@ function Password() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: t('settings.title'),
+            title: t('settings.page.title'),
             href: userSettings.profile.edit().url,
         },
         {

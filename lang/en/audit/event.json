@@ -1,0 +1,7 @@
+{
+    "audit.event.created": "Created",
+    "audit.event.deleted": "Deleted",
+    "audit.event.login": "Login",
+    "audit.event.logout": "Logout",
+    "audit.event.updated": "Updated"
+}

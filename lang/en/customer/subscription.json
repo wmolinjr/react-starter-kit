@@ -1,0 +1,10 @@
+{
+    "customer.subscription.active": "Active subscriptions",
+    "customer.subscription.current_plan": "Current Plan",
+    "customer.subscription.days_remaining": "days remaining",
+    "customer.subscription.no_active": "No active subscription for this workspace.",
+    "customer.subscription.no_plan": "No plan",
+    "customer.subscription.per_month": "per month",
+    "customer.subscription.plan": "Plan",
+    "customer.subscription.title": "Subscriptions"
+}

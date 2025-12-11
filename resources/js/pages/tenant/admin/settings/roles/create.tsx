@@ -15,8 +15,8 @@ function useBreadcrumbs() {
     return [
         { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('roles.title'), href: admin.settings.roles.index.url() },
-        { title: t('roles.create_title'), href: admin.settings.roles.create.url() },
+        { title: t('roles.page.title'), href: admin.settings.roles.index.url() },
+        { title: t('roles.form.create_title'), href: admin.settings.roles.create.url() },
     ] as BreadcrumbItem[];
 }
 
@@ -36,14 +36,14 @@ function CreateRole({ permissions }: Props) {
 
     return (
         <>
-            <Head title={t('roles.create_title')} />
+            <Head title={t('roles.form.create_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Shield}>{t('roles.create_title')}</PageTitle>
+                        <PageTitle icon={Shield}>{t('roles.form.create_title')}</PageTitle>
                         <PageDescription>
-                            {t('roles.create_description')}
+                            {t('roles.form.create_description')}
                         </PageDescription>
                     </PageHeaderContent>
                 </PageHeader>

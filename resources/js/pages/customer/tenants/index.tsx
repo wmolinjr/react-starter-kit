@@ -24,26 +24,26 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.workspaces'), href: '/account/tenants' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.workspace.title'), href: '/account/tenants' },
             ]}
         >
-            <Head title={t('customer.workspaces')} />
+            <Head title={t('customer.workspace.title')} />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            {t('customer.workspaces')}
+                            {t('customer.workspace.title')}
                         </h1>
                         <p className="text-muted-foreground">
-                            {t('customer.workspaces_manage_description')}
+                            {t('customer.workspace.manage_description')}
                         </p>
                     </div>
                     <Button asChild>
                         <Link href="/account/tenants/create">
                             <Plus className="mr-2 h-4 w-4" />
-                            {t('customer.create_workspace')}
+                            {t('customer.workspace.create')}
                         </Link>
                     </Button>
                 </div>
@@ -53,15 +53,15 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                         <CardContent className="flex flex-col items-center justify-center py-16">
                             <Building2 className="h-16 w-16 text-muted-foreground/50 mb-4" />
                             <h3 className="text-lg font-medium mb-2">
-                                {t('customer.no_workspaces')}
+                                {t('customer.workspace.no_workspaces')}
                             </h3>
                             <p className="text-muted-foreground text-center mb-4">
-                                {t('customer.no_workspaces_description')}
+                                {t('customer.workspace.no_workspaces_description')}
                             </p>
                             <Button asChild>
                                 <Link href="/account/tenants/create">
                                     <Plus className="mr-2 h-4 w-4" />
-                                    {t('customer.create_first_workspace')}
+                                    {t('customer.workspace.create_first')}
                                 </Link>
                             </Button>
                         </CardContent>
@@ -88,7 +88,7 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                                             </span>
                                         ) : (
                                             <span className="text-xs text-muted-foreground">
-                                                {t('customer.no_plan')}
+                                                {t('customer.subscription.no_plan')}
                                             </span>
                                         )}
                                         <Button asChild variant="ghost" size="sm">

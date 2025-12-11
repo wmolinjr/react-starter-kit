@@ -15,7 +15,7 @@ function VerifyEmail({ status }: { status?: string }) {
 
     return (
         <>
-            <Head title={t('auth.email_verification')} />
+            <Head title={t('auth.verify.title')} />
 
             <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
                 <Card className="w-full max-w-md">
@@ -23,15 +23,15 @@ function VerifyEmail({ status }: { status?: string }) {
                         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                             <Mail className="h-6 w-6 text-primary" />
                         </div>
-                        <CardTitle>{t('auth.verify_email')}</CardTitle>
+                        <CardTitle>{t('auth.verify.verify')}</CardTitle>
                         <CardDescription>
-                            {t('auth.please_verify_email')}
+                            {t('auth.verify.description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {status === 'verification-link-sent' && (
                             <div className="mb-4 rounded-md bg-green-50 p-3 text-center text-sm font-medium text-green-600 dark:bg-green-900/20 dark:text-green-400">
-                                {t('auth.verification_link_sent')}
+                                {t('auth.verify.link_sent')}
                             </div>
                         )}
 
@@ -40,14 +40,14 @@ function VerifyEmail({ status }: { status?: string }) {
                                 <>
                                     <Button disabled={processing} variant="secondary" className="w-full">
                                         {processing && <Spinner />}
-                                        {t('auth.resend_verification')}
+                                        {t('auth.verify.resend')}
                                     </Button>
 
                                     <TextLink
                                         href={logout()}
                                         className="mx-auto block text-sm"
                                     >
-                                        {t('auth.log_out')}
+                                        {t('auth.logout.button')}
                                     </TextLink>
                                 </>
                             )}

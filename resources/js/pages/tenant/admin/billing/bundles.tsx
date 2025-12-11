@@ -212,7 +212,7 @@ function BundlesPageContent({
                         <PricingToggle
                             value={period}
                             onChange={setPeriod}
-                            savings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                            savings={t('billing.price.yearly_savings', { default: 'Save 20%' })}
                         />
                     </div>
 
@@ -276,7 +276,7 @@ function BundlesPageContent({
                 onClearCart={clearCart}
                 currency="BRL"
                 showBillingToggle={true}
-                yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                yearlySavings={t('billing.price.yearly_savings', { default: 'Save 20%' })}
             />
         </>
     );

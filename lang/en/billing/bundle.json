@@ -1,0 +1,6 @@
+{
+    "billing.bundle.conflict": "You already own: :addons",
+    "billing.bundle.discount": ":percent% bundle discount",
+    "billing.bundle.replace_and_purchase": "Replace and Purchase",
+    "billing.bundle.title": "Bundles"
+}

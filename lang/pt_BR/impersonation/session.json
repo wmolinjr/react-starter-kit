@@ -1,0 +1,6 @@
+{
+    "impersonation.session.actions_restricted": "Algumas acoes estao restritas durante a impersonacao.",
+    "impersonation.session.active": "Voce esta impersonando um usuario.",
+    "impersonation.session.stop": "Parar Impersonacao",
+    "impersonation.session.stopping": "Parando..."
+}

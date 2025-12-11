@@ -13,14 +13,14 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
 
     return (
         <AuthLayout
-            title={t('auth.verify_email')}
+            title={t('auth.verify.verify')}
             description={t('auth.verify_email_description')}
         >
-            <Head title={t('auth.verify_email')} />
+            <Head title={t('auth.verify.verify')} />
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {t('auth.verification_link_sent')}
+                    {t('auth.verify.link_sent')}
                 </div>
             )}
 
@@ -40,7 +40,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
                             disabled={processing}
                         >
                             {processing && <Spinner />}
-                            {t('auth.resend_verification')}
+                            {t('auth.verify.resend')}
                         </Button>
                     )}
                 </Form>
@@ -53,7 +53,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
                             className="w-full"
                             disabled={processing}
                         >
-                            {t('auth.log_out')}
+                            {t('auth.logout.button')}
                         </Button>
                     )}
                 </Form>

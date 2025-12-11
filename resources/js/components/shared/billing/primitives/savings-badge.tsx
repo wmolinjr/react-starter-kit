@@ -39,14 +39,14 @@ export function SavingsBadge({
 
     const getText = (): string => {
         if (percent) {
-            return t('billing.save_percent', {
+            return t('billing.price.save_percent', {
                 default: 'Save :percent%',
                 percent,
             });
         }
 
         if (amount) {
-            return t('billing.save_amount', {
+            return t('billing.price.save_amount', {
                 default: 'Save :amount',
                 amount: formatAmount(amount),
             });

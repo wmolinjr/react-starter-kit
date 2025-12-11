@@ -21,17 +21,17 @@ export function CheckoutPoliciesSection({ className }: CheckoutPoliciesSectionPr
     const policies = [
         {
             icon: Shield,
-            text: t('checkout.secure_payment', { default: '100% secure payment' }),
+            text: t('checkout.policy.secure_payment', { default: '100% secure payment' }),
             color: 'text-green-600 dark:text-green-400',
         },
         {
             icon: Lock,
-            text: t('checkout.encrypted_data', { default: 'Encrypted data' }),
+            text: t('checkout.policy.encrypted_data', { default: 'Encrypted data' }),
             color: 'text-blue-600 dark:text-blue-400',
         },
         {
             icon: RefreshCw,
-            text: t('checkout.cancel_anytime', { default: 'Cancel anytime' }),
+            text: t('checkout.policy.cancel_anytime', { default: 'Cancel anytime' }),
             color: 'text-purple-600 dark:text-purple-400',
         },
     ];
@@ -55,7 +55,7 @@ export function CheckoutPoliciesSection({ className }: CheckoutPoliciesSectionPr
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <CreditCard className="h-3.5 w-3.5" />
                 <span>
-                    {t('checkout.powered_by', {
+                    {t('checkout.policy.powered_by', {
                         default: 'Payments powered by Stripe & Asaas',
                     })}
                 </span>
@@ -64,7 +64,7 @@ export function CheckoutPoliciesSection({ className }: CheckoutPoliciesSectionPr
             {/* Terms agreement */}
             <p className="text-xs text-muted-foreground">
                 <FileText className="inline h-3 w-3 mr-1" />
-                {t('checkout.terms_agreement', {
+                {t('checkout.policy.terms_agreement', {
                     default:
                         'By completing this purchase, you agree to our Terms of Service and Privacy Policy.',
                 })}

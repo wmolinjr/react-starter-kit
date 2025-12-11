@@ -1,0 +1,8 @@
+{
+    "auth.register.already_have_account": "Already have an account?",
+    "auth.register.button": "Register",
+    "auth.register.create_account": "Create account",
+    "auth.register.description": "Enter your details below to create your account",
+    "auth.register.sign_up": "Sign up",
+    "auth.register.title": "Create an account"
+}

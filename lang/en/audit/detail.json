@@ -1,0 +1,7 @@
+{
+    "audit.detail.activity": "Activity Details",
+    "audit.detail.changes": "Changes",
+    "audit.detail.new_value": "New Value",
+    "audit.detail.no_changes": "No changes recorded.",
+    "audit.detail.old_value": "Old Value"
+}

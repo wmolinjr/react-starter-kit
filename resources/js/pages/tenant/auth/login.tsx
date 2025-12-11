@@ -28,10 +28,10 @@ export default function Login({
 
     return (
         <AuthLayout
-            title={t('auth.log_in_to_account')}
-            description={t('auth.enter_credentials')}
+            title={t('auth.login.title')}
+            description={t('auth.login.description')}
         >
-            <Head title={t('auth.log_in')} />
+            <Head title={t('auth.login.button')} />
 
             <Form
                 {...store()}
@@ -43,7 +43,7 @@ export default function Login({
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('auth.email_address')}
+                                    {t('auth.field.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -61,7 +61,7 @@ export default function Login({
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">
-                                        {t('auth.password')}
+                                        {t('auth.field.password')}
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
@@ -69,7 +69,7 @@ export default function Login({
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            {t('auth.forgot_password_question')}
+                                            {t('auth.forgot.question')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -80,7 +80,7 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder={t('auth.password')}
+                                    placeholder={t('auth.field.password')}
                                 />
                                 <InputError message={errors?.password} />
                             </div>
@@ -92,7 +92,7 @@ export default function Login({
                                     tabIndex={3}
                                 />
                                 <Label htmlFor="remember">
-                                    {t('auth.remember_me')}
+                                    {t('auth.field.remember_me')}
                                 </Label>
                             </div>
 
@@ -104,7 +104,7 @@ export default function Login({
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                {t('auth.log_in')}
+                                {t('auth.login.button')}
                             </Button>
                         </div>
 
@@ -112,7 +112,7 @@ export default function Login({
                             <div className="text-center text-sm text-muted-foreground">
                                 {t("Don't have an account?")}{' '}
                                 <TextLink href={register()} tabIndex={5}>
-                                    {t('auth.sign_up')}
+                                    {t('auth.register.sign_up')}
                                 </TextLink>
                             </div>
                         )}

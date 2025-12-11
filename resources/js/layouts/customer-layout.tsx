@@ -26,22 +26,22 @@ export default function CustomerLayout({ children, breadcrumbs = [] }: CustomerL
 
     const mainNavItems = [
         {
-            title: t('customer.dashboard'),
+            title: t('customer.dashboard.title'),
             href: '/account',
             icon: LayoutDashboard,
         },
         {
-            title: t('customer.workspaces'),
+            title: t('customer.workspace.title'),
             href: '/account/tenants',
             icon: Building2,
         },
         {
-            title: t('customer.payment_methods'),
+            title: t('customer.payment.methods'),
             href: '/account/payment-methods',
             icon: CreditCard,
         },
         {
-            title: t('customer.invoices'),
+            title: t('customer.invoices.title'),
             href: '/account/invoices',
             icon: Receipt,
         },
@@ -61,7 +61,7 @@ export default function CustomerLayout({ children, breadcrumbs = [] }: CustomerL
                     <SidebarHeader className="border-b px-4 py-3">
                         <Link href="/account" className="flex items-center gap-2 font-semibold">
                             <CreditCard className="h-5 w-5" />
-                            <span>{t('customer.billing_portal')}</span>
+                            <span>{t('customer.billing.portal')}</span>
                         </Link>
                     </SidebarHeader>
                     <SidebarContent>
@@ -84,7 +84,7 @@ export default function CustomerLayout({ children, breadcrumbs = [] }: CustomerL
                                 <SidebarMenuButton asChild isActive={isActive('/account/profile')}>
                                     <Link href="/account/profile">
                                         <User className="h-4 w-4" />
-                                        <span>{t('customer.profile')}</span>
+                                        <span>{t('customer.profile.title')}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -92,7 +92,7 @@ export default function CustomerLayout({ children, breadcrumbs = [] }: CustomerL
                                 <SidebarMenuButton asChild>
                                     <Link href="/account/logout" method="post" as="button" className="w-full">
                                         <LogOut className="h-4 w-4" />
-                                        <span>{t('auth.log_out')}</span>
+                                        <span>{t('auth.logout.button')}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

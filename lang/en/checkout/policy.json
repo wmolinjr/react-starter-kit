@@ -1,0 +1,7 @@
+{
+    "checkout.policy.cancel_anytime": "Cancel anytime",
+    "checkout.policy.encrypted_data": "Encrypted data",
+    "checkout.policy.powered_by": "Payments powered by Stripe & Asaas",
+    "checkout.policy.secure_payment": "100% secure payment",
+    "checkout.policy.terms_agreement": "By completing this purchase, you agree to our Terms of Service and Privacy Policy."
+}

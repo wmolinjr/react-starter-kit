@@ -159,7 +159,7 @@ export function SubscriptionOverviewWidget({
         ? typeof plan.name === 'string'
             ? plan.name
             : plan.name
-        : t('billing.no_plan', { default: 'No Plan' });
+        : t('billing.plan.no_plan', { default: 'No Plan' });
 
     // Minimal variant
     if (variant === 'minimal') {
@@ -175,7 +175,7 @@ export function SubscriptionOverviewWidget({
                             {costs && (
                                 <p className="text-muted-foreground text-sm">
                                     {costs.formattedTotal}
-                                    {t('billing.per_month', { default: '/mo' })}
+                                    {t('billing.price.per_month', { default: '/mo' })}
                                 </p>
                             )}
                         </div>
@@ -203,7 +203,7 @@ export function SubscriptionOverviewWidget({
                     {costs && (
                         <div className="flex items-center justify-between">
                             <span className="text-muted-foreground text-sm">
-                                {t('billing.monthly_cost', { default: 'Monthly cost' })}
+                                {t('billing.price.monthly_cost', { default: 'Monthly cost' })}
                             </span>
                             <span className="font-semibold">{costs.formattedTotal}</span>
                         </div>
@@ -212,7 +212,7 @@ export function SubscriptionOverviewWidget({
                     {nextInvoice && (
                         <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">
-                                {t('billing.next_invoice', { default: 'Next invoice' })}
+                                {t('billing.invoice.next', { default: 'Next invoice' })}
                             </span>
                             <span>{formatDate(nextInvoice.date)}</span>
                         </div>
@@ -226,13 +226,13 @@ export function SubscriptionOverviewWidget({
                     {onUpgrade && (
                         <Button size="sm" onClick={onUpgrade}>
                             <ArrowUp className="mr-1 h-3 w-3" />
-                            {t('billing.upgrade', { default: 'Upgrade' })}
+                            {t('billing.plan.upgrade', { default: 'Upgrade' })}
                         </Button>
                     )}
                     {onManageSubscription && (
                         <Button size="sm" variant="outline" onClick={onManageSubscription}>
                             <Settings className="mr-1 h-3 w-3" />
-                            {t('billing.manage', { default: 'Manage' })}
+                            {t('billing.subscription.manage', { default: 'Manage' })}
                         </Button>
                     )}
                 </CardFooter>
@@ -248,10 +248,10 @@ export function SubscriptionOverviewWidget({
                 <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>
-                        {t('billing.payment_failed', { default: 'Payment Failed' })}
+                        {t('billing.payment.failed', { default: 'Payment Failed' })}
                     </AlertTitle>
                     <AlertDescription>
-                        {t('billing.update_payment_method', {
+                        {t('billing.payment.update_method', {
                             default: 'Please update your payment method to continue service.',
                         })}
                     </AlertDescription>
@@ -270,13 +270,13 @@ export function SubscriptionOverviewWidget({
                     <Clock className="h-4 w-4" />
                     <AlertTitle>
                         {trialDaysRemaining === 0
-                            ? t('billing.trial_ends_today', { default: 'Trial ends today' })
-                            : t('billing.trial_ending_soon', {
+                            ? t('billing.trial.ends_today', { default: 'Trial ends today' })
+                            : t('billing.trial.ending_soon', {
                                   default: 'Trial ending soon',
                               })}
                     </AlertTitle>
                     <AlertDescription>
-                        {t('billing.trial_days_remaining', {
+                        {t('billing.trial.days_remaining', {
                             default: ':days days remaining in your trial',
                             days: trialDaysRemaining,
                         }).replace(':days', String(trialDaysRemaining))}
@@ -288,17 +288,17 @@ export function SubscriptionOverviewWidget({
                 <Alert>
                     <Clock className="h-4 w-4" />
                     <AlertTitle>
-                        {t('billing.subscription_canceled', {
+                        {t('billing.subscription.canceled', {
                             default: 'Subscription Canceled',
                         })}
                     </AlertTitle>
                     <AlertDescription>
                         {subscription?.endsAt
-                            ? t('billing.access_until', {
+                            ? t('billing.addon.access_until', {
                                   default: 'You will have access until :date',
                                   date: formatDate(subscription.endsAt),
                               }).replace(':date', formatDate(subscription.endsAt))
-                            : t('billing.will_not_renew', {
+                            : t('billing.subscription.will_not_renew', {
                                   default: 'Your subscription will not renew.',
                               })}
                     </AlertDescription>
@@ -313,7 +313,7 @@ export function SubscriptionOverviewWidget({
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center gap-2">
                                 <Crown className="h-5 w-5" />
-                                {t('billing.current_plan', { default: 'Current Plan' })}
+                                {t('billing.plan.current', { default: 'Current Plan' })}
                             </CardTitle>
                             {getStatusBadge()}
                         </div>
@@ -333,7 +333,7 @@ export function SubscriptionOverviewWidget({
                                 <div className="flex items-center gap-2">
                                     <Calendar className="text-muted-foreground h-4 w-4" />
                                     <span className="text-sm">
-                                        {t('billing.next_invoice', { default: 'Next invoice' })}
+                                        {t('billing.invoice.next', { default: 'Next invoice' })}
                                     </span>
                                 </div>
                                 <div className="text-right">
@@ -351,13 +351,13 @@ export function SubscriptionOverviewWidget({
                         {onUpgrade && (
                             <Button onClick={onUpgrade}>
                                 <ArrowUp className="mr-2 h-4 w-4" />
-                                {t('billing.upgrade', { default: 'Upgrade' })}
+                                {t('billing.plan.upgrade', { default: 'Upgrade' })}
                             </Button>
                         )}
                         {onManageSubscription && (
                             <Button variant="outline" onClick={onManageSubscription}>
                                 <ExternalLink className="mr-2 h-4 w-4" />
-                                {t('billing.billing_portal', { default: 'Billing Portal' })}
+                                {t('billing.portal.title', { default: 'Billing Portal' })}
                             </Button>
                         )}
                     </CardFooter>
@@ -379,11 +379,11 @@ export function SubscriptionOverviewWidget({
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <Puzzle className="h-4 w-4" />
-                                {t('billing.active_addons', { default: 'Active Add-ons' })}
+                                {t('billing.addon.active', { default: 'Active Add-ons' })}
                             </CardTitle>
                             {onManageAddons && (
                                 <Button variant="ghost" size="sm" onClick={onManageAddons}>
-                                    {t('billing.manage', { default: 'Manage' })}
+                                    {t('billing.subscription.manage', { default: 'Manage' })}
                                 </Button>
                             )}
                         </div>
@@ -401,7 +401,7 @@ export function SubscriptionOverviewWidget({
                                             <p className="font-medium">{bundle.name}</p>
                                             <p className="text-muted-foreground text-xs">
                                                 {bundle.addonCount}{' '}
-                                                {t('billing.addons_included', {
+                                                {t('billing.addon.included', {
                                                     default: 'add-ons',
                                                 })}
                                             </p>
@@ -443,13 +443,13 @@ export function SubscriptionOverviewWidget({
                 {onViewInvoices && (
                     <Button variant="outline" onClick={onViewInvoices}>
                         <FileText className="mr-2 h-4 w-4" />
-                        {t('billing.view_invoices', { default: 'View Invoices' })}
+                        {t('billing.invoice.view_all', { default: 'View Invoices' })}
                     </Button>
                 )}
                 {onManageAddons && (
                     <Button variant="outline" onClick={onManageAddons}>
                         <Puzzle className="mr-2 h-4 w-4" />
-                        {t('billing.browse_addons', { default: 'Browse Add-ons' })}
+                        {t('billing.addon.browse', { default: 'Browse Add-ons' })}
                     </Button>
                 )}
             </div>

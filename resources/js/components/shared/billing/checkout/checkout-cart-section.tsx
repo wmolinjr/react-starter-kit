@@ -68,10 +68,10 @@ export function CheckoutCartSection({
                         <ShoppingBag className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <p className="font-medium">
-                        {t('checkout.cart_empty', { default: 'Your cart is empty' })}
+                        {t('checkout.cart.empty', { default: 'Your cart is empty' })}
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        {t('checkout.browse_products', {
+                        {t('checkout.cart.browse_products', {
                             default: 'Browse our add-ons to get started',
                         })}
                     </p>
@@ -86,11 +86,11 @@ export function CheckoutCartSection({
                 <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-muted-foreground" />
                     <CardTitle className="text-lg">
-                        {t('checkout.your_order', { default: 'Your Order' })}
+                        {t('checkout.cart.your_order', { default: 'Your Order' })}
                     </CardTitle>
                 </div>
                 <CardDescription>
-                    {t('checkout.items_count', {
+                    {t('checkout.cart.items_count', {
                         default: ':count item(s)',
                         count: itemCount,
                     }).replace(':count', String(itemCount))}

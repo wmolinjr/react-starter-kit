@@ -35,7 +35,7 @@ export function CheckoutBenefitsSection({ items, className }: CheckoutBenefitsSe
 
         // Add quantity-based benefits for addons
         if (product.type === 'addon' && item.quantity > 1) {
-            const quantityBenefit = t('checkout.quantity_benefit', {
+            const quantityBenefit = t('checkout.summary.quantity_benefit', {
                 default: ':quantity units of :name',
                 quantity: item.quantity,
                 name: product.name,
@@ -51,7 +51,7 @@ export function CheckoutBenefitsSection({ items, className }: CheckoutBenefitsSe
                 .map((addon: { name: string }) => addon.name)
                 .join(', ');
             benefits.push(
-                t('checkout.includes_addons', {
+                t('checkout.summary.includes_addons', {
                     default: 'Includes: :addons',
                     addons: bundleAddons,
                 }).replace(':addons', bundleAddons)
@@ -67,9 +67,9 @@ export function CheckoutBenefitsSection({ items, className }: CheckoutBenefitsSe
     // If no benefits found, show generic benefits
     if (uniqueBenefits.length === 0) {
         const genericBenefits = [
-            t('checkout.benefit_instant_access', { default: 'Instant access after purchase' }),
-            t('checkout.benefit_cancel_anytime', { default: 'Cancel anytime' }),
-            t('checkout.benefit_support', { default: 'Priority support included' }),
+            t('checkout.benefit.instant_access', { default: 'Instant access after purchase' }),
+            t('checkout.benefit.cancel_anytime', { default: 'Cancel anytime' }),
+            t('checkout.benefit.support', { default: 'Priority support included' }),
         ];
         uniqueBenefits.push(...genericBenefits);
     }
@@ -79,7 +79,7 @@ export function CheckoutBenefitsSection({ items, className }: CheckoutBenefitsSe
             <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    {t('checkout.what_you_get', { default: "What You'll Get" })}
+                    {t('checkout.summary.what_you_get', { default: "What You'll Get" })}
                 </CardTitle>
             </CardHeader>
 
@@ -100,7 +100,7 @@ export function CheckoutBenefitsSection({ items, className }: CheckoutBenefitsSe
                     <div className="mt-4 flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 p-3 text-sm">
                         <Sparkles className="h-4 w-4 text-amber-500" />
                         <span className="text-amber-700 dark:text-amber-400">
-                            {t('checkout.bundle_savings', {
+                            {t('checkout.summary.bundle_savings', {
                                 default: 'Bundle discount applied automatically',
                             })}
                         </span>

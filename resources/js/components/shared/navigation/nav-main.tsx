@@ -73,7 +73,7 @@ export function NavMain({ items = [], label }: { items: NavItem[]; label?: strin
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>{label ?? t('sidebar.platform')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{label ?? t('sidebar.group.platform')}</SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) =>
                     item.items?.length ? (

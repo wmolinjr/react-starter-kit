@@ -42,19 +42,19 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.invoices'), href: '/account/invoices' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.invoices.title'), href: '/account/invoices' },
             ]}
         >
-            <Head title={t('customer.invoices')} />
+            <Head title={t('customer.invoices.title')} />
 
             <div className="space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {t('customer.invoices')}
+                        {t('customer.invoices.title')}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('customer.invoices_description')}
+                        {t('customer.invoices.description')}
                     </p>
                 </div>
 
@@ -63,10 +63,10 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                         <CardContent className="flex flex-col items-center justify-center py-16">
                             <Receipt className="h-16 w-16 text-muted-foreground/50 mb-4" />
                             <h3 className="text-lg font-medium mb-2">
-                                {t('customer.no_invoices')}
+                                {t('customer.invoice.no_invoices')}
                             </h3>
                             <p className="text-muted-foreground text-center">
-                                {t('customer.no_invoices_description')}
+                                {t('customer.invoice.no_invoices_description')}
                             </p>
                         </CardContent>
                     </Card>
@@ -76,10 +76,10 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>{t('customer.invoice_number')}</TableHead>
-                                        <TableHead>{t('customer.date')}</TableHead>
-                                        <TableHead>{t('customer.description')}</TableHead>
-                                        <TableHead>{t('customer.amount')}</TableHead>
+                                        <TableHead>{t('customer.invoice.number')}</TableHead>
+                                        <TableHead>{t('customer.invoice.date')}</TableHead>
+                                        <TableHead>{t('customer.invoice.description')}</TableHead>
+                                        <TableHead>{t('customer.invoice.amount')}</TableHead>
                                         <TableHead>{t('customer.status')}</TableHead>
                                         <TableHead className="text-right">{t('common.actions')}</TableHead>
                                     </TableRow>

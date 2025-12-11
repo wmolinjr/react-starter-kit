@@ -14,10 +14,10 @@ export default function Register() {
 
     return (
         <AuthLayout
-            title={t('customer.create_account')}
-            description={t('customer.start_managing_billing')}
+            title={t('customer.workspace.create_account')}
+            description={t('customer.dashboard.start')}
         >
-            <Head title={t('auth.sign_up')} />
+            <Head title={t('auth.register.sign_up')} />
 
             <Form
                 action="/account/register"
@@ -28,7 +28,7 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">{t('auth.name')}</Label>
+                                <Label htmlFor="name">{t('auth.field.name')}</Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -37,14 +37,14 @@ export default function Register() {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="name"
-                                    placeholder={t('auth.full_name')}
+                                    placeholder={t('auth.field.full_name')}
                                 />
                                 <InputError message={errors?.name} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('auth.email_address')}
+                                    {t('auth.field.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -60,7 +60,7 @@ export default function Register() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password">
-                                    {t('auth.password')}
+                                    {t('auth.field.password')}
                                 </Label>
                                 <Input
                                     id="password"
@@ -69,14 +69,14 @@ export default function Register() {
                                     required
                                     tabIndex={3}
                                     autoComplete="new-password"
-                                    placeholder={t('auth.password')}
+                                    placeholder={t('auth.field.password')}
                                 />
                                 <InputError message={errors?.password} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password_confirmation">
-                                    {t('auth.confirm_password')}
+                                    {t('auth.field.confirm_password')}
                                 </Label>
                                 <Input
                                     id="password_confirmation"
@@ -85,7 +85,7 @@ export default function Register() {
                                     required
                                     tabIndex={4}
                                     autoComplete="new-password"
-                                    placeholder={t('auth.confirm_password')}
+                                    placeholder={t('auth.field.confirm_password')}
                                 />
                                 <InputError message={errors?.password_confirmation} />
                             </div>
@@ -97,14 +97,14 @@ export default function Register() {
                                 disabled={processing}
                             >
                                 {processing && <Spinner />}
-                                {t('auth.sign_up')}
+                                {t('auth.register.sign_up')}
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-muted-foreground">
-                            {t('auth.already_have_account')}{' '}
+                            {t('auth.register.already_have_account')}{' '}
                             <TextLink href="/account/login" tabIndex={6}>
-                                {t('auth.log_in')}
+                                {t('auth.login.button')}
                             </TextLink>
                         </div>
                     </>

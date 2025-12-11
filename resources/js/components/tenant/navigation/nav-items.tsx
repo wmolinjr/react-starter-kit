@@ -23,12 +23,12 @@ export function useTenantFooterNavItems(): NavItem[] {
 
     return [
         {
-            title: t('sidebar.repository'),
+            title: t('sidebar.item.repository'),
             href: 'https://github.com/laravel/react-starter-kit',
             icon: Folder,
         },
         {
-            title: t('sidebar.documentation'),
+            title: t('sidebar.item.documentation'),
             href: 'https://laravel.com/docs/starter-kits#react',
             icon: BookOpen,
         },
@@ -45,7 +45,7 @@ export function useTenantAdminNavItems(): NavItem[] {
 
     const navItems: NavItem[] = [
         {
-            title: t('sidebar.dashboard'),
+            title: t('sidebar.item.dashboard'),
             href: admin.dashboard.url(),
             icon: LayoutGrid,
         },
@@ -54,7 +54,7 @@ export function useTenantAdminNavItems(): NavItem[] {
     // Projects section (permission-based)
     if (has('projects:view')) {
         navItems.push({
-            title: t('sidebar.projects'),
+            title: t('sidebar.item.projects'),
             href: admin.projects.index.url(),
             icon: FolderOpen,
         });
@@ -66,20 +66,20 @@ export function useTenantAdminNavItems(): NavItem[] {
 
         if (has('team:view')) {
             teamItems.push({
-                title: t('sidebar.members'),
+                title: t('sidebar.item.members'),
                 href: admin.team.index.url(),
             });
         }
 
         if (has('team:activity')) {
             teamItems.push({
-                title: t('sidebar.activities'),
+                title: t('sidebar.item.activities'),
                 href: admin.team.activity.url(),
             });
         }
 
         navItems.push({
-            title: t('sidebar.team'),
+            title: t('sidebar.item.team'),
             href: admin.team.index.url(),
             icon: Users,
             items: teamItems.length > 0 ? teamItems : undefined,
@@ -89,8 +89,8 @@ export function useTenantAdminNavItems(): NavItem[] {
     // Audit Log section (Enterprise feature)
     if (has('audit:view') && hasFeature('auditLog')) {
         navItems.push({
-            title: t('sidebar.audit_log'),
-            href: audit.index.url(),
+            title: t('sidebar.item.audit_log'),
+            href: admin.audit.index.url(),
             icon: ClipboardList,
         });
     }
@@ -100,24 +100,24 @@ export function useTenantAdminNavItems(): NavItem[] {
         const billingItems: NavItem[] = [];
 
         billingItems.push({
-            title: t('sidebar.subscription'),
+            title: t('sidebar.item.subscription'),
             href: admin.billing.index.url(),
         });
 
         billingItems.push({
-            title: t('sidebar.plans'),
+            title: t('sidebar.item.plans'),
             href: admin.billing.plans.url(),
         });
 
         if (has('billing:invoices')) {
             billingItems.push({
-                title: t('sidebar.invoices'),
+                title: t('sidebar.item.invoices'),
                 href: admin.billing.invoices.url(),
             });
         }
 
         navItems.push({
-            title: t('sidebar.billing'),
+            title: t('sidebar.group.billing'),
             href: admin.billing.index.url(),
             icon: CreditCard,
             items: billingItems,
@@ -127,22 +127,22 @@ export function useTenantAdminNavItems(): NavItem[] {
         const addonItems: NavItem[] = [];
 
         addonItems.push({
-            title: t('sidebar.marketplace'),
+            title: t('sidebar.group.marketplace'),
             href: admin.addons.index.url(),
         });
 
         addonItems.push({
-            title: t('sidebar.bundles'),
+            title: t('sidebar.item.bundles'),
             href: admin.billing.bundles.url(),
         });
 
         addonItems.push({
-            title: t('sidebar.usage'),
+            title: t('sidebar.item.usage'),
             href: admin.addons.usage.url(),
         });
 
         navItems.push({
-            title: t('sidebar.addons'),
+            title: t('sidebar.item.addons'),
             href: admin.addons.index.url(),
             icon: Package,
             items: addonItems,
@@ -155,7 +155,7 @@ export function useTenantAdminNavItems(): NavItem[] {
 
         if (has('settings:view')) {
             settingsItems.push({
-                title: t('sidebar.general'),
+                title: t('sidebar.group.general'),
                 href: admin.settings.index.url(),
             });
         }
@@ -215,7 +215,7 @@ export function useTenantAdminNavItems(): NavItem[] {
         }
 
         navItems.push({
-            title: t('sidebar.settings'),
+            title: t('sidebar.item.settings'),
             href: admin.settings.index.url(),
             icon: Settings,
             items: settingsItems.length > 0 ? settingsItems : undefined,

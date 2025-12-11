@@ -1,0 +1,7 @@
+{
+    "auth.forgot.description": "Enter your email and we'll send you a link to reset your password.",
+    "auth.forgot.enter_email": "Enter your email to receive a password reset link",
+    "auth.forgot.question": "Forgot your password?",
+    "auth.forgot.send_link": "Send reset link",
+    "auth.forgot.title": "Forgot password"
+}

@@ -141,7 +141,7 @@ export function PlanComparisonTable({
         if (value === -1) {
             return (
                 <span className="text-primary font-medium">
-                    {t('billing.unlimited', { default: 'Unlimited' })}
+                    {t('billing.usage.unlimited', { default: 'Unlimited' })}
                 </span>
             );
         }
@@ -203,7 +203,7 @@ export function PlanComparisonTable({
                         {/* Price row */}
                         <TableRow>
                             <TableHead className="font-medium">
-                                {t('billing.price', { default: 'Price' })}
+                                {t('billing.price.price', { default: 'Price' })}
                             </TableHead>
                             {sortedPlans.map((plan) => {
                                 const isCurrent = currentPlanSlug === plan.slug;
@@ -307,7 +307,7 @@ export function PlanComparisonTable({
                                             {isCurrent ? (
                                                 <Button variant="outline" disabled className="w-full">
                                                     <Crown className="mr-2 h-4 w-4" />
-                                                    {t('billing.current_plan', {
+                                                    {t('billing.plan.current', {
                                                         default: 'Current Plan',
                                                     })}
                                                 </Button>
@@ -321,7 +321,7 @@ export function PlanComparisonTable({
                                                     className="w-full"
                                                 >
                                                     <ArrowUp className="mr-2 h-4 w-4" />
-                                                    {t('billing.select', { default: 'Select' })}
+                                                    {t('common.select', { default: 'Select' })}
                                                 </Button>
                                             )}
                                         </div>

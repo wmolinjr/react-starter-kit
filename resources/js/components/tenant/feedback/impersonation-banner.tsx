@@ -70,13 +70,13 @@ export function ImpersonationBanner() {
         <span className={`${textColor} font-medium pt-1`}>
           {isAdminMode ? (
             <>
-              {t('impersonation.admin_mode_active')}
-              {' '}{t('impersonation.admin_mode_notice')}
+              {t('impersonation.admin.active')}
+              {' '}{t('impersonation.admin.notice')}
             </>
           ) : (
             <>
-              {t('impersonation.currently_impersonating')}
-              {' '}{t('impersonation.actions_restricted')}
+              {t('impersonation.session.active')}
+              {' '}{t('impersonation.session.actions_restricted')}
             </>
           )}
         </span>
@@ -88,7 +88,7 @@ export function ImpersonationBanner() {
           className={`ml-4 ${buttonClass}`}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          {stopping ? t('impersonation.stopping') : t('impersonation.stop')}
+          {stopping ? t('impersonation.session.stopping') : t('impersonation.session.stop')}
         </Button>
       </AlertDescription>
     </Alert>

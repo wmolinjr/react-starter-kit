@@ -211,15 +211,15 @@ export function CurrentPlanBanner({
                         <Clock className="h-4 w-4" />
                         <AlertTitle>
                             {trialDaysRemaining === 0
-                                ? t('billing.trial_ends_today', { default: 'Trial ends today' })
-                                : t('billing.trial_ends_in', {
+                                ? t('billing.trial.ends_today', { default: 'Trial ends today' })
+                                : t('billing.trial.ends_in', {
                                       default: ':days days left in trial',
                                       days: trialDaysRemaining,
                                   }).replace(':days', String(trialDaysRemaining))}
                         </AlertTitle>
                         <AlertDescription>
                             {trialEndDate &&
-                                t('billing.trial_ends_on', {
+                                t('billing.trial.ends_on', {
                                     default: 'Your trial ends on :date',
                                     date: trialEndDate,
                                 }).replace(':date', trialEndDate)}
@@ -232,12 +232,12 @@ export function CurrentPlanBanner({
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>
-                            {t('billing.subscription_canceled', {
+                            {t('billing.subscription.canceled', {
                                 default: 'Subscription canceled',
                             })}
                         </AlertTitle>
                         <AlertDescription>
-                            {t('billing.access_until', {
+                            {t('billing.addon.access_until', {
                                 default: 'You will have access until :date',
                                 date: formatDate(subscription.endsAt),
                             }).replace(':date', formatDate(subscription.endsAt))}
@@ -250,10 +250,10 @@ export function CurrentPlanBanner({
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>
-                            {t('billing.payment_failed', { default: 'Payment failed' })}
+                            {t('billing.payment.failed', { default: 'Payment failed' })}
                         </AlertTitle>
                         <AlertDescription>
-                            {t('billing.update_payment', {
+                            {t('billing.payment.update', {
                                 default: 'Please update your payment method to continue service.',
                             })}
                         </AlertDescription>
@@ -265,7 +265,7 @@ export function CurrentPlanBanner({
                     <div className="text-muted-foreground flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4" />
                         <span>
-                            {t('billing.next_billing', {
+                            {t('billing.subscription.next_billing', {
                                 default: 'Next billing: :date',
                                 date: nextBillingDate,
                             }).replace(':date', nextBillingDate)}
@@ -278,13 +278,13 @@ export function CurrentPlanBanner({
                     {onManage && (
                         <Button variant="outline" size="sm" onClick={onManage}>
                             <Settings className="mr-2 h-4 w-4" />
-                            {t('billing.manage', { default: 'Manage Subscription' })}
+                            {t('billing.subscription.manage', { default: 'Manage Subscription' })}
                         </Button>
                     )}
                     {onUpgrade && (
                         <Button size="sm" onClick={onUpgrade}>
                             <ArrowUp className="mr-2 h-4 w-4" />
-                            {t('billing.upgrade', { default: 'Upgrade' })}
+                            {t('billing.plan.upgrade', { default: 'Upgrade' })}
                         </Button>
                     )}
                 </div>

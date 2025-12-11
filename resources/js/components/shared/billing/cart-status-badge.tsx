@@ -62,15 +62,15 @@ export function CartStatusBadge({
     // Build tooltip content
     const tooltipContent = hasItems
         ? expiresInMinutes !== null && expiresInMinutes < 60
-            ? t('billing.cart_expires_soon', {
+            ? t('billing.cart.expires_soon', {
                   default: 'Cart expires in :minutes minutes',
                   minutes: expiresInMinutes,
               })
-            : t('billing.items_in_cart', {
+            : t('billing.cart.items_count', {
                   default: ':count item(s) in cart',
                   count: itemCount,
               })
-        : t('billing.cart_empty', { default: 'Your cart is empty' });
+        : t('billing.cart.empty', { default: 'Your cart is empty' });
 
     if (variant === 'icon') {
         return (
@@ -97,7 +97,7 @@ export function CartStatusBadge({
                             </Badge>
                         )}
                         <span className="sr-only">
-                            {t('billing.open_cart', { default: 'Open cart' })}
+                            {t('billing.cart.open', { default: 'Open cart' })}
                         </span>
                     </Button>
                 </TooltipTrigger>
@@ -118,7 +118,7 @@ export function CartStatusBadge({
                     className={cn('gap-2', className)}
                 >
                     <ShoppingCart className="h-4 w-4" />
-                    {t('billing.cart', { default: 'Cart' })}
+                    {t('billing.cart.title', { default: 'Cart' })}
                     {hasItems && (
                         <>
                             <Badge

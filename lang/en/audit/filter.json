@@ -1,0 +1,8 @@
+{
+    "audit.filter.date_from": "From Date",
+    "audit.filter.date_to": "To Date",
+    "audit.filter.event": "Event Type",
+    "audit.filter.log_name": "Log Name",
+    "audit.filter.subject": "Subject Type",
+    "audit.filter.user": "User"
+}

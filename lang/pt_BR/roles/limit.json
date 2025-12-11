@@ -1,0 +1,4 @@
+{
+    "roles.limit.info": "Regras de acesso personalizadas: :count \/ :limit",
+    "roles.limit.reached": "Você atingiu o máximo de :limit regras de acesso personalizadas no plano :plan."
+}

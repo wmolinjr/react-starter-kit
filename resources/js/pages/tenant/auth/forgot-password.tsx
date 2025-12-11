@@ -16,10 +16,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     return (
         <AuthLayout
-            title={t('auth.forgot_password')}
-            description={t('auth.enter_email_reset')}
+            title={t('auth.forgot.title')}
+            description={t('auth.forgot.enter_email')}
         >
-            <Head title={t('auth.forgot_password')} />
+            <Head title={t('auth.forgot.title')} />
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
@@ -33,7 +33,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('auth.email_address')}
+                                    {t('auth.field.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -56,7 +56,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     {processing && (
                                         <LoaderCircle className="h-4 w-4 animate-spin" />
                                     )}
-                                    {t('auth.email_reset_link')}
+                                    {t('auth.reset.email_link')}
                                 </Button>
                             </div>
                         </>
@@ -64,8 +64,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 </Form>
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
-                    <span>{t('auth.or_return_to')}</span>
-                    <TextLink href={login()}>{t('auth.log_in_link')}</TextLink>
+                    <span>{t('common.or_return_to')}</span>
+                    <TextLink href={login()}>{t('auth.login.link')}</TextLink>
                 </div>
             </div>
         </AuthLayout>

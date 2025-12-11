@@ -1,0 +1,12 @@
+{
+    "checkout.payment.boleto": "Pagamento via Boleto",
+    "checkout.payment.card": "Pagamento com Cartão",
+    "checkout.payment.generate_boleto": "Gerar Boleto",
+    "checkout.payment.generate_pix": "Gerar PIX",
+    "checkout.payment.method": "Forma de Pagamento",
+    "checkout.payment.pay_with_card": "Pagar com Cartão",
+    "checkout.payment.pix": "Pagamento via PIX",
+    "checkout.payment.processing": "Processando...",
+    "checkout.payment.recurring_card_only": "Cartão de crédito é obrigatório para assinaturas recorrentes.",
+    "checkout.payment.select_method": "Selecione como deseja pagar"
+}

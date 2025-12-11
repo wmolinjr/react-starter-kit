@@ -1,0 +1,9 @@
+{
+    "customer.address.city": "Cidade",
+    "customer.address.country": "País",
+    "customer.address.line1": "Endereço",
+    "customer.address.line2": "Complemento",
+    "customer.address.phone": "Telefone",
+    "customer.address.postal_code": "CEP",
+    "customer.address.state": "Estado"
+}

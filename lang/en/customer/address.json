@@ -1,0 +1,9 @@
+{
+    "customer.address.city": "City",
+    "customer.address.country": "Country",
+    "customer.address.line1": "Address",
+    "customer.address.line2": "Address Line 2",
+    "customer.address.phone": "Phone",
+    "customer.address.postal_code": "Postal Code",
+    "customer.address.state": "State"
+}

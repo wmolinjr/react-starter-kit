@@ -1,0 +1,5 @@
+{
+    "roles.list.all": "All Roles",
+    "roles.list.no_roles": "No roles found",
+    "roles.list.no_roles_description": "Roles allow you to create specific permission sets for different team members."
+}

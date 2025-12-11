@@ -1,21 +1,8 @@
 {
-    "roles.form.basic_info_description": "Defina o nome e descrição da regra de acesso",
-    "roles.form.basic_info_title": "Informações Básicas",
-    "roles.form.description_label": "Descrição",
-    "roles.form.description_placeholder": "Descreva as responsabilidades desta regra de acesso...",
-    "roles.form.deselect_all": "Desmarcar Tudo",
-    "roles.form.display_name_hint": "Este nome será exibido na interface.",
-    "roles.form.display_name_label": "Nome de Exibição",
-    "roles.form.display_name_placeholder": "ex: Editor, Moderador, Suporte",
-    "roles.form.name_hint": "Use letras minúsculas, números e underscores. Este é o identificador técnico.",
-    "roles.form.name_label": "Nome da Regra de Acesso",
-    "roles.form.name_placeholder": "ex: editor, moderador, suporte",
-    "roles.form.no_permissions": "Nenhuma permissão disponível. Contate o suporte.",
-    "roles.form.permissions_description": "Selecione as permissões para esta regra de acesso",
-    "roles.form.permissions_title": "Permissões",
-    "roles.form.protected_alert": "Esta é uma regra de acesso protegida do sistema. O nome não pode ser alterado.",
-    "roles.form.select_all": "Selecionar Tudo",
-    "roles.form.selected": ":count selecionadas",
-    "roles.form.submit_create": "Criar Regra de Acesso",
-    "roles.form.submit_update": "Atualizar Regra de Acesso"
+    "roles.form.create_description": "Adicione uma nova regra de acesso com permissões específicas para sua equipe",
+    "roles.form.create_title": "Criar Regra de Acesso",
+    "roles.form.delete_confirm": "Tem certeza que deseja excluir a regra de acesso \":name\"?",
+    "roles.form.edit_description": "Atualizar regra de acesso :name e permissões",
+    "roles.form.edit_title": "Editar Regra de Acesso",
+    "roles.form.new": "Nova Regra de Acesso"
 }

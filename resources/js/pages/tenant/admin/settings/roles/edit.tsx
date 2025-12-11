@@ -33,7 +33,7 @@ function EditRole({ role, permissions }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('roles.title'), href: admin.settings.roles.index.url() },
+        { title: t('roles.page.title'), href: admin.settings.roles.index.url() },
         { title: displayName, href: admin.settings.roles.edit.url(role.id) },
     ];
 
@@ -45,13 +45,13 @@ function EditRole({ role, permissions }: Props) {
 
     return (
         <>
-            <Head title={`${t('roles.edit_title')} ${displayName}`} />
+            <Head title={`${t('roles.form.edit_title')} ${displayName}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={Shield}>{t('roles.edit_title')}</PageTitle>
-                        <PageDescription>{t('roles.edit_description', { name: displayName })}</PageDescription>
+                        <PageTitle icon={Shield}>{t('roles.form.edit_title')}</PageTitle>
+                        <PageDescription>{t('roles.form.edit_description', { name: displayName })}</PageDescription>
                     </PageHeaderContent>
                 </PageHeader>
 

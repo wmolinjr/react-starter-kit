@@ -45,17 +45,17 @@ export function CartExpiryWarning({
     // Format time remaining
     const formatTimeRemaining = (): string => {
         if (expiresInMinutes < 1) {
-            return t('billing.expires_soon', { default: 'Expires soon' });
+            return t('billing.subscription.expires_soon', { default: 'Expires soon' });
         }
         if (expiresInMinutes < 60) {
-            return t('billing.expires_in_minutes', {
+            return t('billing.subscription.expires_minutes', {
                 default: 'Expires in :minutes min',
                 minutes: expiresInMinutes,
             });
         }
         const hours = Math.floor(expiresInMinutes / 60);
         const mins = expiresInMinutes % 60;
-        return t('billing.expires_in_hours', {
+        return t('billing.subscription.expires_hours', {
             default: 'Expires in :hours h :minutes min',
             hours,
             minutes: mins,
@@ -92,11 +92,11 @@ export function CartExpiryWarning({
             )}
             <AlertDescription className="ml-2">
                 {isUrgent
-                    ? t('billing.cart_expiring_urgent', {
+                    ? t('billing.cart.expiring_urgent', {
                           default:
                               'Your cart will expire soon! Complete your purchase to avoid losing your items.',
                       })
-                    : t('billing.cart_expiring', {
+                    : t('billing.cart.expiring', {
                           default:
                               'Your cart will expire in :minutes minutes. Complete your purchase to save your items.',
                           minutes: expiresInMinutes,

@@ -1,0 +1,8 @@
+{
+    "customer.status.awaiting_action": "awaiting action",
+    "customer.status.cancelled": "Cancelled",
+    "customer.status.completed": "Completed",
+    "customer.status.expired": "Expired",
+    "customer.status.expires": "Expires",
+    "customer.status.rejected": "Rejected"
+}

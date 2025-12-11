@@ -261,7 +261,7 @@ export function BundleCard({
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="gap-1 bg-green-500 px-3 py-1 text-xs font-semibold text-white">
                         <Check className="h-3 w-3" />
-                        {t('billing.purchased', { default: 'Purchased' })}
+                        {t('billing.addon.purchased', { default: 'Purchased' })}
                     </Badge>
                 </div>
             )}
@@ -276,7 +276,7 @@ export function BundleCard({
                             <CardTitle className="text-lg">{bundleName}</CardTitle>
                             <p className="text-muted-foreground text-xs">
                                 {addonCount}{' '}
-                                {t('billing.addons_included', { default: 'add-ons included' })}
+                                {t('billing.addon.included', { default: 'add-ons included' })}
                             </p>
                         </div>
                     </div>
@@ -309,7 +309,7 @@ export function BundleCard({
                         <AlertTriangle className="h-4 w-4 text-amber-500" />
                         <AlertDescription className="text-amber-700 dark:text-amber-400">
                             {conflictMessage ||
-                                t('billing.bundle_conflict', {
+                                t('billing.bundle.conflict', {
                                     default:
                                         'You already own some add-ons in this bundle. They will be replaced.',
                                 })}
@@ -321,7 +321,7 @@ export function BundleCard({
                 {showAddonDetails && addons.length > 0 && (
                     <div>
                         <p className="text-muted-foreground mb-2 text-xs font-medium uppercase">
-                            {t('billing.whats_included', { default: "What's included" })}
+                            {t('billing.plan.whats_included', { default: "What's included" })}
                         </p>
                         <BundleContents
                             addons={addons}
@@ -348,7 +348,7 @@ export function BundleCard({
                 {isPurchased ? (
                     <Button variant="outline" disabled className="w-full">
                         <Check className="mr-2 h-4 w-4" />
-                        {t('billing.already_purchased', { default: 'Already Purchased' })}
+                        {t('billing.addon.already_purchased', { default: 'Already Purchased' })}
                     </Button>
                 ) : (
                     <>
@@ -363,12 +363,12 @@ export function BundleCard({
                                 {isInCart ? (
                                     <>
                                         <Check className="mr-2 h-4 w-4" />
-                                        {t('billing.in_cart', { default: 'In Cart' })}
+                                        {t('billing.cart.in_cart', { default: 'In Cart' })}
                                     </>
                                 ) : (
                                     <>
                                         <Plus className="mr-2 h-4 w-4" />
-                                        {t('billing.add_to_cart', { default: 'Add to Cart' })}
+                                        {t('billing.cart.add', { default: 'Add to Cart' })}
                                     </>
                                 )}
                             </Button>
@@ -388,10 +388,10 @@ export function BundleCard({
                                     <ShoppingCart className="mr-2 h-4 w-4" />
                                 )}
                                 {hasConflicts
-                                    ? t('billing.replace_and_purchase', {
+                                    ? t('billing.bundle.replace_and_purchase', {
                                           default: 'Replace & Purchase',
                                       })
-                                    : t('billing.purchase', { default: 'Purchase' })}
+                                    : t('common.purchase', { default: 'Purchase' })}
                             </Button>
                         )}
                     </>

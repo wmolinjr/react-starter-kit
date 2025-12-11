@@ -30,7 +30,7 @@ function ImpersonateTenant({ tenant, users }: Props) {
         { title: 'Dashboard', href: admin.dashboard.url() },
         { title: 'Tenants', href: admin.tenants.index.url() },
         { title: tenant.name, href: admin.tenants.show.url(tenant.id) },
-        { title: t('impersonation.select_user'), href: admin.tenants.impersonate.index.url(tenant.id) },
+        { title: t('impersonation.user.select'), href: admin.tenants.impersonate.index.url(tenant.id) },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -57,12 +57,12 @@ function ImpersonateTenant({ tenant, users }: Props) {
 
     return (
         <>
-            <Head title={`${t('impersonation.impersonate_tenant')}: ${tenant.name}`} />
+            <Head title={`${t('impersonation.user.title')}: ${tenant.name}`} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle>{t('impersonation.impersonate_tenant')}</PageTitle>
+                        <PageTitle>{t('impersonation.user.title')}</PageTitle>
                         <PageDescription>
                             {tenant.name} ({tenant.domain || tenant.slug})
                         </PageDescription>
@@ -76,10 +76,10 @@ function ImpersonateTenant({ tenant, users }: Props) {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
                                     <Shield className="h-5 w-5" />
-                                    {t('impersonation.admin_mode')}
+                                    {t('impersonation.admin.title')}
                                 </CardTitle>
                                 <CardDescription className="text-amber-700 dark:text-amber-300">
-                                    {t('impersonation.admin_mode_description')}
+                                    {t('impersonation.admin.description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -91,8 +91,8 @@ function ImpersonateTenant({ tenant, users }: Props) {
                                 >
                                     <KeyRound className="mr-2 h-4 w-4" />
                                     {impersonatingId === tenant.id
-                                        ? t('impersonation.entering')
-                                        : t('impersonation.enter_admin_mode')}
+                                        ? t('impersonation.user.entering')
+                                        : t('impersonation.admin.enter')}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -102,10 +102,10 @@ function ImpersonateTenant({ tenant, users }: Props) {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Users className="h-5 w-5" />
-                                    {t('impersonation.tenant_users')} ({users.length})
+                                    {t('impersonation.user.tenant_users')} ({users.length})
                                 </CardTitle>
                                 <CardDescription>
-                                    {t('impersonation.select_user_description')}
+                                    {t('impersonation.user.select_description')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -147,8 +147,8 @@ function ImpersonateTenant({ tenant, users }: Props) {
                                                     >
                                                         <User className="mr-2 h-4 w-4" />
                                                         {impersonatingId === user.id
-                                                            ? t('impersonation.entering')
-                                                            : t('impersonation.impersonate')}
+                                                            ? t('impersonation.user.entering')
+                                                            : t('impersonation.user.button')}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -158,10 +158,10 @@ function ImpersonateTenant({ tenant, users }: Props) {
                                     <div className="py-8 text-center">
                                         <Users className="mx-auto h-12 w-12 text-muted-foreground/50" />
                                         <p className="text-muted-foreground mt-4">
-                                            {t('impersonation.no_users_in_tenant')}
+                                            {t('impersonation.user.no_users')}
                                         </p>
                                         <p className="text-muted-foreground mt-1 text-sm">
-                                            {t('impersonation.use_admin_mode_instead')}
+                                            {t('impersonation.admin.use_instead')}
                                         </p>
                                     </div>
                                 )}

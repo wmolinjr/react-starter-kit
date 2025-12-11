@@ -61,8 +61,8 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.workspaces'), href: '/account/tenants' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.workspace.title'), href: '/account/tenants' },
                 { title: tenant.name, href: `/account/tenants/${tenant.id}` },
             ]}
         >
@@ -82,7 +82,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                     </div>
                     <Button asChild variant="outline">
                         <a href={`https://${tenant.domains[0]?.domain}`} target="_blank" rel="noopener noreferrer">
-                            {t('customer.open_workspace')}
+                            {t('customer.workspace.open')}
                             <ExternalLink className="ml-2 h-4 w-4" />
                         </a>
                     </Button>
@@ -93,13 +93,13 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.current_plan')}
+                                {t('customer.subscription.current_plan')}
                             </CardTitle>
                             <CreditCard className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {tenant.plan?.name || t('customer.no_plan')}
+                                {tenant.plan?.name || t('customer.subscription.no_plan')}
                             </div>
                             {subscription && (
                                 <div className="flex items-center gap-2 mt-2">
@@ -118,14 +118,14 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.team_members')}
+                                {t('customer.workspace.team_members')}
                             </CardTitle>
                             <Users className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{users_count}</div>
                             <p className="text-xs text-muted-foreground">
-                                {t('customer.active_users')}
+                                {t('customer.workspace.active_users')}
                             </p>
                         </CardContent>
                     </Card>
@@ -134,14 +134,14 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {t('customer.ownership')}
+                                {t('customer.transfer.ownership')}
                             </CardTitle>
                             <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <Button asChild variant="outline" size="sm" className="w-full">
                                 <Link href={`/account/tenants/${tenant.id}/transfer`}>
-                                    {t('customer.transfer_ownership')}
+                                    {t('customer.transfer.ownership_title')}
                                 </Link>
                             </Button>
                         </CardContent>
@@ -151,9 +151,9 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                 {/* Billing Section */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.billing')}</CardTitle>
+                        <CardTitle>{t('customer.billing.title')}</CardTitle>
                         <CardDescription>
-                            {t('customer.billing_description')}
+                            {t('customer.billing.description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -176,7 +176,7 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                                 <div className="flex gap-2">
                                     <Button asChild variant="outline">
                                         <Link href={`/account/tenants/${tenant.id}/billing`}>
-                                            {t('customer.manage_billing')}
+                                            {t('customer.billing.manage')}
                                         </Link>
                                     </Button>
                                 </div>
@@ -185,11 +185,11 @@ export default function TenantShow({ tenant, subscription, users_count }: Tenant
                             <div className="text-center py-8">
                                 <CreditCard className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
                                 <p className="text-muted-foreground mb-4">
-                                    {t('customer.no_active_subscription')}
+                                    {t('customer.subscription.no_active')}
                                 </p>
                                 <Button asChild>
                                     <a href={`https://${tenant.domains[0]?.domain}/admin/billing`}>
-                                        {t('customer.choose_plan')}
+                                        {t('customer.workspace.choose_plan')}
                                     </a>
                                 </Button>
                             </div>

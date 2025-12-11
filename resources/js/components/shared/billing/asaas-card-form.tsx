@@ -287,7 +287,7 @@ export function AsaasCardForm({
             {/* Amount display */}
             <div className="rounded-lg bg-muted/50 p-4 text-center">
                 <p className="text-sm text-muted-foreground">
-                    {t('billing.amount_to_pay', { default: 'Amount to pay' })}
+                    {t('billing.price.amount_to_pay', { default: 'Amount to pay' })}
                 </p>
                 <p className="text-2xl font-bold">{formattedAmount}</p>
             </div>
@@ -517,10 +517,10 @@ export function AsaasCardForm({
                 {isSubmitting ? (
                     <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('billing.processing', { default: 'Processing...' })}
+                        {t('billing.payment.processing', { default: 'Processing...' })}
                     </>
                 ) : (
-                    t('billing.pay_now', { default: 'Pay Now' })
+                    t('billing.payment.pay_now', { default: 'Pay Now' })
                 )}
             </Button>
 

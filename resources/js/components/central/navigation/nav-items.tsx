@@ -47,23 +47,23 @@ export function useCentralAdminNavItems(): NavItem[] {
     return [
         // Dashboard - single item
         {
-            title: t('sidebar.dashboard'),
+            title: t('sidebar.item.dashboard'),
             href: admin.dashboard.url(),
             icon: ShieldCheck,
         },
 
         // Tenant Management group
         {
-            title: t('sidebar.tenant_management'),
+            title: t('sidebar.group.tenant_management'),
             href: admin.tenants.index.url(),
             icon: Building2,
             items: [
                 {
-                    title: t('sidebar.tenants'),
+                    title: t('sidebar.item.tenants'),
                     href: admin.tenants.index.url(),
                 },
                 {
-                    title: t('sidebar.federation'),
+                    title: t('sidebar.item.federation'),
                     href: admin.federation.index.url(),
                 },
             ],
@@ -71,24 +71,24 @@ export function useCentralAdminNavItems(): NavItem[] {
 
         // Catalog group
         {
-            title: t('sidebar.catalog'),
+            title: t('sidebar.group.catalog'),
             href: admin.plans.index.url(),
             icon: Store,
             items: [
                 {
-                    title: t('sidebar.plans'),
+                    title: t('sidebar.item.plans'),
                     href: admin.plans.index.url(),
                 },
                 {
-                    title: t('sidebar.addon_catalog'),
+                    title: t('sidebar.item.addon_catalog'),
                     href: admin.catalog.index.url(),
                 },
                 {
-                    title: t('sidebar.bundle_catalog'),
+                    title: t('sidebar.item.bundle_catalog'),
                     href: admin.bundles.index.url(),
                 },
                 {
-                    title: t('sidebar.active_addons'),
+                    title: t('sidebar.item.active_addons'),
                     href: admin.addons.index.url(),
                 },
             ],
@@ -96,16 +96,16 @@ export function useCentralAdminNavItems(): NavItem[] {
 
         // Access Control group
         {
-            title: t('sidebar.access_control'),
+            title: t('sidebar.group.access_control'),
             href: admin.users.index.url(),
             icon: Shield,
             items: [
                 {
-                    title: t('sidebar.users'),
+                    title: t('sidebar.item.users'),
                     href: admin.users.index.url(),
                 },
                 {
-                    title: t('sidebar.roles'),
+                    title: t('sidebar.item.roles'),
                     href: admin.roles.index.url(),
                 },
             ],
@@ -113,21 +113,21 @@ export function useCentralAdminNavItems(): NavItem[] {
 
         // Audit Log - single item
         {
-            title: t('sidebar.audit_log'),
-            href: audit.index.url(),
+            title: t('sidebar.item.audit_log'),
+            href: admin.audit.index.url(),
             icon: ClipboardList,
         },
 
         // Payments - single item
         {
-            title: t('sidebar.payments'),
+            title: t('sidebar.item.payments'),
             href: admin.payments.index.url(),
             icon: CreditCard,
         },
 
         // Payment Settings - single item
         {
-            title: t('sidebar.payment_settings'),
+            title: t('sidebar.item.payment_settings'),
             href: admin.paymentSettings.index.url(),
             icon: Wallet,
         },

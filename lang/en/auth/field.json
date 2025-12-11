@@ -1,0 +1,11 @@
+{
+    "auth.field.confirm_password": "Confirm password",
+    "auth.field.current_password": "Current password",
+    "auth.field.email": "Email",
+    "auth.field.email_address": "Email address",
+    "auth.field.full_name": "Full name",
+    "auth.field.name": "Name",
+    "auth.field.new_password": "New password",
+    "auth.field.password": "Password",
+    "auth.field.remember_me": "Remember me"
+}

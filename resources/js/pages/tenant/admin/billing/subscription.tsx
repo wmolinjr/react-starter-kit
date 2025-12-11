@@ -83,7 +83,7 @@ function SubscriptionPage({
     const [cancelImmediately, setCancelImmediately] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('sidebar.billing'), href: '/admin/billing' },
+        { title: t('sidebar.group.billing'), href: '/admin/billing' },
         { title: t('billing.subscription_management'), href: '/admin/billing/subscription' },
     ];
 
@@ -229,7 +229,7 @@ function SubscriptionPage({
                                     {getStatusBadge()}
                                 </div>
                                 <CardDescription>
-                                    {plan?.name || t('billing.no_plan')}
+                                    {plan?.name || t('billing.plan.no_plan')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -369,7 +369,7 @@ function SubscriptionPage({
                                                 <AlertDialogTrigger asChild>
                                                     <Button variant="destructive" disabled={isProcessing}>
                                                         <XCircle className="mr-2 h-4 w-4" />
-                                                        {t('billing.cancel')}
+                                                        {t('common.cancel')}
                                                     </Button>
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>

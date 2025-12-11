@@ -48,35 +48,35 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.payment_methods'), href: '/account/payment-methods' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.payment.methods'), href: '/account/payment-methods' },
             ]}
         >
-            <Head title={t('customer.payment_methods')} />
+            <Head title={t('customer.payment.methods')} />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            {t('customer.payment_methods')}
+                            {t('customer.payment.methods')}
                         </h1>
                         <p className="text-muted-foreground">
-                            {t('customer.payment_methods_description')}
+                            {t('customer.payment.methods_description')}
                         </p>
                     </div>
                     <Button asChild>
                         <Link href="/account/payment-methods/create">
                             <Plus className="mr-2 h-4 w-4" />
-                            {t('customer.add_payment_method')}
+                            {t('customer.payment.add_method')}
                         </Link>
                     </Button>
                 </div>
 
                 {status && (
                     <div className="rounded-lg bg-green-50 p-4 text-green-700">
-                        {status === 'payment-method-added' && t('customer.payment_method_added')}
-                        {status === 'payment-method-removed' && t('customer.payment_method_removed')}
-                        {status === 'default-payment-method-updated' && t('customer.default_payment_method_updated')}
+                        {status === 'payment-method-added' && t('customer.payment.method_added')}
+                        {status === 'payment-method-removed' && t('customer.payment.method_removed')}
+                        {status === 'default-payment-method-updated' && t('customer.payment.default_updated')}
                     </div>
                 )}
 
@@ -85,15 +85,15 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                         <CardContent className="flex flex-col items-center justify-center py-16">
                             <CreditCard className="h-16 w-16 text-muted-foreground/50 mb-4" />
                             <h3 className="text-lg font-medium mb-2">
-                                {t('customer.no_payment_methods')}
+                                {t('customer.payment.no_methods')}
                             </h3>
                             <p className="text-muted-foreground text-center mb-4">
-                                {t('customer.no_payment_methods_description')}
+                                {t('customer.payment.no_methods_description')}
                             </p>
                             <Button asChild>
                                 <Link href="/account/payment-methods/create">
                                     <Plus className="mr-2 h-4 w-4" />
-                                    {t('customer.add_first_payment_method')}
+                                    {t('customer.payment.add_first')}
                                 </Link>
                             </Button>
                         </CardContent>
@@ -115,18 +115,18 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                                                 {method.is_default && (
                                                     <Badge variant="secondary" className="text-xs">
                                                         <Star className="mr-1 h-3 w-3" />
-                                                        {t('customer.default')}
+                                                        {t('customer.payment.default')}
                                                     </Badge>
                                                 )}
                                                 {method.is_expired && (
                                                     <Badge variant="destructive" className="text-xs">
-                                                        {t('customer.expired')}
+                                                        {t('customer.status.expired')}
                                                     </Badge>
                                                 )}
                                             </div>
                                             {method.expiration_display && (
                                                 <p className="text-sm text-muted-foreground">
-                                                    {t('customer.expires')} {method.expiration_display}
+                                                    {t('customer.status.expires')} {method.expiration_display}
                                                 </p>
                                             )}
                                         </div>
@@ -144,7 +144,7 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                                                         size="sm"
                                                         disabled={processing}
                                                     >
-                                                        {t('customer.set_as_default')}
+                                                        {t('customer.payment.set_default')}
                                                     </Button>
                                                 )}
                                             </Form>

@@ -155,12 +155,12 @@ export function CheckoutLineItem({
     // Get billing period label
     const getBillingLabel = () => {
         if (!item.isRecurring) {
-            return t('billing.one_time', { default: 'One-time' });
+            return t('billing.price.one_time', { default: 'One-time' });
         }
 
         return pricing.billingPeriod === 'yearly'
-            ? t('billing.per_year', { default: '/year' })
-            : t('billing.per_month', { default: '/month' });
+            ? t('billing.price.per_year', { default: '/year' })
+            : t('billing.price.per_month', { default: '/month' });
     };
 
     // Handle quantity change
@@ -241,7 +241,7 @@ export function CheckoutLineItem({
                     >
                         <Trash2 className="h-3.5 w-3.5" />
                         <span className="sr-only">
-                            {t('billing.remove', { default: 'Remove' })}
+                            {t('common.remove', { default: 'Remove' })}
                         </span>
                     </Button>
                 )}

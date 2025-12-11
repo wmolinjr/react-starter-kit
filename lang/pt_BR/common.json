@@ -69,5 +69,8 @@
         "common.placeholder.select_role": "Selecione uma função",
         "common.placeholder.member_email": "membro@exemplo.com",
         "common.placeholder.leave_empty_auto_calculate": "Deixe vazio para calcular automaticamente",
-        "common.placeholder.enter_recovery_code": "Digite o código de recuperação"
+        "common.placeholder.enter_recovery_code": "Digite o código de recuperação",
+    "common.or_return_to": "Ou, voltar para",
+    "common.remember_password": "Lembrou sua senha?",
+    "common.sign_in": "Entrar"
 }

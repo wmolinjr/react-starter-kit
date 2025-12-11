@@ -18,10 +18,10 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 
     return (
         <AuthLayout
-            title={t('auth.forgot_password')}
-            description={t('auth.forgot_password_description')}
+            title={t('auth.forgot.title')}
+            description={t('auth.forgot.description')}
         >
-            <Head title={t('auth.forgot_password')} />
+            <Head title={t('auth.forgot.title')} />
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
@@ -39,7 +39,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('auth.email_address')}
+                                    {t('auth.field.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -59,14 +59,14 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                                 disabled={processing}
                             >
                                 {processing && <Spinner />}
-                                {t('auth.send_reset_link')}
+                                {t('auth.forgot.send_link')}
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-muted-foreground">
-                            {t('auth.remember_password')}{' '}
+                            {t('common.remember_password')}{' '}
                             <TextLink href="/account/login">
-                                {t('auth.log_in')}
+                                {t('auth.login.button')}
                             </TextLink>
                         </div>
                     </>

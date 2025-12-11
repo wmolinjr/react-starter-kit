@@ -1,0 +1,21 @@
+{
+    "checkout.summary.billed_monthly_note": "Você será cobrado mensalmente. Cancele quando quiser.",
+    "checkout.summary.billed_yearly_note": "Você será cobrado anualmente. Cancele quando quiser.",
+    "checkout.summary.bundle_savings": "Desconto de pacote aplicado automaticamente",
+    "checkout.summary.includes_addons": "Inclui: :addons",
+    "checkout.summary.next_billing": "Próxima cobrança",
+    "checkout.summary.one_time_purchases": "Compras Únicas",
+    "checkout.summary.one_time_subtotal": "Único",
+    "checkout.summary.order_summary": "Resumo do Pedido",
+    "checkout.summary.per_month": "/mês",
+    "checkout.summary.per_year": "/ano",
+    "checkout.summary.plan_change": "Alteração de Plano",
+    "checkout.summary.proceed_to_checkout": "Finalizar Compra",
+    "checkout.summary.proration": "Rateio",
+    "checkout.summary.quantity_benefit": ":quantity unidades de :name",
+    "checkout.summary.recurring_subtotal": "Recorrente",
+    "checkout.summary.secure_checkout_note": "Você será redirecionado para uma página de checkout segura",
+    "checkout.summary.subscriptions": "Assinaturas",
+    "checkout.summary.total_today": "Total Hoje",
+    "checkout.summary.what_you_get": "O que Você Vai Receber"
+}

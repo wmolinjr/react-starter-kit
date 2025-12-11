@@ -384,7 +384,7 @@ function AddonsPageContent({
                         <PricingToggle
                             value={period}
                             onChange={setPeriod}
-                            savings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                            savings={t('billing.price.yearly_savings', { default: 'Save 20%' })}
                         />
                     </div>
 
@@ -400,7 +400,7 @@ function AddonsPageContent({
                                 {t('tenant.addons.bundles', { default: 'Bundles' })}
                                 {availableBundles.length > 0 && (
                                     <Badge variant="secondary" className="ml-1">
-                                        {t('billing.save', { default: 'Save' })}
+                                        {t('billing.price.save', { default: 'Save' })}
                                     </Badge>
                                 )}
                             </TabsTrigger>
@@ -504,7 +504,7 @@ function AddonsPageContent({
                 onClearCart={clearCart}
                 currency="BRL"
                 showBillingToggle={true}
-                yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                yearlySavings={t('billing.price.yearly_savings', { default: 'Save 20%' })}
             />
         </>
     );

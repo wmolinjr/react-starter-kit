@@ -39,10 +39,10 @@ export default function TransferAccept({ transfer, tenant, from_customer }: Tran
 
     return (
         <AuthLayout
-            title={t('customer.workspace_transfer')}
-            description={t('customer.you_have_been_invited')}
+            title={t('customer.transfer.workspace_transfer')}
+            description={t('customer.transfer.you_have_been_invited')}
         >
-            <Head title={t('customer.accept_transfer')} />
+            <Head title={t('customer.transfer.accept')} />
 
             <div className="space-y-6">
                 {/* Transfer Info Card */}
@@ -59,29 +59,29 @@ export default function TransferAccept({ transfer, tenant, from_customer }: Tran
                     <CardContent className="space-y-4">
                         <div className="flex items-center gap-3 text-sm">
                             <User className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">{t('customer.from')}:</span>
+                            <span className="text-muted-foreground">{t('customer.invoice.from')}:</span>
                             <span className="font-medium">{from_customer.name}</span>
                         </div>
 
                         {tenant.plan && (
                             <div className="flex items-center gap-3 text-sm">
                                 <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">{t('customer.plan')}:</span>
+                                <span className="text-muted-foreground">{t('customer.subscription.plan')}:</span>
                                 <span className="font-medium">{tenant.plan}</span>
                             </div>
                         )}
 
                         <div className="flex items-center gap-3 text-sm">
                             <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">{t('customer.expires')}:</span>
+                            <span className="text-muted-foreground">{t('customer.status.expires')}:</span>
                             <span className="font-medium">
-                                {expiresAt.toLocaleDateString()} ({daysRemaining} {t('customer.days_remaining')})
+                                {expiresAt.toLocaleDateString()} ({daysRemaining} {t('customer.subscription.days_remaining')})
                             </span>
                         </div>
 
                         {transfer.notes && (
                             <div className="p-3 bg-muted rounded-lg text-sm">
-                                <p className="text-muted-foreground mb-1">{t('customer.notes')}:</p>
+                                <p className="text-muted-foreground mb-1">{t('customer.invoice.notes')}:</p>
                                 <p>{transfer.notes}</p>
                             </div>
                         )}
@@ -97,7 +97,7 @@ export default function TransferAccept({ transfer, tenant, from_customer }: Tran
                     {({ processing }) => (
                         <>
                             <p className="text-sm text-muted-foreground">
-                                {t('customer.accept_transfer_description')}
+                                {t('customer.transfer.accept_description')}
                             </p>
 
                             <div className="flex gap-4">
@@ -107,7 +107,7 @@ export default function TransferAccept({ transfer, tenant, from_customer }: Tran
                                     disabled={processing}
                                 >
                                     {processing && <Spinner />}
-                                    {t('customer.accept_transfer')}
+                                    {t('customer.transfer.accept')}
                                 </Button>
                             </div>
                         </>
@@ -115,7 +115,7 @@ export default function TransferAccept({ transfer, tenant, from_customer }: Tran
                 </Form>
 
                 <p className="text-xs text-center text-muted-foreground">
-                    {t('customer.accept_transfer_disclaimer')}
+                    {t('customer.transfer.accept_disclaimer')}
                 </p>
             </div>
         </AuthLayout>

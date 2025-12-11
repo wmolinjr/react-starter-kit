@@ -1,0 +1,14 @@
+{
+    "billing.subscription.billed_monthly": "Billed monthly",
+    "billing.subscription.billed_yearly": "Billed yearly",
+    "billing.subscription.canceled": "Your subscription will end on :date",
+    "billing.subscription.effective": "Effective :date",
+    "billing.subscription.expires": "Expires",
+    "billing.subscription.expires_hours": "Expires in :hours h :minutes min",
+    "billing.subscription.expires_minutes": "Expires in :minutes min",
+    "billing.subscription.expires_soon": "Expires soon",
+    "billing.subscription.manage": "Manage",
+    "billing.subscription.new": "New",
+    "billing.subscription.next_billing": "Next Billing",
+    "billing.subscription.will_not_renew": "Will not renew"
+}

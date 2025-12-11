@@ -1,0 +1,7 @@
+{
+    "audit.column.action": "Action",
+    "audit.column.date": "Date",
+    "audit.column.description": "Description",
+    "audit.column.subject": "Subject",
+    "audit.column.user": "User"
+}

@@ -1,0 +1,6 @@
+{
+    "roles.page.create_first": "Criar Primeira Regra de Acesso",
+    "roles.page.description": "Gerencie regras de acesso e permissões para sua equipe",
+    "roles.page.info": "Regras de sistema (Owner, Admin, Member) são protegidas e não podem ser excluídas. Você pode criar regras personalizadas para definir conjuntos específicos de permissões para sua equipe.",
+    "roles.page.title": "Regras de Acesso"
+}

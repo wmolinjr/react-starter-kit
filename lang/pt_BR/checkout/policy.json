@@ -1,0 +1,7 @@
+{
+    "checkout.policy.cancel_anytime": "Cancele quando quiser",
+    "checkout.policy.encrypted_data": "Dados criptografados",
+    "checkout.policy.powered_by": "Pagamentos processados por Stripe & Asaas",
+    "checkout.policy.secure_payment": "Pagamento 100% seguro",
+    "checkout.policy.terms_agreement": "Ao concluir esta compra, você concorda com nossos Termos de Uso e Política de Privacidade."
+}

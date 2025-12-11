@@ -1,0 +1,8 @@
+{
+    "audit.page.description": "Acompanhe todas as alterações e ações.",
+    "audit.page.empty": "Nenhum registro de auditoria encontrado.",
+    "audit.page.export_csv": "Exportar CSV",
+    "audit.page.search": "Buscar por descrição ou usuário...",
+    "audit.page.system": "Sistema",
+    "audit.page.title": "Log de Auditoria"
+}

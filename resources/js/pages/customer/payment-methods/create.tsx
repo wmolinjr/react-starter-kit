@@ -82,20 +82,20 @@ export default function PaymentMethodCreate({ provider, setupData, supportedType
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.payment_methods'), href: '/account/payment-methods' },
-                { title: t('customer.add_payment_method'), href: '/account/payment-methods/create' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.payment.methods'), href: '/account/payment-methods' },
+                { title: t('customer.payment.add_method'), href: '/account/payment-methods/create' },
             ]}
         >
-            <Head title={t('customer.add_payment_method')} />
+            <Head title={t('customer.payment.add_method')} />
 
             <div className="space-y-6 max-w-2xl">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {t('customer.add_payment_method')}
+                        {t('customer.payment.add_method')}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('customer.add_payment_method_description')}
+                        {t('customer.payment.add_method_description')}
                     </p>
                 </div>
 
@@ -103,10 +103,10 @@ export default function PaymentMethodCreate({ provider, setupData, supportedType
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <CreditCard className="h-5 w-5" />
-                            {t('customer.card_details')}
+                            {t('customer.payment.card_details')}
                         </CardTitle>
                         <CardDescription>
-                            {t('customer.card_details_description')}
+                            {t('customer.payment.card_details_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -117,7 +117,7 @@ export default function PaymentMethodCreate({ provider, setupData, supportedType
                                     <div className="p-4 border rounded-lg bg-muted/50 min-h-[120px] flex items-center justify-center">
                                         {stripeReady ? (
                                             <p className="text-sm text-muted-foreground text-center">
-                                                {t('customer.stripe_card_element_placeholder')}
+                                                {t('customer.payment.stripe_placeholder')}
                                             </p>
                                         ) : (
                                             <p className="text-sm text-muted-foreground">
@@ -217,12 +217,12 @@ export default function PaymentMethodCreate({ provider, setupData, supportedType
 
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Lock className="h-4 w-4" />
-                                {t('customer.secure_payment')}
+                                {t('customer.payment.secure')}
                             </div>
 
                             <div className="flex gap-4">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? t('common.processing') : t('customer.add_card')}
+                                    {processing ? t('common.processing') : t('customer.payment.add_card')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -241,8 +241,8 @@ export default function PaymentMethodCreate({ provider, setupData, supportedType
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <Lock className="h-5 w-5" />
                             <div>
-                                <p className="font-medium">{t('customer.secure_processing')}</p>
-                                <p>{t('customer.secure_processing_description')}</p>
+                                <p className="font-medium">{t('customer.payment.secure_processing')}</p>
+                                <p>{t('customer.payment.secure_processing_description')}</p>
                             </div>
                         </div>
                     </CardContent>

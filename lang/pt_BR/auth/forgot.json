@@ -1,0 +1,7 @@
+{
+    "auth.forgot.description": "Digite seu e-mail e enviaremos um link para redefinir sua senha.",
+    "auth.forgot.enter_email": "Digite seu e-mail para receber um link de redefinição de senha",
+    "auth.forgot.question": "Esqueceu sua senha?",
+    "auth.forgot.send_link": "Enviar link de redefinição",
+    "auth.forgot.title": "Esqueceu a senha"
+}

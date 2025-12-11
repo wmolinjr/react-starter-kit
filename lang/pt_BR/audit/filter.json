@@ -1,0 +1,8 @@
+{
+    "audit.filter.date_from": "Data Inicial",
+    "audit.filter.date_to": "Data Final",
+    "audit.filter.event": "Tipo de Evento",
+    "audit.filter.log_name": "Nome do Log",
+    "audit.filter.subject": "Tipo de Objeto",
+    "audit.filter.user": "Usuário"
+}

@@ -118,7 +118,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.billing.title'), href: admin.billing.index.url() },
-        { title: t('checkout.page_title', { default: 'Checkout' }), href: admin.billing.checkoutPage.url() },
+        { title: t('checkout.page.title', { default: 'Checkout' }), href: admin.billing.checkoutPage.url() },
     ];
     useSetBreadcrumbs(breadcrumbs);
 
@@ -177,7 +177,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
                 const errorData = await response.json();
                 throw new Error(
                     errorData.message ||
-                        t('checkout.error_failed', { default: 'Checkout failed' })
+                        t('checkout.error.failed', { default: 'Checkout failed' })
                 );
             }
 
@@ -204,7 +204,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
             setError(
                 err instanceof Error
                     ? err.message
-                    : t('checkout.error_failed', { default: 'Checkout failed' })
+                    : t('checkout.error.failed', { default: 'Checkout failed' })
             );
             setCheckoutState('selecting');
         }
@@ -235,11 +235,11 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
     const getCheckoutButtonLabel = () => {
         switch (selectedPaymentMethod) {
             case 'pix':
-                return t('checkout.generate_pix', { default: 'Generate PIX' });
+                return t('checkout.payment.generate_pix', { default: 'Generate PIX' });
             case 'boleto':
-                return t('checkout.generate_boleto', { default: 'Generate Boleto' });
+                return t('checkout.payment.generate_boleto', { default: 'Generate Boleto' });
             default:
-                return t('checkout.pay_with_card', { default: 'Pay with Card' });
+                return t('checkout.payment.pay_with_card', { default: 'Pay with Card' });
         }
     };
 
@@ -314,10 +314,10 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
 
                     <div className="animate-in fade-in-0 slide-in-from-bottom-4 delay-300 duration-500 space-y-2">
                         <h3 className="text-xl font-semibold text-foreground">
-                            {t('checkout.payment_confirmed', { default: 'Payment Confirmed!' })}
+                            {t('checkout.success.confirmed', { default: 'Payment Confirmed!' })}
                         </h3>
                         <p className="text-sm text-muted-foreground max-w-md">
-                            {t('checkout.payment_success_message', {
+                            {t('checkout.success.message', {
                                 default:
                                     'Your purchase has been completed successfully. Your add-ons are now active.',
                             })}
@@ -326,7 +326,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
 
                     <div className="animate-in fade-in-0 slide-in-from-bottom-4 delay-500 duration-500 flex flex-col gap-2 w-full max-w-xs">
                         <Button onClick={handleSuccessClose} size="lg" className="w-full">
-                            {t('checkout.view_billing', { default: 'View Billing' })}
+                            {t('checkout.success.view_billing', { default: 'View Billing' })}
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                         <Button
@@ -334,7 +334,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
                             onClick={() => router.visit(admin.addons.index.url())}
                             className="w-full"
                         >
-                            {t('checkout.continue_shopping', { default: 'Continue Shopping' })}
+                            {t('checkout.success.continue_shopping', { default: 'Continue Shopping' })}
                         </Button>
                     </div>
                 </div>
@@ -349,7 +349,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
 
     return (
         <>
-            <Head title={t('checkout.page_title', { default: 'Checkout' })} />
+            <Head title={t('checkout.page.title', { default: 'Checkout' })} />
 
             <Page>
                 <PageHeader>
@@ -357,23 +357,23 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
                         <PageTitle>
                             <ShoppingCart className="mr-2 h-6 w-6" />
                             {checkoutState === 'success'
-                                ? t('checkout.success_title', { default: 'Order Complete' })
+                                ? t('checkout.success.title', { default: 'Order Complete' })
                                 : checkoutState === 'async-payment'
                                   ? asyncPaymentResult?.type === 'pix'
-                                      ? t('checkout.pix_payment', { default: 'PIX Payment' })
-                                      : t('checkout.boleto_payment', { default: 'Boleto Payment' })
+                                      ? t('checkout.payment.pix', { default: 'PIX Payment' })
+                                      : t('checkout.payment.boleto', { default: 'Boleto Payment' })
                                   : checkoutState === 'asaas-card'
-                                    ? t('checkout.card_payment', { default: 'Card Payment' })
-                                    : t('checkout.page_title', { default: 'Checkout' })}
+                                    ? t('checkout.payment.card', { default: 'Card Payment' })
+                                    : t('checkout.page.title', { default: 'Checkout' })}
                         </PageTitle>
                         <PageDescription>
                             {checkoutState === 'success'
-                                ? t('checkout.success_description', { default: 'Thank you for your purchase' })
+                                ? t('checkout.success.description', { default: 'Thank you for your purchase' })
                                 : checkoutState === 'async-payment'
-                                  ? t('checkout.complete_payment', {
+                                  ? t('checkout.page.description', {
                                         default: 'Complete your payment to finish the purchase',
                                     })
-                                  : t('checkout.review_order', {
+                                  : t('checkout.page.description', {
                                         default: 'Review your order and select a payment method',
                                     })}
                         </PageDescription>
@@ -443,7 +443,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
                                     onRemoveItem={removeItem}
                                     onUpdateQuantity={updateQuantity}
                                     showBillingToggle={hasRecurringItems}
-                                    yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
+                                    yearlySavings={t('billing.price.yearly_savings', { default: 'Save 20%' })}
                                 />
                             </div>
 
@@ -477,7 +477,7 @@ function CheckoutPageContent({ paymentConfig }: CheckoutPageProps) {
                                     {checkoutState === 'processing' ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            {t('checkout.processing', { default: 'Processing...' })}
+                                            {t('checkout.payment.processing', { default: 'Processing...' })}
                                         </>
                                     ) : (
                                         <>

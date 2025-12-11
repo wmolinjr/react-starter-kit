@@ -20,10 +20,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <AuthLayout
-            title={t('customer.log_in_to_account')}
-            description={t('customer.manage_billing')}
+            title={t('customer.login.title')}
+            description={t('customer.billing.manage')}
         >
-            <Head title={t('customer.login')} />
+            <Head title={t('customer.login.button')} />
 
             <Form
                 action="/account/login"
@@ -36,7 +36,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">
-                                    {t('auth.email_address')}
+                                    {t('auth.field.email_address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -54,7 +54,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">
-                                        {t('auth.password')}
+                                        {t('auth.field.password')}
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
@@ -62,7 +62,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            {t('auth.forgot_password_question')}
+                                            {t('auth.forgot.question')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -73,7 +73,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder={t('auth.password')}
+                                    placeholder={t('auth.field.password')}
                                 />
                                 <InputError message={errors?.password} />
                             </div>
@@ -85,7 +85,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     tabIndex={3}
                                 />
                                 <Label htmlFor="remember">
-                                    {t('auth.remember_me')}
+                                    {t('auth.field.remember_me')}
                                 </Label>
                             </div>
 
@@ -96,14 +96,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 disabled={processing}
                             >
                                 {processing && <Spinner />}
-                                {t('auth.log_in')}
+                                {t('auth.login.button')}
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-muted-foreground">
                             {t("Don't have an account?")}{' '}
                             <TextLink href="/account/register" tabIndex={5}>
-                                {t('auth.sign_up')}
+                                {t('auth.register.sign_up')}
                             </TextLink>
                         </div>
                     </>

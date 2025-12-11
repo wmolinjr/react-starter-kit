@@ -1,0 +1,10 @@
+{
+    "customer.subscription.active": "Assinaturas ativas",
+    "customer.subscription.current_plan": "Plano Atual",
+    "customer.subscription.days_remaining": "dias restantes",
+    "customer.subscription.no_active": "Nenhuma assinatura ativa para este workspace.",
+    "customer.subscription.no_plan": "Sem plano",
+    "customer.subscription.per_month": "por mês",
+    "customer.subscription.plan": "Plano",
+    "customer.subscription.title": "Assinaturas"
+}

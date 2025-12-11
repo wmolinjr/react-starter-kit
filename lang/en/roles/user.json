@@ -1,0 +1,5 @@
+{
+    "roles.user.description": "Team members assigned to this role",
+    "roles.user.none": "No users assigned to this role.",
+    "roles.user.title": "Users"
+}

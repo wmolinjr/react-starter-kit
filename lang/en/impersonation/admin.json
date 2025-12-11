@@ -1,0 +1,8 @@
+{
+    "impersonation.admin.active": "You are in Admin Mode.",
+    "impersonation.admin.description": "Enter the tenant as an administrator without logging in as a specific user. Useful for support and inspection.",
+    "impersonation.admin.enter": "Enter as Admin",
+    "impersonation.admin.notice": "You are viewing this tenant without a specific user session.",
+    "impersonation.admin.title": "Admin Mode",
+    "impersonation.admin.use_instead": "Use Admin Mode to access the tenant."
+}

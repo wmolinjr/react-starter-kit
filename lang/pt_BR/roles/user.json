@@ -1,0 +1,5 @@
+{
+    "roles.user.description": "Membros da equipe atribuídos a esta regra de acesso",
+    "roles.user.none": "Nenhum usuário atribuído a esta regra de acesso.",
+    "roles.user.title": "Usuários"
+}

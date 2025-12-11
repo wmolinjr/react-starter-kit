@@ -1,0 +1,18 @@
+{
+    "customer.invoice.amount": "Amount",
+    "customer.invoice.date": "Date",
+    "customer.invoice.description": "Description",
+    "customer.invoice.details": "Invoice Details",
+    "customer.invoice.download_pdf": "Download PDF",
+    "customer.invoice.due_date": "Due Date",
+    "customer.invoice.from": "From",
+    "customer.invoice.line_items": "Line Items",
+    "customer.invoice.no_invoices": "No Invoices",
+    "customer.invoice.no_invoices_description": "Your invoices will appear here when you have charges.",
+    "customer.invoice.notes": "Notes",
+    "customer.invoice.number": "Invoice Number",
+    "customer.invoice.quantity": "Quantity",
+    "customer.invoice.subtotal": "Subtotal",
+    "customer.invoice.title": "Invoice",
+    "customer.invoice.total": "Total"
+}

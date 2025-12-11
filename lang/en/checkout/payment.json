@@ -1,0 +1,12 @@
+{
+    "checkout.payment.boleto": "Boleto Payment",
+    "checkout.payment.card": "Card Payment",
+    "checkout.payment.generate_boleto": "Generate Boleto",
+    "checkout.payment.generate_pix": "Generate PIX",
+    "checkout.payment.method": "Payment Method",
+    "checkout.payment.pay_with_card": "Pay with Card",
+    "checkout.payment.pix": "PIX Payment",
+    "checkout.payment.processing": "Processing...",
+    "checkout.payment.recurring_card_only": "Credit card is required for recurring subscriptions.",
+    "checkout.payment.select_method": "Select how you want to pay"
+}

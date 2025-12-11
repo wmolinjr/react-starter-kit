@@ -133,7 +133,7 @@ export function PricingCard({
 
                     {price.period === 'yearly' && price.amount > 0 && (
                         <p className="text-muted-foreground mt-1 text-sm">
-                            {t('billing.billed_yearly', {
+                            {t('billing.subscription.billed_yearly', {
                                 default: 'Billed yearly',
                             })}
                         </p>

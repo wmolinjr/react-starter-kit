@@ -18,7 +18,7 @@ function useBreadcrumbs() {
     return [
         { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('tenant.settings.title'), href: admin.settings.index.url() },
-        { title: t('roles.title'), href: admin.settings.roles.index.url() },
+        { title: t('roles.page.title'), href: admin.settings.roles.index.url() },
     ] as BreadcrumbItem[];
 }
 
@@ -49,28 +49,28 @@ function RolesIndex({ roles, planInfo }: Props) {
 
     const handleDelete = (role: RoleResource) => {
         if (role.is_protected) {
-            alert(t('roles.delete_protected_error'));
+            alert(t('roles.error.delete_protected'));
             return;
         }
         if (role.users_count > 0) {
-            alert(t('roles.delete_has_users_error'));
+            alert(t('roles.error.delete_has_users'));
             return;
         }
-        if (confirm(t('roles.delete_confirm', { name: role.display_name }))) {
+        if (confirm(t('roles.form.delete_confirm', { name: role.display_name }))) {
             router.delete(admin.settings.roles.destroy.url(role.id));
         }
     };
 
     return (
         <>
-            <Head title={t('roles.title')} />
+            <Head title={t('roles.page.title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
                         <PageTitle icon={Shield}>{t('tenant.settings.custom_roles')}</PageTitle>
                         <PageDescription>
-                            {t('roles.description')}
+                            {t('roles.page.description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -78,13 +78,13 @@ function RolesIndex({ roles, planInfo }: Props) {
                             <Button asChild>
                                 <Link href={admin.settings.roles.create.url()}>
                                     <Plus className="mr-2 h-4 w-4" />
-                                    {t('roles.new_role')}
+                                    {t('roles.form.new')}
                                 </Link>
                             </Button>
                         ) : planInfo.hasReachedLimit ? (
                             <Button disabled>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('roles.new_role')}
+                                {t('roles.form.new')}
                             </Button>
                         ) : null}
                     </PageHeaderActions>
@@ -98,11 +98,11 @@ function RolesIndex({ roles, planInfo }: Props) {
                             <AlertDescription className="flex items-center justify-between">
                                 <span>
                                     {planInfo.hasReachedLimit
-                                        ? t('roles.limit_reached_info', {
+                                        ? t('roles.limit.reached', {
                                               limit: formatLimit(planInfo.customRolesLimit),
                                               plan: planInfo.planName ?? '',
                                           })
-                                        : t('roles.limit_info', {
+                                        : t('roles.limit.info', {
                                               count: planInfo.customRolesCount,
                                               limit: formatLimit(planInfo.customRolesLimit),
                                           })}
@@ -122,12 +122,12 @@ function RolesIndex({ roles, planInfo }: Props) {
                     <Alert>
                         <Info className="h-4 w-4" />
                         <AlertDescription>
-                            {t('roles.roles_info')}
+                            {t('roles.page.info')}
                         </AlertDescription>
                     </Alert>
 
                     {/* All Roles */}
-                    <h2 className="text-lg font-semibold">{t('roles.all_roles')}</h2>
+                    <h2 className="text-lg font-semibold">{t('roles.list.all')}</h2>
                     {roles.length > 0 ? (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {roles.map((role) => (
@@ -208,15 +208,15 @@ function RolesIndex({ roles, planInfo }: Props) {
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <Shield className="text-muted-foreground mb-4 h-12 w-12" />
                                 <p className="text-muted-foreground mb-4">
-                                    {t('roles.no_roles')}
+                                    {t('roles.list.no_roles')}
                                 </p>
                                 <p className="text-muted-foreground text-center text-sm mb-4 max-w-md">
-                                    {t('roles.no_roles_description')}
+                                    {t('roles.list.no_roles_description')}
                                 </p>
                                 <Button asChild>
                                     <Link href={admin.settings.roles.create.url()}>
                                         <Plus className="mr-2 h-4 w-4" />
-                                        {t('roles.create_first')}
+                                        {t('roles.page.create_first')}
                                     </Link>
                                 </Button>
                             </CardContent>

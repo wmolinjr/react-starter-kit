@@ -75,8 +75,8 @@ export function CheckoutSummarySection({
     // Get billing period label
     const periodLabel =
         billingPeriod === 'yearly'
-            ? t('checkout.per_year', { default: '/year' })
-            : t('checkout.per_month', { default: '/month' });
+            ? t('checkout.summary.per_year', { default: '/year' })
+            : t('checkout.summary.per_month', { default: '/month' });
 
     // Calculate next billing date
     const getNextBillingDate = (): string => {
@@ -95,7 +95,7 @@ export function CheckoutSummarySection({
                 <div className="flex items-center gap-2">
                     <Receipt className="h-5 w-5 text-muted-foreground" />
                     <CardTitle className="text-lg">
-                        {t('checkout.order_summary', { default: 'Order Summary' })}
+                        {t('checkout.summary.order_summary', { default: 'Order Summary' })}
                     </CardTitle>
                 </div>
             </CardHeader>
@@ -106,7 +106,7 @@ export function CheckoutSummarySection({
                     <div className="bg-muted/50 rounded-lg p-3">
                         <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                             <RefreshCw className="h-4 w-4" />
-                            {t('checkout.plan_change', { default: 'Plan Change' })}
+                            {t('checkout.summary.plan_change', { default: 'Plan Change' })}
                         </div>
                         <div className="text-sm">
                             <span className="text-muted-foreground">{planChange.from.name}</span>
@@ -116,7 +116,7 @@ export function CheckoutSummarySection({
                         {planChange.prorationAmount !== 0 && (
                             <div className="mt-2 flex justify-between text-sm">
                                 <span className="text-muted-foreground">
-                                    {t('checkout.proration', { default: 'Proration' })}
+                                    {t('checkout.summary.proration', { default: 'Proration' })}
                                 </span>
                                 <span
                                     className={cn(
@@ -136,7 +136,7 @@ export function CheckoutSummarySection({
                     <div className="space-y-2">
                         <div className="flex items-center gap-1 text-sm font-medium">
                             <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
-                            {t('checkout.subscriptions', { default: 'Subscriptions' })}
+                            {t('checkout.summary.subscriptions', { default: 'Subscriptions' })}
                         </div>
                         {recurringItems.map((item) => (
                             <div
@@ -161,7 +161,7 @@ export function CheckoutSummarySection({
                         ))}
                         <div className="flex items-center gap-1 text-xs text-muted-foreground pt-1">
                             <Calendar className="h-3 w-3" />
-                            {t('checkout.next_billing', { default: 'Next billing' })}:{' '}
+                            {t('checkout.summary.next_billing', { default: 'Next billing' })}:{' '}
                             {getNextBillingDate()}
                         </div>
                     </div>
@@ -172,7 +172,7 @@ export function CheckoutSummarySection({
                     <div className="space-y-2">
                         <div className="flex items-center gap-1 text-sm font-medium">
                             <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
-                            {t('checkout.one_time_purchases', { default: 'One-time Purchases' })}
+                            {t('checkout.summary.one_time_purchases', { default: 'One-time Purchases' })}
                         </div>
                         {oneTimeItems.map((item) => (
                             <div
@@ -199,14 +199,14 @@ export function CheckoutSummarySection({
                 {recurringItems.length > 0 && oneTimeItems.length > 0 && (
                     <div className="space-y-1 text-sm">
                         <div className="flex justify-between text-muted-foreground">
-                            <span>{t('checkout.recurring_subtotal', { default: 'Recurring' })}</span>
+                            <span>{t('checkout.summary.recurring_subtotal', { default: 'Recurring' })}</span>
                             <span>
                                 {formatPrice(recurringTotal)}
                                 {periodLabel}
                             </span>
                         </div>
                         <div className="flex justify-between text-muted-foreground">
-                            <span>{t('checkout.one_time_subtotal', { default: 'One-time' })}</span>
+                            <span>{t('checkout.summary.one_time_subtotal', { default: 'One-time' })}</span>
                             <span>{formatPrice(oneTimeTotal)}</span>
                         </div>
                     </div>
@@ -215,7 +215,7 @@ export function CheckoutSummarySection({
                 {/* Total */}
                 <div className="flex items-center justify-between pt-2">
                     <span className="text-lg font-semibold">
-                        {t('checkout.total_today', { default: 'Total Today' })}
+                        {t('checkout.summary.total_today', { default: 'Total Today' })}
                     </span>
                     <span className="text-2xl font-bold">{formatPrice(total)}</span>
                 </div>
@@ -224,10 +224,10 @@ export function CheckoutSummarySection({
                 {recurringItems.length > 0 && (
                     <p className="text-xs text-muted-foreground">
                         {billingPeriod === 'yearly'
-                            ? t('checkout.billed_yearly_note', {
+                            ? t('checkout.summary.billed_yearly_note', {
                                   default: 'You will be billed annually. Cancel anytime.',
                               })
-                            : t('checkout.billed_monthly_note', {
+                            : t('checkout.summary.billed_monthly_note', {
                                   default: 'You will be billed monthly. Cancel anytime.',
                               })}
                     </p>

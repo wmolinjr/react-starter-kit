@@ -1,0 +1,15 @@
+{
+    "billing.cart.add": "Add to Cart",
+    "billing.cart.clear": "Clear",
+    "billing.cart.description": "Review your items before checkout",
+    "billing.cart.empty": "Your cart is empty",
+    "billing.cart.expires_soon": "Cart expires in :minutes minutes",
+    "billing.cart.expiring": "Your cart will expire in :minutes minutes. Complete your purchase to save your items.",
+    "billing.cart.expiring_urgent": "Your cart will expire soon! Complete your purchase to avoid losing your items.",
+    "billing.cart.in_cart": "In Cart",
+    "billing.cart.items": "Items",
+    "billing.cart.items_count": ":count item(s) in cart",
+    "billing.cart.no_items": "No items",
+    "billing.cart.open": "Open Cart",
+    "billing.cart.title": "Cart"
+}

@@ -119,9 +119,9 @@ export function AddonCard({
                         className="text-xs"
                     >
                         {addon.badge === 'popular'
-                            ? t('billing.popular', { default: 'Popular' })
+                            ? t('billing.price.popular', { default: 'Popular' })
                             : addon.badge === 'new'
-                                ? t('billing.new', { default: 'New' })
+                                ? t('billing.subscription.new', { default: 'New' })
                                 : addon.badge}
                     </Badge>
                 </div>
@@ -143,7 +143,7 @@ export function AddonCard({
                     {isPurchased && (
                         <Badge variant="secondary" className="gap-1">
                             <Check className="h-3 w-3" />
-                            {t('billing.owned', { default: 'Owned' })}
+                            {t('billing.addon.owned', { default: 'Owned' })}
                             {currentQuantity > 1 && ` (×${currentQuantity})`}
                         </Badge>
                     )}
@@ -166,7 +166,7 @@ export function AddonCard({
                     />
                     {isOneTime && (
                         <p className="text-muted-foreground text-sm">
-                            {t('billing.one_time_purchase', { default: 'One-time purchase' })}
+                            {t('billing.price.one_time_purchase', { default: 'One-time purchase' })}
                         </p>
                     )}
                 </div>
@@ -174,7 +174,7 @@ export function AddonCard({
                 {/* Unit value (for quota addons) */}
                 {addon.unit_value && addon.type === 'quota' && (
                     <div className="text-muted-foreground text-sm">
-                        +{addon.unit_value} {addon.unit_label || t('billing.units', { default: 'units' })}
+                        +{addon.unit_value} {addon.unit_label || t('billing.usage.units', { default: 'units' })}
                     </div>
                 )}
 
@@ -186,7 +186,7 @@ export function AddonCard({
                 {/* Quantity info */}
                 {addon.max_quantity > 1 && (
                     <p className="text-muted-foreground text-xs">
-                        {t('billing.max_quantity', {
+                        {t('billing.usage.max_quantity', {
                             default: 'Max: :max',
                             max: addon.max_quantity,
                         }).replace(':max', String(addon.max_quantity))}
@@ -206,12 +206,12 @@ export function AddonCard({
                         {isInCart ? (
                             <>
                                 <Check className="mr-2 h-4 w-4" />
-                                {t('billing.in_cart', { default: 'In Cart' })}
+                                {t('billing.cart.in_cart', { default: 'In Cart' })}
                             </>
                         ) : (
                             <>
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t('billing.add_to_cart', { default: 'Add to Cart' })}
+                                {t('billing.cart.add', { default: 'Add to Cart' })}
                             </>
                         )}
                     </Button>
@@ -234,18 +234,18 @@ export function AddonCard({
                             canPurchase ? (
                                 <>
                                     <Plus className="mr-2 h-4 w-4" />
-                                    {t('billing.add_more', { default: 'Add More' })}
+                                    {t('billing.addon.add_more', { default: 'Add More' })}
                                 </>
                             ) : (
                                 <>
                                     <Check className="mr-2 h-4 w-4" />
-                                    {t('billing.already_owned', { default: 'Already Owned' })}
+                                    {t('billing.addon.already_owned', { default: 'Already Owned' })}
                                 </>
                             )
                         ) : (
                             <>
                                 <ShoppingCart className="mr-2 h-4 w-4" />
-                                {t('billing.purchase', { default: 'Purchase' })}
+                                {t('common.purchase', { default: 'Purchase' })}
                             </>
                         )}
                     </Button>
@@ -298,10 +298,10 @@ export function ActiveAddonCard({
     const { t } = useLaravelReactI18n();
 
     const periodLabel = addon.billingPeriod === 'yearly'
-        ? t('billing.yearly', { default: 'Yearly' })
+        ? t('billing.price.yearly', { default: 'Yearly' })
         : addon.billingPeriod === 'one_time'
-            ? t('billing.one_time', { default: 'One-time' })
-            : t('billing.monthly', { default: 'Monthly' });
+            ? t('billing.price.one_time', { default: 'One-time' })
+            : t('billing.price.monthly', { default: 'Monthly' });
 
     return (
         <Card className={cn('relative', className)}>
@@ -343,7 +343,7 @@ export function ActiveAddonCard({
 
                 <div className="flex items-center justify-between">
                     <span className="text-muted-foreground text-sm">
-                        {t('billing.cost', { default: 'Cost' })}
+                        {t('billing.price.cost', { default: 'Cost' })}
                     </span>
                     <span className="font-semibold">{addon.formattedTotalPrice}</span>
                 </div>
@@ -351,7 +351,7 @@ export function ActiveAddonCard({
                 {addon.expiresAt && (
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground text-sm">
-                            {t('billing.expires', { default: 'Expires' })}
+                            {t('billing.subscription.expires', { default: 'Expires' })}
                         </span>
                         <span className="text-sm">
                             {new Date(addon.expiresAt).toLocaleDateString()}
@@ -369,7 +369,7 @@ export function ActiveAddonCard({
                         onClick={() => onCancel(addon.id)}
                         disabled={isLoading}
                     >
-                        {t('billing.cancel', { default: 'Cancel' })}
+                        {t('common.cancel', { default: 'Cancel' })}
                     </Button>
                 )}
             </CardFooter>

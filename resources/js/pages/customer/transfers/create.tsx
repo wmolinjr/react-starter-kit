@@ -28,22 +28,22 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard'), href: '/account' },
-                { title: t('customer.workspaces'), href: '/account/tenants' },
+                { title: t('customer.dashboard.title'), href: '/account' },
+                { title: t('customer.workspace.title'), href: '/account/tenants' },
                 { title: tenant.name, href: `/account/tenants/${tenant.id}` },
-                { title: t('customer.transfer'), href: `/account/tenants/${tenant.id}/transfer` },
+                { title: t('customer.transfer.title'), href: `/account/tenants/${tenant.id}/transfer` },
             ]}
         >
-            <Head title={t('customer.transfer_ownership')} />
+            <Head title={t('customer.transfer.ownership_title')} />
 
             <div className="space-y-6 max-w-2xl">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
                         <ArrowRightLeft className="h-6 w-6" />
-                        {t('customer.transfer_ownership')}
+                        {t('customer.transfer.ownership_title')}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t('customer.transfer_ownership_description')}
+                        {t('customer.transfer.ownership_description')}
                     </p>
                 </div>
 
@@ -52,9 +52,9 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
                     <CardContent className="flex items-start gap-4 py-4">
                         <AlertTriangle className="h-5 w-5 text-warning mt-0.5" />
                         <div>
-                            <p className="font-medium text-warning">{t('customer.transfer_warning_title')}</p>
+                            <p className="font-medium text-warning">{t('customer.transfer.warning_title')}</p>
                             <p className="text-sm text-muted-foreground mt-1">
-                                {t('customer.transfer_warning_description')}
+                                {t('customer.transfer.warning_description')}
                             </p>
                         </div>
                     </CardContent>
@@ -65,22 +65,22 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Building2 className="h-5 w-5" />
-                            {t('customer.workspace_being_transferred')}
+                            {t('customer.transfer.workspace_being_transferred')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-2">
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">{t('customer.workspace_name')}</span>
+                                <span className="text-muted-foreground">{t('customer.workspace.name')}</span>
                                 <span className="font-medium">{tenant.name}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">{t('customer.domain')}</span>
+                                <span className="text-muted-foreground">{t('customer.workspace.domain')}</span>
                                 <span className="font-medium">{tenant.domain}</span>
                             </div>
                             {tenant.plan && (
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{t('customer.plan')}</span>
+                                    <span className="text-muted-foreground">{t('customer.subscription.plan')}</span>
                                     <span className="font-medium">{tenant.plan}</span>
                                 </div>
                             )}
@@ -91,9 +91,9 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
                 {/* Transfer Form */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('customer.new_owner_details')}</CardTitle>
+                        <CardTitle>{t('customer.transfer.new_owner_details')}</CardTitle>
                         <CardDescription>
-                            {t('customer.new_owner_details_description')}
+                            {t('customer.transfer.new_owner_details_description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -105,7 +105,7 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
                             {({ processing }) => (
                                 <>
                                     <div className="space-y-2">
-                                        <Label htmlFor="to_email">{t('customer.recipient_email')}</Label>
+                                        <Label htmlFor="to_email">{t('customer.transfer.recipient_email')}</Label>
                                         <Input
                                             id="to_email"
                                             name="to_email"
@@ -115,18 +115,18 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
                                             placeholder="new-owner@example.com"
                                         />
                                         <p className="text-xs text-muted-foreground">
-                                            {t('customer.recipient_email_help')}
+                                            {t('customer.transfer.recipient_email_help')}
                                         </p>
                                         <InputError message={errors?.to_email} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="notes">{t('customer.notes_optional')}</Label>
+                                        <Label htmlFor="notes">{t('customer.transfer.notes_optional')}</Label>
                                         <Textarea
                                             id="notes"
                                             name="notes"
                                             rows={3}
-                                            placeholder={t('customer.notes_placeholder')}
+                                            placeholder={t('customer.transfer.notes_placeholder')}
                                         />
                                         <InputError message={errors?.notes} />
                                     </div>
@@ -138,7 +138,7 @@ export default function TransferCreate({ tenant }: TransferCreateProps) {
                                             disabled={processing}
                                         >
                                             {processing && <Spinner />}
-                                            {t('customer.initiate_transfer')}
+                                            {t('customer.transfer.initiate')}
                                         </Button>
                                         <Button
                                             type="button"

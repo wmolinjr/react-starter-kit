@@ -1,0 +1,5 @@
+{
+    "roles.permission.description": "Permissions granted to users with this role",
+    "roles.permission.none": "No permissions assigned to this role.",
+    "roles.permission.title": "Permissions"
+}

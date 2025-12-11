@@ -1,0 +1,18 @@
+{
+    "billing.usage.alerts": "alerts",
+    "billing.usage.calls": "calls",
+    "billing.usage.max_quantity": "Max: :max",
+    "billing.usage.near_limit": "Near limit",
+    "billing.usage.near_limit_alert": ":count resource(s) near limit",
+    "billing.usage.no_alerts": "No usage alerts",
+    "billing.usage.no_data": "No usage data available",
+    "billing.usage.over_limit": "Over limit",
+    "billing.usage.over_limit_alert": ":count resource(s) over limit",
+    "billing.usage.resource_usage": "Your resource usage",
+    "billing.usage.title": "Usage",
+    "billing.usage.units": "units",
+    "billing.usage.unlimited": "Unlimited",
+    "billing.usage.unlimited_usage": "Unlimited usage",
+    "billing.usage.used": "used",
+    "billing.usage.users": "users"
+}

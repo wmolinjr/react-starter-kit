@@ -19,7 +19,7 @@ function CreateRole({ permissions }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
         { title: t('admin.roles.title'), href: admin.roles.index.url() },
-        { title: t('roles.create_title'), href: admin.roles.create.url() },
+        { title: t('roles.form.create_title'), href: admin.roles.create.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);

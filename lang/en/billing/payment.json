@@ -1,0 +1,18 @@
+{
+    "billing.payment.boleto": "Boleto Payment",
+    "billing.payment.card": "Card Payment",
+    "billing.payment.complete": "Complete your payment to finish the purchase",
+    "billing.payment.failed": "Payment failed. Please update your payment method.",
+    "billing.payment.generate_boleto": "Generate Boleto",
+    "billing.payment.generate_pix": "Generate PIX",
+    "billing.payment.method": "Payment Method",
+    "billing.payment.pay_now": "Pay Now",
+    "billing.payment.pay_with_card": "Pay with Card",
+    "billing.payment.pix": "PIX Payment",
+    "billing.payment.proceed": "Proceed to Payment",
+    "billing.payment.processing": "Processing...",
+    "billing.payment.recurring_card_only": "Credit card is required for recurring subscriptions.",
+    "billing.payment.select_method": "Select how you want to pay",
+    "billing.payment.update": "Update Payment",
+    "billing.payment.update_method": "Update Payment Method"
+}

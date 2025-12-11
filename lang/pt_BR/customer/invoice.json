@@ -1,0 +1,18 @@
+{
+    "customer.invoice.amount": "Valor",
+    "customer.invoice.date": "Data",
+    "customer.invoice.description": "Descrição",
+    "customer.invoice.details": "Detalhes da Fatura",
+    "customer.invoice.download_pdf": "Baixar PDF",
+    "customer.invoice.due_date": "Data de Vencimento",
+    "customer.invoice.from": "De",
+    "customer.invoice.line_items": "Itens",
+    "customer.invoice.no_invoices": "Nenhuma Fatura",
+    "customer.invoice.no_invoices_description": "Suas faturas aparecerão aqui quando você tiver cobranças.",
+    "customer.invoice.notes": "Notas",
+    "customer.invoice.number": "Número da Fatura",
+    "customer.invoice.quantity": "Quantidade",
+    "customer.invoice.subtotal": "Subtotal",
+    "customer.invoice.title": "Fatura",
+    "customer.invoice.total": "Total"
+}

@@ -15,28 +15,28 @@ export default function TransferInvalid({ status }: TransferInvalidProps) {
     const getStatusMessage = (status: string) => {
         switch (status) {
             case 'completed':
-                return t('customer.transfer_already_completed');
+                return t('customer.transfer.already_completed');
             case 'cancelled':
-                return t('customer.transfer_was_cancelled');
+                return t('customer.transfer.cancelled');
             case 'rejected':
-                return t('customer.transfer_was_rejected');
+                return t('customer.transfer.rejected');
             case 'expired':
-                return t('customer.transfer_has_expired');
+                return t('customer.transfer.has_expired');
             default:
-                return t('customer.transfer_not_available');
+                return t('customer.transfer.not_available');
         }
     };
 
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'completed':
-                return <Badge variant="default">{t('customer.completed')}</Badge>;
+                return <Badge variant="default">{t('customer.status.completed')}</Badge>;
             case 'cancelled':
-                return <Badge variant="outline">{t('customer.cancelled')}</Badge>;
+                return <Badge variant="outline">{t('customer.status.cancelled')}</Badge>;
             case 'rejected':
-                return <Badge variant="destructive">{t('customer.rejected')}</Badge>;
+                return <Badge variant="destructive">{t('customer.status.rejected')}</Badge>;
             case 'expired':
-                return <Badge variant="secondary">{t('customer.expired')}</Badge>;
+                return <Badge variant="secondary">{t('customer.status.expired')}</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
@@ -44,10 +44,10 @@ export default function TransferInvalid({ status }: TransferInvalidProps) {
 
     return (
         <AuthLayout
-            title={t('customer.transfer_unavailable')}
+            title={t('customer.transfer.unavailable')}
             description={getStatusMessage(status)}
         >
-            <Head title={t('customer.transfer_unavailable')} />
+            <Head title={t('customer.transfer.unavailable')} />
 
             <div className="flex flex-col items-center text-center space-y-6">
                 <div className="rounded-full bg-destructive/10 p-4">
@@ -57,7 +57,7 @@ export default function TransferInvalid({ status }: TransferInvalidProps) {
                 <div className="space-y-2">
                     <div className="flex items-center justify-center gap-2">
                         <h2 className="text-lg font-semibold">
-                            {t('customer.transfer_status')}:
+                            {t('customer.transfer.status')}:
                         </h2>
                         {getStatusBadge(status)}
                     </div>
@@ -68,7 +68,7 @@ export default function TransferInvalid({ status }: TransferInvalidProps) {
 
                 <Button asChild>
                     <Link href="/account">
-                        {t('customer.go_to_dashboard')}
+                        {t('customer.workspace.go_to_dashboard')}
                     </Link>
                 </Button>
             </div>

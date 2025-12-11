@@ -1,0 +1,10 @@
+{
+    "sidebar.group.access_control": "Controle de Acesso",
+    "sidebar.group.administration": "Administração",
+    "sidebar.group.billing": "Cobrança",
+    "sidebar.group.catalog": "Catálogo",
+    "sidebar.group.general": "Geral",
+    "sidebar.group.marketplace": "Loja",
+    "sidebar.group.platform": "Plataforma",
+    "sidebar.group.tenant_management": "Gestão de Tenants"
+}

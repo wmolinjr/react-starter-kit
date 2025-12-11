@@ -121,8 +121,8 @@ export function CheckoutSummary({
     // Get billing period label
     const periodLabel =
         billingPeriod === 'yearly'
-            ? t('billing.per_year', { default: '/year' })
-            : t('billing.per_month', { default: '/month' });
+            ? t('billing.price.per_year', { default: '/year' })
+            : t('billing.price.per_month', { default: '/month' });
 
     return (
         <div className={cn('space-y-4', className)}>
@@ -131,7 +131,7 @@ export function CheckoutSummary({
                 <div className="bg-muted/50 rounded-lg p-3">
                     <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                         <RefreshCw className="h-4 w-4" />
-                        {t('billing.plan_change', { default: 'Plan Change' })}
+                        {t('billing.plan.change', { default: 'Plan Change' })}
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                         <span className="text-muted-foreground">{planChange.from.name}</span>
@@ -141,7 +141,7 @@ export function CheckoutSummary({
                     {planChange.prorationAmount !== 0 && (
                         <div className="mt-2 flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">
-                                {t('billing.proration', { default: 'Proration adjustment' })}
+                                {t('billing.price.proration', { default: 'Proration adjustment' })}
                             </span>
                             <span
                                 className={cn(
@@ -156,7 +156,7 @@ export function CheckoutSummary({
                     {planChange.effectiveDate && (
                         <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
                             <Calendar className="h-3 w-3" />
-                            {t('billing.effective', { default: 'Effective' })}:{' '}
+                            {t('billing.subscription.effective', { default: 'Effective' })}:{' '}
                             {new Date(planChange.effectiveDate).toLocaleDateString()}
                         </div>
                     )}
@@ -186,7 +186,7 @@ export function CheckoutSummary({
             {/* Subtotal */}
             <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                    {t('billing.subtotal', { default: 'Subtotal' })}
+                    {t('billing.price.subtotal', { default: 'Subtotal' })}
                 </span>
                 <span>{formattedSubtotal || formatPrice(subtotal)}</span>
             </div>
@@ -196,7 +196,7 @@ export function CheckoutSummary({
                 <div className="flex items-center justify-between text-sm text-green-600">
                     <div className="flex items-center gap-1">
                         <Tag className="h-3.5 w-3.5" />
-                        <span>{t('billing.discount', { default: 'Discount' })}</span>
+                        <span>{t('billing.price.discount', { default: 'Discount' })}</span>
                     </div>
                     <span>-{formattedDiscount || formatPrice(discount)}</span>
                 </div>
@@ -207,7 +207,7 @@ export function CheckoutSummary({
             {/* Total */}
             <div className="flex items-center justify-between">
                 <span className="font-medium">
-                    {t('billing.total', { default: 'Total' })}
+                    {t('billing.price.total', { default: 'Total' })}
                 </span>
                 <div className="text-right">
                     <span className="text-lg font-semibold">
@@ -228,7 +228,7 @@ export function CheckoutSummary({
                         <div className="flex items-center gap-1">
                             <RefreshCw className="text-muted-foreground h-3.5 w-3.5" />
                             <span className="text-muted-foreground">
-                                {t('billing.recurring', { default: 'Recurring' })}
+                                {t('billing.price.recurring', { default: 'Recurring' })}
                             </span>
                         </div>
                         <span>
@@ -240,7 +240,7 @@ export function CheckoutSummary({
                         <div className="flex items-center gap-1">
                             <CreditCard className="text-muted-foreground h-3.5 w-3.5" />
                             <span className="text-muted-foreground">
-                                {t('billing.one_time', { default: 'One-time' })}
+                                {t('billing.price.one_time', { default: 'One-time' })}
                             </span>
                         </div>
                         <span>{formatPrice(oneTimeTotal)}</span>
@@ -251,7 +251,7 @@ export function CheckoutSummary({
             {/* Due today info */}
             {hasRecurring && (
                 <div className="text-muted-foreground flex items-center justify-between text-xs">
-                    <span>{t('billing.due_today', { default: 'Due today' })}</span>
+                    <span>{t('billing.price.due_today', { default: 'Due today' })}</span>
                     <span className="font-medium text-foreground">
                         {formattedTotal || formatPrice(total)}
                     </span>
@@ -262,10 +262,10 @@ export function CheckoutSummary({
             {hasRecurring && (
                 <p className="text-muted-foreground text-xs">
                     {billingPeriod === 'yearly'
-                        ? t('billing.billed_yearly_note', {
+                        ? t('billing.subscription.billed_yearly', {
                               default: 'You will be billed annually. Cancel anytime.',
                           })
-                        : t('billing.billed_monthly_note', {
+                        : t('billing.subscription.billed_monthly', {
                               default: 'You will be billed monthly. Cancel anytime.',
                           })}
                 </p>

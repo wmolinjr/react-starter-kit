@@ -59,7 +59,7 @@ export function AdminSidebar() {
             <SidebarContent>
                 <NavMain
                     items={adminNavItems}
-                    label={isCollapsed ? undefined : t('sidebar.administration')}
+                    label={isCollapsed ? undefined : t('sidebar.group.administration')}
                 />
             </SidebarContent>
 

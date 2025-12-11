@@ -1,0 +1,4 @@
+{
+    "roles.error.delete_has_users": "Cannot delete a role that has users assigned.",
+    "roles.error.delete_protected": "Cannot delete a protected system role."
+}

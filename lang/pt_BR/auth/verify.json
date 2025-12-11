@@ -1,0 +1,7 @@
+{
+    "auth.verify.description": "Por favor, verifique seu endereço de e-mail clicando no link que acabamos de enviar para você.",
+    "auth.verify.link_sent": "Um novo link de verificação foi enviado para o endereço de e-mail que você forneceu durante o registro.",
+    "auth.verify.resend": "Reenviar e-mail de verificação",
+    "auth.verify.title": "Verificação de e-mail",
+    "auth.verify.verify": "Verificar e-mail"
+}

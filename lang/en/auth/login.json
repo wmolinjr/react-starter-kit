@@ -1,0 +1,9 @@
+{
+    "auth.login.admin_title": "Admin Login",
+    "auth.login.button": "Log in",
+    "auth.login.description": "Enter your email and password below to log in",
+    "auth.login.link": "log in",
+    "auth.login.sign_in": "Sign in",
+    "auth.login.sign_in_admin": "Sign in to the administration panel",
+    "auth.login.title": "Log in to your account"
+}
