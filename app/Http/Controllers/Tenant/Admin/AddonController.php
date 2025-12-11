@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Tenant\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Central\AddonResource;
 use App\Http\Resources\Central\BundleResource;
+use App\Http\Resources\Central\PaymentConfigResource;
 use App\Services\Central\AddonService;
 use App\Services\Central\CheckoutService;
+use App\Services\Central\PaymentSettingsService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,7 +17,8 @@ class AddonController extends Controller
 {
     public function __construct(
         protected AddonService $addonService,
-        protected CheckoutService $checkoutService
+        protected CheckoutService $checkoutService,
+        protected PaymentSettingsService $paymentSettingsService
     ) {}
 
     public function index(): Response
@@ -62,6 +65,9 @@ class AddonController extends Controller
             'monthlyCost' => $monthlyCost,
             'formattedMonthlyCost' => '$'.number_format($monthlyCost / 100, 2),
             'activeAddonSlugs' => $tenant->activeAddons()->pluck('addon_slug')->toArray(),
+            'paymentConfig' => new PaymentConfigResource(
+                $this->paymentSettingsService->getAvailablePaymentMethods()
+            ),
         ]);
     }
 

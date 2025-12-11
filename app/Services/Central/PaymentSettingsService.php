@@ -457,4 +457,83 @@ class PaymentSettingsService
 
         return $query->get();
     }
+
+    /**
+     * Get available payment methods configuration for checkout UI.
+     *
+     * Returns a configuration array with available payment methods,
+     * their corresponding gateways, and the default method.
+     *
+     * @param  string  $countryCode  ISO country code (e.g., 'BR', 'US')
+     * @return array{
+     *     available_methods: array<string>,
+     *     default_method: string,
+     *     gateways: array<string, string>,
+     *     has_recurring_support: bool
+     * }
+     */
+    public function getAvailablePaymentMethods(string $countryCode = 'BR'): array
+    {
+        $enabledSettings = PaymentSetting::enabled()
+            ->availableIn($countryCode)
+            ->orderByDesc('is_default')
+            ->get();
+
+        $availableMethods = [];
+        $gateways = [];
+        $hasRecurringSupport = false;
+
+        foreach ($enabledSettings as $setting) {
+            foreach ($setting->enabled_payment_types as $paymentType) {
+                // Only add if not already added (first gateway wins - by is_default priority)
+                if (! isset($gateways[$paymentType])) {
+                    $availableMethods[] = $paymentType;
+                    $gateways[$paymentType] = $setting->gateway;
+
+                    // Card payments support recurring
+                    if ($paymentType === 'card') {
+                        $hasRecurringSupport = true;
+                    }
+                }
+            }
+        }
+
+        // Determine default method (card if available, otherwise first)
+        $defaultMethod = in_array('card', $availableMethods) ? 'card' : ($availableMethods[0] ?? 'card');
+
+        return [
+            'available_methods' => $availableMethods,
+            'default_method' => $defaultMethod,
+            'gateways' => $gateways,
+            'has_recurring_support' => $hasRecurringSupport,
+        ];
+    }
+
+    /**
+     * Get the enabled gateway for a specific payment method.
+     *
+     * Used by CartCheckoutService to route payments to the correct gateway.
+     *
+     * @param  string  $paymentMethod  The payment method (card, pix, boleto)
+     * @param  string  $countryCode  ISO country code
+     */
+    public function getEnabledGatewayForMethod(string $paymentMethod, string $countryCode = 'BR'): ?PaymentSetting
+    {
+        return PaymentSetting::enabled()
+            ->availableIn($countryCode)
+            ->supporting($paymentMethod)
+            ->orderByDesc('is_default')
+            ->first();
+    }
+
+    /**
+     * Check if a payment method is available for checkout.
+     *
+     * @param  string  $paymentMethod  The payment method (card, pix, boleto)
+     * @param  string  $countryCode  ISO country code
+     */
+    public function isPaymentMethodAvailable(string $paymentMethod, string $countryCode = 'BR'): bool
+    {
+        return $this->getEnabledGatewayForMethod($paymentMethod, $countryCode) !== null;
+    }
 }

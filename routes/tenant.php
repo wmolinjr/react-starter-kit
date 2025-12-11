@@ -290,6 +290,8 @@ Route::middleware([
                 // Async payment status (PIX/Boleto)
                 Route::post('/cart-payment-status', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'checkCartPaymentStatus'])->name('cart-payment-status');
                 Route::post('/pix-refresh', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'refreshPixQrCode'])->name('pix-refresh');
+                // Asaas card payment completion
+                Route::post('/asaas-card-payment', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'completeAsaasCardPayment'])->name('asaas-card-payment');
 
                 // Subscription management
                 Route::get('/subscription', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'subscription'])->name('subscription');

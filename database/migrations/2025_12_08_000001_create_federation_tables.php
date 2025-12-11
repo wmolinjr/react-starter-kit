@@ -131,7 +131,7 @@ return new class extends Migration
             $table->integer('sync_version')->default(1);
 
             // Status
-            $table->enum('status', ['active', 'suspended', 'pending_review'])->default('active');
+            $table->enum('status', ['active', 'suspended', 'pending_review', 'pending_master_sync'])->default('active');
 
             $table->timestamps();
             $table->softDeletes();

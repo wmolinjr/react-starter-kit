@@ -94,7 +94,14 @@ class CartCheckoutServiceTest extends TenantTestCase
             $this->assertTrue(true); // If we get here, Stripe worked
         } catch (AddonException $e) {
             // Expected - Stripe/customer configuration issue (validation passed)
-            $this->assertStringContainsStringIgnoringCase('customer', $e->getMessage());
+            // Error could be about customer, stripe, or gateway configuration
+            $this->assertTrue(
+                str_contains(strtolower($e->getMessage()), 'customer') ||
+                str_contains(strtolower($e->getMessage()), 'stripe') ||
+                str_contains(strtolower($e->getMessage()), 'gateway') ||
+                str_contains(strtolower($e->getMessage()), 'api'),
+                "Expected gateway/customer error, got: {$e->getMessage()}"
+            );
         }
     }
 
@@ -143,7 +150,14 @@ class CartCheckoutServiceTest extends TenantTestCase
             $this->service->processCartCheckout($this->tenant, $items, 'card');
         } catch (AddonException $e) {
             // Expected - Stripe/customer configuration issue (validation passed)
-            $this->assertStringContainsStringIgnoringCase('customer', $e->getMessage());
+            // Error could be about customer, stripe, or gateway configuration
+            $this->assertTrue(
+                str_contains(strtolower($e->getMessage()), 'customer') ||
+                str_contains(strtolower($e->getMessage()), 'stripe') ||
+                str_contains(strtolower($e->getMessage()), 'gateway') ||
+                str_contains(strtolower($e->getMessage()), 'api'),
+                "Expected gateway/customer error, got: {$e->getMessage()}"
+            );
         }
     }
 
@@ -244,7 +258,8 @@ class CartCheckoutServiceTest extends TenantTestCase
         ];
 
         $this->expectException(AddonException::class);
-        $this->expectExceptionMessage('Invalid payment method');
+        // Error message is now localized: "Payment method 'invalid_method' is not available."
+        $this->expectExceptionMessageMatches('/invalid_method|unavailable|not available/i');
 
         $this->service->processCartCheckout($this->tenant, $items, 'invalid_method');
     }

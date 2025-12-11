@@ -7,12 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\CartCheckoutRequest;
 use App\Http\Requests\Tenant\CheckoutRequest;
 use App\Http\Resources\Central\BundleResource;
+use App\Http\Resources\Central\PaymentConfigResource;
 use App\Http\Resources\Central\PlanResource;
 use App\Http\Resources\Tenant\InvoiceDetailResource;
 use App\Http\Resources\Tenant\InvoiceResource;
 use App\Models\Central\Plan;
 use App\Services\Central\AddonService;
 use App\Services\Central\CartCheckoutService;
+use App\Services\Central\PaymentSettingsService;
 use App\Services\Tenant\BillingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +30,8 @@ class BillingController extends Controller implements HasMiddleware
     public function __construct(
         protected BillingService $billingService,
         protected AddonService $addonService,
-        protected CartCheckoutService $cartCheckoutService
+        protected CartCheckoutService $cartCheckoutService,
+        protected PaymentSettingsService $paymentSettingsService
     ) {}
 
     /**
@@ -38,7 +41,7 @@ class BillingController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'cartSuccess', 'plans', 'bundles', 'subscription']),
-            new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal', 'cartCheckout', 'checkCartPaymentStatus', 'refreshPixQrCode', 'cancelSubscription', 'resumeSubscription', 'pauseSubscription', 'unpauseSubscription', 'changePlan']),
+            new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal', 'cartCheckout', 'completeAsaasCardPayment', 'checkCartPaymentStatus', 'refreshPixQrCode', 'cancelSubscription', 'resumeSubscription', 'pauseSubscription', 'unpauseSubscription', 'changePlan']),
             new Middleware('permission:'.TenantPermission::BILLING_INVOICES->value, only: ['invoices', 'invoice']),
         ];
     }
@@ -129,6 +132,9 @@ class BillingController extends Controller implements HasMiddleware
             'activeBundles' => $activeBundles,
             'activeAddonSlugs' => $activeAddonSlugs,
             'currentPlan' => $tenant->plan ? new PlanResource($tenant->plan) : null,
+            'paymentConfig' => new PaymentConfigResource(
+                $this->paymentSettingsService->getAvailablePaymentMethods()
+            ),
         ]);
     }
 
@@ -196,12 +202,13 @@ class BillingController extends Controller implements HasMiddleware
             $paymentMethod
         );
 
-        // For card payments, redirect to Stripe Checkout
+        // For Stripe card payments, redirect to Stripe Checkout
         if ($result['type'] === 'redirect') {
             return Inertia::location($result['url']);
         }
 
-        // For PIX/Boleto, return JSON response for frontend handling
+        // For Asaas card, PIX, or Boleto, return JSON response for frontend handling
+        // (asaas_card requires card form, pix/boleto show async payment UI)
         return response()->json($result);
     }
 
@@ -237,6 +244,50 @@ class BillingController extends Controller implements HasMiddleware
         }
 
         return response()->json(['pix' => $pixData]);
+    }
+
+    /**
+     * Complete Asaas card payment with card data.
+     *
+     * This endpoint is called after the frontend collects card data
+     * for Asaas gateway payments.
+     */
+    public function completeAsaasCardPayment(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'purchase_id' => ['required', 'string', 'uuid'],
+            'card' => ['required', 'array'],
+            'card.holder_name' => ['required', 'string', 'max:100'],
+            'card.number' => ['required', 'string', 'digits_between:13,19'],
+            'card.exp_month' => ['required', 'string', 'digits:2'],
+            'card.exp_year' => ['required', 'string', 'digits:4'],
+            'card.cvv' => ['required', 'string', 'digits_between:3,4'],
+            'holder' => ['required', 'array'],
+            'holder.name' => ['required', 'string', 'max:100'],
+            'holder.email' => ['required', 'email', 'max:100'],
+            'holder.cpf_cnpj' => ['required', 'string', 'max:18'],
+            'holder.postal_code' => ['required', 'string', 'max:10'],
+            'holder.address_number' => ['required', 'string', 'max:10'],
+            'holder.address_complement' => ['nullable', 'string', 'max:100'],
+            'holder.phone' => ['nullable', 'string', 'max:20'],
+            'installments' => ['sometimes', 'integer', 'min:1', 'max:12'],
+        ]);
+
+        $result = $this->cartCheckoutService->completeAsaasCardPayment(
+            $validated['purchase_id'],
+            $validated['card'],
+            $validated['holder'],
+            [
+                'installments' => $validated['installments'] ?? 1,
+                'remote_ip' => $request->ip(),
+            ]
+        );
+
+        if ($result['success']) {
+            return response()->json($result);
+        }
+
+        return response()->json($result, 422);
     }
 
     /**

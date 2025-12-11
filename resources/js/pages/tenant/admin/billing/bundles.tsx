@@ -24,7 +24,7 @@ import {
     CheckoutPaymentSheet,
 } from '@/components/shared/billing';
 import { BillingPeriodProvider, useBillingPeriod, useCheckout, createCheckoutItem } from '@/hooks/billing';
-import type { BreadcrumbItem, PlanResource, BundleResource } from '@/types';
+import type { BreadcrumbItem, PlanResource, BundleResource, PaymentConfigResource } from '@/types';
 
 interface ActiveBundle {
     purchase_id: string;
@@ -41,6 +41,7 @@ interface BundlesPageProps {
     activeBundles: ActiveBundle[];
     activeAddonSlugs: string[];
     currentPlan: PlanResource | null;
+    paymentConfig?: PaymentConfigResource;
     [key: string]: unknown;
 }
 
@@ -48,6 +49,7 @@ function BundlesPageContent({
     bundles,
     activeBundles,
     activeAddonSlugs,
+    paymentConfig,
 }: BundlesPageProps) {
     const { t } = useLaravelReactI18n();
     const { period, setPeriod } = useBillingPeriod();
@@ -280,7 +282,7 @@ function BundlesPageContent({
                 currency="BRL"
                 showBillingToggle={true}
                 yearlySavings={t('billing.yearly_savings', { default: 'Save 20%' })}
-                availableMethods={['card', 'pix', 'boleto']}
+                paymentConfig={paymentConfig}
                 hasRecurring={hasRecurringItems}
             />
         </>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { router } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -31,11 +31,13 @@ import {
 } from '../payment-method-selector';
 import { PixPayment } from '../pix-payment';
 import { BoletoPayment } from '../boleto-payment';
+import { AsaasCardForm } from '../asaas-card-form';
 import type { CheckoutItem, PlanChangeInfo } from '@/types/billing';
 import type { BillingPeriod } from '@/types/enums';
-import { cartCheckout, cartPaymentStatus } from '@/routes/tenant/admin/billing';
+import type { PaymentConfigResource } from '@/types';
+import { cartCheckout, cartPaymentStatus, asaasCardPayment } from '@/routes/tenant/admin/billing';
 
-type CheckoutStep = 'cart' | 'payment' | 'async-payment' | 'success';
+type CheckoutStep = 'cart' | 'payment' | 'async-payment' | 'asaas-card' | 'success';
 
 // Animation configuration for step transitions
 const stepAnimationClasses = {
@@ -68,6 +70,18 @@ interface AsyncPaymentResult {
     due_date?: string;
 }
 
+interface AsaasCardPaymentResult {
+    type: 'asaas_card';
+    purchase_id: string;
+    amount: number;
+    gateway: string;
+    requires_card_data: boolean;
+    required_fields?: {
+        card: string[];
+        holder: string[];
+    };
+}
+
 export interface CheckoutPaymentSheetProps {
     /** Whether the sheet is open */
     open: boolean;
@@ -93,7 +107,14 @@ export interface CheckoutPaymentSheetProps {
     showBillingToggle?: boolean;
     /** Yearly savings text (e.g., "Save 20%") */
     yearlySavings?: string;
-    /** Available payment methods */
+    /**
+     * Payment configuration from backend (preferred).
+     * Takes precedence over availableMethods.
+     */
+    paymentConfig?: PaymentConfigResource;
+    /**
+     * @deprecated Use paymentConfig instead. Kept for backward compatibility.
+     */
     availableMethods?: PaymentMethod[];
     /** Whether recurring items are in cart (disables pix/boleto) */
     hasRecurring?: boolean;
@@ -133,7 +154,8 @@ export function CheckoutPaymentSheet({
     planChange,
     showBillingToggle = true,
     yearlySavings,
-    availableMethods = ['card', 'pix', 'boleto'],
+    paymentConfig,
+    availableMethods: legacyAvailableMethods = ['card', 'pix', 'boleto'],
     hasRecurring = false,
     side = 'right',
     className,
@@ -145,10 +167,16 @@ export function CheckoutPaymentSheet({
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [asyncPaymentResult, setAsyncPaymentResult] =
         useState<AsyncPaymentResult | null>(null);
+    const [asaasCardResult, setAsaasCardResult] =
+        useState<AsaasCardPaymentResult | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [animationDirection, setAnimationDirection] = useState<'forward' | 'back'>('forward');
     const [isAnimating, setIsAnimating] = useState(false);
-    const contentRef = useRef<HTMLDivElement>(null);
+
+    // Use paymentConfig from backend if available, otherwise fall back to legacy prop
+    const availableMethods: PaymentMethod[] = paymentConfig
+        ? (paymentConfig.available_methods as PaymentMethod[])
+        : legacyAvailableMethods;
 
     // Handle animated step transition
     const goToStep = useCallback((newStep: CheckoutStep, direction: 'forward' | 'back' = 'forward') => {
@@ -163,6 +191,7 @@ export function CheckoutPaymentSheet({
     }, []);
 
     // Filter out pix/boleto if cart has recurring items
+    // Also respect paymentConfig.has_recurring_support if available
     const effectiveAvailableMethods = hasRecurring
         ? availableMethods.filter((m) => m === 'card')
         : availableMethods;
@@ -226,31 +255,8 @@ export function CheckoutPaymentSheet({
 
         const cartItems = buildCartItems();
 
-        if (selectedPaymentMethod === 'card') {
-            // For card, use Inertia to redirect to Stripe Checkout
-            router.post(
-                cartCheckout.url(),
-                {
-                    items: cartItems,
-                    payment_method: 'card',
-                },
-                {
-                    preserveScroll: true,
-                    onError: (errors) => {
-                        setError(
-                            errors.message ||
-                                t('billing.errors.checkout_failed', {
-                                    default: 'Checkout failed',
-                                }),
-                        );
-                        setIsCheckingOut(false);
-                    },
-                },
-            );
-            return;
-        }
-
-        // For PIX/Boleto, make a fetch request to get the payment data
+        // For all payment methods, make a fetch request first
+        // This allows us to handle both Stripe redirect and Asaas card form
         try {
             const response = await fetch(cartCheckout.url(), {
                 method: 'POST',
@@ -282,8 +288,25 @@ export function CheckoutPaymentSheet({
                 );
             }
 
-            const result: AsyncPaymentResult = await response.json();
-            setAsyncPaymentResult(result);
+            const result = await response.json();
+
+            // Handle different response types
+            if (result.type === 'redirect') {
+                // Stripe card checkout - redirect to Stripe hosted page
+                window.location.href = result.url;
+                return;
+            }
+
+            if (result.type === 'asaas_card') {
+                // Asaas card checkout - show card form
+                setAsaasCardResult(result as AsaasCardPaymentResult);
+                goToStep('asaas-card', 'forward');
+                setIsCheckingOut(false);
+                return;
+            }
+
+            // PIX or Boleto - show async payment UI
+            setAsyncPaymentResult(result as AsyncPaymentResult);
             goToStep('async-payment', 'forward');
         } catch (err) {
             setError(
@@ -322,7 +345,19 @@ export function CheckoutPaymentSheet({
         } else if (step === 'async-payment') {
             goToStep('payment', 'back');
             setAsyncPaymentResult(null);
+        } else if (step === 'asaas-card') {
+            goToStep('payment', 'back');
+            setAsaasCardResult(null);
         }
+    };
+
+    // Handle Asaas card payment success
+    const handleAsaasCardSuccess = () => {
+        goToStep('success', 'forward');
+        // Clear cart after showing success
+        setTimeout(() => {
+            onClearCart?.();
+        }, 500);
     };
 
     // Reset state when closing
@@ -330,6 +365,7 @@ export function CheckoutPaymentSheet({
         if (!isOpen) {
             setStep('cart');
             setAsyncPaymentResult(null);
+            setAsaasCardResult(null);
             setError(null);
         }
         onOpenChange(isOpen);
@@ -350,6 +386,10 @@ export function CheckoutPaymentSheet({
                     : t('billing.boleto_payment', {
                           default: 'Boleto Payment',
                       });
+            case 'asaas-card':
+                return t('billing.card_payment', {
+                    default: 'Card Payment',
+                });
             case 'success':
                 return t('billing.payment_successful', {
                     default: 'Payment Successful',
@@ -729,6 +769,20 @@ export function CheckoutPaymentSheet({
                             ? renderPixPayment()
                             : renderBoletoPayment()}
                     </div>
+                )}
+
+                {/* Step: Asaas Card Payment */}
+                {step === 'asaas-card' && asaasCardResult && (
+                    <ScrollArea className={cn('-mx-6 flex-1 px-6', getAnimationClass())}>
+                        <AsaasCardForm
+                            purchaseId={asaasCardResult.purchase_id}
+                            amount={asaasCardResult.amount}
+                            formattedAmount={formatPrice(asaasCardResult.amount)}
+                            submitEndpoint={asaasCardPayment.url()}
+                            onSuccess={handleAsaasCardSuccess}
+                            onError={(err) => setError(err)}
+                        />
+                    </ScrollArea>
                 )}
 
                 {/* Step: Success */}

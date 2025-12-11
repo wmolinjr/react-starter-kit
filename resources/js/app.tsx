@@ -1,6 +1,6 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { LaravelReactI18nProvider } from 'laravel-react-i18n';
 import { StrictMode, type ComponentType, type ReactNode, type ReactElement } from 'react';
@@ -10,6 +10,26 @@ import { Toaster } from './components/ui/sonner';
 import { FlashMessages } from './components/shared/feedback/flash-messages';
 import { BreadcrumbProvider } from './contexts/breadcrumb-context';
 import { CheckoutProvider, BillingPeriodProvider } from './hooks/billing';
+
+/**
+ * Inertia v2: Handle invalid (non-Inertia) responses.
+ *
+ * This prevents the default modal from showing when we intentionally
+ * return JSON responses from API endpoints (like checkout, payments, etc.)
+ *
+ * @see https://inertiajs.com/events#invalid
+ */
+router.on('invalid', (event) => {
+    const response = event.detail.response;
+
+    // Check if this is an expected JSON API response (not an error)
+    // We cancel the event to prevent the Inertia error modal
+    const contentType = response.headers?.['content-type'] as string | undefined;
+    if (contentType?.includes('application/json')) {
+        event.preventDefault();
+        return false;
+    }
+});
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

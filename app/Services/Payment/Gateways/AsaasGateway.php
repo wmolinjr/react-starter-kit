@@ -491,6 +491,18 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
 
     /**
      * Create a subscription.
+     *
+     * Supports credit card subscriptions when credit_card and credit_card_holder_info
+     * are provided in options.
+     *
+     * @param  array  $options  Additional options:
+     *                          - billing_type: CREDIT_CARD, BOLETO, PIX
+     *                          - amount: Amount in cents
+     *                          - cycle: WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, SEMIANNUALLY, YEARLY
+     *                          - description: Subscription description
+     *                          - start_date: First charge date (Y-m-d)
+     *                          - credit_card: Card data for CREDIT_CARD billing
+     *                          - credit_card_holder_info: Holder info for CREDIT_CARD billing
      */
     public function createSubscription(Customer $customer, string $priceId, array $options = []): SubscriptionResult
     {
@@ -499,16 +511,47 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
         $billingType = $options['billing_type'] ?? 'CREDIT_CARD';
         $cycle = $options['cycle'] ?? 'MONTHLY';
 
+        $subscriptionData = [
+            'customer' => $asaasId,
+            'billingType' => $billingType,
+            'value' => ($options['amount'] ?? 0) / 100,
+            'nextDueDate' => $options['start_date'] ?? now()->addDays(1)->format('Y-m-d'),
+            'cycle' => $cycle,
+            'description' => $options['description'] ?? 'Subscription',
+            'externalReference' => $priceId,
+        ];
+
+        // Add credit card data for CREDIT_CARD billing type
+        if ($billingType === 'CREDIT_CARD' && isset($options['credit_card'])) {
+            $cardData = $options['credit_card'];
+            $subscriptionData['creditCard'] = [
+                'holderName' => $cardData['holder_name'],
+                'number' => $cardData['number'],
+                'expiryMonth' => $cardData['exp_month'],
+                'expiryYear' => $cardData['exp_year'],
+                'ccv' => $cardData['cvv'],
+            ];
+
+            if (isset($options['credit_card_holder_info'])) {
+                $holderInfo = $options['credit_card_holder_info'];
+                $subscriptionData['creditCardHolderInfo'] = [
+                    'name' => $holderInfo['name'],
+                    'email' => $holderInfo['email'],
+                    'cpfCnpj' => preg_replace('/\D/', '', $holderInfo['cpf_cnpj']),
+                    'postalCode' => preg_replace('/\D/', '', $holderInfo['postal_code']),
+                    'addressNumber' => $holderInfo['address_number'],
+                    'addressComplement' => $holderInfo['address_complement'] ?? null,
+                    'phone' => $holderInfo['phone'] ?? null,
+                    'mobilePhone' => $holderInfo['mobile_phone'] ?? null,
+                ];
+            }
+
+            // Add remote IP for fraud prevention
+            $subscriptionData['remoteIp'] = $options['remote_ip'] ?? request()->ip();
+        }
+
         try {
-            $response = $this->http()->post('/subscriptions', [
-                'customer' => $asaasId,
-                'billingType' => $billingType,
-                'value' => ($options['amount'] ?? 0) / 100,
-                'nextDueDate' => $options['start_date'] ?? now()->addDays(1)->format('Y-m-d'),
-                'cycle' => $cycle,
-                'description' => $options['description'] ?? 'Subscription',
-                'externalReference' => $priceId,
-            ]);
+            $response = $this->http()->post('/subscriptions', $subscriptionData);
 
             if ($response->failed()) {
                 return new SubscriptionResult(

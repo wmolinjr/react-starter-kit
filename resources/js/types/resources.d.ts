@@ -322,6 +322,13 @@ export interface PaymentAdminResource {
     formatted_refundable_amount: string;
 }
 
+export interface PaymentConfigResource {
+    available_methods: ('card' | 'pix' | 'boleto')[];
+    default_method: 'card' | 'pix' | 'boleto';
+    gateways: Record<'card' | 'pix' | 'boleto', string>;
+    has_recurring_support: boolean;
+}
+
 export interface PaymentMethodResource {
     id: string;
     type: 'card' | 'pix' | 'boleto' | 'bank_transfer';

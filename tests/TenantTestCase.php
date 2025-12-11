@@ -38,6 +38,9 @@ abstract class TenantTestCase extends TestCase
         // Seed addons for test (required for addon tests)
         \Artisan::call('db:seed', ['--class' => 'AddonSeeder']);
 
+        // Seed payment settings for checkout tests
+        $this->seedPaymentSettingsForTests();
+
         // Get professional plan for testing (has good limits)
         $professionalPlan = \App\Models\Central\Plan::where('slug', 'professional')->first();
 
@@ -179,6 +182,47 @@ abstract class TenantTestCase extends TestCase
 
         // Create tenant roles directly (like SeedTenantDatabase does in production)
         $this->seedTenantRolesForTests();
+    }
+
+    /**
+     * Seed payment settings for checkout tests.
+     * Creates Stripe (card) and Asaas (pix, boleto) gateways.
+     */
+    protected function seedPaymentSettingsForTests(): void
+    {
+        // Stripe for card payments (default)
+        \App\Models\Central\PaymentSetting::firstOrCreate(
+            ['gateway' => 'stripe'],
+            [
+                'display_name' => 'Stripe',
+                'is_enabled' => true,
+                'is_sandbox' => true,
+                'is_default' => true,
+                'enabled_payment_types' => ['card'],
+                'available_countries' => [],
+                'sandbox_credentials' => [
+                    'secret_key' => 'sk_test_fake',
+                    'publishable_key' => 'pk_test_fake',
+                    'webhook_secret' => 'whsec_fake',
+                ],
+            ]
+        );
+
+        // Asaas for Brazilian payments (PIX, Boleto)
+        \App\Models\Central\PaymentSetting::firstOrCreate(
+            ['gateway' => 'asaas'],
+            [
+                'display_name' => 'Asaas',
+                'is_enabled' => true,
+                'is_sandbox' => true,
+                'is_default' => false,
+                'enabled_payment_types' => ['card', 'pix', 'boleto'],
+                'available_countries' => ['BR'],
+                'sandbox_credentials' => [
+                    'api_key' => 'test_api_key_fake',
+                ],
+            ]
+        );
     }
 
     /**

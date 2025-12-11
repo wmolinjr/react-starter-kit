@@ -3,12 +3,13 @@
 namespace App\Services\Central;
 
 use App\Enums\BillingPeriod;
+use App\Enums\PaymentGateway;
 use App\Exceptions\Central\AddonException;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonBundle;
 use App\Models\Central\AddonPurchase;
+use App\Models\Central\PaymentSetting;
 use App\Models\Central\Tenant;
-use App\Services\Payment\Gateways\AsaasGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
@@ -19,7 +20,8 @@ class CartCheckoutService
 
     public function __construct(
         protected AddonService $addonService,
-        protected PaymentGatewayManager $gatewayManager
+        protected PaymentGatewayManager $gatewayManager,
+        protected PaymentSettingsService $paymentSettingsService
     ) {
         $secret = config('payment.drivers.stripe.secret');
         if ($secret) {
@@ -28,7 +30,30 @@ class CartCheckoutService
     }
 
     /**
+     * Resolve the enabled gateway for a payment method.
+     *
+     * Uses PaymentSettingsService to determine which gateway should handle
+     * the payment method based on admin configuration.
+     *
+     * @throws AddonException if no gateway is enabled for the payment method
+     */
+    protected function resolveGatewayForPaymentMethod(string $paymentMethod): PaymentSetting
+    {
+        $setting = $this->paymentSettingsService->getEnabledGatewayForMethod($paymentMethod);
+
+        if (! $setting) {
+            throw new AddonException(
+                __('billing.errors.payment_method_unavailable', ['method' => $paymentMethod])
+            );
+        }
+
+        return $setting;
+    }
+
+    /**
      * Process cart checkout with multi-payment method support.
+     *
+     * Routes payments to the configured gateway based on PaymentSettings.
      *
      * @param  array<int, array{type: string, slug: string, quantity: int, billing_period: string}>  $items
      * @param  string  $paymentMethod  Payment method type: 'card', 'pix', 'boleto'
@@ -39,6 +64,11 @@ class CartCheckoutService
         array $items,
         string $paymentMethod = 'card'
     ): array {
+        // Resolve gateway from PaymentSettings - validates method is available
+        $paymentSetting = $this->resolveGatewayForPaymentMethod($paymentMethod);
+        // PaymentSetting model already casts gateway to PaymentGateway enum
+        $gateway = $paymentSetting->gateway;
+
         // Validate items and calculate total
         $lineItems = [];
         $totalAmount = 0;
@@ -62,20 +92,49 @@ class CartCheckoutService
             );
         }
 
+        // Route to appropriate gateway based on payment method and configuration
         return match ($paymentMethod) {
-            'card' => $this->processCardCheckout($tenant, $items, $lineItems, $hasRecurring),
-            'pix' => $this->processPixCheckout($tenant, $items, $lineItems, $totalAmount),
-            'boleto' => $this->processBoletoCheckout($tenant, $items, $lineItems, $totalAmount),
+            'card' => $this->processCardCheckout($tenant, $items, $lineItems, $hasRecurring, $gateway),
+            'pix' => $this->processPixCheckout($tenant, $items, $lineItems, $totalAmount, $gateway),
+            'boleto' => $this->processBoletoCheckout($tenant, $items, $lineItems, $totalAmount, $gateway),
             default => throw new AddonException('Invalid payment method: '.$paymentMethod),
         };
     }
 
     /**
-     * Process card checkout via Stripe.
+     * Process card checkout via configured gateway.
+     *
+     * Routes to appropriate gateway:
+     * - Stripe: Uses hosted Checkout sessions (redirect)
+     * - Asaas: Returns purchase ID for card form submission
+     *
+     * @return array{type: string, ...}
+     */
+    protected function processCardCheckout(
+        Tenant $tenant,
+        array $items,
+        array $lineItems,
+        bool $hasRecurring,
+        PaymentGateway $gateway
+    ): array {
+        return match ($gateway) {
+            PaymentGateway::STRIPE => $this->processStripeCardCheckout($tenant, $items, $lineItems, $hasRecurring),
+            PaymentGateway::ASAAS => $this->processAsaasCardCheckout($tenant, $items, $lineItems, $hasRecurring),
+            default => throw new AddonException(
+                __('billing.errors.gateway_not_supported_for_method', [
+                    'gateway' => $gateway->displayName(),
+                    'method' => 'card',
+                ])
+            ),
+        };
+    }
+
+    /**
+     * Process card checkout via Stripe Checkout Sessions.
      *
      * @return array{type: string, session_id: string, url: string}
      */
-    protected function processCardCheckout(
+    protected function processStripeCardCheckout(
         Tenant $tenant,
         array $items,
         array $lineItems,
@@ -125,7 +184,256 @@ class CartCheckoutService
     }
 
     /**
-     * Process PIX checkout via Asaas.
+     * Process card checkout via Asaas.
+     *
+     * Asaas requires card data to be submitted directly (not hosted checkout).
+     * This method creates a pending purchase and returns it for the frontend
+     * to collect card data and complete the payment.
+     *
+     * Supports both one-time charges and recurring subscriptions with credit card.
+     *
+     * @return array{type: string, purchase_id: string, amount: int, gateway: string, requires_card_data: bool}
+     */
+    protected function processAsaasCardCheckout(
+        Tenant $tenant,
+        array $items,
+        array $lineItems,
+        bool $hasRecurring
+    ): array {
+        $customer = $tenant->customer;
+        if (! $customer) {
+            throw new AddonException('Tenant has no associated customer for billing');
+        }
+
+        // Calculate total amount
+        $totalAmount = array_reduce($lineItems, function ($carry, $item) {
+            return $carry + ($item['amount'] * $item['quantity']);
+        }, 0);
+
+        // Separate recurring and one-time items for processing
+        $recurringItems = array_filter($lineItems, fn ($item) => $item['recurring'] ?? false);
+        $oneTimeItems = array_filter($lineItems, fn ($item) => ! ($item['recurring'] ?? false));
+
+        // Create pending purchase with recurring info in metadata
+        $purchase = $this->createPendingPurchase(
+            $tenant,
+            $items,
+            $totalAmount,
+            'card',
+            PaymentGateway::ASAAS,
+            [
+                'has_recurring' => $hasRecurring,
+                'line_items' => $lineItems,
+                'recurring_items' => array_values($recurringItems),
+                'one_time_items' => array_values($oneTimeItems),
+            ]
+        );
+
+        Log::info('Asaas card checkout initiated', [
+            'tenant_id' => $tenant->id,
+            'purchase_id' => $purchase->id,
+            'amount' => $totalAmount,
+            'items_count' => count($items),
+            'has_recurring' => $hasRecurring,
+            'recurring_count' => count($recurringItems),
+            'one_time_count' => count($oneTimeItems),
+        ]);
+
+        return [
+            'type' => 'asaas_card',
+            'purchase_id' => $purchase->id,
+            'amount' => $totalAmount,
+            'gateway' => 'asaas',
+            'requires_card_data' => true,
+            'has_recurring' => $hasRecurring,
+            'required_fields' => [
+                'card' => ['holder_name', 'number', 'exp_month', 'exp_year', 'cvv'],
+                'holder' => ['name', 'email', 'cpf_cnpj', 'postal_code', 'address_number'],
+            ],
+        ];
+    }
+
+    /**
+     * Complete Asaas card payment with card data.
+     *
+     * Called after the frontend collects card data from the user.
+     * Supports both one-time charges and recurring subscriptions.
+     *
+     * @param  string  $purchaseId  The pending purchase ID
+     * @param  array  $cardData  Card details: holder_name, number, exp_month, exp_year, cvv
+     * @param  array  $holderInfo  Holder details: name, email, cpf_cnpj, postal_code, address_number
+     * @return array{success: bool, message?: string, card?: array}
+     */
+    public function completeAsaasCardPayment(
+        string $purchaseId,
+        array $cardData,
+        array $holderInfo,
+        array $options = []
+    ): array {
+        $purchase = AddonPurchase::findOrFail($purchaseId);
+
+        // Validate purchase is pending and for card payment
+        if ($purchase->status !== 'pending') {
+            throw new AddonException(__('billing.errors.purchase_not_pending'));
+        }
+
+        if ($purchase->payment_method !== 'card') {
+            throw new AddonException(__('billing.errors.invalid_payment_method'));
+        }
+
+        $tenant = $purchase->tenant;
+        $customer = $tenant->customer;
+
+        if (! $customer) {
+            throw new AddonException('Tenant has no associated customer for billing');
+        }
+
+        // Get Asaas gateway instance
+        $gateway = $this->gatewayManager->gateway('asaas');
+
+        // Check if we have recurring items
+        $hasRecurring = $purchase->metadata['has_recurring'] ?? false;
+        $recurringItems = $purchase->metadata['recurring_items'] ?? [];
+        $oneTimeItems = $purchase->metadata['one_time_items'] ?? [];
+
+        try {
+            $providerPaymentIds = [];
+            $subscriptionIds = [];
+            $cardInfo = null;
+
+            // Process one-time items with direct charge
+            if (! empty($oneTimeItems)) {
+                $oneTimeAmount = array_reduce($oneTimeItems, function ($carry, $item) {
+                    return $carry + ($item['amount'] * $item['quantity']);
+                }, 0);
+
+                $chargeResult = $gateway->createCardChargeWithData(
+                    $customer,
+                    $oneTimeAmount,
+                    $cardData,
+                    $holderInfo,
+                    [
+                        'description' => $this->buildCartDescription($purchase->metadata['cart_items'] ?? []),
+                        'reference' => 'addon_purchase_'.$purchase->id,
+                        'installments' => $options['installments'] ?? 1,
+                        'remote_ip' => $options['remote_ip'] ?? request()->ip(),
+                    ]
+                );
+
+                if (! $chargeResult->success) {
+                    $purchase->markAsFailed($chargeResult->failureMessage ?? 'Card charge failed');
+
+                    return [
+                        'success' => false,
+                        'message' => $chargeResult->failureMessage ?? __('billing.errors.card_charge_failed'),
+                    ];
+                }
+
+                $providerPaymentIds[] = $chargeResult->providerPaymentId;
+                $cardInfo = [
+                    'last_four' => $chargeResult->providerData['card']['last_four'] ?? null,
+                    'brand' => $chargeResult->providerData['card']['brand'] ?? null,
+                    'token' => $chargeResult->providerData['card']['token'] ?? null,
+                ];
+            }
+
+            // Process recurring items with subscriptions
+            if (! empty($recurringItems)) {
+                foreach ($recurringItems as $item) {
+                    $subscriptionResult = $gateway->createSubscription(
+                        $customer,
+                        $item['slug'] ?? 'addon_subscription',
+                        [
+                            'billing_type' => 'CREDIT_CARD',
+                            'amount' => $item['amount'] * $item['quantity'],
+                            'cycle' => $this->mapBillingPeriodToCycle($item['billing_period'] ?? 'monthly'),
+                            'description' => $item['name'] ?? 'Addon Subscription',
+                            'start_date' => now()->format('Y-m-d'),
+                            'credit_card' => $cardData,
+                            'credit_card_holder_info' => $holderInfo,
+                        ]
+                    );
+
+                    if (! $subscriptionResult->success) {
+                        Log::error('Asaas subscription creation failed', [
+                            'purchase_id' => $purchaseId,
+                            'item' => $item,
+                            'error' => $subscriptionResult->failureMessage,
+                        ]);
+                        // Continue with other items, don't fail the entire purchase
+                        continue;
+                    }
+
+                    $subscriptionIds[] = $subscriptionResult->providerSubscriptionId;
+                }
+            }
+
+            // Update purchase with payment info
+            $purchase->update([
+                'provider_payment_id' => implode(',', $providerPaymentIds) ?: null,
+                'status' => 'paid',
+                'paid_at' => now(),
+                'metadata' => array_merge($purchase->metadata ?? [], [
+                    'card_last_four' => $cardInfo['last_four'] ?? null,
+                    'card_brand' => $cardInfo['brand'] ?? null,
+                    'card_token' => $cardInfo['token'] ?? null,
+                    'subscription_ids' => $subscriptionIds,
+                ]),
+            ]);
+
+            Log::info('Asaas card payment completed', [
+                'tenant_id' => $tenant->id,
+                'purchase_id' => $purchase->id,
+                'payment_ids' => $providerPaymentIds,
+                'subscription_ids' => $subscriptionIds,
+                'has_recurring' => $hasRecurring,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => __('billing.success.payment_completed'),
+                'purchase_id' => $purchase->id,
+                'card' => [
+                    'last_four' => $cardInfo['last_four'] ?? null,
+                    'brand' => $cardInfo['brand'] ?? null,
+                ],
+                'subscriptions' => $subscriptionIds,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Asaas card payment failed', [
+                'purchase_id' => $purchaseId,
+                'error' => $e->getMessage(),
+            ]);
+
+            $purchase->markAsFailed($e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Map billing period to Asaas subscription cycle.
+     */
+    protected function mapBillingPeriodToCycle(string $billingPeriod): string
+    {
+        return match ($billingPeriod) {
+            'weekly' => 'WEEKLY',
+            'biweekly' => 'BIWEEKLY',
+            'monthly' => 'MONTHLY',
+            'quarterly' => 'QUARTERLY',
+            'semiannually' => 'SEMIANNUALLY',
+            'yearly', 'annual' => 'YEARLY',
+            default => 'MONTHLY',
+        };
+    }
+
+    /**
+     * Process PIX checkout via configured gateway.
+     *
+     * Supports: Asaas, PagSeguro, MercadoPago
      *
      * @return array{type: string, payment_id: string, purchase_id: string, pix: array}
      */
@@ -133,7 +441,8 @@ class CartCheckoutService
         Tenant $tenant,
         array $items,
         array $lineItems,
-        int $totalAmount
+        int $totalAmount,
+        PaymentGateway $gateway
     ): array {
         $customer = $tenant->customer;
         if (! $customer) {
@@ -141,12 +450,12 @@ class CartCheckoutService
         }
 
         // Create pending purchase record for tracking
-        $purchase = $this->createPendingPurchase($tenant, $items, $totalAmount, 'pix');
+        $purchase = $this->createPendingPurchase($tenant, $items, $totalAmount, 'pix', $gateway);
 
-        /** @var AsaasGateway $asaas */
-        $asaas = $this->gatewayManager->gateway('asaas');
+        // Get the configured gateway instance
+        $gatewayInstance = $this->gatewayManager->gateway($gateway->value);
 
-        $result = $asaas->createPixCharge($customer, $totalAmount, [
+        $result = $gatewayInstance->createPixCharge($customer, $totalAmount, [
             'description' => $this->buildCartDescription($items),
             'reference' => 'addon_purchase_'.$purchase->id,
         ]);
@@ -165,6 +474,7 @@ class CartCheckoutService
             'tenant_id' => $tenant->id,
             'purchase_id' => $purchase->id,
             'payment_id' => $result->providerPaymentId,
+            'gateway' => $gateway->value,
             'amount' => $totalAmount,
         ]);
 
@@ -173,12 +483,15 @@ class CartCheckoutService
             'payment_id' => $result->providerPaymentId,
             'purchase_id' => $purchase->id,
             'amount' => $totalAmount,
+            'gateway' => $gateway->value,
             'pix' => $result->providerData['pix'] ?? [],
         ];
     }
 
     /**
-     * Process Boleto checkout via Asaas.
+     * Process Boleto checkout via configured gateway.
+     *
+     * Supports: Asaas, PagSeguro, MercadoPago
      *
      * @return array{type: string, payment_id: string, purchase_id: string, boleto: array}
      */
@@ -186,7 +499,8 @@ class CartCheckoutService
         Tenant $tenant,
         array $items,
         array $lineItems,
-        int $totalAmount
+        int $totalAmount,
+        PaymentGateway $gateway
     ): array {
         $customer = $tenant->customer;
         if (! $customer) {
@@ -194,12 +508,12 @@ class CartCheckoutService
         }
 
         // Create pending purchase record for tracking
-        $purchase = $this->createPendingPurchase($tenant, $items, $totalAmount, 'boleto');
+        $purchase = $this->createPendingPurchase($tenant, $items, $totalAmount, 'boleto', $gateway);
 
-        /** @var AsaasGateway $asaas */
-        $asaas = $this->gatewayManager->gateway('asaas');
+        // Get the configured gateway instance
+        $gatewayInstance = $this->gatewayManager->gateway($gateway->value);
 
-        $result = $asaas->createBoletoCharge($customer, $totalAmount, [
+        $result = $gatewayInstance->createBoletoCharge($customer, $totalAmount, [
             'description' => $this->buildCartDescription($items),
             'reference' => 'addon_purchase_'.$purchase->id,
             'due_date' => now()->addDays(3)->format('Y-m-d'),
@@ -219,6 +533,7 @@ class CartCheckoutService
             'tenant_id' => $tenant->id,
             'purchase_id' => $purchase->id,
             'payment_id' => $result->providerPaymentId,
+            'gateway' => $gateway->value,
             'amount' => $totalAmount,
         ]);
 
@@ -227,6 +542,7 @@ class CartCheckoutService
             'payment_id' => $result->providerPaymentId,
             'purchase_id' => $purchase->id,
             'amount' => $totalAmount,
+            'gateway' => $gateway->value,
             'due_date' => $result->providerData['due_date'] ?? null,
             'boleto' => $result->providerData['boleto'] ?? [],
         ];
@@ -239,7 +555,9 @@ class CartCheckoutService
         Tenant $tenant,
         array $items,
         int $totalAmount,
-        string $paymentMethod
+        string $paymentMethod,
+        PaymentGateway $gateway,
+        array $additionalMetadata = []
     ): AddonPurchase {
         // For cart purchases, we create a single purchase with cart metadata
         $firstItem = $items[0] ?? null;
@@ -254,10 +572,10 @@ class CartCheckoutService
             'status' => 'pending',
             'valid_from' => now(),
             'valid_until' => now()->addMonths(12),
-            'metadata' => [
+            'metadata' => array_merge([
                 'cart_items' => $items,
-                'payment_provider' => 'asaas',
-            ],
+                'payment_provider' => $gateway->value,
+            ], $additionalMetadata),
         ]);
     }
 
@@ -303,59 +621,91 @@ class CartCheckoutService
 
     /**
      * Check payment status for async payments (PIX/Boleto).
+     *
+     * Looks up the gateway from the purchase record and queries the appropriate provider.
      */
     public function checkPaymentStatus(string $paymentId): array
     {
-        /** @var AsaasGateway $asaas */
-        $asaas = $this->gatewayManager->gateway('asaas');
+        // Look up the purchase to find which gateway was used
+        $purchase = AddonPurchase::where('provider_payment_id', $paymentId)->first();
+        $gatewayName = $purchase?->metadata['payment_provider'] ?? 'asaas';
+
+        $gateway = $this->gatewayManager->gateway($gatewayName);
 
         try {
-            $paymentData = $asaas->retrievePayment($paymentId);
+            $paymentData = $gateway->retrievePayment($paymentId);
             $rawStatus = $paymentData['status'] ?? 'FAILED';
 
             return [
-                'status' => $this->mapAsaasPaymentStatus($rawStatus),
+                'status' => $this->mapPaymentStatus($rawStatus, $gatewayName),
                 'raw_status' => $rawStatus,
-                'payment_date' => $paymentData['paymentDate'] ?? null,
-                'confirmed_date' => $paymentData['confirmedDate'] ?? null,
+                'gateway' => $gatewayName,
+                'payment_date' => $paymentData['paymentDate'] ?? $paymentData['date_approved'] ?? null,
+                'confirmed_date' => $paymentData['confirmedDate'] ?? $paymentData['date_approved'] ?? null,
             ];
         } catch (\Exception $e) {
             Log::error('Failed to check payment status', [
                 'payment_id' => $paymentId,
+                'gateway' => $gatewayName,
                 'error' => $e->getMessage(),
             ]);
 
             return [
                 'status' => 'failed',
+                'gateway' => $gatewayName,
                 'error' => $e->getMessage(),
             ];
         }
     }
 
     /**
-     * Map Asaas payment status to internal status.
+     * Map payment status to internal status based on gateway.
      */
-    protected function mapAsaasPaymentStatus(string $status): string
+    protected function mapPaymentStatus(string $status, string $gateway): string
     {
-        return match ($status) {
-            'CONFIRMED', 'RECEIVED' => 'paid',
-            'PENDING', 'AWAITING_RISK_ANALYSIS' => 'pending',
-            'OVERDUE' => 'past_due',
-            'REFUNDED', 'REFUND_REQUESTED', 'REFUND_IN_PROGRESS' => 'refunded',
-            'CHARGEBACK_REQUESTED', 'CHARGEBACK_DISPUTE', 'AWAITING_CHARGEBACK_REVERSAL' => 'disputed',
+        return match ($gateway) {
+            'asaas' => match ($status) {
+                'CONFIRMED', 'RECEIVED' => 'paid',
+                'PENDING', 'AWAITING_RISK_ANALYSIS' => 'pending',
+                'OVERDUE' => 'past_due',
+                'REFUNDED', 'REFUND_REQUESTED', 'REFUND_IN_PROGRESS' => 'refunded',
+                'CHARGEBACK_REQUESTED', 'CHARGEBACK_DISPUTE', 'AWAITING_CHARGEBACK_REVERSAL' => 'disputed',
+                default => 'failed',
+            },
+            'mercadopago' => match ($status) {
+                'approved' => 'paid',
+                'pending', 'in_process', 'authorized' => 'pending',
+                'rejected', 'cancelled' => 'failed',
+                'refunded' => 'refunded',
+                'charged_back' => 'disputed',
+                default => 'failed',
+            },
+            'pagseguro' => match ($status) {
+                'PAID', 'AVAILABLE' => 'paid',
+                'WAITING', 'IN_ANALYSIS', 'AUTHORIZED' => 'pending',
+                'DECLINED', 'CANCELED' => 'failed',
+                'REFUNDED' => 'refunded',
+                'CONTESTED' => 'disputed',
+                default => 'failed',
+            },
             default => 'failed',
         };
     }
 
     /**
      * Refresh PIX QR code for an existing payment.
+     *
+     * Looks up the gateway from the purchase record and queries the appropriate provider.
      */
     public function refreshPixQrCode(string $paymentId): ?array
     {
-        /** @var AsaasGateway $asaas */
-        $asaas = $this->gatewayManager->gateway('asaas');
+        // Look up the purchase to find which gateway was used
+        $purchase = AddonPurchase::where('provider_payment_id', $paymentId)->first();
+        $gatewayName = $purchase?->metadata['payment_provider'] ?? 'asaas';
 
-        return $asaas->getPixQrCode($paymentId);
+        $gateway = $this->gatewayManager->gateway($gatewayName);
+
+        return $gateway->getPixQrCode($paymentId);
     }
 
     /**
