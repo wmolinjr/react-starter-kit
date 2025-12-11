@@ -139,29 +139,29 @@ export function PlanCard({
         const badgeKey = plan.badge as string;
         const badgeMap: Record<string, { text: string; variant: string }> = {
             most_popular: {
-                text: t('billing.badge.most_popular', { default: 'Most Popular' }),
+                text: t('enums.badge.preset.most_popular', { default: 'Most Popular' }),
                 variant: 'popular',
             },
             best_value: {
-                text: t('billing.badge.best_value', { default: 'Best Value' }),
+                text: t('enums.badge.preset.best_value', { default: 'Best Value' }),
                 variant: 'best-value',
             },
             best_for_teams: {
-                text: t('billing.badge.best_for_teams', { default: 'Best for Teams' }),
+                text: t('enums.badge.preset.best_for_teams', { default: 'Best for Teams' }),
                 variant: 'recommended',
             },
             enterprise: {
-                text: t('billing.badge.enterprise', { default: 'Enterprise' }),
+                text: t('enums.badge.preset.enterprise', { default: 'Enterprise' }),
                 variant: 'default',
             },
             recommended: {
-                text: t('billing.badge.recommended', { default: 'Recommended' }),
+                text: t('enums.badge.preset.recommended', { default: 'Recommended' }),
                 variant: 'recommended',
             },
-            new: { text: t('billing.badge.new', { default: 'New' }), variant: 'new' },
-            pro: { text: t('billing.badge.pro', { default: 'Pro' }), variant: 'popular' },
+            new: { text: t('enums.badge.preset.new', { default: 'New' }), variant: 'new' },
+            pro: { text: t('enums.badge.preset.pro', { default: 'Pro' }), variant: 'popular' },
             starter: {
-                text: t('billing.badge.starter', { default: 'Starter' }),
+                text: t('enums.badge.preset.starter', { default: 'Starter' }),
                 variant: 'default',
             },
         };
@@ -178,12 +178,12 @@ export function PlanCard({
         // Add limits as features
         if (plan.limits) {
             const limitLabels: Record<string, string> = {
-                users: t('billing.limits.users', { default: 'users' }),
-                projects: t('billing.limits.projects', { default: 'projects' }),
-                storage: t('billing.limits.storage', { default: 'GB storage' }),
-                apiCalls: t('billing.limits.api_calls', { default: 'API calls/month' }),
-                customRoles: t('billing.limits.custom_roles', { default: 'custom roles' }),
-                locales: t('billing.limits.locales', { default: 'languages' }),
+                users: t('enums.plan.limit.users', { default: 'User Seats' }),
+                projects: t('enums.plan.limit.projects', { default: 'Projects' }),
+                storage: t('enums.plan.limit.storage', { default: 'Storage' }),
+                apiCalls: t('enums.plan.limit.apiCalls', { default: 'API Calls' }),
+                customRoles: t('enums.plan.limit.customRoles', { default: 'Custom Roles' }),
+                locales: t('enums.plan.limit.locales', { default: 'Languages' }),
             };
 
             const displayOrder = ['users', 'projects', 'storage', 'apiCalls', 'customRoles', 'locales'];
@@ -220,21 +220,21 @@ export function PlanCard({
             } else {
                 // PlanResource has PlanFeatures object
                 const featureLabels: Record<string, string> = {
-                    customRoles: t('billing.features.custom_roles', { default: 'Custom roles' }),
-                    apiAccess: t('billing.features.api_access', { default: 'API access' }),
-                    advancedReports: t('billing.features.advanced_reports', {
-                        default: 'Advanced reports',
+                    customRoles: t('enums.plan.feature.customRoles', { default: 'Custom Roles' }),
+                    apiAccess: t('enums.plan.feature.apiAccess', { default: 'API Access' }),
+                    advancedReports: t('enums.plan.feature.advancedReports', {
+                        default: 'Advanced Reports',
                     }),
-                    sso: t('billing.features.sso', { default: 'SSO authentication' }),
-                    whiteLabel: t('billing.features.white_label', { default: 'White label' }),
-                    auditLog: t('billing.features.audit_log', { default: 'Audit log' }),
-                    prioritySupport: t('billing.features.priority_support', {
-                        default: 'Priority support',
+                    sso: t('enums.plan.feature.sso', { default: 'Single Sign-On (SSO)' }),
+                    whiteLabel: t('enums.plan.feature.whiteLabel', { default: 'White Label' }),
+                    auditLog: t('enums.plan.feature.auditLog', { default: 'Audit Log' }),
+                    prioritySupport: t('enums.plan.feature.prioritySupport', {
+                        default: 'Priority Support',
                     }),
-                    multiLanguage: t('billing.features.multi_language', {
-                        default: 'Multi-language',
+                    multiLanguage: t('enums.plan.feature.multiLanguage', {
+                        default: 'Multi-Language',
                     }),
-                    federation: t('billing.features.federation', { default: 'User federation' }),
+                    federation: t('enums.plan.feature.federation', { default: 'User Federation' }),
                 };
 
                 for (const [key, value] of Object.entries(plan.features)) {

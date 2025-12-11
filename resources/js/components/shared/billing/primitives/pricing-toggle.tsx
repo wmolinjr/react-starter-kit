@@ -36,8 +36,8 @@ export function PricingToggle({
 }: PricingToggleProps) {
     const { t } = useLaravelReactI18n();
 
-    const defaultMonthlyLabel = t('billing.period.monthly', { default: 'Monthly' });
-    const defaultYearlyLabel = t('billing.period.yearly', { default: 'Yearly' });
+    const defaultMonthlyLabel = t('enums.billing.period.monthly', { default: 'Monthly' });
+    const defaultYearlyLabel = t('enums.billing.period.yearly', { default: 'Yearly' });
 
     return (
         <div className={cn('flex items-center gap-3', className)}>

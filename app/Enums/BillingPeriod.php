@@ -140,6 +140,33 @@ enum BillingPeriod: string
     }
 
     /**
+     * Get short label for price display (e.g., "/mo", "/yr").
+     *
+     * @return array<string, string>
+     */
+    public function shortLabel(): array
+    {
+        return match ($this) {
+            self::MONTHLY => ['en' => '/mo', 'pt_BR' => '/mês', 'es' => '/mes'],
+            self::YEARLY => ['en' => '/yr', 'pt_BR' => '/ano', 'es' => '/año'],
+            self::ONE_TIME => ['en' => 'one-time', 'pt_BR' => 'único', 'es' => 'único'],
+            self::METERED => ['en' => '/use', 'pt_BR' => '/uso', 'es' => '/uso'],
+            self::MANUAL => ['en' => 'manual', 'pt_BR' => 'manual', 'es' => 'manual'],
+        };
+    }
+
+    /**
+     * Get translated short label for current locale.
+     */
+    public function translatedShortLabel(?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+        $labels = $this->shortLabel();
+
+        return $labels[$locale] ?? $labels['en'] ?? '';
+    }
+
+    /**
      * Get translated label for current locale.
      */
     public function label(?string $locale = null): string

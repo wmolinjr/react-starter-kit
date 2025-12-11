@@ -30,6 +30,7 @@
     "common.icon": "Ícone",
     "common.icon_color": "Cor do Ícone",
     "common.inactive": "Inativo",
+    "common.logout": "Sair",
     "common.loading": "Carregando...",
     "common.manage": "Gerenciar",
     "common.monthly": "Mensal",
@@ -64,5 +65,9 @@
     "common.users_count": ":count usuários",
     "common.view": "Visualizar",
     "common.warning": "Aviso",
-    "common.yearly": "Anual"
+    "common.yearly": "Anual",
+        "common.placeholder.select_role": "Selecione uma função",
+        "common.placeholder.member_email": "membro@exemplo.com",
+        "common.placeholder.leave_empty_auto_calculate": "Deixe vazio para calcular automaticamente",
+        "common.placeholder.enter_recovery_code": "Digite o código de recuperação"
 }

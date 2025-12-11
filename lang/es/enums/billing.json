@@ -1,7 +1,12 @@
 {
     "enums.billing.period.manual": "Manual",
+    "enums.billing.period.manual.short": "manual",
     "enums.billing.period.metered": "Medido",
+    "enums.billing.period.metered.short": "/uso",
     "enums.billing.period.monthly": "Mensual",
+    "enums.billing.period.monthly.short": "/mes",
     "enums.billing.period.one_time": "Único",
-    "enums.billing.period.yearly": "Anual"
+    "enums.billing.period.one_time.short": "único",
+    "enums.billing.period.yearly": "Anual",
+    "enums.billing.period.yearly.short": "/año"
 }

@@ -53,7 +53,7 @@ const AUDIT_CONFIG: AuditPageConfig = {
     translationPrefix: 'admin.audit',
     baseUrl: '/admin/audit',
     exportUrl: '/admin/audit/export',
-    userLabelKey: 'admin.audit.filter_user',
+    userLabelKey: 'audit.filter_user',
 };
 
 function AuditLogIndex({
@@ -71,7 +71,7 @@ function AuditLogIndex({
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('admin.dashboard.title'), href: admin.dashboard.url() },
-        { title: t('admin.audit.title'), href: admin.audit.index.url() },
+        { title: t('audit.title'), href: audit.index.url() },
     ];
 
     useSetBreadcrumbs(breadcrumbs);
@@ -106,14 +106,14 @@ function AuditLogIndex({
 
     return (
         <>
-            <Head title={t('admin.audit.page_title')} />
+            <Head title={t('audit.page_title')} />
 
             <Page>
                 <PageHeader>
                     <PageHeaderContent>
-                        <PageTitle icon={ClipboardList}>{t('admin.audit.page_title')}</PageTitle>
+                        <PageTitle icon={ClipboardList}>{t('audit.page_title')}</PageTitle>
                         <PageDescription>
-                            {t('admin.audit.description')}
+                            {t('audit.description')}
                         </PageDescription>
                     </PageHeaderContent>
                     <PageHeaderActions>
@@ -123,7 +123,7 @@ function AuditLogIndex({
                             disabled={isExporting}
                         >
                             <Download className="mr-2 h-4 w-4" />
-                            {isExporting ? t('common.loading') : t('admin.audit.export_csv')}
+                            {isExporting ? t('common.loading') : t('audit.export_csv')}
                         </Button>
                         <Button
                             variant="outline"

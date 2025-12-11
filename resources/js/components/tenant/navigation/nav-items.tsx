@@ -90,7 +90,7 @@ export function useTenantAdminNavItems(): NavItem[] {
     if (has('audit:view') && hasFeature('auditLog')) {
         navItems.push({
             title: t('sidebar.audit_log'),
-            href: admin.audit.index.url(),
+            href: audit.index.url(),
             icon: ClipboardList,
         });
     }

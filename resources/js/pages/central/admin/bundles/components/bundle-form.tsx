@@ -320,7 +320,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                                 type="number"
                                 value={data.price_monthly}
                                 onChange={e => setData('price_monthly', e.target.value)}
-                                placeholder={t('placeholders.leave_empty_auto_calculate')}
+                                placeholder={t('common.placeholder.leave_empty_auto_calculate')}
                             />
                         </div>
                         <div className="space-y-2">
@@ -332,7 +332,7 @@ export function BundleForm({ bundle, addons, plans, isEdit = false }: Props) {
                                 type="number"
                                 value={data.price_yearly}
                                 onChange={e => setData('price_yearly', e.target.value)}
-                                placeholder={t('placeholders.leave_empty_auto_calculate')}
+                                placeholder={t('common.placeholder.leave_empty_auto_calculate')}
                             />
                         </div>
                     </div>

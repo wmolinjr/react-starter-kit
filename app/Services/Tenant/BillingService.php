@@ -376,7 +376,7 @@ class BillingService
         $maxUsers = $limits['max_users'] ?? null;
         $usage['users'] = $this->buildUsageMetric(
             'users',
-            __('billing.limits.users'),
+            __('enums.plan.limit.users'),
             $currentUsers,
             $maxUsers
         );
@@ -386,7 +386,7 @@ class BillingService
         $maxProjects = $limits['max_projects'] ?? null;
         $usage['projects'] = $this->buildUsageMetric(
             'projects',
-            __('billing.limits.projects'),
+            __('enums.plan.limit.projects'),
             $currentProjects,
             $maxProjects
         );
@@ -396,7 +396,7 @@ class BillingService
         $maxStorageMb = $limits['max_storage_mb'] ?? null;
         $usage['storage'] = $this->buildUsageMetric(
             'storage',
-            __('billing.limits.storage'),
+            __('enums.plan.limit.storage'),
             $currentStorageMb,
             $maxStorageMb,
             'MB'

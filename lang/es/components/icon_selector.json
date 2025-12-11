@@ -1,0 +1,6 @@
+{
+    "components.icon_selector.custom_hint": "Ingresa el nombre de un icono de Lucide",
+    "components.icon_selector.no_results": "No se encontraron iconos",
+    "components.icon_selector.preview": "Vista previa",
+    "components.icon_selector.search_placeholder": "Buscar íconos..."
+}

@@ -30,6 +30,7 @@
     "common.icon": "Icon",
     "common.icon_color": "Icon Color",
     "common.inactive": "Inactive",
+    "common.logout": "Log out",
     "common.loading": "Loading...",
     "common.manage": "Manage",
     "common.monthly": "Monthly",
@@ -64,5 +65,9 @@
     "common.users_count": ":count users",
     "common.view": "View",
     "common.warning": "Warning",
-    "common.yearly": "Yearly"
+    "common.yearly": "Yearly",
+        "common.placeholder.select_role": "Select a role",
+        "common.placeholder.member_email": "member@example.com",
+        "common.placeholder.leave_empty_auto_calculate": "Leave empty to calculate automatically",
+        "common.placeholder.enter_recovery_code": "Enter recovery code"
 }

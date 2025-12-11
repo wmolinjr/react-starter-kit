@@ -41,9 +41,9 @@ export function PriceDisplay({
         if (!period || !showPeriod) return '';
 
         const labels: Record<string, string> = {
-            monthly: t('billing.period.monthly_short', { default: '/mo' }),
-            yearly: t('billing.period.yearly_short', { default: '/yr' }),
-            one_time: t('billing.period.one_time', { default: 'one-time' }),
+            monthly: t('enums.billing.period.monthly.short', { default: '/mo' }),
+            yearly: t('enums.billing.period.yearly.short', { default: '/yr' }),
+            one_time: t('enums.billing.period.one_time.short', { default: 'one-time' }),
         };
 
         return labels[period] || '';

@@ -86,12 +86,12 @@ export function AddonCard({
     // Check if addon is a one-time purchase
     const isOneTime = pricePeriod === 'one_time';
 
-    // Get type label
+    // Get type label from enum translations
     const typeLabel = addon.type === 'feature'
-        ? t('billing.addon_type.feature', { default: 'Feature' })
+        ? t('enums.addon.type.feature', { default: 'Feature' })
         : addon.type === 'quota'
-            ? t('billing.addon_type.quota', { default: 'Quota' })
-            : t('billing.addon_type.service', { default: 'Service' });
+            ? t('enums.addon.type.quota', { default: 'Quota Increase' })
+            : t('enums.addon.type.metered', { default: 'Usage-Based' });
 
     // Features list from addon (FeatureItem expects 'text' not 'label')
     const features = addon.features

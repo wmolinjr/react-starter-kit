@@ -191,6 +191,10 @@ class GenerateTypes extends Command
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.billing.period',
+                // Extra translations for short labels (e.g., "/mo", "/yr")
+                'extra_translations' => fn ($case, $locale, $key) => [
+                    "{$key}.short" => $this->getTranslation($case->shortLabel(), $locale, "{$key}.short"),
+                ],
             ],
             'PlanFeature' => [
                 'class' => PlanFeature::class,
@@ -218,6 +222,10 @@ class GenerateTypes extends Command
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.plan.feature',
+                // Extra translations for descriptions
+                'extra_translations' => fn ($case, $locale, $key) => [
+                    "{$key}.desc" => $this->getTranslation($case->description(), $locale, "{$key}.desc"),
+                ],
             ],
             'PlanLimit' => [
                 'class' => PlanLimit::class,
@@ -249,6 +257,10 @@ class GenerateTypes extends Command
                 ],
                 'translations' => fn ($case, $locale, $key) => $this->getTranslation($case->name(), $locale, $key),
                 'translation_key' => 'enums.plan.limit',
+                // Extra translations for descriptions
+                'extra_translations' => fn ($case, $locale, $key) => [
+                    "{$key}.desc" => $this->getTranslation($case->description(), $locale, "{$key}.desc"),
+                ],
             ],
             'TenantRole' => [
                 'class' => TenantRole::class,
@@ -1221,6 +1233,7 @@ TS;
             $cases = $config['class']::cases();
             $getter = $config['translations'];
             $prefix = $config['translation_key'];
+            $extraGetter = $config['extra_translations'] ?? null;
 
             // Determine target file based on prefix
             // e.g., 'enums.addon.type' → enums/addon.json
@@ -1229,6 +1242,14 @@ TS;
             foreach ($cases as $case) {
                 $key = "{$prefix}.{$case->value}";
                 $enumsByFile[$targetFile][$key] = $getter($case, $locale, $key);
+
+                // Process extra translations (e.g., descriptions)
+                if ($extraGetter !== null) {
+                    $extras = $extraGetter($case, $locale, $key);
+                    foreach ($extras as $extraKey => $extraValue) {
+                        $enumsByFile[$targetFile][$extraKey] = $extraValue;
+                    }
+                }
             }
         }
 
@@ -1313,11 +1334,21 @@ TS;
             $cases = $config['class']::cases();
             $getter = $config['translations'];
             $prefix = $config['translation_key'];
+            $extraGetter = $config['extra_translations'] ?? null;
 
             foreach ($cases as $case) {
                 $key = "{$prefix}.{$case->value}";
                 $enumKeys[] = $key;
                 $translations[$key] = $getter($case, $locale, $key);
+
+                // Process extra translations (e.g., descriptions)
+                if ($extraGetter !== null) {
+                    $extras = $extraGetter($case, $locale, $key);
+                    foreach ($extras as $extraKey => $extraValue) {
+                        $enumKeys[] = $extraKey;
+                        $translations[$extraKey] = $extraValue;
+                    }
+                }
             }
         }
 

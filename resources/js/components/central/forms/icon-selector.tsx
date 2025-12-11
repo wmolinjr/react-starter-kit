@@ -97,7 +97,7 @@ export function IconSelector({ label, value, onChange, iconColor, className }: I
 
             {/* Preview */}
             <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground">{t('icons.preview')}:</span>
+                <span className="text-sm text-muted-foreground">{t('components.icon_selector.preview')}:</span>
                 <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2" style={colorStyle}>
                     <DynamicIcon name={value} className="h-5 w-5" />
                     <span className="text-sm font-medium">{value}</span>
@@ -109,7 +109,7 @@ export function IconSelector({ label, value, onChange, iconColor, className }: I
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                     type="text"
-                    placeholder={t('icons.search_placeholder')}
+                    placeholder={t('components.icon_selector.search_placeholder')}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-9"
@@ -139,14 +139,14 @@ export function IconSelector({ label, value, onChange, iconColor, className }: I
                 </div>
                 {filteredIcons.length === 0 && (
                     <p className="py-4 text-center text-sm text-muted-foreground">
-                        {t('icons.no_results')}
+                        {t('components.icon_selector.no_results')}
                     </p>
                 )}
             </div>
 
             {/* Custom input */}
             <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">{t('icons.custom_hint')}:</span>
+                <span className="text-xs text-muted-foreground">{t('components.icon_selector.custom_hint')}:</span>
                 <Input
                     type="text"
                     value={value}

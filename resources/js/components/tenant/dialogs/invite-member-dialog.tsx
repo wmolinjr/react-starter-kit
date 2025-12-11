@@ -84,7 +84,7 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
             <Input
               id="email"
               type="email"
-              placeholder={t('placeholders.member_email')}
+              placeholder={t('common.placeholder.member_email')}
               value={data.email}
               onChange={(e) => setData('email', e.target.value)}
               disabled={maxUsersReached || processing}
@@ -103,7 +103,7 @@ export function InviteMemberDialog({ open, onOpenChange, maxUsersReached }: Invi
               disabled={maxUsersReached || processing}
             >
               <SelectTrigger id="role">
-                <SelectValue placeholder={t('placeholders.select_role')} />
+                <SelectValue placeholder={t('common.placeholder.select_role')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">{t('tenant.team.role_admin')}</SelectItem>

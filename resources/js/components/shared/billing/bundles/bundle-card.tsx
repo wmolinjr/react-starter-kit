@@ -195,20 +195,20 @@ export function BundleCard({
         const badgeKey = badgeValue as string;
         const badgeMap: Record<string, { text: string; variant: string }> = {
             best_value: {
-                text: t('billing.badge.best_value', { default: 'Best Value' }),
+                text: t('enums.badge.preset.best_value', { default: 'Best Value' }),
                 variant: 'best-value',
             },
             most_popular: {
-                text: t('billing.badge.most_popular', { default: 'Most Popular' }),
+                text: t('enums.badge.preset.most_popular', { default: 'Most Popular' }),
                 variant: 'popular',
             },
             recommended: {
-                text: t('billing.badge.recommended', { default: 'Recommended' }),
+                text: t('enums.badge.preset.recommended', { default: 'Recommended' }),
                 variant: 'recommended',
             },
-            new: { text: t('billing.badge.new', { default: 'New' }), variant: 'new' },
+            new: { text: t('enums.badge.preset.new', { default: 'New' }), variant: 'new' },
             limited_time: {
-                text: t('billing.badge.limited_time', { default: 'Limited Time' }),
+                text: t('enums.badge.preset.limited_time', { default: 'Limited Time' }),
                 variant: 'destructive',
             },
         };

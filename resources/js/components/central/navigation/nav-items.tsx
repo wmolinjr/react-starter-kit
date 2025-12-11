@@ -114,7 +114,7 @@ export function useCentralAdminNavItems(): NavItem[] {
         // Audit Log - single item
         {
             title: t('sidebar.audit_log'),
-            href: admin.audit.index.url(),
+            href: audit.index.url(),
             icon: ClipboardList,
         },
 

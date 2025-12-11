@@ -58,7 +58,7 @@ export function ColorSelector({ label, value, onChange, className }: ColorSelect
                 <button
                     type="button"
                     onClick={() => onChange(null)}
-                    title={t('colors.system')}
+                    title={t('components.color_selector.system')}
                     className={cn(
                         'relative flex h-8 w-8 items-center justify-center rounded-full transition-all',
                         'border-2 border-dashed border-muted-foreground/50 bg-background',
@@ -97,9 +97,9 @@ export function ColorSelector({ label, value, onChange, className }: ColorSelect
 
             {/* Selected color name */}
             <p className="text-xs text-muted-foreground">
-                {t('colors.selected')}:{' '}
+                {t('components.color_selector.selected')}:{' '}
                 {isSystemColor ? (
-                    <span className="font-medium">{t('colors.system')}</span>
+                    <span className="font-medium">{t('components.color_selector.system')}</span>
                 ) : (
                     <span className={cn('font-medium', selectedPreset?.text)}>{selectedPreset?.label}</span>
                 )}

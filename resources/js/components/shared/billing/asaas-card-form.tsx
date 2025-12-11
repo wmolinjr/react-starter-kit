@@ -151,38 +151,38 @@ export function AsaasCardForm({
         // Card validation
         const cardNumber = cardData.number.replace(/\s/g, '');
         if (!cardNumber || cardNumber.length < 13) {
-            return t('billing.card_form.invalid_card_number', { default: 'Invalid card number' });
+            return t('billing.form.invalid_card_number', { default: 'Invalid card number' });
         }
         if (!cardData.holder_name.trim()) {
-            return t('billing.card_form.holder_name_required', { default: 'Cardholder name is required' });
+            return t('billing.form.holder_name_required', { default: 'Cardholder name is required' });
         }
         if (!cardData.exp_month || parseInt(cardData.exp_month) < 1 || parseInt(cardData.exp_month) > 12) {
-            return t('billing.card_form.invalid_exp_month', { default: 'Invalid expiration month' });
+            return t('billing.form.invalid_exp_month', { default: 'Invalid expiration month' });
         }
         if (!cardData.exp_year || cardData.exp_year.length !== 4) {
-            return t('billing.card_form.invalid_exp_year', { default: 'Invalid expiration year' });
+            return t('billing.form.invalid_exp_year', { default: 'Invalid expiration year' });
         }
         if (!cardData.cvv || cardData.cvv.length < 3) {
-            return t('billing.card_form.invalid_cvv', { default: 'Invalid CVV' });
+            return t('billing.form.invalid_cvv', { default: 'Invalid CVV' });
         }
 
         // Holder validation
         if (!holderData.name.trim()) {
-            return t('billing.card_form.name_required', { default: 'Name is required' });
+            return t('billing.form.name_required', { default: 'Name is required' });
         }
         if (!holderData.email.trim() || !holderData.email.includes('@')) {
-            return t('billing.card_form.invalid_email', { default: 'Invalid email' });
+            return t('billing.form.invalid_email', { default: 'Invalid email' });
         }
         const cpfCnpj = holderData.cpf_cnpj.replace(/\D/g, '');
         if (!cpfCnpj || (cpfCnpj.length !== 11 && cpfCnpj.length !== 14)) {
-            return t('billing.card_form.invalid_cpf_cnpj', { default: 'Invalid CPF/CNPJ' });
+            return t('billing.form.invalid_cpf_cnpj', { default: 'Invalid CPF/CNPJ' });
         }
         const postalCode = holderData.postal_code.replace(/\D/g, '');
         if (!postalCode || postalCode.length !== 8) {
-            return t('billing.card_form.invalid_postal_code', { default: 'Invalid postal code' });
+            return t('billing.form.invalid_postal_code', { default: 'Invalid postal code' });
         }
         if (!holderData.address_number.trim()) {
-            return t('billing.card_form.address_number_required', { default: 'Address number is required' });
+            return t('billing.form.address_number_required', { default: 'Address number is required' });
         }
 
         return null;
@@ -267,7 +267,7 @@ export function AsaasCardForm({
                         {t('billing.payment_successful', { default: 'Payment Successful!' })}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                        {t('billing.card_form.payment_processed', { default: 'Your card payment has been processed.' })}
+                        {t('billing.form.payment_processed', { default: 'Your card payment has been processed.' })}
                     </p>
                 </div>
             </div>
@@ -297,14 +297,14 @@ export function AsaasCardForm({
                 <div className="flex items-center gap-2">
                     <CreditCard className="h-4 w-4 text-muted-foreground" />
                     <h4 className="font-medium">
-                        {t('billing.card_form.card_info', { default: 'Card Information' })}
+                        {t('billing.form.card_info', { default: 'Card Information' })}
                     </h4>
                 </div>
 
                 <div className="space-y-3">
                     <div>
                         <Label htmlFor="card-number">
-                            {t('billing.card_form.card_number', { default: 'Card Number' })}
+                            {t('billing.form.card_number', { default: 'Card Number' })}
                         </Label>
                         <Input
                             id="card-number"
@@ -320,7 +320,7 @@ export function AsaasCardForm({
 
                     <div>
                         <Label htmlFor="holder-name">
-                            {t('billing.card_form.cardholder_name', { default: 'Cardholder Name' })}
+                            {t('billing.form.cardholder_name', { default: 'Cardholder Name' })}
                         </Label>
                         <Input
                             id="holder-name"
@@ -336,7 +336,7 @@ export function AsaasCardForm({
                     <div className="grid grid-cols-3 gap-3">
                         <div>
                             <Label htmlFor="exp-month">
-                                {t('billing.card_form.exp_month', { default: 'Month' })}
+                                {t('billing.form.exp_month', { default: 'Month' })}
                             </Label>
                             <Input
                                 id="exp-month"
@@ -351,7 +351,7 @@ export function AsaasCardForm({
                         </div>
                         <div>
                             <Label htmlFor="exp-year">
-                                {t('billing.card_form.exp_year', { default: 'Year' })}
+                                {t('billing.form.exp_year', { default: 'Year' })}
                             </Label>
                             <Input
                                 id="exp-year"
@@ -366,7 +366,7 @@ export function AsaasCardForm({
                         </div>
                         <div>
                             <Label htmlFor="cvv">
-                                {t('billing.card_form.cvv', { default: 'CVV' })}
+                                {t('billing.form.cvv', { default: 'CVV' })}
                             </Label>
                             <Input
                                 id="cvv"
@@ -390,7 +390,7 @@ export function AsaasCardForm({
                 <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <h4 className="font-medium">
-                        {t('billing.card_form.holder_info', { default: 'Billing Information' })}
+                        {t('billing.form.holder_info', { default: 'Billing Information' })}
                     </h4>
                 </div>
 
@@ -398,7 +398,7 @@ export function AsaasCardForm({
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <Label htmlFor="holder-full-name">
-                                {t('billing.card_form.full_name', { default: 'Full Name' })}
+                                {t('billing.form.full_name', { default: 'Full Name' })}
                             </Label>
                             <Input
                                 id="holder-full-name"
@@ -410,7 +410,7 @@ export function AsaasCardForm({
                         </div>
                         <div>
                             <Label htmlFor="holder-email">
-                                {t('billing.card_form.email', { default: 'Email' })}
+                                {t('billing.form.email', { default: 'Email' })}
                             </Label>
                             <Input
                                 id="holder-email"
@@ -424,7 +424,7 @@ export function AsaasCardForm({
 
                     <div>
                         <Label htmlFor="cpf-cnpj">
-                            {t('billing.card_form.cpf_cnpj', { default: 'CPF/CNPJ' })}
+                            {t('billing.form.cpf_cnpj', { default: 'CPF/CNPJ' })}
                         </Label>
                         <Input
                             id="cpf-cnpj"
@@ -447,7 +447,7 @@ export function AsaasCardForm({
                 <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <h4 className="font-medium">
-                        {t('billing.card_form.address', { default: 'Address' })}
+                        {t('billing.form.address', { default: 'Address' })}
                     </h4>
                 </div>
 
@@ -455,7 +455,7 @@ export function AsaasCardForm({
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <Label htmlFor="postal-code">
-                                {t('billing.card_form.postal_code', { default: 'Postal Code' })}
+                                {t('billing.form.postal_code', { default: 'Postal Code' })}
                             </Label>
                             <Input
                                 id="postal-code"
@@ -470,7 +470,7 @@ export function AsaasCardForm({
                         </div>
                         <div>
                             <Label htmlFor="address-number">
-                                {t('billing.card_form.number', { default: 'Number' })}
+                                {t('billing.form.number', { default: 'Number' })}
                             </Label>
                             <Input
                                 id="address-number"
@@ -484,12 +484,12 @@ export function AsaasCardForm({
 
                     <div>
                         <Label htmlFor="address-complement">
-                            {t('billing.card_form.complement', { default: 'Complement (optional)' })}
+                            {t('billing.form.complement', { default: 'Complement (optional)' })}
                         </Label>
                         <Input
                             id="address-complement"
                             type="text"
-                            placeholder={t('billing.card_form.complement_placeholder', { default: 'Apt, Suite, etc.' })}
+                            placeholder={t('billing.form.complement_placeholder', { default: 'Apt, Suite, etc.' })}
                             value={holderData.address_complement}
                             onChange={(e) => handleHolderChange('address_complement', e.target.value)}
                             disabled={isSubmitting}
@@ -498,7 +498,7 @@ export function AsaasCardForm({
 
                     <div>
                         <Label htmlFor="phone">
-                            {t('billing.card_form.phone', { default: 'Phone (optional)' })}
+                            {t('billing.form.phone', { default: 'Phone (optional)' })}
                         </Label>
                         <Input
                             id="phone"
@@ -526,7 +526,7 @@ export function AsaasCardForm({
 
             {/* Security note */}
             <p className="text-xs text-center text-muted-foreground">
-                {t('billing.card_form.secure_payment', {
+                {t('billing.form.secure_payment', {
                     default: 'Your payment information is securely processed.',
                 })}
             </p>

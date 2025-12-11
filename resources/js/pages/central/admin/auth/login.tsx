@@ -30,7 +30,7 @@ export default function AdminLogin({ status, canResetPassword = true }: AdminLog
 
             <div className="mb-4 flex items-center justify-center gap-2 text-muted-foreground">
                 <Shield className="h-5 w-5" />
-                <span className="text-sm font-medium">{t('navigation.central_admin')}</span>
+                <span className="text-sm font-medium">{t('sidebar.central_admin')}</span>
             </div>
 
             <Form

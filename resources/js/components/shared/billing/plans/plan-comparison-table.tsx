@@ -110,18 +110,18 @@ export function PlanComparisonTable({
 
         const badgeMap: Record<string, { text: string; variant: string }> = {
             most_popular: {
-                text: t('billing.badge.most_popular', { default: 'Most Popular' }),
+                text: t('enums.badge.preset.most_popular', { default: 'Most Popular' }),
                 variant: 'popular',
             },
             best_value: {
-                text: t('billing.badge.best_value', { default: 'Best Value' }),
+                text: t('enums.badge.preset.best_value', { default: 'Best Value' }),
                 variant: 'best-value',
             },
             recommended: {
-                text: t('billing.badge.recommended', { default: 'Recommended' }),
+                text: t('enums.badge.preset.recommended', { default: 'Recommended' }),
                 variant: 'recommended',
             },
-            new: { text: t('billing.badge.new', { default: 'New' }), variant: 'new' },
+            new: { text: t('enums.badge.preset.new', { default: 'New' }), variant: 'new' },
         };
 
         return badgeMap[plan.badge] || { text: plan.badge, variant: 'default' };
@@ -354,40 +354,40 @@ function generateCategories(
             { label: string; description?: string; suffix?: string }
         > = {
             users: {
-                label: t('billing.limits.users', { default: 'Team members' }),
-                description: t('billing.limits.users_desc', {
-                    default: 'Number of users allowed in your team',
+                label: t('enums.plan.limit.users', { default: 'User Seats' }),
+                description: t('enums.plan.limit.users.desc', {
+                    default: 'Maximum number of team members',
                 }),
             },
             projects: {
-                label: t('billing.limits.projects', { default: 'Projects' }),
-                description: t('billing.limits.projects_desc', {
-                    default: 'Number of projects you can create',
+                label: t('enums.plan.limit.projects', { default: 'Projects' }),
+                description: t('enums.plan.limit.projects.desc', {
+                    default: 'Maximum number of active projects',
                 }),
             },
             storage: {
-                label: t('billing.limits.storage', { default: 'Storage' }),
+                label: t('enums.plan.limit.storage', { default: 'Storage' }),
                 suffix: 'GB',
-                description: t('billing.limits.storage_desc', {
-                    default: 'Total storage space for files',
+                description: t('enums.plan.limit.storage.desc', {
+                    default: 'Total storage space available',
                 }),
             },
             apiCalls: {
-                label: t('billing.limits.api_calls', { default: 'API calls/month' }),
-                description: t('billing.limits.api_calls_desc', {
+                label: t('enums.plan.limit.apiCalls', { default: 'API Calls' }),
+                description: t('enums.plan.limit.apiCalls.desc', {
                     default: 'Monthly API request limit',
                 }),
             },
             customRoles: {
-                label: t('billing.limits.custom_roles', { default: 'Custom roles' }),
-                description: t('billing.limits.custom_roles_desc', {
-                    default: 'Number of custom roles you can create',
+                label: t('enums.plan.limit.customRoles', { default: 'Custom Roles' }),
+                description: t('enums.plan.limit.customRoles.desc', {
+                    default: 'Maximum number of custom roles that can be created',
                 }),
             },
             locales: {
-                label: t('billing.limits.locales', { default: 'Languages' }),
-                description: t('billing.limits.locales_desc', {
-                    default: 'Number of languages supported',
+                label: t('enums.plan.limit.locales', { default: 'Languages' }),
+                description: t('enums.plan.limit.locales.desc', {
+                    default: 'Maximum number of languages that can be enabled',
                 }),
             },
         };
@@ -445,57 +445,57 @@ function generateCategories(
     if (showFeatures && plans.length > 0 && plans[0].features) {
         const featureLabels: Record<string, { label: string; description?: string }> = {
             customRoles: {
-                label: t('billing.features.custom_roles', { default: 'Custom roles' }),
-                description: t('billing.features.custom_roles_desc', {
-                    default: 'Create custom roles with specific permissions',
+                label: t('enums.plan.feature.customRoles', { default: 'Custom Roles' }),
+                description: t('enums.plan.feature.customRoles.desc', {
+                    default: 'Create and manage custom roles with granular permissions',
                 }),
             },
             apiAccess: {
-                label: t('billing.features.api_access', { default: 'API access' }),
-                description: t('billing.features.api_access_desc', {
-                    default: 'Access to REST API for integrations',
+                label: t('enums.plan.feature.apiAccess', { default: 'API Access' }),
+                description: t('enums.plan.feature.apiAccess.desc', {
+                    default: 'Generate API tokens for external integrations',
                 }),
             },
             advancedReports: {
-                label: t('billing.features.advanced_reports', { default: 'Advanced reports' }),
-                description: t('billing.features.advanced_reports_desc', {
-                    default: 'Detailed analytics and reporting',
+                label: t('enums.plan.feature.advancedReports', { default: 'Advanced Reports' }),
+                description: t('enums.plan.feature.advancedReports.desc', {
+                    default: 'Access advanced analytics and custom report builder',
                 }),
             },
             sso: {
-                label: t('billing.features.sso', { default: 'SSO authentication' }),
-                description: t('billing.features.sso_desc', {
-                    default: 'Single sign-on with SAML/OAuth',
+                label: t('enums.plan.feature.sso', { default: 'Single Sign-On (SSO)' }),
+                description: t('enums.plan.feature.sso.desc', {
+                    default: 'Enable SAML/OIDC authentication for enterprise security',
                 }),
             },
             whiteLabel: {
-                label: t('billing.features.white_label', { default: 'White label' }),
-                description: t('billing.features.white_label_desc', {
-                    default: 'Remove branding and customize appearance',
+                label: t('enums.plan.feature.whiteLabel', { default: 'White Label' }),
+                description: t('enums.plan.feature.whiteLabel.desc', {
+                    default: 'Customize branding, colors, and remove platform branding',
                 }),
             },
             auditLog: {
-                label: t('billing.features.audit_log', { default: 'Audit log' }),
-                description: t('billing.features.audit_log_desc', {
-                    default: 'Track all user actions and changes',
+                label: t('enums.plan.feature.auditLog', { default: 'Audit Log' }),
+                description: t('enums.plan.feature.auditLog.desc', {
+                    default: 'Track all user actions and system events',
                 }),
             },
             prioritySupport: {
-                label: t('billing.features.priority_support', { default: 'Priority support' }),
-                description: t('billing.features.priority_support_desc', {
-                    default: 'Faster response times and dedicated support',
+                label: t('enums.plan.feature.prioritySupport', { default: 'Priority Support' }),
+                description: t('enums.plan.feature.prioritySupport.desc', {
+                    default: '24/7 priority support with dedicated account manager',
                 }),
             },
             multiLanguage: {
-                label: t('billing.features.multi_language', { default: 'Multi-language' }),
-                description: t('billing.features.multi_language_desc', {
-                    default: 'Support for multiple languages',
+                label: t('enums.plan.feature.multiLanguage', { default: 'Multi-Language' }),
+                description: t('enums.plan.feature.multiLanguage.desc', {
+                    default: 'Enable multiple language support for your users',
                 }),
             },
             federation: {
-                label: t('billing.features.federation', { default: 'User federation' }),
-                description: t('billing.features.federation_desc', {
-                    default: 'Share users across multiple workspaces',
+                label: t('enums.plan.feature.federation', { default: 'User Federation' }),
+                description: t('enums.plan.feature.federation.desc', {
+                    default: 'Sync users across multiple tenants in a federation group',
                 }),
             },
         };

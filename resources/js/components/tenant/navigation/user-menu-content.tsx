@@ -44,7 +44,7 @@ export function TenantUserMenuContent({ user }: UserMenuContentProps) {
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />
-                        {t('user_menu.settings')}
+                        {t('common.settings')}
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -59,7 +59,7 @@ export function TenantUserMenuContent({ user }: UserMenuContentProps) {
                     data-test="logout-button"
                 >
                     <LogOut className="mr-2" />
-                    {t('user_menu.logout')}
+                    {t('common.logout')}
                 </Link>
             </DropdownMenuItem>
         </>
