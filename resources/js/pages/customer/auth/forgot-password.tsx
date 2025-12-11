@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import customer from '@/routes/customer';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
@@ -30,8 +31,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             )}
 
             <Form
-                action="/account/forgot-password"
-                method="post"
+                {...customer.password.email.form()}
                 className="flex flex-col gap-6"
             >
                 {({ processing }) => (
@@ -65,7 +65,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 
                         <div className="text-center text-sm text-muted-foreground">
                             {t('common.remember_password')}{' '}
-                            <TextLink href="/account/login">
+                            <TextLink href={customer.login.url()}>
                                 {t('auth.login.button')}
                             </TextLink>
                         </div>

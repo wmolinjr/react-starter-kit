@@ -73,7 +73,7 @@ function DomainsSettings({
     };
 
     const handleDelete = (domainId: string) => {
-        router.delete(`/tenant-settings/domains/${domainId}`);
+        router.delete(admin.settings.domains.remove.url(domainId));
     };
 
     return (
@@ -244,7 +244,7 @@ function DomainsSettings({
                                 {t('settings.upgrade_for_domains')}
                             </p>
                             <Button asChild>
-                                <Link href="/billing">{t('settings.view_plans')}</Link>
+                                <Link href={admin.billing.index.url()}>{t('settings.view_plans')}</Link>
                             </Button>
                         </CardContent>
                     </Card>

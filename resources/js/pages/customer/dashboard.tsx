@@ -1,6 +1,7 @@
 import CustomerLayout from '@/layouts/customer-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import customerRoutes from '@/routes/customer';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Building2, CreditCard, Receipt, ArrowRight, Plus } from 'lucide-react';
@@ -45,7 +46,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
 
     return (
         <CustomerLayout
-            breadcrumbs={[{ title: t('customer.dashboard.title'), href: '/account' }]}
+            breadcrumbs={[{ title: t('customer.dashboard.title'), href: customerRoutes.dashboard.url() }]}
         >
             <Head title={t('customer.dashboard.title')} />
 
@@ -138,7 +139,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                         </CardHeader>
                         <CardContent>
                             <Button asChild>
-                                <Link href="/account/payment-methods/create">
+                                <Link href={customerRoutes.paymentMethods.create.url()}>
                                     <CreditCard className="mr-2 h-4 w-4" />
                                     {t('customer.payment.add_method')}
                                 </Link>
@@ -157,7 +158,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                             </CardDescription>
                         </div>
                         <Button asChild variant="outline" size="sm">
-                            <Link href="/account/tenants/create">
+                            <Link href={customerRoutes.tenants.create.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 {t('customer.workspace.create')}
                             </Link>
@@ -169,7 +170,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                                 <Building2 className="mx-auto h-12 w-12 mb-4 opacity-50" />
                                 <p>{t('customer.workspace.no_workspaces')}</p>
                                 <Button asChild className="mt-4">
-                                    <Link href="/account/tenants/create">
+                                    <Link href={customerRoutes.tenants.create.url()}>
                                         {t('customer.workspace.create_first')}
                                     </Link>
                                 </Button>
@@ -194,7 +195,7 @@ export default function Dashboard({ customer, tenants, stats }: DashboardProps) 
                                                 </span>
                                             )}
                                             <Button asChild variant="ghost" size="sm">
-                                                <Link href={`/account/tenants/${tenant.id}`}>
+                                                <Link href={customerRoutes.tenants.show.url(tenant.id)}>
                                                     {t('common.view')}
                                                     <ArrowRight className="ml-2 h-4 w-4" />
                                                 </Link>

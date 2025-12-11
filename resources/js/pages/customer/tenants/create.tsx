@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { Form, Head, usePage } from '@inertiajs/react';
+import customer from '@/routes/customer';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { AlertCircle } from 'lucide-react';
 
@@ -20,9 +21,9 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard.title'), href: '/account' },
-                { title: t('customer.workspace.title'), href: '/account/tenants' },
-                { title: t('customer.workspace.create'), href: '/account/tenants/create' },
+                { title: t('customer.dashboard.title'), href: customer.dashboard.url() },
+                { title: t('customer.workspace.title'), href: customer.tenants.index.url() },
+                { title: t('customer.workspace.create'), href: customer.tenants.create.url() },
             ]}
         >
             <Head title={t('customer.workspace.create')} />
@@ -48,9 +49,9 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
                                 </p>
                             </div>
                             <Button asChild variant="outline" className="ml-auto">
-                                <a href="/account/payment-methods/create">
+                                <Link href={customer.paymentMethods.create.url()}>
                                     {t('customer.payment.add_method')}
-                                </a>
+                                </Link>
                             </Button>
                         </CardContent>
                     </Card>
@@ -65,8 +66,7 @@ export default function TenantCreate({ hasPaymentMethod }: TenantCreateProps) {
                     </CardHeader>
                     <CardContent>
                         <Form
-                            action="/account/tenants"
-                            method="post"
+                            {...customer.tenants.store.form()}
                             className="space-y-4"
                         >
                             {({ processing }) => (

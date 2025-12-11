@@ -1,6 +1,7 @@
 import CustomerLayout from '@/layouts/customer-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import customer from '@/routes/customer';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Building2, Plus, ArrowRight, Globe } from 'lucide-react';
@@ -24,8 +25,8 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard.title'), href: '/account' },
-                { title: t('customer.workspace.title'), href: '/account/tenants' },
+                { title: t('customer.dashboard.title'), href: customer.dashboard.url() },
+                { title: t('customer.workspace.title'), href: customer.tenants.index.url() },
             ]}
         >
             <Head title={t('customer.workspace.title')} />
@@ -41,7 +42,7 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                         </p>
                     </div>
                     <Button asChild>
-                        <Link href="/account/tenants/create">
+                        <Link href={customer.tenants.create.url()}>
                             <Plus className="mr-2 h-4 w-4" />
                             {t('customer.workspace.create')}
                         </Link>
@@ -59,7 +60,7 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                                 {t('customer.workspace.no_workspaces_description')}
                             </p>
                             <Button asChild>
-                                <Link href="/account/tenants/create">
+                                <Link href={customer.tenants.create.url()}>
                                     <Plus className="mr-2 h-4 w-4" />
                                     {t('customer.workspace.create_first')}
                                 </Link>
@@ -92,7 +93,7 @@ export default function TenantsIndex({ tenants }: TenantsIndexProps) {
                                             </span>
                                         )}
                                         <Button asChild variant="ghost" size="sm">
-                                            <Link href={`/account/tenants/${tenant.id}`}>
+                                            <Link href={customer.tenants.show.url(tenant.id)}>
                                                 {t('common.manage')}
                                                 <ArrowRight className="ml-2 h-4 w-4" />
                                             </Link>

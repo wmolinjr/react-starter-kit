@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import customer from '@/routes/customer';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
@@ -26,8 +27,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <Head title={t('customer.login.button')} />
 
             <Form
-                action="/account/login"
-                method="post"
+                {...customer.login.store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
@@ -58,7 +58,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
-                                            href="/account/forgot-password"
+                                            href={customer.password.request.url()}
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
@@ -102,7 +102,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                         <div className="text-center text-sm text-muted-foreground">
                             {t("Don't have an account?")}{' '}
-                            <TextLink href="/account/register" tabIndex={5}>
+                            <TextLink href={customer.register.url()} tabIndex={5}>
                                 {t('auth.register.sign_up')}
                             </TextLink>
                         </div>

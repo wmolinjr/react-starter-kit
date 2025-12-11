@@ -41,11 +41,11 @@ Route::prefix('account')->name('customer.')->group(function () {
     Route::middleware('guest:customer')->group(function () {
         // Registration
         Route::get('register', [RegisterController::class, 'create'])->name('register');
-        Route::post('register', [RegisterController::class, 'store']);
+        Route::post('register', [RegisterController::class, 'store'])->name('register.store');
 
         // Login
         Route::get('login', [LoginController::class, 'create'])->name('login');
-        Route::post('login', [LoginController::class, 'store']);
+        Route::post('login', [LoginController::class, 'store'])->name('login.store');
 
         // Password Reset
         Route::get('forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
+import customer from '@/routes/customer';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
@@ -20,8 +21,7 @@ export default function Register() {
             <Head title={t('auth.register.sign_up')} />
 
             <Form
-                action="/account/register"
-                method="post"
+                {...customer.register.store.form()}
                 className="flex flex-col gap-6"
             >
                 {({ processing }) => (
@@ -103,7 +103,7 @@ export default function Register() {
 
                         <div className="text-center text-sm text-muted-foreground">
                             {t('auth.register.already_have_account')}{' '}
-                            <TextLink href="/account/login" tabIndex={6}>
+                            <TextLink href={customer.login.url()} tabIndex={6}>
                                 {t('auth.login.button')}
                             </TextLink>
                         </div>

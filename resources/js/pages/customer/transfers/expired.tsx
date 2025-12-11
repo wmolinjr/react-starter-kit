@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
+import customer from '@/routes/customer';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Clock } from 'lucide-react';
@@ -29,7 +30,7 @@ export default function TransferExpired() {
                 </div>
 
                 <Button asChild>
-                    <Link href="/account">
+                    <Link href={customer.dashboard.url()}>
                         {t('customer.workspace.go_to_dashboard')}
                     </Link>
                 </Button>

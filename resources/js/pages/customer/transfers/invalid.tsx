@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import AuthLayout from '@/layouts/auth-layout';
+import customer from '@/routes/customer';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { XCircle } from 'lucide-react';
@@ -67,7 +68,7 @@ export default function TransferInvalid({ status }: TransferInvalidProps) {
                 </div>
 
                 <Button asChild>
-                    <Link href="/account">
+                    <Link href={customer.dashboard.url()}>
                         {t('customer.workspace.go_to_dashboard')}
                     </Link>
                 </Button>

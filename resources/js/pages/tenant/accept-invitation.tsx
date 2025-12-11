@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import tenant from '@/routes/tenant';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +22,7 @@ export default function AcceptInvitation({ token }: Props) {
   });
 
   const handleAccept = () => {
-    post('/accept-invitation', {
+    post(tenant.invitation.accept.url(), {
       onSuccess: () => {
         // Redirect will be handled by controller
       },
@@ -73,11 +74,11 @@ export default function AcceptInvitation({ token }: Props) {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 {t('invitation.page.auth_required')}{' '}
-                <Link href={`/login?redirect=/accept-invitation?token=${token}`} className="underline font-medium">
+                <Link href={tenant.admin.auth.login.url({ query: { redirect: tenant.invitation.show.url({ query: { token } }) } })} className="underline font-medium">
                   {t('invitation.page.login')}
                 </Link>{' '}
                 {t('invitation.page.or')}{' '}
-                <Link href={`/register?redirect=/accept-invitation?token=${token}`} className="underline font-medium">
+                <Link href={tenant.admin.auth.register.url({ query: { redirect: tenant.invitation.show.url({ query: { token } }) } })} className="underline font-medium">
                   {t('invitation.page.create_account')}
                 </Link>
                 .

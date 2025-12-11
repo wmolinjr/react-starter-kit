@@ -2,6 +2,7 @@ import CustomerLayout from '@/layouts/customer-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import customer from '@/routes/customer';
 import { Form, Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CreditCard, Plus, Star, Trash2 } from 'lucide-react';
@@ -48,8 +49,8 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
     return (
         <CustomerLayout
             breadcrumbs={[
-                { title: t('customer.dashboard.title'), href: '/account' },
-                { title: t('customer.payment.methods'), href: '/account/payment-methods' },
+                { title: t('customer.dashboard.title'), href: customer.dashboard.url() },
+                { title: t('customer.payment.methods'), href: customer.paymentMethods.index.url() },
             ]}
         >
             <Head title={t('customer.payment.methods')} />
@@ -65,7 +66,7 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                         </p>
                     </div>
                     <Button asChild>
-                        <Link href="/account/payment-methods/create">
+                        <Link href={customer.paymentMethods.create.url()}>
                             <Plus className="mr-2 h-4 w-4" />
                             {t('customer.payment.add_method')}
                         </Link>
@@ -91,7 +92,7 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                                 {t('customer.payment.no_methods_description')}
                             </p>
                             <Button asChild>
-                                <Link href="/account/payment-methods/create">
+                                <Link href={customer.paymentMethods.create.url()}>
                                     <Plus className="mr-2 h-4 w-4" />
                                     {t('customer.payment.add_first')}
                                 </Link>
@@ -134,8 +135,7 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                                     <div className="flex items-center gap-2">
                                         {!method.is_default && !method.is_expired && (
                                             <Form
-                                                action={`/account/payment-methods/${method.id}/default`}
-                                                method="post"
+                                                {...customer.paymentMethods.default.form(method.id)}
                                             >
                                                 {({ processing }) => (
                                                     <Button
@@ -150,8 +150,7 @@ export default function PaymentMethodsIndex({ paymentMethods, status }: PaymentM
                                             </Form>
                                         )}
                                         <Form
-                                            action={`/account/payment-methods/${method.id}`}
-                                            method="delete"
+                                            {...customer.paymentMethods.destroy.form(method.id)}
                                         >
                                             {({ processing }) => (
                                                 <Button
