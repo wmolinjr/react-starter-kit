@@ -1,0 +1,7 @@
+{
+    "payment_settings.fields.default": "Gateway Padrão",
+    "payment_settings.fields.default_help": "Usar este gateway como padrão para novas transações.",
+    "payment_settings.fields.enabled": "Habilitado",
+    "payment_settings.fields.enabled_help": "Habilitar ou desabilitar este gateway de pagamento.",
+    "payment_settings.fields.webhook_url": "URL do Webhook"
+}

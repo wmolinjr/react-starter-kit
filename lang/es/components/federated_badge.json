@@ -1,0 +1,6 @@
+{
+    "components.federated_badge.federated": "Federado",
+    "components.federated_badge.master": "Principal",
+    "components.federated_badge.tooltip": "Este usuario está federado en múltiples inquilinos",
+    "components.federated_badge.tooltip_with_group": "Federado con :group"
+}

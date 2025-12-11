@@ -1,0 +1,4 @@
+{
+    "validation.federation.already_master": "O tenant selecionado já é o tenant mestre.",
+    "validation.federation.tenant_not_in_group": "O tenant selecionado não é membro deste grupo de federação."
+}

@@ -1,0 +1,8 @@
+{
+    "settings.profile.description": "Actualiza tu nombre y dirección de correo electrónico",
+    "settings.profile.email_unverified": "Su dirección de correo electrónico no está verificada.",
+    "settings.profile.page_title": "Configuración de Perfil",
+    "settings.profile.resend_verification": "Haga clic aquí para reenviar el correo de verificación.",
+    "settings.profile.title": "Perfil",
+    "settings.profile.verification_sent": "Se ha enviado un nuevo enlace de verificación a su dirección de correo electrónico."
+}

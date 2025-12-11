@@ -1,0 +1,7 @@
+{
+    "settings.language.description": "Selecciona tu idioma preferido",
+    "settings.language.help": "Este idioma se usará en toda la aplicación.",
+    "settings.language.preferred": "Idioma preferido",
+    "settings.language.title": "Idioma",
+    "settings.language.updated": "Preferencia de idioma actualizada exitosamente."
+}

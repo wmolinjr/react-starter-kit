@@ -1,0 +1,4 @@
+{
+    "validation.cart_empty": "Seu carrinho está vazio.",
+    "validation.file_too_large": "O arquivo é muito grande. O tamanho máximo permitido é :limitMB."
+}

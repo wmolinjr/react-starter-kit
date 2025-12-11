@@ -1,0 +1,10 @@
+{
+    "flash.addon.cancelled": "Complemento cancelado",
+    "flash.addon.created": "Complemento :name creado exitosamente.",
+    "flash.addon.deleted": "Complemento :name eliminado.",
+    "flash.addon.granted": "Complemento otorgado exitosamente.",
+    "flash.addon.revoked": "Complemento revocado exitosamente.",
+    "flash.addon.sync_failed": "Sincronización fallida: :errors",
+    "flash.addon.synced": "Complemento :name sincronizado con Stripe.",
+    "flash.addon.updated": "Complemento actualizado exitosamente."
+}

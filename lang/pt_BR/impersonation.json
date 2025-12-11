@@ -1,0 +1,19 @@
+{
+    "impersonation.actions_restricted": "Algumas acoes estao restritas durante a impersonacao.",
+    "impersonation.admin_mode": "Modo Admin",
+    "impersonation.admin_mode_active": "Voce esta no Modo Admin.",
+    "impersonation.admin_mode_description": "Entre no tenant como administrador sem fazer login como um usuario especifico. Util para suporte e inspecao.",
+    "impersonation.admin_mode_notice": "Voce esta visualizando este tenant sem uma sessao de usuario especifica.",
+    "impersonation.currently_impersonating": "Voce esta impersonando um usuario.",
+    "impersonation.enter_admin_mode": "Entrar como Admin",
+    "impersonation.entering": "Entrando...",
+    "impersonation.impersonate": "Impersonar",
+    "impersonation.impersonate_tenant": "Impersonar Tenant",
+    "impersonation.no_users_in_tenant": "Nenhum usuario encontrado neste tenant.",
+    "impersonation.select_user": "Selecionar Usuario",
+    "impersonation.select_user_description": "Selecione um usuario para impersonar e ver o sistema como ele veria.",
+    "impersonation.stop": "Parar Impersonacao",
+    "impersonation.stopping": "Parando...",
+    "impersonation.tenant_users": "Usuarios do Tenant",
+    "impersonation.use_admin_mode_instead": "Use o Modo Admin para acessar o tenant."
+}

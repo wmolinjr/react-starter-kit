@@ -1,0 +1,23 @@
+{
+    "tenant.dashboard.active": "Ativa",
+    "tenant.dashboard.activity": "Atividade",
+    "tenant.dashboard.billing": "Cobrança",
+    "tenant.dashboard.inactive": "Inativa",
+    "tenant.dashboard.last_7_days": "Últimos 7 dias",
+    "tenant.dashboard.manage_members": "Gerenciar membros",
+    "tenant.dashboard.manage_projects": "Gerenciar projetos",
+    "tenant.dashboard.manage_team": "Gerenciar equipe",
+    "tenant.dashboard.members": "Membros",
+    "tenant.dashboard.plans_and_invoices": "Planos e faturas",
+    "tenant.dashboard.projects": "Projetos",
+    "tenant.dashboard.quick_access": "Acesso Rápido",
+    "tenant.dashboard.quick_access_description": "Atalhos para as funções mais usadas",
+    "tenant.dashboard.reports": "Relatórios",
+    "tenant.dashboard.subscription_status": "Status da Assinatura",
+    "tenant.dashboard.team": "Equipe",
+    "tenant.dashboard.trial_ends_at": "Trial termina em :date",
+    "tenant.dashboard.trial_period": "Período de Teste",
+    "tenant.dashboard.view_all_projects": "Ver todos os projetos",
+    "tenant.dashboard.view_reports": "Ver relatórios",
+    "tenant.dashboard.welcome": "Bem-vindo ao :name"
+}

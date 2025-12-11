@@ -1,0 +1,16 @@
+{
+    "breadcrumbs.addon_catalog": "Catálogo de complementos",
+    "breadcrumbs.addon_management": "Gestión de complementos",
+    "breadcrumbs.bundle_catalog": "Catálogo de paquetes",
+    "breadcrumbs.create_addon": "Crear complemento",
+    "breadcrumbs.create_bundle": "Crear paquete",
+    "breadcrumbs.create_plan": "Crear plan",
+    "breadcrumbs.create_role": "Crear rol",
+    "breadcrumbs.custom_roles": "Roles personalizados",
+    "breadcrumbs.dashboard": "Panel",
+    "breadcrumbs.plan_catalog": "Catálogo de planes",
+    "breadcrumbs.role_management": "Gestión de roles",
+    "breadcrumbs.settings": "Configuración",
+    "breadcrumbs.tenants": "Inquilinos",
+    "breadcrumbs.users": "Usuarios"
+}

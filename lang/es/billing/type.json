@@ -1,0 +1,5 @@
+{
+    "billing.type.addon": "Complemento",
+    "billing.type.bundle": "Paquete",
+    "billing.type.plan": "Plan"
+}

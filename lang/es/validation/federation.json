@@ -1,0 +1,4 @@
+{
+    "validation.federation.already_master": "La organización seleccionada ya es la organización maestra.",
+    "validation.federation.tenant_not_in_group": "La organización seleccionada no es miembro de este grupo de federación."
+}

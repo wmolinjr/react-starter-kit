@@ -1,0 +1,5 @@
+{
+    "payment_settings.success.connection_verified": "Conexão verificada. Conta: :account",
+    "payment_settings.success.mode_changed": ":gateway alterado para modo :mode.",
+    "payment_settings.success.updated": "Configurações do :gateway salvas com sucesso."
+}

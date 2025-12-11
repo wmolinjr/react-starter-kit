@@ -39,7 +39,9 @@ export default defineConfig({
         wayfinder({
             formVariants: true,
         }),
-        i18n(),
+        i18n({
+            langDirname: 'lang', // Only scan lang/ directory, not vendor
+        }),
     ],
     esbuild: {
         jsx: 'automatic',

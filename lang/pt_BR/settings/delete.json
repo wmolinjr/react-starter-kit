@@ -1,0 +1,7 @@
+{
+    "settings.delete.confirm_description": "Uma vez que sua conta for excluída, todos os seus recursos e dados serão permanentemente excluídos. Por favor, digite sua senha para confirmar que deseja excluir permanentemente sua conta.",
+    "settings.delete.confirm_title": "Tem certeza que deseja excluir sua conta?",
+    "settings.delete.description": "Deletar sua conta e todos os seus dados e recursos",
+    "settings.delete.title": "Deletar Conta",
+    "settings.delete.warning": "Por favor, prossiga com cautela, isso não pode ser desfeito."
+}

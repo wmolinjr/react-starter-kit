@@ -1,0 +1,19 @@
+{
+    "impersonation.actions_restricted": "Some actions are restricted during impersonation.",
+    "impersonation.admin_mode": "Admin Mode",
+    "impersonation.admin_mode_active": "You are in Admin Mode.",
+    "impersonation.admin_mode_description": "Enter the tenant as an administrator without logging in as a specific user. Useful for support and inspection.",
+    "impersonation.admin_mode_notice": "You are viewing this tenant without a specific user session.",
+    "impersonation.currently_impersonating": "You are currently impersonating a user.",
+    "impersonation.enter_admin_mode": "Enter as Admin",
+    "impersonation.entering": "Entering...",
+    "impersonation.impersonate": "Impersonate",
+    "impersonation.impersonate_tenant": "Impersonate Tenant",
+    "impersonation.no_users_in_tenant": "No users found in this tenant.",
+    "impersonation.select_user": "Select User",
+    "impersonation.select_user_description": "Select a user to impersonate and see the system as they would see it.",
+    "impersonation.stop": "Stop Impersonating",
+    "impersonation.stopping": "Stopping...",
+    "impersonation.tenant_users": "Tenant Users",
+    "impersonation.use_admin_mode_instead": "Use Admin Mode to access the tenant."
+}

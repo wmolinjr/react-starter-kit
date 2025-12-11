@@ -1,0 +1,8 @@
+{
+    "flash.settings.branding_updated": "Identidade visual atualizada com sucesso!",
+    "flash.settings.config_updated": "Configurações do sistema atualizadas com sucesso!",
+    "flash.settings.domain_added": "Domínio adicionado! Configure o DNS para apontar para o servidor.",
+    "flash.settings.domain_removed": "Domínio removido com sucesso!",
+    "flash.settings.features_updated": "Configurações de recursos atualizadas!",
+    "flash.settings.notifications_updated": "Configurações de notificações atualizadas!"
+}

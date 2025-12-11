@@ -1,0 +1,8 @@
+{
+    "billing.payment_methods.boleto": "Boleto Bancário",
+    "billing.payment_methods.boleto.description": "Até 3 dias úteis para confirmação",
+    "billing.payment_methods.card": "Cartão de Crédito",
+    "billing.payment_methods.card.description": "Aprovação instantânea",
+    "billing.payment_methods.pix": "PIX",
+    "billing.payment_methods.pix.description": "Confirmado em segundos"
+}

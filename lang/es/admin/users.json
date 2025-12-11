@@ -1,0 +1,15 @@
+{
+    "admin.users.admin_description": "Acceso administrativo limitado",
+    "admin.users.all_users": "Todos los usuarios",
+    "admin.users.delete_confirm": "¿Estás seguro de que deseas eliminar este usuario?",
+    "admin.users.description": "Gestiona los usuarios del sistema",
+    "admin.users.email_verified": "Correo Verificado",
+    "admin.users.no_users": "No hay usuarios",
+    "admin.users.pending": "Pendiente",
+    "admin.users.pending_verification": "Verificación pendiente",
+    "admin.users.search_placeholder": "Buscar usuarios...",
+    "admin.users.super_admin_description": "Acceso completo a todos los inquilinos y configuración del sistema",
+    "admin.users.title": "Usuarios",
+    "admin.users.user_details": "Detalles del Usuario",
+    "admin.users.verified": "Verificado"
+}

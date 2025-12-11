@@ -1,0 +1,6 @@
+{
+    "billing.status.active": "Ativo",
+    "billing.status.canceled": "Cancelado",
+    "billing.status.past_due": "Vencido",
+    "billing.status.trial": "Teste"
+}

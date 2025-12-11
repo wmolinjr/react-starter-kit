@@ -1,0 +1,14 @@
+{
+    "billing.limits.api_calls": "Chamadas de API",
+    "billing.limits.api_calls_desc": "Requisições de API por mês",
+    "billing.limits.custom_roles": "Papéis Personalizados",
+    "billing.limits.custom_roles_desc": "Número de papéis personalizados",
+    "billing.limits.locales": "Idiomas",
+    "billing.limits.locales_desc": "Idiomas de interface suportados",
+    "billing.limits.projects": "Projetos",
+    "billing.limits.projects_desc": "Projetos máximos",
+    "billing.limits.storage": "Armazenamento",
+    "billing.limits.storage_desc": "Capacidade de armazenamento",
+    "billing.limits.users": "Usuários",
+    "billing.limits.users_desc": "Membros da equipe"
+}

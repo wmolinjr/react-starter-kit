@@ -1,0 +1,17 @@
+{
+    "flash.team.auth_required": "Você precisa estar autenticado para aceitar convites.",
+    "flash.team.cannot_change_only_owner": "Não é possível alterar a regra de acesso do único owner. Promova outro membro primeiro.",
+    "flash.team.cannot_change_own_role": "Você não pode alterar sua própria regra de acesso.",
+    "flash.team.cannot_remove_self": "Você não pode remover a si mesmo do time.",
+    "flash.team.invite_accept_error": "Erro ao aceitar convite: :error",
+    "flash.team.invite_accepted": "Convite aceito! Bem-vindo ao time.",
+    "flash.team.invite_error": "Erro ao enviar convite: :error",
+    "flash.team.invite_invalid": "Convite inválido, expirado ou já aceito.",
+    "flash.team.invite_sent": "Convite enviado com sucesso!",
+    "flash.team.invite_wrong_email": "Este convite não é para você.",
+    "flash.team.invite_wrong_tenant": "Este convite não é para esta contratação.",
+    "flash.team.member_removed": "Membro removido com sucesso!",
+    "flash.team.role_updated": "Regra de acesso atualizada com sucesso!",
+    "flash.team.user_already_member": "Este usuário já é membro do time.",
+    "flash.team.user_limit_reached": "Limite de usuários atingido para este plano."
+}

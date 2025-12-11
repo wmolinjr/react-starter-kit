@@ -1,0 +1,5 @@
+{
+    "flash.role.created": "Regra de acesso ':name' criada com sucesso.",
+    "flash.role.deleted": "Regra de acesso ':name' excluída com sucesso.",
+    "flash.role.updated": "Regra de acesso ':name' atualizada com sucesso."
+}

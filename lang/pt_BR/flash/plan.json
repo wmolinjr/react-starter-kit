@@ -1,0 +1,9 @@
+{
+    "flash.plan.cannot_delete_with_tenants": "Não é possível excluir plano com contratações ativas.",
+    "flash.plan.created": "Plano criado com sucesso.",
+    "flash.plan.deleted": "Plano excluído com sucesso.",
+    "flash.plan.sync_failed": "Falha na sincronização com Stripe: :error",
+    "flash.plan.synced": "Plano sincronizado com Stripe.",
+    "flash.plan.synced_all": ":count planos sincronizados com Stripe.",
+    "flash.plan.updated": "Plano atualizado com sucesso."
+}

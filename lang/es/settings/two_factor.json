@@ -1,0 +1,11 @@
+{
+    "settings.two_factor.continue_setup": "Continuar configuración",
+    "settings.two_factor.description": "Añade seguridad adicional a tu cuenta",
+    "settings.two_factor.disable": "Deshabilitar 2FA",
+    "settings.two_factor.disabled": "Deshabilitado",
+    "settings.two_factor.disabled_description": "Cuando habilites la autenticación de dos factores, se te pedirá un pin seguro durante el inicio de sesión. Este pin se puede obtener de una aplicación compatible con TOTP en tu teléfono.",
+    "settings.two_factor.enable": "Habilitar 2FA",
+    "settings.two_factor.enabled": "Habilitado",
+    "settings.two_factor.enabled_description": "Con la autenticación de dos factores habilitada, se te pedirá un pin seguro y aleatorio durante el inicio de sesión, el cual puedes obtener de una aplicación compatible con TOTP en tu teléfono.",
+    "settings.two_factor.title": "Autenticación de dos factores"
+}

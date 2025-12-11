@@ -11,6 +11,7 @@ export * from './resources';
 export * from './pagination';
 export * from './common';
 export * from './billing';
+export * from './translations';
 
 export interface User {
     id: string; // UUID

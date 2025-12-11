@@ -1,0 +1,7 @@
+{
+    "settings.delete.confirm_description": "Una vez que tu cuenta sea eliminada, todos sus recursos y datos serán eliminados permanentemente. Por favor ingresa tu contraseña para confirmar que deseas eliminar permanentemente tu cuenta.",
+    "settings.delete.confirm_title": "¿Está seguro de que desea eliminar su cuenta?",
+    "settings.delete.description": "Elimina permanentemente tu cuenta y todos tus datos",
+    "settings.delete.title": "Eliminar cuenta",
+    "settings.delete.warning": "Por favor procede con precaución, esto no se puede deshacer."
+}

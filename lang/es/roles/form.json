@@ -1,0 +1,21 @@
+{
+    "roles.form.basic_info_description": "Define el nombre y descripción del rol",
+    "roles.form.basic_info_title": "Información básica",
+    "roles.form.description_label": "Descripción",
+    "roles.form.description_placeholder": "Describe el propósito de este rol",
+    "roles.form.deselect_all": "Deseleccionar todo",
+    "roles.form.display_name_hint": "Este nombre se mostrará en la interfaz.",
+    "roles.form.display_name_label": "Nombre para mostrar",
+    "roles.form.display_name_placeholder": "ej., Editor, Moderador, Soporte",
+    "roles.form.name_hint": "Usa letras minúsculas, números y guiones bajos. Este es el identificador técnico.",
+    "roles.form.name_label": "Nombre del Rol",
+    "roles.form.name_placeholder": "Ingresa el nombre del rol",
+    "roles.form.no_permissions": "No hay permisos disponibles. Contacta a soporte.",
+    "roles.form.permissions_description": "Seleccione los permisos para este rol",
+    "roles.form.permissions_title": "Permisos",
+    "roles.form.protected_alert": "Este es un rol protegido del sistema. El nombre del rol no puede ser cambiado.",
+    "roles.form.select_all": "Seleccionar todo",
+    "roles.form.selected": ":count seleccionados",
+    "roles.form.submit_create": "Crear Rol",
+    "roles.form.submit_update": "Actualizar Rol"
+}

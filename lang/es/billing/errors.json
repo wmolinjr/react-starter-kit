@@ -1,0 +1,10 @@
+{
+    "billing.errors.async_no_recurring": ":method no soporta pagos recurrentes. Use tarjeta para suscripciones.",
+    "billing.errors.card_charge_failed": "El pago con tarjeta falló. Verifique los datos de la tarjeta e intente nuevamente.",
+    "billing.errors.checkout_failed": "Error en el checkout. Por favor, inténtalo de nuevo.",
+    "billing.errors.gateway_not_supported_for_method": "El gateway ':gateway' no soporta pagos con ':method'.",
+    "billing.errors.invalid_payment_method": "Método de pago inválido para esta operación.",
+    "billing.errors.payment_method_unavailable": "El método de pago ':method' no está disponible.",
+    "billing.errors.pix_qr_code_not_found": "Código QR PIX no encontrado",
+    "billing.errors.purchase_not_pending": "Esta compra ya no está pendiente."
+}

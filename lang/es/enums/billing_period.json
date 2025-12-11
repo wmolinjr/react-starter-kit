@@ -1,0 +1,7 @@
+{
+    "enums.billing_period.manual": "Manual",
+    "enums.billing_period.metered": "Medido",
+    "enums.billing_period.monthly": "Mensual",
+    "enums.billing_period.one_time": "Único",
+    "enums.billing_period.yearly": "Anual"
+}

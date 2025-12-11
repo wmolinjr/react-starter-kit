@@ -1,0 +1,4 @@
+{
+    "validation.cart_empty": "Your cart is empty.",
+    "validation.file_too_large": "The file is too large. Maximum allowed size is :limitMB."
+}

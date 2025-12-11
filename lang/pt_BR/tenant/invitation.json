@@ -1,0 +1,17 @@
+{
+    "tenant.invitation.accept_button": "Aceitar Convite",
+    "tenant.invitation.accept_title": "Aceitar Convite",
+    "tenant.invitation.accepting": "Aceitando...",
+    "tenant.invitation.access_info": "Ao aceitar o convite, você terá acesso completo aos recursos da organização de acordo com sua função.",
+    "tenant.invitation.auth_required": "Você precisa estar autenticado para aceitar o convite.",
+    "tenant.invitation.back_home": "Voltar para Home",
+    "tenant.invitation.create_account": "crie uma conta",
+    "tenant.invitation.hello_user": "Olá :name, você recebeu um convite para participar de uma organização.",
+    "tenant.invitation.invalid_description": "O link de convite que você acessou é inválido ou expirou.",
+    "tenant.invitation.invalid_title": "Convite Inválido",
+    "tenant.invitation.login": "Faça login",
+    "tenant.invitation.or": "ou",
+    "tenant.invitation.ready_to_start": "Pronto para começar?",
+    "tenant.invitation.received_invite": "Você recebeu um convite para participar de uma organização.",
+    "tenant.invitation.you_were_invited": "Você foi convidado!"
+}

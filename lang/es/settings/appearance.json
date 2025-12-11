@@ -1,0 +1,8 @@
+{
+    "settings.appearance.dark": "Oscuro",
+    "settings.appearance.description": "Personaliza la apariencia de la aplicación",
+    "settings.appearance.light": "Claro",
+    "settings.appearance.system": "Sistema",
+    "settings.appearance.title": "Apariencia",
+    "settings.appearance.toggle_theme": "Cambiar tema"
+}

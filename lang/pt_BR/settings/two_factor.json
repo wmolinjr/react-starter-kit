@@ -1,0 +1,11 @@
+{
+    "settings.two_factor.continue_setup": "Continuar Configuração",
+    "settings.two_factor.description": "Gerencie suas configurações de autenticação em dois fatores",
+    "settings.two_factor.disable": "Desabilitar 2FA",
+    "settings.two_factor.disabled": "Desabilitado",
+    "settings.two_factor.disabled_description": "Quando você habilitar a autenticação em dois fatores, será solicitado um PIN seguro durante o login. Este PIN pode ser obtido em um aplicativo compatível com TOTP no seu celular.",
+    "settings.two_factor.enable": "Habilitar 2FA",
+    "settings.two_factor.enabled": "Habilitado",
+    "settings.two_factor.enabled_description": "Com a autenticação em dois fatores habilitada, você será solicitado a fornecer um PIN seguro e aleatório durante o login, que pode ser obtido em um aplicativo compatível com TOTP no seu celular.",
+    "settings.two_factor.title": "Autenticação em Dois Fatores"
+}

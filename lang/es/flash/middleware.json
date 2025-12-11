@@ -1,0 +1,4 @@
+{
+    "flash.middleware.feature_not_available": "Esta característica no está disponible en tu plan",
+    "flash.middleware.limit_reached": "Has alcanzado el límite de :resource. Por favor actualiza tu plan."
+}

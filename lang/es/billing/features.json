@@ -1,0 +1,20 @@
+{
+    "billing.features.advanced_reports": "Reportes Avanzados",
+    "billing.features.advanced_reports_desc": "Acceso a análisis e informes detallados",
+    "billing.features.api_access": "Acceso API",
+    "billing.features.api_access_desc": "Acceso completo a la API REST para integraciones",
+    "billing.features.audit_log": "Registro de Auditoría",
+    "billing.features.audit_log_desc": "Rastrea todos los cambios y acciones",
+    "billing.features.custom_roles": "Roles Personalizados",
+    "billing.features.custom_roles_desc": "Crea conjuntos de permisos personalizados",
+    "billing.features.federation": "Federación de Usuarios",
+    "billing.features.federation_desc": "Sincroniza usuarios entre múltiples inquilinos",
+    "billing.features.multi_language": "Multi-idioma",
+    "billing.features.multi_language_desc": "Soporte para múltiples idiomas",
+    "billing.features.priority_support": "Soporte Prioritario",
+    "billing.features.priority_support_desc": "Acceso a soporte prioritario 24/7",
+    "billing.features.sso": "Integración SSO",
+    "billing.features.sso_desc": "Inicio de sesión único con tu proveedor de identidad",
+    "billing.features.white_label": "Marca Blanca",
+    "billing.features.white_label_desc": "Elimina la marca y personaliza"
+}

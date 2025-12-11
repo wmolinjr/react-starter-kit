@@ -1,0 +1,4 @@
+{
+    "tenant.roles.custom_roles_not_available": "Funções personalizadas não estão disponíveis no seu plano atual.",
+    "tenant.roles.limit_reached": "Você atingiu o número máximo de funções personalizadas permitidas pelo seu plano."
+}

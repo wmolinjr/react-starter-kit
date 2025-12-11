@@ -1,0 +1,7 @@
+{
+    "flash.bundle.created": "Paquete :name creado exitosamente.",
+    "flash.bundle.deleted": "Paquete :name eliminado.",
+    "flash.bundle.sync_failed": "Error al sincronizar paquete: :errors",
+    "flash.bundle.synced": "Paquete :name sincronizado con Stripe.",
+    "flash.bundle.updated": "Paquete actualizado exitosamente."
+}

@@ -92,7 +92,9 @@ class GenerateTypes extends Command
         $this->generatePermissionTypes();
         $this->generatePlanTypes();
         $this->generateResourceTypes();
-        $this->generateTranslations();
+        $this->generateTranslations();      // Updates enum keys in nested files
+        $this->mergeTranslationFiles();     // Merge nested → flat (after enum updates)
+        $this->generateTranslationTypes();
 
         $this->newLine();
         $this->displaySummary();
@@ -518,6 +520,7 @@ class GenerateTypes extends Command
             resource_path('js/types/permissions.d.ts'),
             resource_path('js/types/plan.d.ts'),
             resource_path('js/types/resources.d.ts'),
+            resource_path('js/types/translations.d.ts'),
             resource_path('js/lib/enum-metadata.ts'),
         ];
 
@@ -1123,17 +1126,170 @@ TS;
     // TRANSLATIONS
     // =========================================================================
 
+    /**
+     * Merge nested translation files into flat files for laravel-react-i18n.
+     *
+     * The package expects: lang/pt_BR.json, lang/en.json
+     * We organize as: lang/pt_BR/admin/federation.json, lang/pt_BR/tenant/team.json
+     *
+     * This method merges all nested files into a single flat file per locale.
+     */
+    protected function mergeTranslationFiles(): void
+    {
+        $locales = config('app.locales', ['en', 'pt_BR', 'es']);
+
+        foreach ($locales as $locale) {
+            $dir = lang_path($locale);
+
+            // Only merge if nested structure exists
+            if (! File::isDirectory($dir)) {
+                continue;
+            }
+
+            $translations = [];
+
+            // Collect all translations from nested files
+            foreach (File::allFiles($dir) as $file) {
+                if ($file->getExtension() !== 'json') {
+                    continue;
+                }
+
+                $content = json_decode(File::get($file->getPathname()), true);
+
+                if (is_array($content)) {
+                    $translations = array_merge($translations, $content);
+                }
+            }
+
+            if (empty($translations)) {
+                continue;
+            }
+
+            // Sort alphabetically
+            ksort($translations);
+
+            // Write flat file for laravel-react-i18n
+            $flatFile = lang_path("{$locale}.json");
+            $json = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            File::put($flatFile, $json."\n");
+
+            $this->info("  ✓ Merged translations: lang/{$locale}.json (".count($translations).' keys)');
+        }
+    }
+
     protected function generateTranslations(): void
     {
         // Get locales from config (reads from APP_LOCALES env)
         $locales = config('app.locales', ['en', 'pt_BR', 'es']);
 
         foreach ($locales as $locale) {
-            $this->updateTranslationFile($locale);
+            $this->updateTranslationFiles($locale);
         }
     }
 
-    protected function updateTranslationFile(string $locale): void
+    /**
+     * Update translation files for a locale.
+     *
+     * Supports both:
+     * - Namespace-based structure: lang/{locale}/*.json (new)
+     * - Monolithic structure: lang/{locale}.json (legacy)
+     */
+    protected function updateTranslationFiles(string $locale): void
+    {
+        $dir = lang_path($locale);
+
+        // Check if using namespace-based structure
+        if (File::isDirectory($dir)) {
+            $this->updateNamespacedTranslations($locale, $dir);
+
+            return;
+        }
+
+        // Fallback to monolithic file (legacy)
+        $this->updateMonolithicTranslationFile($locale);
+    }
+
+    /**
+     * Update translations in namespace-based structure.
+     *
+     * Each enum's translation_key prefix determines which file to update.
+     * Supports nested structure: 'enums.addon_type' → enums/addon_type.json or enums.json
+     */
+    protected function updateNamespacedTranslations(string $locale, string $dir): void
+    {
+        // Group enum translations by target file
+        $enumsByFile = [];
+
+        foreach ($this->enums as $name => $config) {
+            $cases = $config['class']::cases();
+            $getter = $config['translations'];
+            $prefix = $config['translation_key'];
+
+            // Determine target file based on prefix
+            // e.g., 'enums.addon_type' → find enums/addon_type.json OR enums.json
+            $targetFile = $this->findTranslationFile($dir, $prefix);
+
+            foreach ($cases as $case) {
+                $key = "{$prefix}.{$case->value}";
+                $enumsByFile[$targetFile][$key] = $getter($case, $locale, $key);
+            }
+        }
+
+        // Update each file
+        $totalEnumKeys = 0;
+
+        foreach ($enumsByFile as $targetFile => $enumTranslations) {
+            $existingTranslations = [];
+
+            if (File::exists($targetFile)) {
+                $existingTranslations = json_decode(File::get($targetFile), true) ?? [];
+            }
+
+            // Ensure directory exists (for nested structure)
+            $targetDir = dirname($targetFile);
+            if (! File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+
+            // Merge: existing + new enum translations (enum overwrites existing)
+            $translations = array_merge($existingTranslations, $enumTranslations);
+            ksort($translations);
+
+            $json = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            File::put($targetFile, $json."\n");
+
+            $totalEnumKeys += count($enumTranslations);
+        }
+
+        $this->info("  ✓ Updated translations: lang/{$locale}/ ({$totalEnumKeys} enum-generated keys)");
+    }
+
+    /**
+     * Find the correct translation file for a key prefix.
+     *
+     * Checks for nested structure first (enums/addon_type.json),
+     * then falls back to flat structure (enums.json).
+     */
+    protected function findTranslationFile(string $dir, string $prefix): string
+    {
+        $parts = explode('.', $prefix);
+
+        // Try nested structure first (if prefix has 2+ parts)
+        if (count($parts) >= 2) {
+            $nestedPath = "{$dir}/{$parts[0]}/{$parts[1]}.json";
+            if (File::exists($nestedPath)) {
+                return $nestedPath;
+            }
+        }
+
+        // Fallback to flat structure
+        return "{$dir}/{$parts[0]}.json";
+    }
+
+    /**
+     * Update monolithic translation file (legacy structure).
+     */
+    protected function updateMonolithicTranslationFile(string $locale): void
     {
         $filePath = lang_path("{$locale}.json");
 
@@ -1143,8 +1299,6 @@ TS;
             $content = File::get($filePath);
             $existingTranslations = json_decode($content, true) ?? [];
         }
-
-        $existingCount = count($existingTranslations);
 
         // Start with existing translations (preserves all hardcoded keys)
         $translations = $existingTranslations;
@@ -1171,10 +1325,9 @@ TS;
         $newCount = count($translations);
 
         // Safety check: ABORT if significant translation loss detected
-        // This happens when translations were accidentally deleted before running this command
         $minimumExpected = [
-            'en' => 1200,     // English should have at least 1200 keys
-            'pt_BR' => 1200,  // Portuguese should have at least 1200 keys
+            'en' => 1200,
+            'pt_BR' => 1200,
         ];
 
         $minExpected = $minimumExpected[$locale] ?? 200;
@@ -1191,7 +1344,7 @@ TS;
             $this->error('      sail artisan types:generate --force');
             $this->newLine();
 
-            return; // Do NOT write the file
+            return;
         }
 
         // Write back
@@ -1199,6 +1352,135 @@ TS;
         File::put($filePath, $json."\n");
 
         $this->info("  ✓ Updated translations: lang/{$locale}.json ({$newCount} keys, ".count($enumKeys).' enum-generated)');
+    }
+
+    // =========================================================================
+    // TRANSLATION TYPES (translations.d.ts)
+    // =========================================================================
+
+    /**
+     * Generate TypeScript types for translation keys.
+     *
+     * Creates a type-safe interface for all translation keys,
+     * providing autocomplete support in the IDE.
+     */
+    protected function generateTranslationTypes(): void
+    {
+        $baseLocale = config('app.fallback_locale', 'en');
+        $allKeys = $this->collectTranslationKeys($baseLocale);
+
+        if (empty($allKeys)) {
+            $this->warn('  ⚠ No translation keys found');
+
+            return;
+        }
+
+        $output = $this->getTranslationTypesHeader();
+        $output .= $this->generateTranslationKeyUnion($allKeys);
+
+        $path = resource_path('js/types/translations.d.ts');
+        File::put($path, $output);
+
+        $this->info('  ✓ Generated: resources/js/types/translations.d.ts ('.count($allKeys).' keys)');
+    }
+
+    /**
+     * Collect all translation keys from a locale.
+     *
+     * @return array<string>
+     */
+    protected function collectTranslationKeys(string $locale): array
+    {
+        $keys = [];
+        $dir = lang_path($locale);
+
+        // Check namespace-based structure first (supports nested folders)
+        if (File::isDirectory($dir)) {
+            // Use File::allFiles for recursive scanning
+            foreach (File::allFiles($dir) as $file) {
+                if ($file->getExtension() === 'json') {
+                    $translations = json_decode(File::get($file->getPathname()), true) ?? [];
+                    $keys = array_merge($keys, array_keys($translations));
+                }
+            }
+        } else {
+            // Fallback to monolithic file
+            $file = lang_path("{$locale}.json");
+
+            if (File::exists($file)) {
+                $translations = json_decode(File::get($file), true) ?? [];
+                $keys = array_keys($translations);
+            }
+        }
+
+        sort($keys);
+
+        return array_unique($keys);
+    }
+
+    protected function getTranslationTypesHeader(): string
+    {
+        return <<<'TS'
+/**
+ * Translation Key Types - Auto-generated from translation files
+ *
+ * DO NOT EDIT MANUALLY!
+ * Run: sail artisan types:generate
+ *
+ * Source of truth: lang/{locale}/*.json files
+ *
+ * Usage:
+ *   import type { TranslationKey } from '@/types/translations';
+ *
+ *   const { t } = useLaravelReactI18n();
+ *   t('admin.users.title'); // TypeScript validates this key
+ */
+
+
+TS;
+    }
+
+    /**
+     * Generate TypeScript union type for all translation keys.
+     *
+     * Groups keys by namespace for better readability and generates
+     * both a global TranslationKey type and namespace-specific types.
+     *
+     * @param  array<string>  $keys
+     */
+    protected function generateTranslationKeyUnion(array $keys): string
+    {
+        // Group keys by namespace
+        $namespaces = [];
+        foreach ($keys as $key) {
+            $parts = explode('.', $key);
+            $namespace = $parts[0];
+            $namespaces[$namespace][] = $key;
+        }
+
+        ksort($namespaces);
+
+        $output = '';
+
+        // Generate namespace-specific types
+        foreach ($namespaces as $namespace => $nsKeys) {
+            $capitalizedNs = ucfirst($namespace);
+            $count = count($nsKeys);
+            $keyList = array_map(fn ($k) => "    | '{$k}'", $nsKeys);
+
+            $output .= "/**\n * {$capitalizedNs} namespace keys ({$count} keys)\n */\n";
+            $output .= "export type {$capitalizedNs}TranslationKey =\n";
+            $output .= implode("\n", $keyList).";\n\n";
+        }
+
+        // Generate global TranslationKey type
+        $allKeysUnion = array_map(fn ($k) => "    | '{$k}'", $keys);
+
+        $output .= "/**\n * All available translation keys.\n * Use with: t(key: TranslationKey)\n */\n";
+        $output .= "export type TranslationKey =\n";
+        $output .= implode("\n", $allKeysUnion).";\n";
+
+        return $output;
     }
 
     // =========================================================================
@@ -1327,9 +1609,9 @@ TS;
         $this->line('    • resources/js/types/permissions.d.ts');
         $this->line('    • resources/js/types/plan.d.ts');
         $this->line('    • resources/js/types/resources.d.ts');
+        $this->line('    • resources/js/types/translations.d.ts');
         $this->line('    • resources/js/lib/enum-metadata.ts');
-        $this->line('    • lang/en.json (updated)');
-        $this->line('    • lang/pt_BR.json (updated)');
+        $this->line('    • lang/{locale}/ or lang/{locale}.json (updated)');
         $this->newLine();
     }
 }

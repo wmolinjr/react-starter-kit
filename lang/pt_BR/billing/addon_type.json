@@ -1,0 +1,5 @@
+{
+    "billing.addon_type.feature": "Recurso",
+    "billing.addon_type.quota": "Cota",
+    "billing.addon_type.service": "Serviço"
+}

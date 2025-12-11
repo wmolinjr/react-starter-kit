@@ -1,0 +1,19 @@
+{
+    "impersonation.actions_restricted": "Algunas acciones están restringidas en modo administrador",
+    "impersonation.admin_mode": "Modo Administrador",
+    "impersonation.admin_mode_active": "Modo administrador activo",
+    "impersonation.admin_mode_description": "Estás viendo esta organización como administrador",
+    "impersonation.admin_mode_notice": "Estás en modo administrador",
+    "impersonation.currently_impersonating": "Actualmente suplantando a",
+    "impersonation.enter_admin_mode": "Entrar en modo administrador",
+    "impersonation.entering": "Entrando como...",
+    "impersonation.impersonate": "Impersonar",
+    "impersonation.impersonate_tenant": "Impersonar Inquilino",
+    "impersonation.no_users_in_tenant": "No hay usuarios en esta organización",
+    "impersonation.select_user": "Seleccionar usuario",
+    "impersonation.select_user_description": "Selecciona un usuario para suplantar",
+    "impersonation.stop": "Dejar de Impersonar",
+    "impersonation.stopping": "Deteniendo suplantación...",
+    "impersonation.tenant_users": "Usuarios del Inquilino",
+    "impersonation.use_admin_mode_instead": "Usar modo administrador en su lugar"
+}

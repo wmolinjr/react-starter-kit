@@ -1,0 +1,23 @@
+{
+    "flash.federation.bulk_federated": ":count usuários federados com sucesso.",
+    "flash.federation.bulk_federated_partial": ":success usuários federados com sucesso, :failed falharam.",
+    "flash.federation.cannot_unfederate_master": "Não é possível desfederar o usuário mestre.",
+    "flash.federation.conflict_dismissed": "Conflito descartado.",
+    "flash.federation.conflict_resolved": "Conflito resolvido com sucesso.",
+    "flash.federation.group_created": "Grupo de federação ':name' criado com sucesso.",
+    "flash.federation.group_deleted": "Grupo de federação excluído com sucesso.",
+    "flash.federation.group_updated": "Grupo de federação atualizado com sucesso.",
+    "flash.federation.master_changed": "Tenant mestre alterado para :tenant com sucesso.",
+    "flash.federation.no_local_users": "Não há usuários locais disponíveis para federar.",
+    "flash.federation.no_users_selected": "Nenhum usuário selecionado para federação.",
+    "flash.federation.retry_sync_queued": "Retry de sincronização adicionado à fila.",
+    "flash.federation.sync_disabled": "Sincronização desabilitada para :tenant.",
+    "flash.federation.sync_enabled": "Sincronização habilitada para :tenant.",
+    "flash.federation.tenant_added": "Tenant adicionado ao grupo de federação.",
+    "flash.federation.tenant_not_in_group": "Tenant não está neste grupo de federação.",
+    "flash.federation.tenant_removed": "Tenant removido do grupo de federação.",
+    "flash.federation.user_federated": "Usuário :email federado com sucesso.",
+    "flash.federation.user_not_federated": "Este usuário não está federado.",
+    "flash.federation.user_synced": "Usuário sincronizado com sucesso.",
+    "flash.federation.user_unfederated": "Usuário :email desfederado com sucesso."
+}

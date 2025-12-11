@@ -1,0 +1,5 @@
+{
+    "flash.tenant.deleted": "Organización eliminada exitosamente",
+    "flash.tenant.organization_deleted": "Organización eliminada exitosamente.",
+    "flash.tenant.updated": "Organización actualizada exitosamente"
+}

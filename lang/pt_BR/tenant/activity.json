@@ -1,0 +1,22 @@
+{
+    "tenant.activity.column_action": "Ação",
+    "tenant.activity.column_date": "Data",
+    "tenant.activity.column_description": "Descrição",
+    "tenant.activity.column_subject": "Objeto",
+    "tenant.activity.column_user": "Usuário",
+    "tenant.activity.description": "Visualize todas as atividades e alterações em :name.",
+    "tenant.activity.event_created": "Criado",
+    "tenant.activity.event_deleted": "Deletado",
+    "tenant.activity.event_login": "Login",
+    "tenant.activity.event_logout": "Logout",
+    "tenant.activity.event_updated": "Atualizado",
+    "tenant.activity.filter_date_from": "Data Inicial",
+    "tenant.activity.filter_date_to": "Data Final",
+    "tenant.activity.filter_event": "Tipo de Evento",
+    "tenant.activity.filter_subject": "Tipo de Objeto",
+    "tenant.activity.filter_user": "Usuário",
+    "tenant.activity.no_activities": "Nenhuma atividade registrada ainda.",
+    "tenant.activity.page_title": "Atividade do Time",
+    "tenant.activity.system": "Sistema",
+    "tenant.activity.title": "Atividades"
+}

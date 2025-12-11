@@ -1,0 +1,3 @@
+{
+    "payment_settings.warnings.no_credentials": "Nenhuma credencial de :mode configurada. Adicione credenciais para habilitar este gateway."
+}

@@ -1,0 +1,20 @@
+{
+    "tenant.invoices.all_invoices": "Todas las facturas",
+    "tenant.invoices.all_invoices_description": "Historial completo de facturas y pagos",
+    "tenant.invoices.column_amount": "Monto",
+    "tenant.invoices.column_date": "Fecha",
+    "tenant.invoices.column_number": "Factura #",
+    "tenant.invoices.column_status": "Estado",
+    "tenant.invoices.description": "Historial de facturas y pagos",
+    "tenant.invoices.download_pdf": "Descargar PDF",
+    "tenant.invoices.invoice_details": "Detalles de la Factura",
+    "tenant.invoices.line_items": "Conceptos",
+    "tenant.invoices.no_invoices": "No hay facturas disponibles",
+    "tenant.invoices.page_title": "Facturas",
+    "tenant.invoices.quantity": "Cant.",
+    "tenant.invoices.status_open": "Abierta",
+    "tenant.invoices.status_paid": "Pagado",
+    "tenant.invoices.status_uncollectible": "Incobrable",
+    "tenant.invoices.status_void": "Anulada",
+    "tenant.invoices.title": "Facturas"
+}
