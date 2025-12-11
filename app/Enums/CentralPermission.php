@@ -58,6 +58,10 @@ enum CentralPermission: string
     case SYSTEM_EDIT = 'system:edit';
     case SYSTEM_LOGS = 'system:logs';
 
+    // Payment Settings (2 permissions)
+    case PAYMENT_SETTINGS_VIEW = 'payment:view';
+    case PAYMENT_SETTINGS_MANAGE = 'payment:manage';
+
     // Federation Management (5 permissions)
     case FEDERATION_VIEW = 'federation:view';
     case FEDERATION_CREATE = 'federation:create';
@@ -89,6 +93,7 @@ enum CentralPermission: string
             'system' => ['en' => 'System', 'pt_BR' => 'Sistema', 'es' => 'Sistema'],
             'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
             'audit' => ['en' => 'Audit', 'pt_BR' => 'Auditoria', 'es' => 'Auditoría'],
+            'payment' => ['en' => 'Payment', 'pt_BR' => 'Pagamento', 'es' => 'Pago'],
         ];
 
         $actionNames = [
@@ -105,6 +110,7 @@ enum CentralPermission: string
             'revoke' => ['en' => 'Revoke', 'pt_BR' => 'Revogar', 'es' => 'Revocar'],
             'manageConflicts' => ['en' => 'Manage Conflicts', 'pt_BR' => 'Gerenciar Conflitos', 'es' => 'Gestionar Conflictos'],
             'export' => ['en' => 'Export', 'pt_BR' => 'Exportar', 'es' => 'Exportar'],
+            'manage' => ['en' => 'Manage', 'pt_BR' => 'Gerenciar', 'es' => 'Gestionar'],
         ];
 
         $catName = $categoryNames[$category] ?? ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)];
@@ -169,6 +175,10 @@ enum CentralPermission: string
             self::SYSTEM_EDIT => ['en' => 'Edit system settings', 'pt_BR' => 'Editar configurações do sistema', 'es' => 'Editar configuración del sistema'],
             self::SYSTEM_LOGS => ['en' => 'View system logs', 'pt_BR' => 'Visualizar logs do sistema', 'es' => 'Ver registros del sistema'],
 
+            // Payment Settings
+            self::PAYMENT_SETTINGS_VIEW => ['en' => 'View payment gateway settings', 'pt_BR' => 'Visualizar configurações de gateway de pagamento', 'es' => 'Ver configuración de gateway de pago'],
+            self::PAYMENT_SETTINGS_MANAGE => ['en' => 'Manage payment gateway credentials', 'pt_BR' => 'Gerenciar credenciais de gateway de pagamento', 'es' => 'Gestionar credenciales de gateway de pago'],
+
             // Federation
             self::FEDERATION_VIEW => ['en' => 'View federation groups', 'pt_BR' => 'Visualizar grupos de federação', 'es' => 'Ver grupos de federación'],
             self::FEDERATION_CREATE => ['en' => 'Create federation groups', 'pt_BR' => 'Criar grupos de federação', 'es' => 'Crear grupos de federación'],
@@ -195,6 +205,7 @@ enum CentralPermission: string
             'addons' => 'Puzzle',
             'roles' => 'Shield',
             'system' => 'Settings',
+            'payment' => 'Wallet',
             'federation' => 'Network',
             'audit' => 'ClipboardList',
             default => 'Circle',
@@ -214,6 +225,7 @@ enum CentralPermission: string
             'addons' => 'pink',
             'roles' => 'yellow',
             'system' => 'gray',
+            'payment' => 'emerald',
             'federation' => 'cyan',
             'audit' => 'amber',
             default => 'gray',
@@ -229,6 +241,7 @@ enum CentralPermission: string
             'tenants', 'users' => 'default',
             'plans', 'catalog', 'addons' => 'secondary',
             'roles', 'system' => 'outline',
+            'payment' => 'default',
             'federation', 'audit' => 'default',
             default => 'outline',
         };
@@ -289,6 +302,7 @@ enum CentralPermission: string
             'system' => ['en' => 'System', 'pt_BR' => 'Sistema', 'es' => 'Sistema'],
             'federation' => ['en' => 'Federation', 'pt_BR' => 'Federação', 'es' => 'Federación'],
             'audit' => ['en' => 'Audit Log', 'pt_BR' => 'Log de Auditoria', 'es' => 'Registro de Auditoría'],
+            'payment' => ['en' => 'Payment Settings', 'pt_BR' => 'Configurações de Pagamento', 'es' => 'Configuración de Pago'],
             default => ['en' => ucfirst($category), 'pt_BR' => ucfirst($category), 'es' => ucfirst($category)],
         };
     }

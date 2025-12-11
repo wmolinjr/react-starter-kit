@@ -7,6 +7,8 @@ namespace App\Services\Payment;
 use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Contracts\Payment\PaymentMethodGatewayInterface;
 use App\Contracts\Payment\SubscriptionGatewayInterface;
+use App\Enums\PaymentGateway;
+use App\Services\Central\PaymentSettingsService;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -41,11 +43,29 @@ class PaymentGatewayManager extends Manager
     }
 
     /**
+     * Get merged config for a gateway (DB settings + ENV fallback).
+     *
+     * Uses PaymentSettingsService to get config from database first,
+     * falling back to config file if not configured in DB.
+     */
+    protected function getMergedConfig(PaymentGateway $gateway): array
+    {
+        try {
+            $service = app(PaymentSettingsService::class);
+
+            return $service->getMergedConfig($gateway);
+        } catch (\Exception $e) {
+            // Fallback to config file if service fails
+            return $this->config->get("payment.drivers.{$gateway->value}", []);
+        }
+    }
+
+    /**
      * Create Stripe gateway driver.
      */
     protected function createStripeDriver(): PaymentGatewayInterface
     {
-        $config = $this->config->get('payment.drivers.stripe', []);
+        $config = $this->getMergedConfig(PaymentGateway::STRIPE);
 
         return new Gateways\StripeGateway($config);
     }
@@ -55,7 +75,7 @@ class PaymentGatewayManager extends Manager
      */
     protected function createAsaasDriver(): PaymentGatewayInterface
     {
-        $config = $this->config->get('payment.drivers.asaas', []);
+        $config = $this->getMergedConfig(PaymentGateway::ASAAS);
 
         return new Gateways\AsaasGateway($config);
     }
@@ -65,7 +85,7 @@ class PaymentGatewayManager extends Manager
      */
     protected function createPagseguroDriver(): PaymentGatewayInterface
     {
-        $config = $this->config->get('payment.drivers.pagseguro', []);
+        $config = $this->getMergedConfig(PaymentGateway::PAGSEGURO);
 
         return new Gateways\PagSeguroGateway($config);
     }
@@ -75,7 +95,7 @@ class PaymentGatewayManager extends Manager
      */
     protected function createMercadopagoDriver(): PaymentGatewayInterface
     {
-        $config = $this->config->get('payment.drivers.mercadopago', []);
+        $config = $this->getMergedConfig(PaymentGateway::MERCADOPAGO);
 
         return new Gateways\MercadoPagoGateway($config);
     }

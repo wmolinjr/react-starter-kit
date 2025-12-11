@@ -233,7 +233,7 @@ export interface CheckoutState {
  */
 export interface SubscriptionInfo {
     id: string;
-    status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete';
+    status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete' | 'paused';
     currentPeriodStart: string;
     currentPeriodEnd: string;
     cancelAtPeriodEnd: boolean;

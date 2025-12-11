@@ -2,12 +2,28 @@
 
 > Plano de execução para completar o sistema de billing multi-pagamento.
 >
-> **Status**: Em andamento
+> **Status**: Fase 6 e 7 concluídas ✅
 > **Última atualização**: 2025-12-10
+> **Progresso**: ~85% completo
 
 ## Visão Geral
 
 Este documento detalha o plano de implementação para o sistema completo de billing com suporte a múltiplos métodos de pagamento (Card, PIX, Boleto).
+
+### Resumo do Progresso
+
+| Fase | Descrição | Status | Progresso |
+|------|-----------|--------|-----------|
+| 1 | Webhooks e Confirmação | ✅ Concluída | 100% |
+| 2 | Integração Frontend | ✅ Concluída | 100% |
+| 3 | Notificações por Email | ✅ Concluída | 100% |
+| 4 | Admin Dashboard Pagamentos | ✅ Concluída | 100% |
+| 5 | Metered Billing | ⏳ Parcial | ~60% |
+| 6 | Subscription Management | ✅ Concluída | 100% |
+| 7 | Melhorias de UX | ✅ Concluída | 100% |
+| 8 | Testes Adicionais | ⏳ Parcial | ~60% |
+
+**Progresso Total**: ~85%
 
 ### Arquitetura Atual
 
@@ -282,82 +298,126 @@ GET  /api/v1/usage/summary  # Resumo de uso atual
 
 ---
 
-## Fase 6: Subscription Management
+## Fase 6: Subscription Management ✅ CONCLUÍDA
 
 **Duração estimada**: 2-3 dias
 **Prioridade**: MÉDIA
+**Status**: ✅ Concluída em 2025-12-10
 
-### 6.1 Pausar/Retomar Assinatura
+### 6.1 Pausar/Retomar Assinatura ✅
 
-**Arquivos a modificar**:
-- [ ] `app/Services/Tenant/BillingService.php`
-- [ ] `app/Http/Controllers/Tenant/Admin/SubscriptionController.php`
+**Arquivos modificados**:
+- [x] `app/Services/Tenant/BillingService.php` - Métodos `pauseSubscription()`, `unpauseSubscription()`
+- [x] `app/Http/Controllers/Tenant/Admin/BillingController.php` - Actions `pauseSubscription()`, `unpauseSubscription()`
 
 **Endpoints**:
 ```
-POST /admin/subscription/pause
-POST /admin/subscription/resume
+POST /admin/billing/subscription/pause
+POST /admin/billing/subscription/unpause
+POST /admin/billing/subscription/resume
 ```
 
-### 6.2 Cancelamento com Período de Graça
+### 6.2 Cancelamento com Período de Graça ✅
 
-**Arquivos a modificar**:
-- [ ] `app/Services/Tenant/BillingService.php` - `cancelSubscription()`
-- [ ] `app/Jobs/Central/HandleSubscriptionGracePeriodJob.php`
+**Arquivos criados/modificados**:
+- [x] `app/Services/Tenant/BillingService.php` - `cancelSubscription()`, `resumeSubscription()`
+- [x] `app/Jobs/Central/HandleSubscriptionGracePeriodJob.php` - **NOVO**
+- [x] `app/Events/Central/SubscriptionExpired.php` - **NOVO**
+- [x] `routes/console.php` - Job agendado para meia-noite
 
 **Fluxo**:
 ```
-Cancelar → Marcar ends_at → Manter acesso até ends_at → Downgrade para free
+Cancelar → Marcar ends_at → Manter acesso até ends_at → Job detecta expiração → Downgrade para free → Dispara evento SubscriptionExpired
 ```
 
-### 6.3 Upgrade/Downgrade de Plano
+### 6.3 Upgrade/Downgrade de Plano ✅
 
-**Arquivos a modificar**:
-- [ ] `app/Services/Tenant/BillingService.php` - `changePlan()`
-- [ ] Proration handling
+**Arquivos modificados**:
+- [x] `app/Services/Tenant/BillingService.php` - `changePlan()`
+- [x] Proration handling via Stripe
 
-### 6.4 UI de Gerenciamento
+### 6.4 UI de Gerenciamento ✅
 
-**Arquivo a criar**:
-- [ ] `resources/js/pages/tenant/admin/billing/subscription.tsx`
+**Arquivo criado**:
+- [x] `resources/js/pages/tenant/admin/billing/subscription.tsx` - **NOVO**
+
+**Features implementadas**:
+- Status badges (active, trialing, paused, past_due, canceled)
+- Pausar/retomar assinatura
+- Retomar de período de graça
+- Cancelar com opções (fim do período ou imediato)
+- Trocar de plano com seletor visual
 
 ---
 
-## Fase 7: Melhorias de UX
+## Fase 7: Melhorias de UX ✅ CONCLUÍDA
 
 **Duração estimada**: 1-2 dias
 **Prioridade**: BAIXA
+**Status**: ✅ Concluída em 2025-12-10
 
-### 7.1 Persistência do Carrinho
+### 7.1 Persistência do Carrinho ✅
 
-**Arquivo a modificar**:
-- [ ] `resources/js/hooks/billing/use-checkout.tsx`
+**Arquivo modificado**:
+- [x] `resources/js/hooks/billing/use-checkout.tsx` - Já implementado!
 
-**Implementação**:
+**Implementação existente** (linhas 117-149, 188-196):
 ```typescript
-// Salvar em localStorage
-useEffect(() => {
-  localStorage.setItem('checkout_cart', JSON.stringify(items));
-}, [items]);
-
-// Recuperar ao montar
-useEffect(() => {
-  const saved = localStorage.getItem('checkout_cart');
-  if (saved) setItems(JSON.parse(saved));
+// loadStoredCart() - Recupera do localStorage com expiração de 24h
+const loadStoredCart = useCallback(() => {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.expiry > Date.now()) {
+            // Restaura items
+        }
+    }
 }, []);
+
+// Persist effect - Salva no localStorage
+useEffect(() => {
+    if (items.length > 0) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({
+            items,
+            billingPeriod,
+            expiry: Date.now() + CART_EXPIRY_MS, // 24 horas
+        }));
+    }
+}, [items, billingPeriod]);
 ```
 
-### 7.2 Animações de Transição
+### 7.2 Animações de Transição ✅
 
-**Arquivo a modificar**:
-- [ ] `resources/js/components/shared/billing/checkout/checkout-payment-sheet.tsx`
+**Arquivos modificados**:
+- [x] `resources/js/components/shared/billing/checkout/checkout-payment-sheet.tsx`
+- [x] `resources/js/pages/tenant/admin/billing/success.tsx`
 
-**Usar**: Framer Motion ou CSS transitions
+**Implementação**:
+- Transições animadas entre steps (cart → payment → async-payment → success)
+- Estado de sucesso com checkmark animado e efeito ripple
+- Animações staggered para conteúdo
+- Usa `tw-animate-css` (Tailwind animations: `animate-in`, `fade-in`, `slide-in-from-*`, `zoom-in-*`)
 
-### 7.3 Histórico de Tentativas
+**Features de animação**:
+- Step transitions com slide/fade
+- Success state com animated checkmark
+- Ripple effect no ícone de sucesso
+- Sparkle decorations na página de sucesso
+- Staggered content animations
 
-**Arquivo a criar**:
-- [ ] `resources/js/components/shared/billing/payment-history.tsx`
+### 7.3 Histórico de Pagamentos ✅
+
+**Arquivo criado**:
+- [x] `resources/js/components/shared/billing/dashboard/payment-history.tsx` - **NOVO**
+
+**Features**:
+- 3 variantes de display: `card`, `table`, `timeline`
+- Status badges (paid, open, failed, refunded, void)
+- Payment method badges (card, pix, boleto)
+- Download de invoice
+- Empty state handling
+- Suporte a `PaymentResource` e `InvoiceDetailResource`
+- Paginação com "View All"
 
 ---
 
@@ -443,16 +503,16 @@ useEffect(() => {
 - [ ] API de uso
 - [ ] Dashboard de uso
 
-### Fase 6 - Subscription
-- [ ] Pausar/retomar
-- [ ] Cancelamento graceful
-- [ ] Upgrade/downgrade
-- [ ] UI de gerenciamento
+### Fase 6 - Subscription ✅
+- [x] Pausar/retomar - `BillingService` e `BillingController`
+- [x] Cancelamento graceful - `HandleSubscriptionGracePeriodJob`
+- [x] Upgrade/downgrade - `changePlan()` com proration
+- [x] UI de gerenciamento - `subscription.tsx`
 
-### Fase 7 - UX
-- [ ] Persistência carrinho
-- [ ] Animações
-- [ ] Histórico tentativas
+### Fase 7 - UX ✅
+- [x] Persistência carrinho - `use-checkout.tsx` (24h expiry)
+- [x] Animações - `checkout-payment-sheet.tsx`, `success.tsx`
+- [x] Histórico pagamentos - `payment-history.tsx`
 
 ### Fase 8 - Testes
 - [ ] Integração Asaas sandbox

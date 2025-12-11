@@ -1053,6 +1053,8 @@
     "permissions.central.federation:edit": "Federación: Editar",
     "permissions.central.federation:manageConflicts": "Federación: Gestionar Conflictos",
     "permissions.central.federation:view": "Federación: Ver",
+    "permissions.central.payment:manage": "Pago: Gestionar",
+    "permissions.central.payment:view": "Pago: Ver",
     "permissions.central.plans:create": "Planes: Crear",
     "permissions.central.plans:delete": "Planes: Eliminar",
     "permissions.central.plans:edit": "Planes: Editar",

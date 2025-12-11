@@ -11,6 +11,7 @@ use App\Http\Controllers\Central\Admin\FederationConflictController;
 use App\Http\Controllers\Central\Admin\FederationGroupController;
 use App\Http\Controllers\Central\Admin\ImpersonationController;
 use App\Http\Controllers\Central\Admin\PaymentController;
+use App\Http\Controllers\Central\Admin\PaymentSettingsController;
 use App\Http\Controllers\Central\Admin\PlanCatalogController;
 use App\Http\Controllers\Central\Admin\RoleManagementController;
 use App\Http\Controllers\Central\Admin\TenantManagementController;
@@ -288,6 +289,14 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::get('/export', [PaymentController::class, 'export'])->name('export');
                     Route::get('/{payment}', [PaymentController::class, 'show'])->name('show');
                     Route::post('/{payment}/refund', [PaymentController::class, 'refund'])->name('refund');
+                });
+
+                // Payment Gateway Settings
+                Route::prefix('payment-settings')->name('payment-settings.')->group(function () {
+                    Route::get('/', [PaymentSettingsController::class, 'index'])->name('index');
+                    Route::put('/{gateway}', [PaymentSettingsController::class, 'update'])->name('update');
+                    Route::post('/{gateway}/toggle-sandbox', [PaymentSettingsController::class, 'toggleSandbox'])->name('toggle-sandbox');
+                    Route::post('/{gateway}/test', [PaymentSettingsController::class, 'test'])->name('test');
                 });
 
                 /*

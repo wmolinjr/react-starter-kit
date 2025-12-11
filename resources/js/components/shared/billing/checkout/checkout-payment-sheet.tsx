@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -9,6 +9,7 @@ import {
     ArrowRight,
     ShoppingBag,
     ArrowLeft,
+    CheckCircle2,
 } from 'lucide-react';
 import {
     Sheet,
@@ -34,7 +35,14 @@ import type { CheckoutItem, PlanChangeInfo } from '@/types/billing';
 import type { BillingPeriod } from '@/types/enums';
 import { cartCheckout, cartPaymentStatus } from '@/routes/tenant/admin/billing';
 
-type CheckoutStep = 'cart' | 'payment' | 'async-payment';
+type CheckoutStep = 'cart' | 'payment' | 'async-payment' | 'success';
+
+// Animation configuration for step transitions
+const stepAnimationClasses = {
+    enter: 'animate-in fade-in-0 slide-in-from-right-4 duration-300',
+    exit: 'animate-out fade-out-0 slide-out-to-left-4 duration-200',
+    back: 'animate-in fade-in-0 slide-in-from-left-4 duration-300',
+};
 
 interface AsyncPaymentResult {
     type: 'pix' | 'boleto';
@@ -138,6 +146,21 @@ export function CheckoutPaymentSheet({
     const [asyncPaymentResult, setAsyncPaymentResult] =
         useState<AsyncPaymentResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [animationDirection, setAnimationDirection] = useState<'forward' | 'back'>('forward');
+    const [isAnimating, setIsAnimating] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    // Handle animated step transition
+    const goToStep = useCallback((newStep: CheckoutStep, direction: 'forward' | 'back' = 'forward') => {
+        setAnimationDirection(direction);
+        setIsAnimating(true);
+
+        // Short delay for exit animation
+        setTimeout(() => {
+            setStep(newStep);
+            setIsAnimating(false);
+        }, 150);
+    }, []);
 
     // Filter out pix/boleto if cart has recurring items
     const effectiveAvailableMethods = hasRecurring
@@ -193,7 +216,7 @@ export function CheckoutPaymentSheet({
     // Proceed to payment method selection
     const handleProceedToPayment = () => {
         setError(null);
-        setStep('payment');
+        goToStep('payment', 'forward');
     };
 
     // Handle checkout submission
@@ -261,7 +284,7 @@ export function CheckoutPaymentSheet({
 
             const result: AsyncPaymentResult = await response.json();
             setAsyncPaymentResult(result);
-            setStep('async-payment');
+            goToStep('async-payment', 'forward');
         } catch (err) {
             setError(
                 err instanceof Error
@@ -277,7 +300,15 @@ export function CheckoutPaymentSheet({
 
     // Handle async payment success
     const handleAsyncPaymentSuccess = () => {
-        onClearCart?.();
+        goToStep('success', 'forward');
+        // Clear cart after showing success
+        setTimeout(() => {
+            onClearCart?.();
+        }, 500);
+    };
+
+    // Handle closing from success state
+    const handleSuccessClose = () => {
         onOpenChange(false);
         router.visit('/admin/billing', {
             preserveScroll: true,
@@ -287,9 +318,9 @@ export function CheckoutPaymentSheet({
     // Handle going back
     const handleBack = () => {
         if (step === 'payment') {
-            setStep('cart');
+            goToStep('cart', 'back');
         } else if (step === 'async-payment') {
-            setStep('payment');
+            goToStep('payment', 'back');
             setAsyncPaymentResult(null);
         }
     };
@@ -319,7 +350,21 @@ export function CheckoutPaymentSheet({
                     : t('billing.boleto_payment', {
                           default: 'Boleto Payment',
                       });
+            case 'success':
+                return t('billing.payment_successful', {
+                    default: 'Payment Successful',
+                });
         }
+    };
+
+    // Get animation class based on direction
+    const getAnimationClass = () => {
+        if (isAnimating) {
+            return 'opacity-0 transition-opacity duration-150';
+        }
+        return animationDirection === 'forward'
+            ? stepAnimationClasses.enter
+            : stepAnimationClasses.back;
     };
 
     // Render PIX payment
@@ -369,6 +414,47 @@ export function CheckoutPaymentSheet({
                 dueDate={asyncPaymentResult.due_date || ''}
                 amount={formatPrice(asyncPaymentResult.amount)}
             />
+        );
+    };
+
+    // Render success step
+    const renderSuccess = () => {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
+                {/* Animated checkmark */}
+                <div className="relative">
+                    <div className="animate-in zoom-in-50 duration-500 ease-out flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                        <CheckCircle2 className="animate-in fade-in-0 zoom-in-75 delay-200 duration-500 h-10 w-10 text-green-600 dark:text-green-400" />
+                    </div>
+                    {/* Ripple effect */}
+                    <div className="animate-ping absolute inset-0 rounded-full bg-green-400/30 dark:bg-green-400/20" style={{ animationDuration: '1s', animationIterationCount: '2' }} />
+                </div>
+
+                <div className="animate-in fade-in-0 slide-in-from-bottom-4 delay-300 duration-500 space-y-2">
+                    <h3 className="text-xl font-semibold text-foreground">
+                        {t('billing.payment_confirmed', { default: 'Payment Confirmed!' })}
+                    </h3>
+                    <p className="text-sm text-muted-foreground max-w-xs">
+                        {t('billing.payment_success_message', {
+                            default: 'Your purchase has been completed successfully. Your add-ons are now active.',
+                        })}
+                    </p>
+                </div>
+
+                <div className="animate-in fade-in-0 slide-in-from-bottom-4 delay-500 duration-500 flex flex-col gap-2 w-full max-w-xs">
+                    <Button onClick={handleSuccessClose} size="lg" className="w-full">
+                        {t('billing.view_billing', { default: 'View Billing' })}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={() => onOpenChange(false)}
+                        className="w-full"
+                    >
+                        {t('billing.continue_shopping', { default: 'Continue Shopping' })}
+                    </Button>
+                </div>
+            </div>
         );
     };
 
@@ -638,10 +724,17 @@ export function CheckoutPaymentSheet({
 
                 {/* Step: Async Payment (PIX/Boleto) */}
                 {step === 'async-payment' && asyncPaymentResult && (
-                    <div className="flex-1">
+                    <div className={cn('flex-1', getAnimationClass())}>
                         {asyncPaymentResult.type === 'pix'
                             ? renderPixPayment()
                             : renderBoletoPayment()}
+                    </div>
+                )}
+
+                {/* Step: Success */}
+                {step === 'success' && (
+                    <div className={cn('flex-1', getAnimationClass())}>
+                        {renderSuccess()}
                     </div>
                 )}
             </SheetContent>

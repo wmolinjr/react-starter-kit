@@ -10,7 +10,7 @@ import AdminLayout from '@/layouts/tenant/admin-layout';
 import admin from '@/routes/tenant/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { CheckCircle, CreditCard, LayoutGrid } from 'lucide-react';
+import { CheckCircle, CreditCard, LayoutGrid, Sparkles } from 'lucide-react';
 import { type ReactElement } from 'react';
 
 interface Props {
@@ -26,24 +26,35 @@ function BillingSuccess({ plan, message }: Props) {
             <Head title={t('tenant.billing.payment_confirmed')} />
 
             <div className="flex items-center justify-center min-h-[60vh]">
-                <Card className="max-w-md w-full text-center">
+                <Card className="animate-in fade-in-0 zoom-in-95 duration-500 max-w-md w-full text-center">
                     <CardHeader>
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-                            <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
+                        {/* Animated success icon with ripple effect */}
+                        <div className="relative mx-auto mb-4">
+                            <div className="animate-in zoom-in-50 duration-700 ease-out flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                                <CheckCircle className="animate-in fade-in-0 zoom-in-75 delay-300 duration-500 h-12 w-12 text-green-600 dark:text-green-400" />
+                            </div>
+                            {/* Sparkle decorations */}
+                            <Sparkles className="animate-in fade-in-0 delay-500 duration-700 absolute -top-2 -right-2 h-5 w-5 text-yellow-500" />
+                            <Sparkles className="animate-in fade-in-0 delay-700 duration-700 absolute -bottom-1 -left-3 h-4 w-4 text-yellow-400" />
+                            {/* Ripple effect */}
+                            <div
+                                className="animate-ping absolute inset-0 rounded-full bg-green-400/20 dark:bg-green-400/10"
+                                style={{ animationDuration: '1.5s', animationIterationCount: '2' }}
+                            />
                         </div>
-                        <CardTitle className="text-2xl">
+                        <CardTitle className="animate-in fade-in-0 slide-in-from-bottom-4 delay-200 duration-500 text-2xl">
                             {t('tenant.billing.payment_confirmed')}
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="animate-in fade-in-0 slide-in-from-bottom-4 delay-300 duration-500">
                             {message || t('tenant.billing.subscription_activated', { plan: plan || '' })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <p className="text-sm text-muted-foreground">
+                        <p className="animate-in fade-in-0 slide-in-from-bottom-4 delay-400 duration-500 text-sm text-muted-foreground">
                             {t('tenant.billing.success_message')}
                         </p>
 
-                        <div className="flex flex-col gap-2 pt-4">
+                        <div className="animate-in fade-in-0 slide-in-from-bottom-4 delay-500 duration-500 flex flex-col gap-2 pt-4">
                             <Button asChild>
                                 <Link href={admin.dashboard.url()}>
                                     <LayoutGrid className="mr-2 h-4 w-4" />

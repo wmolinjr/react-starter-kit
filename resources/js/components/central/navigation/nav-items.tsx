@@ -10,6 +10,7 @@ import {
     ShieldCheck,
     Store,
     Telescope,
+    Wallet,
 } from 'lucide-react';
 
 /**
@@ -122,6 +123,13 @@ export function useCentralAdminNavItems(): NavItem[] {
             title: t('sidebar.payments'),
             href: admin.payments.index.url(),
             icon: CreditCard,
+        },
+
+        // Payment Settings - single item
+        {
+            title: t('sidebar.payment_settings'),
+            href: admin.paymentSettings.index.url(),
+            icon: Wallet,
         },
     ];
 }

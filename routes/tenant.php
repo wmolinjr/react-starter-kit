@@ -292,6 +292,7 @@ Route::middleware([
                 Route::post('/pix-refresh', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'refreshPixQrCode'])->name('pix-refresh');
 
                 // Subscription management
+                Route::get('/subscription', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'subscription'])->name('subscription');
                 Route::post('/subscription/cancel', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'cancelSubscription'])->name('subscription.cancel');
                 Route::post('/subscription/resume', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'resumeSubscription'])->name('subscription.resume');
                 Route::post('/subscription/pause', [\App\Http\Controllers\Tenant\Admin\BillingController::class, 'pauseSubscription'])->name('subscription.pause');

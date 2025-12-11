@@ -37,7 +37,7 @@ class BillingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'cartSuccess', 'plans', 'bundles']),
+            new Middleware('permission:'.TenantPermission::BILLING_VIEW->value, only: ['index', 'success', 'cartSuccess', 'plans', 'bundles', 'subscription']),
             new Middleware('permission:'.TenantPermission::BILLING_MANAGE->value, only: ['checkout', 'portal', 'cartCheckout', 'checkCartPaymentStatus', 'refreshPixQrCode', 'cancelSubscription', 'resumeSubscription', 'pauseSubscription', 'unpauseSubscription', 'changePlan']),
             new Middleware('permission:'.TenantPermission::BILLING_INVOICES->value, only: ['invoices', 'invoice']),
         ];
@@ -61,6 +61,35 @@ class BillingController extends Controller implements HasMiddleware
             'activeBundles' => $data['activeBundles'],
             'recentInvoices' => InvoiceResource::collection($data['recentInvoices']),
             'trialEndsAt' => $data['trialEndsAt'],
+        ]);
+    }
+
+    /**
+     * Display subscription management page.
+     */
+    public function subscription(): Response
+    {
+        $tenant = tenant();
+        $subscription = $this->billingService->formatSubscription($tenant->subscription('default'));
+        $currentPlan = $tenant->plan;
+
+        $plans = Plan::active()
+            ->ordered()
+            ->get();
+
+        // Determine available actions
+        $hasActiveSubscription = $subscription && in_array($subscription['status'], ['active', 'trialing']);
+        $isPaused = $subscription && $subscription['status'] === 'paused';
+        $isOnGracePeriod = $subscription && $subscription['ends_at'] !== null;
+
+        return Inertia::render('tenant/admin/billing/subscription', [
+            'subscription' => $subscription,
+            'plan' => $currentPlan ? new PlanResource($currentPlan) : null,
+            'plans' => PlanResource::collection($plans),
+            'canPause' => $hasActiveSubscription && ! $isPaused,
+            'canResume' => $isOnGracePeriod,
+            'canCancel' => $hasActiveSubscription && ! $isOnGracePeriod,
+            'canChangePlan' => $hasActiveSubscription,
         ]);
     }
 

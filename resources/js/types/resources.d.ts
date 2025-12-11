@@ -356,6 +356,31 @@ export interface PaymentResource {
     failure_message: string | null;
 }
 
+export interface PaymentSettingResource {
+    id: string;
+    gateway: string;
+    display_name: string;
+    is_enabled: boolean;
+    is_sandbox: boolean;
+    is_default: boolean;
+    enabled_payment_types: string[];
+    available_countries: string[];
+    webhook_urls: Record<string, string>;
+    supported_payment_types: string[];
+    credential_fields: CredentialField[];
+    docs_url: string;
+    sandbox_url: string | null;
+    production_credential_hints: Record<string, string | null>;
+    sandbox_credential_hints: Record<string, string | null>;
+    has_production_credentials: boolean;
+    has_sandbox_credentials: boolean;
+    last_tested_at: string | null;
+    last_test_success: boolean | null;
+    last_test_error: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+}
+
 export interface PlanDetailResource {
     id: string;
     name: string;
