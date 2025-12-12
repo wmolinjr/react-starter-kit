@@ -53,26 +53,28 @@ export default function SignupPage({
     );
 
     // Handle step navigation
-    const goToStep = (step: SignupStepType) => {
+    const goToStep = (step: SignupStepType, signupData?: PendingSignupResource | null) => {
         setCurrentStep(step);
         // Update URL without full navigation
-        const url = new URL(window.location.href);
-        if (signup?.id) {
-            url.searchParams.set('signup_id', signup.id);
-        }
-        window.history.replaceState({}, '', url.toString());
+        // Format: /signup/{plan}/{signup_id}
+        const signupId = signupData?.id ?? signup?.id;
+        const planSlug = selectedPlanSlug || selectedPlan || 'starter';
+        const newPath = signupId
+            ? `/signup/${planSlug}/${signupId}`
+            : `/signup/${planSlug}`;
+        window.history.replaceState({}, '', newPath);
     };
 
     // Handle account creation success
     const handleAccountCreated = (newSignup: PendingSignupResource) => {
         setSignup(newSignup);
-        goToStep('workspace');
+        goToStep('workspace', newSignup);
     };
 
     // Handle workspace setup success
     const handleWorkspaceUpdated = (updatedSignup: PendingSignupResource) => {
         setSignup(updatedSignup);
-        goToStep('payment');
+        goToStep('payment', updatedSignup);
     };
 
     // Handle payment initiation
@@ -128,7 +130,10 @@ export default function SignupPage({
                 {/* Step content */}
                 <main className="mx-auto max-w-2xl px-4 py-8">
                     {currentStep === 'account' && (
-                        <AccountStep onSuccess={handleAccountCreated} />
+                        <AccountStep
+                            existingSignup={signup}
+                            onSuccess={handleAccountCreated}
+                        />
                     )}
 
                     {currentStep === 'workspace' && signup && (

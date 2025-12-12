@@ -12,28 +12,36 @@ import type { PendingSignupResource } from '@/types/resources';
 import type { PageProps } from '@/types';
 
 interface AccountStepProps {
+    existingSignup?: PendingSignupResource | null;
     onSuccess: (signup: PendingSignupResource) => void;
 }
 
-export function AccountStep({ onSuccess }: AccountStepProps) {
+export function AccountStep({ existingSignup, onSuccess }: AccountStepProps) {
     const { t } = useLaravelReactI18n();
     const { props } = usePage<PageProps>();
     const { errors = {} } = props;
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
+        name: existingSignup?.name || '',
+        email: existingSignup?.email || '',
         password: '',
         password_confirmation: '',
     });
 
     // Watch for flash data changes (pendingSignup from server)
+    // Only react to NEW signups, not when returning to this step with existing signup
     const handleFlashSuccess = useCallback(() => {
+        // If we already have an existing signup, don't react to flash data
+        // (user is returning to this step, not creating a new signup)
+        if (existingSignup) {
+            return;
+        }
+
         const pendingSignup = props.flash?.pendingSignup as PendingSignupResource | undefined;
         if (pendingSignup && pendingSignup.id) {
             onSuccess(pendingSignup);
         }
-    }, [props.flash?.pendingSignup, onSuccess]);
+    }, [props.flash?.pendingSignup, onSuccess, existingSignup]);
 
     useEffect(() => {
         handleFlashSuccess();
@@ -41,6 +49,13 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // If we already have a signup, just continue to next step
+        if (existingSignup) {
+            onSuccess(existingSignup);
+            return;
+        }
+
         setIsLoading(true);
 
         router.post(storeAccount.url(), formData, {
@@ -77,7 +92,9 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                                 setFormData((prev) => ({ ...prev, name: e.target.value }))
                             }
                             placeholder={t('signup.account.name_placeholder')}
-                            autoFocus
+                            autoFocus={!existingSignup}
+                            disabled={!!existingSignup}
+                            className={existingSignup ? 'bg-muted' : ''}
                         />
                         <InputError message={errors.name} />
                     </div>
@@ -92,46 +109,54 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                                 setFormData((prev) => ({ ...prev, email: e.target.value }))
                             }
                             placeholder={t('signup.account.email_placeholder')}
+                            disabled={!!existingSignup}
+                            className={existingSignup ? 'bg-muted' : ''}
                         />
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="password">{t('signup.account.password')}</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, password: e.target.value }))
-                            }
-                            placeholder={t('signup.account.password_placeholder')}
-                        />
-                        <InputError message={errors.password} />
-                    </div>
+                    {!existingSignup && (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="password">{t('signup.account.password')}</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({ ...prev, password: e.target.value }))
+                                    }
+                                    placeholder={t('signup.account.password_placeholder')}
+                                />
+                                <InputError message={errors.password} />
+                            </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="password_confirmation">
-                            {t('signup.account.password_confirmation')}
-                        </Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            value={formData.password_confirmation}
-                            onChange={(e) =>
-                                setFormData((prev) => ({
-                                    ...prev,
-                                    password_confirmation: e.target.value,
-                                }))
-                            }
-                            placeholder={t('signup.account.password_confirmation_placeholder')}
-                        />
-                        <InputError message={errors.password_confirmation} />
-                    </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password_confirmation">
+                                    {t('signup.account.password_confirmation')}
+                                </Label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={formData.password_confirmation}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            password_confirmation: e.target.value,
+                                        }))
+                                    }
+                                    placeholder={t('signup.account.password_confirmation_placeholder')}
+                                />
+                                <InputError message={errors.password_confirmation} />
+                            </div>
+                        </>
+                    )}
 
                     <Button type="submit" className="w-full" disabled={isLoading}>
                         {isLoading && <Spinner className="mr-2" />}
-                        {t('signup.account.continue', { default: 'Continue' })}
+                        {existingSignup
+                            ? t('signup.account.continue_to_workspace', { default: 'Continue to Workspace' })
+                            : t('signup.account.continue', { default: 'Continue' })}
                     </Button>
                 </form>
             </CardContent>

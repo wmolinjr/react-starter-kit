@@ -37,19 +37,15 @@ class SignupController extends Controller
     /**
      * Display the signup wizard.
      *
-     * GET /signup/{plan?}
+     * GET /signup/{plan}/{signup?}
      */
-    public function create(Request $request, ?string $plan = null): Response
+    public function create(Request $request, string $plan, ?PendingSignup $signup = null): Response
     {
         $plans = Plan::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('price')
             ->get();
-
-        // Get existing signup if resuming
-        $signupId = $request->get('signup_id');
-        $signup = $signupId ? PendingSignup::find($signupId) : null;
 
         // Validate signup is still usable
         if ($signup && ($signup->isCompleted() || $signup->isExpired() || $signup->isFailed())) {
