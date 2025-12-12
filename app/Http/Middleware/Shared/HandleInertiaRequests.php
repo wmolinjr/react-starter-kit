@@ -42,10 +42,11 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        // Check central guard first, then default guard
-        // This fixes the issue where central admins have null auth.user
-        // because $request->user() uses the default 'tenant' guard
-        $user = auth('central')->user() ?? $request->user();
+        // Check all guards: central (admins), customer (billing portal), tenant (default)
+        // This ensures auth.user is populated regardless of which guard authenticated the user
+        $user = auth('central')->user()
+            ?? auth('customer')->user()
+            ?? $request->user();
 
         return [
             ...parent::share($request),
