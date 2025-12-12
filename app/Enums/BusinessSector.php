@@ -139,16 +139,16 @@ enum BusinessSector: string
     }
 
     /**
-     * Get all sectors with translations for frontend.
+     * Get all sectors with localized labels for frontend.
      *
-     * @return array<int, array{value: string, label: array<string, string>}>
+     * @return array<int, array{value: string, label: string}>
      */
     public static function toArray(): array
     {
         return array_map(
             fn (self $case) => [
                 'value' => $case->value,
-                'label' => $case->label(),
+                'label' => $case->localizedLabel(),
             ],
             self::cases()
         );
