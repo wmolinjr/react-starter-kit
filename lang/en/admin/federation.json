@@ -1,0 +1,17 @@
+{
+    "admin.federation.conflict.dismissed": "Dismissed",
+    "admin.federation.conflict.pending": "Pending",
+    "admin.federation.conflict.resolved": "Resolved",
+    "admin.federation.link_status.conflict": "Conflict",
+    "admin.federation.link_status.disabled": "Disabled",
+    "admin.federation.link_status.pending_sync": "Pending Sync",
+    "admin.federation.link_status.sync_failed": "Sync Failed",
+    "admin.federation.link_status.synced": "Synced",
+    "admin.federation.sync_strategy.last_write_wins": "Last Write Wins",
+    "admin.federation.sync_strategy.manual_review": "Manual Review",
+    "admin.federation.sync_strategy.master_wins": "Master Wins",
+    "admin.federation.user_status.active": "Active",
+    "admin.federation.user_status.pending_master_sync": "Pending Master Sync",
+    "admin.federation.user_status.pending_review": "Pending Review",
+    "admin.federation.user_status.suspended": "Suspended"
+}

@@ -72,5 +72,6 @@
         "common.placeholder.enter_recovery_code": "Enter recovery code",
     "common.or_return_to": "Or, return to",
     "common.remember_password": "Remember your password?",
-    "common.sign_in": "Sign in"
+    "common.sign_in": "Sign in",
+    "common.more_features": "more features"
 }

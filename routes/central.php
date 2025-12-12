@@ -23,10 +23,12 @@ use App\Http\Controllers\Central\Auth\ForgotPasswordController;
 use App\Http\Controllers\Central\Auth\ResetPasswordController;
 use App\Http\Controllers\Central\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Central\Auth\VerifyEmailController;
+use App\Http\Controllers\Central\PricingController;
 use App\Http\Controllers\Central\Settings\PasswordController;
 use App\Http\Controllers\Central\Settings\ProfileController;
 use App\Http\Controllers\Central\Settings\TwoFactorAuthenticationController;
 use App\Http\Controllers\Central\Settings\TwoFactorController;
+use App\Http\Controllers\Central\SignupController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -89,6 +91,49 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         Route::get('/sanctum/csrf-cookie', [\Laravel\Sanctum\Http\Controllers\CsrfCookieController::class, 'show'])
             ->middleware('web')
             ->name('sanctum.csrf-cookie');
+
+        /*
+        |----------------------------------------------------------------------
+        | Public Pricing & Signup Routes (central.pricing.*, central.signup.*)
+        |----------------------------------------------------------------------
+        |
+        | WIX-like signup flow:
+        | 1. /pricing - Public pricing page
+        | 2. /signup - Multi-step wizard (account, workspace, payment)
+        | 3. /signup/success - Success page after payment
+        |
+        */
+
+        // Public pricing page
+        Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+
+        // Signup wizard routes
+        Route::prefix('signup')->name('signup.')->group(function () {
+            // Show wizard
+            Route::get('/', [SignupController::class, 'create'])->name('index');
+
+            // Step 1: Account creation
+            Route::post('/account', [SignupController::class, 'storeAccount'])->name('account.store');
+
+            // Step 2: Workspace setup
+            Route::patch('/{signup}/workspace', [SignupController::class, 'updateWorkspace'])->name('workspace.update');
+
+            // Step 3: Payment processing
+            Route::post('/{signup}/payment', [SignupController::class, 'processPayment'])->name('payment.process');
+
+            // Status polling
+            Route::get('/{signup}/status', [SignupController::class, 'checkStatus'])->name('status');
+
+            // Refresh PIX QR code
+            Route::post('/{signup}/refresh-pix', [SignupController::class, 'refreshPix'])->name('refresh-pix');
+
+            // Success page
+            Route::get('/success', [SignupController::class, 'success'])->name('success');
+
+            // Validation endpoints (AJAX)
+            Route::post('/validate/email', [SignupController::class, 'validateEmail'])->name('validate.email');
+            Route::post('/validate/slug', [SignupController::class, 'validateSlug'])->name('validate.slug');
+        });
 
         /*
         |----------------------------------------------------------------------

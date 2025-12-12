@@ -1,0 +1,17 @@
+{
+    "signup.success.title": "Welcome to your new workspace!",
+    "signup.success.subtitle": "Your account has been created successfully.",
+    "signup.success.workspace_name": "Your workspace",
+    "signup.success.next_steps": "Next steps",
+    "signup.success.step_1": "Access your workspace and complete your profile",
+    "signup.success.step_2": "Invite your team members to collaborate",
+    "signup.success.step_3": "Start building and growing your business",
+    "signup.success.go_to_workspace": "Go to Workspace",
+    "signup.success.email_sent": "We sent a confirmation email to",
+    "signup.success.processing_title": "Setting up your workspace...",
+    "signup.success.processing_description": "This may take a few moments. Please wait.",
+    "signup.success.error_title": "Something went wrong",
+    "signup.success.error_description": "We could not complete your signup. Please try again.",
+    "signup.success.try_again": "Try Again",
+    "signup.success.redirecting": "Redirecting automatically in a few seconds..."
+}

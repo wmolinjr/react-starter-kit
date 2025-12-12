@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\Central\CheckPendingPaymentsJob;
+use App\Jobs\Central\CleanupExpiredSignupsJob;
 use App\Jobs\Central\HandleSubscriptionGracePeriodJob;
 use App\Jobs\Central\SendBoletoRemindersJob;
 use Illuminate\Foundation\Inspiring;
@@ -32,5 +33,11 @@ Schedule::job(new SendBoletoRemindersJob)
 // Handle expired subscription grace periods daily at midnight
 Schedule::job(new HandleSubscriptionGracePeriodJob)
     ->dailyAt('00:00')
+    ->withoutOverlapping()
+    ->onOneServer();
+
+// Cleanup expired/failed signup attempts daily at 3am
+Schedule::job(new CleanupExpiredSignupsJob)
+    ->dailyAt('03:00')
     ->withoutOverlapping()
     ->onOneServer();

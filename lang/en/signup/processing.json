@@ -1,0 +1,9 @@
+{
+    "signup.processing.title": "Processing Payment",
+    "signup.processing.pix_description": "Complete your PIX payment to proceed",
+    "signup.processing.boleto_description": "Complete your Boleto payment to proceed",
+    "signup.processing.waiting": "Waiting for payment confirmation...",
+    "signup.processing.auto_redirect": "You will be redirected automatically once payment is confirmed.",
+    "signup.processing.payment_confirmed": "Payment Confirmed!",
+    "signup.processing.redirecting": "Redirecting to your workspace..."
+}

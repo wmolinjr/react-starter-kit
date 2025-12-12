@@ -388,6 +388,28 @@ export interface PaymentSettingResource {
     updated_at: string | null;
 }
 
+export interface PendingSignupResource {
+    id: string;
+    email: string;
+    name: string;
+    locale: string;
+    workspace_name: string | null;
+    workspace_slug: string | null;
+    business_sector: string | null;
+    plan_id: string | null;
+    billing_period: 'monthly' | 'yearly';
+    payment_method: 'card' | 'pix' | 'boleto' | null;
+    status: 'pending' | 'processing' | 'completed' | 'failed' | 'expired';
+    is_completed: boolean;
+    is_expired: boolean;
+    has_workspace_data: boolean;
+    tenant_url: string | null;
+    tenant_id: string | null;
+    failure_reason: string | null;
+    expires_at: string | null;
+    created_at: string;
+}
+
 export interface PlanDetailResource {
     id: string;
     name: string;

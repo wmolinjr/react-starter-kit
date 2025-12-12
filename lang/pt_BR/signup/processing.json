@@ -1,0 +1,9 @@
+{
+    "signup.processing.title": "Processando Pagamento",
+    "signup.processing.pix_description": "Complete seu pagamento PIX para continuar",
+    "signup.processing.boleto_description": "Complete seu pagamento via Boleto para continuar",
+    "signup.processing.waiting": "Aguardando confirmação do pagamento...",
+    "signup.processing.auto_redirect": "Você será redirecionado automaticamente após a confirmação.",
+    "signup.processing.payment_confirmed": "Pagamento Confirmado!",
+    "signup.processing.redirecting": "Redirecionando para seu workspace..."
+}

@@ -1,0 +1,17 @@
+{
+    "admin.federation.conflict.dismissed": "Descartado",
+    "admin.federation.conflict.pending": "Pendente",
+    "admin.federation.conflict.resolved": "Resolvido",
+    "admin.federation.link_status.conflict": "Conflito",
+    "admin.federation.link_status.disabled": "Desabilitado",
+    "admin.federation.link_status.pending_sync": "Sincronização Pendente",
+    "admin.federation.link_status.sync_failed": "Falha na Sincronização",
+    "admin.federation.link_status.synced": "Sincronizado",
+    "admin.federation.sync_strategy.last_write_wins": "Última Escrita Vence",
+    "admin.federation.sync_strategy.manual_review": "Revisão Manual",
+    "admin.federation.sync_strategy.master_wins": "Mestre Vence",
+    "admin.federation.user_status.active": "Ativo",
+    "admin.federation.user_status.pending_master_sync": "Aguardando Sincronização do Mestre",
+    "admin.federation.user_status.pending_review": "Aguardando Revisão",
+    "admin.federation.user_status.suspended": "Suspenso"
+}

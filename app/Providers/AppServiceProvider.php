@@ -15,6 +15,7 @@ use App\Listeners\Central\Federation\SyncNewFederatedUser;
 use App\Listeners\Central\Federation\SyncUpdatedFederatedUser;
 use App\Listeners\Central\Federation\SyncUsersToNewTenant;
 use App\Listeners\Central\HandleAsyncPaymentWebhooks;
+use App\Listeners\Central\HandleSignupWebhooks;
 use App\Listeners\Central\SyncPermissionsOnSubscriptionChange;
 use App\Listeners\Central\UpdateTenantLimits;
 use App\Listeners\Shared\SetDatabaseTimezone;
@@ -157,6 +158,12 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             \App\Events\Payment\WebhookReceived::class,
             \App\Listeners\Central\HandleAddonWebhooks::class,
+        );
+
+        // Signup Payment Webhook Listener
+        Event::listen(
+            \App\Events\Payment\WebhookReceived::class,
+            HandleSignupWebhooks::class,
         );
 
         // Async Payment Event Listeners (PIX, Boleto)

@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Enums\BusinessSector;
 use App\Enums\PlanLimit;
 use App\Enums\TenantConfigKey;
 use App\Models\Tenant\User as TenantUser;
@@ -67,6 +68,7 @@ class Tenant extends Model implements TenantWithDatabase
     protected $fillable = [
         'name',
         'slug',
+        'business_sector',
         'data', // Stancl internal keys (tenancy_db_name, etc.)
         'settings',
         'plan_id',
@@ -83,6 +85,7 @@ class Tenant extends Model implements TenantWithDatabase
     protected $casts = [
         'data' => 'array', // Stancl internal keys
         'settings' => 'array',
+        'business_sector' => BusinessSector::class,
         'plan_features_override' => 'array',
         'plan_limits_override' => 'array',
         'current_usage' => 'array',
@@ -118,6 +121,7 @@ class Tenant extends Model implements TenantWithDatabase
             'payment_method_id',
             'name',
             'slug',
+            'business_sector',
             'data',
             'settings',
             'plan_id',

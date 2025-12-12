@@ -1,0 +1,17 @@
+{
+    "signup.errors.email_already_registered": "Este e-mail já está cadastrado",
+    "signup.errors.slug_already_taken": "Esta URL já está em uso",
+    "signup.errors.signup_expired": "Esta tentativa de cadastro expirou. Por favor, comece novamente.",
+    "signup.errors.signup_already_processed": "Este cadastro já foi processado.",
+    "signup.errors.workspace_data_required": "Os dados do workspace são obrigatórios.",
+    "signup.errors.plan_not_found": "Plano não encontrado.",
+    "signup.errors.plan_not_synced_to_stripe": "Este plano não está configurado para pagamento.",
+    "signup.errors.invalid_payment_method": "Método de pagamento inválido.",
+    "signup.errors.pix_creation_failed": "Falha ao gerar o código PIX.",
+    "signup.errors.boleto_creation_failed": "Falha ao gerar o boleto.",
+    "signup.errors.cannot_complete_signup": "Não foi possível completar o cadastro.",
+    "signup.errors.not_pix_payment": "Esta não é uma transação PIX.",
+    "signup.errors.generic": "Ocorreu um erro. Por favor, tente novamente.",
+    "signup.errors.network": "Erro de conexão. Verifique sua internet e tente novamente.",
+    "signup.errors.payment_failed": "O pagamento falhou. Por favor, tente novamente."
+}

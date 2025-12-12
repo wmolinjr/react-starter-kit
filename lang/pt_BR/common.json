@@ -72,5 +72,6 @@
         "common.placeholder.enter_recovery_code": "Digite o código de recuperação",
     "common.or_return_to": "Ou, voltar para",
     "common.remember_password": "Lembrou sua senha?",
-    "common.sign_in": "Entrar"
+    "common.sign_in": "Entrar",
+    "common.more_features": "mais recursos"
 }

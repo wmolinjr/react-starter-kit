@@ -1,0 +1,16 @@
+{
+    "signup.payment.summary": "Resumo do Pedido",
+    "signup.payment.billed_monthly": "Cobrança mensal",
+    "signup.payment.billed_yearly": "Cobrança anual",
+    "signup.payment.yearly_savings": "Você economiza 20% com a cobrança anual",
+    "signup.payment.total": "Total",
+    "signup.payment.method": "Método de Pagamento",
+    "signup.payment.method_description": "Escolha como você deseja pagar",
+    "signup.payment.security_title": "Checkout Seguro",
+    "signup.payment.security_description": "Seu pagamento é protegido com criptografia SSL de 256 bits",
+    "signup.payment.processing": "Processando...",
+    "signup.payment.pay_with_card": "Pagar com Cartão",
+    "signup.payment.generate_pix": "Gerar PIX",
+    "signup.payment.generate_boleto": "Gerar Boleto",
+    "signup.payment.description": "Assinatura :plan - :workspace"
+}

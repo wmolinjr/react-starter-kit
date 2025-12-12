@@ -1,0 +1,13 @@
+{
+    "signup.account.title": "Create your account",
+    "signup.account.description": "Enter your information to get started",
+    "signup.account.name": "Full name",
+    "signup.account.name_placeholder": "Your name",
+    "signup.account.email": "Email",
+    "signup.account.email_placeholder": "you@example.com",
+    "signup.account.password": "Password",
+    "signup.account.password_placeholder": "Minimum 8 characters",
+    "signup.account.password_confirmation": "Confirm password",
+    "signup.account.password_confirmation_placeholder": "Enter password again",
+    "signup.account.continue": "Continue"
+}

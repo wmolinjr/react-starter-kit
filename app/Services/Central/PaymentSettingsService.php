@@ -536,4 +536,20 @@ class PaymentSettingsService
     {
         return $this->getEnabledGatewayForMethod($paymentMethod, $countryCode) !== null;
     }
+
+    /**
+     * Get payment configuration for checkout UI.
+     *
+     * Returns a structured array suitable for frontend consumption.
+     * Alias for getAvailablePaymentMethods with PaymentConfigResource compatibility.
+     *
+     * @param  string  $countryCode  ISO country code (e.g., 'BR', 'US')
+     * @return \App\Http\Resources\Central\PaymentConfigResource
+     */
+    public function getPaymentConfig(string $countryCode = 'BR'): \App\Http\Resources\Central\PaymentConfigResource
+    {
+        $methods = $this->getAvailablePaymentMethods($countryCode);
+
+        return new \App\Http\Resources\Central\PaymentConfigResource($methods);
+    }
 }

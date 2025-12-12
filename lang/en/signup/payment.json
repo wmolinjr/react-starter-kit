@@ -1,0 +1,16 @@
+{
+    "signup.payment.summary": "Order Summary",
+    "signup.payment.billed_monthly": "Billed monthly",
+    "signup.payment.billed_yearly": "Billed yearly",
+    "signup.payment.yearly_savings": "You save 20% with yearly billing",
+    "signup.payment.total": "Total",
+    "signup.payment.method": "Payment Method",
+    "signup.payment.method_description": "Choose how you want to pay",
+    "signup.payment.security_title": "Secure Checkout",
+    "signup.payment.security_description": "Your payment is secured with 256-bit SSL encryption",
+    "signup.payment.processing": "Processing...",
+    "signup.payment.pay_with_card": "Pay with Card",
+    "signup.payment.generate_pix": "Generate PIX",
+    "signup.payment.generate_boleto": "Generate Boleto",
+    "signup.payment.description": ":plan subscription - :workspace"
+}
