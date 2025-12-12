@@ -12,21 +12,22 @@ use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Stripe\StripeClient;
 
 /**
  * SignupService
  *
- * Orchestrates the WIX-like signup flow:
- * 1. Create pending signup with account data
+ * Customer-First Signup Flow:
+ * 1. Create Customer + PendingSignup (customer logged in immediately)
  * 2. Update with workspace data and plan selection
  * 3. Process payment (Card/PIX/Boleto)
- * 4. Complete signup after payment confirmation (via webhook)
+ * 4. Complete signup after payment confirmation (via webhook) - creates only Tenant
  *
- * Key principle: Tenant is created ONLY after payment is confirmed.
+ * Key principles:
+ * - Customer is created IMMEDIATELY in Step 1 (before payment)
+ * - Tenant is created ONLY after payment is confirmed
+ * - Customer is logged in during the entire signup process
  */
 class SignupService
 {
@@ -44,24 +45,73 @@ class SignupService
     }
 
     // =========================================================================
-    // Step 1: Create Pending Signup with Account Data
+    // Step 1: Create Customer + PendingSignup (Customer-First Flow)
     // =========================================================================
 
     /**
-     * Create a new pending signup with account information.
+     * Create Customer + PendingSignup in a single transaction.
+     *
+     * Customer-First Flow:
+     * 1. Create Customer (billing entity)
+     * 2. Create PendingSignup linked to Customer
+     * 3. Fire Registered event (email verification - non-blocking)
      *
      * @param  array{name: string, email: string, password: string, locale?: string}  $data
+     * @return array{customer: Customer, signup: PendingSignup}
      */
-    public function createPendingSignup(array $data): PendingSignup
+    public function createPendingSignupWithCustomer(array $data): array
     {
-        return PendingSignup::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'locale' => $data['locale'] ?? config('app.locale', 'pt_BR'),
+        return DB::transaction(function () use ($data) {
+            // 1. Create Customer first
+            $customer = $this->customerService->registerCustomerOnly([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'locale' => $data['locale'] ?? config('app.locale', 'pt_BR'),
+            ]);
+
+            // 2. Create PendingSignup linked to Customer
+            $signup = PendingSignup::create([
+                'customer_id' => $customer->id,
+                'status' => PendingSignup::STATUS_PENDING,
+                'expires_at' => now()->addHours(24),
+            ]);
+
+            // 3. Fire Registered event (email verification - non-blocking)
+            event(new \Illuminate\Auth\Events\Registered($customer));
+
+            Log::info('Customer-first signup created', [
+                'customer_id' => $customer->id,
+                'signup_id' => $signup->id,
+                'email' => $customer->email,
+            ]);
+
+            return [
+                'customer' => $customer,
+                'signup' => $signup,
+            ];
+        });
+    }
+
+    /**
+     * Create PendingSignup for an existing Customer.
+     *
+     * Used when a logged-in customer wants to create an additional workspace.
+     */
+    public function createPendingSignupForCustomer(Customer $customer): PendingSignup
+    {
+        $signup = PendingSignup::create([
+            'customer_id' => $customer->id,
             'status' => PendingSignup::STATUS_PENDING,
             'expires_at' => now()->addHours(24),
         ]);
+
+        Log::info('PendingSignup created for existing customer', [
+            'customer_id' => $customer->id,
+            'signup_id' => $signup->id,
+        ]);
+
+        return $signup;
     }
 
     // =========================================================================
@@ -197,6 +247,7 @@ class SignupService
             'metadata' => [
                 'signup_id' => $signup->id,
                 'signup_type' => 'new_customer',
+                'customer_id' => $signup->customer_id,
             ],
             'subscription_data' => [
                 'metadata' => [
@@ -381,8 +432,8 @@ class SignupService
     /**
      * Complete the signup after payment is confirmed.
      *
+     * Customer-First Flow: Customer already exists, only creates Tenant.
      * Called by webhook handler after payment confirmation.
-     * Creates Customer, Tenant, and Subscription.
      *
      * @return array{customer: Customer, tenant: Tenant}
      */
@@ -399,18 +450,14 @@ class SignupService
             throw new AddonException(__('signup.errors.cannot_complete_signup'));
         }
 
-        return DB::transaction(function () use ($signup) {
-            // 1. Create Customer
-            $customer = Customer::create([
-                'global_id' => 'cust_'.Str::orderedUuid()->toString(),
-                'name' => $signup->name,
-                'email' => $signup->email,
-                'password' => $signup->password, // Already hashed
-                'locale' => $signup->locale,
-                'currency' => 'brl',
-            ]);
+        // Customer-First: Customer must already exist
+        $customer = $signup->customer;
+        if (! $customer) {
+            throw new AddonException(__('signup.errors.customer_not_found'));
+        }
 
-            // 2. Create Tenant
+        return DB::transaction(function () use ($signup, $customer) {
+            // 1. Create Tenant (Customer already exists)
             $tenant = Tenant::create([
                 'name' => $signup->workspace_name,
                 'slug' => $signup->workspace_slug,
@@ -419,10 +466,10 @@ class SignupService
                 'plan_id' => $signup->plan_id,
             ]);
 
-            // 3. Attach Customer to Tenant (triggers Resource Syncing)
+            // 2. Attach Customer to Tenant (triggers Resource Syncing)
             $customer->tenants()->attach($tenant);
 
-            // 4. Assign owner role to the synced user
+            // 3. Assign owner role to the synced user
             $tenant->run(function () use ($customer) {
                 $user = \App\Models\Tenant\User::where('global_id', $customer->global_id)->first();
                 if ($user) {
@@ -430,13 +477,13 @@ class SignupService
                 }
             });
 
-            // 5. Create Subscription record
+            // 4. Create Subscription record
             $this->createSubscriptionRecord($customer, $tenant, $signup);
 
-            // 6. Mark signup as completed
-            $signup->markAsCompleted($customer->id, $tenant->id);
+            // 5. Mark signup as completed (only tenant_id, customer already set)
+            $signup->markAsCompleted($tenant->id);
 
-            Log::info('Signup completed successfully', [
+            Log::info('Customer-first signup completed', [
                 'signup_id' => $signup->id,
                 'customer_id' => $customer->id,
                 'tenant_id' => $tenant->id,

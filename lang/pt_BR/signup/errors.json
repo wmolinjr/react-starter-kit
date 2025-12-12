@@ -1,6 +1,7 @@
 {
     "signup.errors.email_already_registered": "Este e-mail já está cadastrado",
     "signup.errors.slug_already_taken": "Esta URL já está em uso",
+    "signup.errors.unauthorized": "Você não tem permissão para acessar este cadastro.",
     "signup.errors.signup_expired": "Esta tentativa de cadastro expirou. Por favor, comece novamente.",
     "signup.errors.signup_already_processed": "Este cadastro já foi processado.",
     "signup.errors.workspace_data_required": "Os dados do workspace são obrigatórios.",

@@ -3,13 +3,16 @@
 namespace Database\Factories;
 
 use App\Enums\BusinessSector;
+use App\Models\Central\Customer;
 use App\Models\Central\PendingSignup;
 use App\Models\Central\Plan;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * Factory for PendingSignup model.
+ *
+ * Customer-First Flow: PendingSignup requires a Customer.
+ * Account data (name, email, password, locale) lives in Customer.
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Central\PendingSignup>
  */
@@ -17,15 +20,11 @@ class PendingSignupFactory extends Factory
 {
     protected $model = PendingSignup::class;
 
-    protected static ?string $password;
-
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'password' => static::$password ??= Hash::make('password'),
-            'locale' => 'pt_BR',
+            // Customer-First: customer_id is required
+            'customer_id' => Customer::factory(),
             'workspace_name' => null,
             'workspace_slug' => null,
             'business_sector' => null,
@@ -36,13 +35,20 @@ class PendingSignupFactory extends Factory
             'provider_session_id' => null,
             'provider_payment_id' => null,
             'status' => PendingSignup::STATUS_PENDING,
-            'customer_id' => null,
             'tenant_id' => null,
             'failure_reason' => null,
             'metadata' => null,
             'expires_at' => now()->addHours(24),
             'paid_at' => null,
         ];
+    }
+
+    /**
+     * Use a specific customer.
+     */
+    public function forCustomer(Customer $customer): static
+    {
+        return $this->state(['customer_id' => $customer->id]);
     }
 
     /**

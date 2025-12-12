@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Redirects to customer-specific verification notice route.
  * This is needed because Laravel's default EnsureEmailIsVerified
- * redirects to 'verification.notice', not 'customer.verification.notice'.
+ * redirects to 'verification.notice', not 'central.account.verification.notice'.
  */
 class EnsureCustomerEmailIsVerified
 {
@@ -25,7 +25,7 @@ class EnsureCustomerEmailIsVerified
             ! $request->user('customer')->hasVerifiedEmail())) {
             return $request->expectsJson()
                     ? abort(403, 'Your email address is not verified.')
-                    : redirect()->route($redirectToRoute ?: 'customer.verification.notice');
+                    : redirect()->route($redirectToRoute ?: 'central.account.verification.notice');
         }
 
         return $next($request);

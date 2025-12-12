@@ -36,7 +36,8 @@ interface WorkspaceStepProps {
     onPlanChange: (slug: string) => void;
     onBillingPeriodChange: (period: 'monthly' | 'yearly') => void;
     onSuccess: (signup: PendingSignupResource) => void;
-    onBack: () => void;
+    /** Optional back handler. When undefined, back button is not shown. */
+    onBack?: () => void;
 }
 
 // Generate slug from workspace name
@@ -258,16 +259,18 @@ export function WorkspaceStep({
 
                         {/* Actions */}
                         <div className="flex gap-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={onBack}
-                                className="flex-1"
-                            >
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                {t('common.back', { default: 'Back' })}
-                            </Button>
-                            <Button type="submit" className="flex-1" disabled={isLoading}>
+                            {onBack && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={onBack}
+                                    className="flex-1"
+                                >
+                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    {t('common.back', { default: 'Back' })}
+                                </Button>
+                            )}
+                            <Button type="submit" className={onBack ? 'flex-1' : 'w-full'} disabled={isLoading}>
                                 {isLoading && <Spinner className="mr-2" />}
                                 {t('signup.workspace.continue', { default: 'Continue to Payment' })}
                             </Button>

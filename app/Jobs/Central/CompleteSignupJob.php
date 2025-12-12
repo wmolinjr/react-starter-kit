@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Mail;
  * Complete Signup Job
  *
  * Queued job that completes the signup process after payment confirmation.
- * Creates Customer, Tenant, and Subscription, then sends welcome email.
+ *
+ * Customer-First Flow: Customer already exists (created in Step 1).
+ * This job only creates Tenant and Subscription, then sends welcome email.
  */
 class CompleteSignupJob implements ShouldQueue
 {
@@ -81,7 +83,7 @@ class CompleteSignupJob implements ShouldQueue
         }
 
         try {
-            // Complete the signup (create Customer, Tenant, Subscription)
+            // Customer-First: Complete signup (create Tenant + Subscription - Customer already exists)
             $result = $signupService->completeSignup($this->signup);
 
             // Update subscription with provider IDs if available

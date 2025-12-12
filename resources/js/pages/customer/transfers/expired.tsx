@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
-import customer from '@/routes/customer';
+import customer from '@/routes/central/account';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Clock } from 'lucide-react';

@@ -70,7 +70,7 @@ class TenantController extends Controller
             'domain' => $domain,
         ]);
 
-        return redirect()->route('customer.tenants.show', $tenant)
+        return redirect()->route('central.account.tenants.show', $tenant)
             ->with('status', 'tenant-created');
     }
 

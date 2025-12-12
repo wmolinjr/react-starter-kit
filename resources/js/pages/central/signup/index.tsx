@@ -18,12 +18,28 @@ interface BusinessSectorOption {
     label: string;
 }
 
+/**
+ * Customer summary data for logged-in customers.
+ * Used in customer-first signup flow.
+ */
+interface CustomerSummary {
+    id: string;
+    name: string;
+    email: string;
+    locale: string;
+    email_verified: boolean;
+}
+
 interface SignupPageProps {
     plans: PlanResource[];
     selectedPlan?: string;
     signup?: PendingSignupResource | null;
     businessSectors: BusinessSectorOption[];
     paymentConfig: PaymentConfigResource;
+    /** Logged-in customer data (customer-first flow) */
+    customer?: CustomerSummary | null;
+    /** Skip account step when customer is already logged in */
+    skipAccountStep?: boolean;
 }
 
 export default function SignupPage({
@@ -32,17 +48,32 @@ export default function SignupPage({
     signup: initialSignup,
     businessSectors,
     paymentConfig,
+    customer,
+    skipAccountStep = false,
 }: SignupPageProps) {
     const { t } = useLaravelReactI18n();
     const { name: appName } = usePage<{ name: string }>().props;
 
-    // Determine initial step based on signup state
+    /**
+     * Determine initial step based on signup state.
+     *
+     * Customer-First Flow:
+     * - If customer is logged in (skipAccountStep), start at workspace step
+     * - If signup has customer_id, the customer already created account, skip to workspace
+     */
     const getInitialStep = (): SignupStepType => {
-        if (!initialSignup) return 'account';
+        // No signup yet
+        if (!initialSignup) {
+            return skipAccountStep ? 'workspace' : 'account';
+        }
+
+        // Signup exists - check its state
         if (initialSignup.is_completed) return 'success';
         if (initialSignup.status === 'processing') return 'processing';
         if (initialSignup.has_workspace_data) return 'payment';
-        return 'workspace';
+
+        // Signup has customer_id means account step is done (customer-first)
+        return initialSignup.customer_id ? 'workspace' : 'account';
     };
 
     const [currentStep, setCurrentStep] = useState<SignupStepType>(getInitialStep());
@@ -123,7 +154,10 @@ export default function SignupPage({
                 {/* Progress indicator */}
                 {currentStep !== 'success' && (
                     <div className="mx-auto max-w-4xl px-4 py-6">
-                        <SignupProgress currentStep={currentStep} />
+                        <SignupProgress
+                            currentStep={currentStep}
+                            skipAccountStep={skipAccountStep}
+                        />
                     </div>
                 )}
 
@@ -146,7 +180,7 @@ export default function SignupPage({
                             onPlanChange={setSelectedPlanSlug}
                             onBillingPeriodChange={setBillingPeriod}
                             onSuccess={handleWorkspaceUpdated}
-                            onBack={() => goToStep('account')}
+                            onBack={skipAccountStep ? undefined : () => goToStep('account')}
                         />
                     )}
 

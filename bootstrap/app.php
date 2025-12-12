@@ -59,11 +59,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ];
             });
 
-            // Central routes (admin + panel + auth) - managed by domain scoping
+            // Central routes (admin + panel + customer portal) - managed by domain scoping
+            // Includes: central.*, customer.* (/account/*), central.admin.*
             require base_path('routes/central.php');
-
-            // Customer Portal routes (/account/*) - uses 'customer' guard
-            Route::middleware('web')->group(base_path('routes/customer.php'));
 
             // Webhook routes (Stripe, etc.) - no CSRF, no auth
             Route::middleware('api')->group(base_path('routes/webhooks.php'));
@@ -86,8 +84,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Configure redirect for unauthenticated users
         $middleware->redirectGuestsTo(function (Request $request) {
             // Customer portal routes redirect to customer login
-            if ($request->routeIs('customer.*')) {
-                return route('customer.login');
+            if ($request->routeIs('central.account.*')) {
+                return route('central.account.login');
             }
             // Central admin routes redirect to central admin login
             if ($request->routeIs('central.admin.*')) {
@@ -103,7 +101,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo(function (Request $request) {
             // If authenticated as customer, redirect to customer dashboard
             if (auth('customer')->check()) {
-                return route('customer.dashboard');
+                return route('central.account.dashboard');
             }
             // If authenticated as central admin, redirect to central admin dashboard
             if (auth('central')->check()) {
@@ -165,6 +163,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Tenant password confirmation (custom middleware replacing Fortify's password.confirm)
             'tenant.password.confirm' => \App\Http\Middleware\Tenant\RequireTenantPassword::class,
+
+            // Signup ownership verification (customer-first flow)
+            'verify.signup.ownership' => \App\Http\Middleware\Central\VerifySignupOwnership::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

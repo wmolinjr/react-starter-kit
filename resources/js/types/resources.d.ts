@@ -191,6 +191,14 @@ export interface CentralUserResource {
     has_2fa: boolean;
 }
 
+export interface CustomerSummaryResource {
+    id: string;
+    name: string;
+    email: string;
+    locale: string;
+    email_verified: boolean;
+}
+
 export interface DomainResource {
     id: string;
     domain: string;
@@ -390,6 +398,7 @@ export interface PaymentSettingResource {
 
 export interface PendingSignupResource {
     id: string;
+    customer_id: string;
     email: string;
     name: string;
     locale: string;

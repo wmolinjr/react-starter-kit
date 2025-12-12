@@ -14,9 +14,9 @@ class CustomerDashboardTest extends TestCase
 
     public function test_customer_dashboard_requires_authentication(): void
     {
-        $response = $this->get(route('customer.dashboard'));
+        $response = $this->get(route('central.account.dashboard'));
 
-        $response->assertRedirect(route('customer.login', absolute: false));
+        $response->assertRedirect(route('central.account.login', absolute: false));
     }
 
     public function test_customer_dashboard_requires_verified_email(): void
@@ -24,9 +24,9 @@ class CustomerDashboardTest extends TestCase
         $customer = Customer::factory()->unverified()->create();
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.dashboard'));
+            ->get(route('central.account.dashboard'));
 
-        $response->assertRedirect(route('customer.verification.notice', absolute: false));
+        $response->assertRedirect(route('central.account.verification.notice', absolute: false));
     }
 
     public function test_verified_customer_can_view_dashboard(): void
@@ -36,7 +36,7 @@ class CustomerDashboardTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.dashboard'));
+            ->get(route('central.account.dashboard'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -69,7 +69,7 @@ class CustomerDashboardTest extends TestCase
         $customer->tenants()->attach($tenant);
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.dashboard'));
+            ->get(route('central.account.dashboard'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -85,7 +85,7 @@ class CustomerDashboardTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.dashboard'));
+            ->get(route('central.account.dashboard'));
 
         $response->assertInertia(fn ($page) => $page
             ->has('stats.tenant_count')

@@ -1,7 +1,7 @@
 import CustomerLayout from '@/layouts/customer-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import customer from '@/routes/customer';
+import customer from '@/routes/central/account';
 import { Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Building2, Plus, ArrowRight, Globe } from 'lucide-react';

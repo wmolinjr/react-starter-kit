@@ -29,6 +29,18 @@ use App\Http\Controllers\Central\Settings\ProfileController;
 use App\Http\Controllers\Central\Settings\TwoFactorAuthenticationController;
 use App\Http\Controllers\Central\Settings\TwoFactorController;
 use App\Http\Controllers\Central\SignupController;
+use App\Http\Controllers\Customer\Auth\ForgotPasswordController as CustomerForgotPasswordController;
+use App\Http\Controllers\Customer\Auth\LoginController as CustomerLoginController;
+use App\Http\Controllers\Customer\Auth\LogoutController as CustomerLogoutController;
+use App\Http\Controllers\Customer\Auth\RegisterController as CustomerRegisterController;
+use App\Http\Controllers\Customer\Auth\ResetPasswordController as CustomerResetPasswordController;
+use App\Http\Controllers\Customer\Auth\VerifyEmailController as CustomerVerifyEmailController;
+use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\Customer\InvoiceController;
+use App\Http\Controllers\Customer\PaymentMethodController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Customer\TenantController as CustomerTenantController;
+use App\Http\Controllers\Customer\TransferController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -50,6 +62,125 @@ use Laravel\Fortify\Features;
 */
 
 foreach (config('tenancy.identification.central_domains') as $domain) {
+    /*
+    |----------------------------------------------------------------------
+    | Customer Portal Routes (central.account.*)
+    |----------------------------------------------------------------------
+    |
+    | Routes for the Customer Billing Portal at /account/*
+    | Uses 'customer' guard for authentication
+    |
+    | Customers are the billing entities - real people who pay for tenants.
+    | This portal allows them to:
+    | - Manage their profile and billing information
+    | - View and manage all their tenants (workspaces)
+    | - Manage payment methods
+    | - View invoices
+    | - Transfer tenant ownership
+    |
+    */
+    Route::domain($domain)->middleware('web')->name('central.')->group(function () {
+        Route::prefix('account')->name('account.')->group(function () {
+
+            // ─────────────────────────────────────────────────────────────────────
+            // Guest Routes (not authenticated)
+            // ─────────────────────────────────────────────────────────────────────
+
+            Route::middleware('guest:customer')->group(function () {
+                // Registration
+                Route::get('register', [CustomerRegisterController::class, 'create'])->name('register');
+                Route::post('register', [CustomerRegisterController::class, 'store'])->name('register.store');
+
+                // Login
+                Route::get('login', [CustomerLoginController::class, 'create'])->name('login');
+                Route::post('login', [CustomerLoginController::class, 'store'])->name('login.store');
+
+                // Password Reset
+                Route::get('forgot-password', [CustomerForgotPasswordController::class, 'create'])->name('password.request');
+                Route::post('forgot-password', [CustomerForgotPasswordController::class, 'store'])->name('password.email');
+                Route::get('reset-password/{token}', [CustomerResetPasswordController::class, 'create'])->name('password.reset');
+                Route::post('reset-password', [CustomerResetPasswordController::class, 'store'])->name('password.update');
+
+                // Transfer acceptance (can view before login, but must login to accept)
+                Route::get('transfers/{token}/accept', [TransferController::class, 'showAccept'])->name('transfers.accept.show');
+            });
+
+            // ─────────────────────────────────────────────────────────────────────
+            // Authenticated Routes
+            // ─────────────────────────────────────────────────────────────────────
+
+            Route::middleware('auth:customer')->group(function () {
+                // Logout
+                Route::post('logout', CustomerLogoutController::class)->name('logout');
+
+                // Email Verification
+                Route::get('verify-email', [CustomerVerifyEmailController::class, 'notice'])->name('verification.notice');
+                Route::get('verify-email/{id}/{hash}', [CustomerVerifyEmailController::class, 'verify'])
+                    ->middleware(['signed', 'throttle:6,1'])
+                    ->name('verification.verify');
+                Route::post('email/verification-notification', [CustomerVerifyEmailController::class, 'send'])
+                    ->middleware('throttle:6,1')
+                    ->name('verification.send');
+
+                // ─────────────────────────────────────────────────────────────────
+                // Verified Routes (email must be verified)
+                // ─────────────────────────────────────────────────────────────────
+
+                Route::middleware('customer.verified')->group(function () {
+                    // Dashboard
+                    Route::get('/', [CustomerDashboardController::class, 'index'])->name('dashboard');
+
+                    // Profile Management
+                    Route::get('profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+                    Route::patch('profile', [CustomerProfileController::class, 'update'])->name('profile.update');
+                    Route::patch('profile/password', [CustomerProfileController::class, 'updatePassword'])->name('profile.password');
+                    Route::patch('profile/billing', [CustomerProfileController::class, 'updateBilling'])->name('profile.billing');
+                    Route::delete('profile', [CustomerProfileController::class, 'destroy'])->name('profile.destroy');
+
+                    // Tenants (Workspaces)
+                    Route::get('tenants', [CustomerTenantController::class, 'index'])->name('tenants.index');
+                    Route::get('tenants/create', [CustomerTenantController::class, 'create'])->name('tenants.create');
+                    Route::post('tenants', [CustomerTenantController::class, 'store'])->name('tenants.store');
+                    Route::get('tenants/{tenant}', [CustomerTenantController::class, 'show'])->name('tenants.show');
+                    Route::get('tenants/{tenant}/billing', [CustomerTenantController::class, 'billing'])->name('tenants.billing');
+                    Route::patch('tenants/{tenant}/payment-method', [CustomerTenantController::class, 'updatePaymentMethod'])
+                        ->name('tenants.payment-method');
+
+                    // Tenant Transfers
+                    Route::get('tenants/{tenant}/transfer', [TransferController::class, 'create'])->name('transfers.create');
+                    Route::post('tenants/{tenant}/transfer', [TransferController::class, 'store'])->name('transfers.store');
+                    Route::post('transfers/{token}/confirm', [TransferController::class, 'confirm'])->name('transfers.confirm');
+                    Route::post('transfers/{transfer}/cancel', [TransferController::class, 'cancel'])->name('transfers.cancel');
+                    Route::post('transfers/{transfer}/reject', [TransferController::class, 'reject'])->name('transfers.reject');
+
+                    // Payment Methods
+                    Route::get('payment-methods', [PaymentMethodController::class, 'index'])->name('payment-methods.index');
+                    Route::get('payment-methods/create', [PaymentMethodController::class, 'create'])->name('payment-methods.create');
+                    Route::post('payment-methods', [PaymentMethodController::class, 'store'])->name('payment-methods.store');
+                    Route::delete('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])
+                        ->name('payment-methods.destroy');
+                    Route::post('payment-methods/{paymentMethod}/default', [PaymentMethodController::class, 'setDefault'])
+                        ->name('payment-methods.default');
+
+                    // Invoices
+                    Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+                    Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+                    Route::get('invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
+
+                    // Stripe Billing Portal (redirect to Stripe-hosted portal)
+                    Route::get('billing-portal', [CustomerProfileController::class, 'billingPortal'])->name('billing-portal');
+
+                    // API Routes (JSON responses for AJAX polling)
+                    Route::prefix('api')->name('api.')->group(function () {
+                        // Purchase status polling for async payments (PIX, Boleto)
+                        Route::get('purchases/{purchase}/status', [CustomerTenantController::class, 'purchaseStatus'])
+                            ->name('purchases.status');
+                    });
+                });
+            });
+        });
+    });
+
     Route::domain($domain)->middleware('web')->name('central.')->group(function () {
 
         /*
@@ -115,20 +246,23 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                 ->where('plan', '^(?!account|success|validate)[a-z0-9-]+$')
                 ->name('index');
 
-            // Step 1: Account creation
+            // Step 1: Account creation (creates Customer + PendingSignup + logs in)
             Route::post('/account', [SignupController::class, 'storeAccount'])->name('account.store');
 
-            // Step 2: Workspace setup
-            Route::patch('/{signup}/workspace', [SignupController::class, 'updateWorkspace'])->name('workspace.update');
+            // Routes that require signup ownership verification
+            Route::middleware('verify.signup.ownership')->group(function () {
+                // Step 2: Workspace setup
+                Route::patch('/{signup}/workspace', [SignupController::class, 'updateWorkspace'])->name('workspace.update');
 
-            // Step 3: Payment processing
-            Route::post('/{signup}/payment', [SignupController::class, 'processPayment'])->name('payment.process');
+                // Step 3: Payment processing
+                Route::post('/{signup}/payment', [SignupController::class, 'processPayment'])->name('payment.process');
 
-            // Status polling
-            Route::get('/{signup}/status', [SignupController::class, 'checkStatus'])->name('status');
+                // Status polling
+                Route::get('/{signup}/status', [SignupController::class, 'checkStatus'])->name('status');
 
-            // Refresh PIX QR code
-            Route::post('/{signup}/refresh-pix', [SignupController::class, 'refreshPix'])->name('refresh-pix');
+                // Refresh PIX QR code
+                Route::post('/{signup}/refresh-pix', [SignupController::class, 'refreshPix'])->name('refresh-pix');
+            });
 
             // Success page
             Route::get('/success', [SignupController::class, 'success'])->name('success');

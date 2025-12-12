@@ -12,7 +12,7 @@ class CustomerPasswordResetTest extends TestCase
 
     public function test_customer_reset_password_link_screen_can_be_rendered(): void
     {
-        $response = $this->get(route('customer.password.request'));
+        $response = $this->get(route('central.account.password.request'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page->component('customer/auth/forgot-password'));

@@ -5,16 +5,23 @@ import type { SignupStepType } from '@/pages/central/signup/index';
 
 interface SignupProgressProps {
     currentStep: SignupStepType;
+    /** Skip account step when customer is already logged in */
+    skipAccountStep?: boolean;
 }
 
-const steps = [
+const allSteps = [
     { key: 'account' as const, icon: User },
     { key: 'workspace' as const, icon: Building2 },
     { key: 'payment' as const, icon: CreditCard },
 ];
 
-export function SignupProgress({ currentStep }: SignupProgressProps) {
+export function SignupProgress({ currentStep, skipAccountStep = false }: SignupProgressProps) {
     const { t } = useLaravelReactI18n();
+
+    // Filter out account step when customer is logged in
+    const steps = skipAccountStep
+        ? allSteps.filter((s) => s.key !== 'account')
+        : allSteps;
 
     const stepLabels: Record<string, string> = {
         account: t('signup.steps.account', { default: 'Account' }),
@@ -23,13 +30,15 @@ export function SignupProgress({ currentStep }: SignupProgressProps) {
     };
 
     const getStepStatus = (stepKey: string): 'completed' | 'current' | 'upcoming' => {
-        const stepOrder = ['account', 'workspace', 'payment'];
-        const currentIndex = stepOrder.indexOf(currentStep);
-        const stepIndex = stepOrder.indexOf(stepKey);
-
+        // Handle processing/success states - all steps are completed
         if (currentStep === 'processing' || currentStep === 'success') {
             return 'completed';
         }
+
+        // Use filtered steps for ordering
+        const stepOrder = steps.map((s) => s.key);
+        const currentIndex = stepOrder.indexOf(currentStep as typeof stepOrder[number]);
+        const stepIndex = stepOrder.indexOf(stepKey as typeof stepOrder[number]);
 
         if (stepIndex < currentIndex) return 'completed';
         if (stepIndex === currentIndex) return 'current';

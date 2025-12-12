@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Central\Signup;
 
-use App\Models\Central\Customer;
-use App\Models\Central\PendingSignup;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
 /**
  * Validates account creation data (Step 1 of signup wizard).
+ *
+ * Customer-First Flow: Creates Customer immediately, so we only
+ * check the customers table for email uniqueness.
  */
 class StoreAccountRequest extends FormRequest
 {
@@ -27,23 +28,7 @@ class StoreAccountRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                function ($attribute, $value, $fail) {
-                    // Check if email exists in customers table
-                    if (Customer::where('email', $value)->exists()) {
-                        $fail(__('signup.errors.email_already_registered'));
-                    }
-                    // Check if email exists in pending signups (not expired)
-                    if (PendingSignup::where('email', $value)
-                        ->whereIn('status', ['pending', 'processing'])
-                        ->where(function ($q) {
-                            $q->whereNull('expires_at')
-                                ->orWhere('expires_at', '>', now());
-                        })
-                        ->exists()
-                    ) {
-                        $fail(__('signup.errors.email_already_registered'));
-                    }
-                },
+                'unique:customers,email', // Customer-first: only check customers table
             ],
             'password' => ['required', 'confirmed', Password::defaults()],
             'locale' => ['nullable', 'string', 'max:10'],

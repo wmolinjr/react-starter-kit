@@ -17,7 +17,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.profile.edit'));
+            ->get(route('central.account.profile.edit'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -33,7 +33,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->patch(route('customer.profile.update'), [
+            ->patch(route('central.account.profile.update'), [
                 'name' => 'Updated Name',
                 'email' => 'updated@example.com',
                 'phone' => '+55 11 99999-9999',
@@ -59,7 +59,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->patch(route('customer.profile.update'), [
+            ->patch(route('central.account.profile.update'), [
                 'name' => 'Updated Name',
                 'email' => $customer->email,
             ]);
@@ -79,7 +79,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->patch(route('customer.profile.password'), [
+            ->patch(route('central.account.profile.password'), [
                 'current_password' => 'old-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -100,7 +100,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->patch(route('customer.profile.password'), [
+            ->patch(route('central.account.profile.password'), [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -116,7 +116,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->patch(route('customer.profile.billing'), [
+            ->patch(route('central.account.profile.billing'), [
                 'billing_address' => [
                     'line1' => '123 Main St',
                     'line2' => 'Apt 4B',
@@ -145,11 +145,11 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->delete(route('customer.profile.destroy'), [
+            ->delete(route('central.account.profile.destroy'), [
                 'password' => 'password',
             ]);
 
-        $response->assertRedirect(route('customer.login', absolute: false));
+        $response->assertRedirect(route('central.account.login', absolute: false));
 
         $this->assertGuest('customer');
         $this->assertSoftDeleted('customers', ['id' => $customer->id]);
@@ -163,7 +163,7 @@ class CustomerProfileTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->delete(route('customer.profile.destroy'), [
+            ->delete(route('central.account.profile.destroy'), [
                 'password' => 'wrong-password',
             ]);
 

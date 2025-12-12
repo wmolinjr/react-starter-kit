@@ -23,7 +23,7 @@ export default function PricingPage({ plans }: PricingPageProps) {
 
     const handleSelectPlan = (planSlug: string) => {
         // Navigate to signup with plan pre-selected (using clean URL: /signup/professional)
-        router.visit(signupIndex.url(planSlug));
+        router.visit(signupIndex.url({ plan: planSlug }));
     };
 
     return (
@@ -43,7 +43,7 @@ export default function PricingPage({ plans }: PricingPageProps) {
 
                         <nav className="flex items-center gap-4">
                             <Link
-                                href={signupIndex.url()}
+                                href={signupIndex.url({ plan: 'starter' })}
                                 className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
                             >
                                 {t('pricing.cta.signup', { default: 'Sign Up' })}
@@ -119,7 +119,7 @@ export default function PricingPage({ plans }: PricingPageProps) {
                         </p>
                         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                             <Button asChild size="lg">
-                                <Link href={signupIndex.url()}>
+                                <Link href={signupIndex.url({ plan: 'starter' })}>
                                     {t('pricing.cta_section.primary', { default: 'Start Free Trial' })}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>

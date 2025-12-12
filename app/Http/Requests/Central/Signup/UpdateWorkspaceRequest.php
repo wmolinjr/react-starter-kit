@@ -4,7 +4,6 @@ namespace App\Http\Requests\Central\Signup;
 
 use App\Enums\BusinessSector;
 use App\Models\Central\PendingSignup;
-use App\Models\Central\Tenant;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

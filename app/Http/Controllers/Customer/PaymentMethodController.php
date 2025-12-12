@@ -130,7 +130,7 @@ class PaymentMethodController extends Controller
                 $customer->update(['default_payment_method_id' => $paymentMethod->id]);
             }
 
-            return redirect()->route('customer.payment-methods.index')
+            return redirect()->route('central.account.payment-methods.index')
                 ->with('status', 'payment-method-added');
 
         } catch (\Exception $e) {

@@ -18,7 +18,7 @@ class CustomerEmailVerificationTest extends TestCase
         $customer = Customer::factory()->unverified()->create();
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.verification.notice'));
+            ->get(route('central.account.verification.notice'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page->component('customer/auth/verify-email'));
@@ -31,7 +31,7 @@ class CustomerEmailVerificationTest extends TestCase
         $customer = Customer::factory()->unverified()->create();
 
         $verificationUrl = URL::temporarySignedRoute(
-            'customer.verification.verify',
+            'central.account.verification.verify',
             now()->addMinutes(60),
             ['id' => $customer->id, 'hash' => sha1($customer->email)]
         );
@@ -42,7 +42,7 @@ class CustomerEmailVerificationTest extends TestCase
         Event::assertDispatched(Verified::class);
 
         $this->assertTrue($customer->fresh()->hasVerifiedEmail());
-        $response->assertRedirect(route('customer.dashboard', ['verified' => 1], absolute: false));
+        $response->assertRedirect(route('central.account.dashboard', ['verified' => 1], absolute: false));
     }
 
     public function test_customer_email_is_not_verified_with_invalid_hash(): void
@@ -50,7 +50,7 @@ class CustomerEmailVerificationTest extends TestCase
         $customer = Customer::factory()->unverified()->create();
 
         $verificationUrl = URL::temporarySignedRoute(
-            'customer.verification.verify',
+            'central.account.verification.verify',
             now()->addMinutes(60),
             ['id' => $customer->id, 'hash' => sha1('wrong-email')]
         );
@@ -68,8 +68,8 @@ class CustomerEmailVerificationTest extends TestCase
         ]);
 
         $response = $this->actingAs($customer, 'customer')
-            ->get(route('customer.verification.notice'));
+            ->get(route('central.account.verification.notice'));
 
-        $response->assertRedirect(route('customer.dashboard', absolute: false));
+        $response->assertRedirect(route('central.account.dashboard', absolute: false));
     }
 }

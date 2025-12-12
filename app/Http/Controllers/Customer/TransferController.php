@@ -63,7 +63,7 @@ class TransferController extends Controller
                 ['notes' => $validated['notes'] ?? null]
             );
 
-            return redirect()->route('customer.tenants.show', $tenant)
+            return redirect()->route('central.account.tenants.show', $tenant)
                 ->with('status', 'transfer-initiated');
         } catch (\App\Exceptions\Central\TransferException $e) {
             return back()->withErrors(['to_email' => $e->getMessage()]);
@@ -119,8 +119,8 @@ class TransferController extends Controller
 
         if (! $customer) {
             // Redirect to login with return URL
-            return redirect()->route('customer.login')
-                ->with('intended_url', route('customer.transfers.accept.show', $token));
+            return redirect()->route('central.account.login')
+                ->with('intended_url', route('central.account.transfers.accept.show', $token));
         }
 
         try {
@@ -130,7 +130,7 @@ class TransferController extends Controller
             // Complete the transfer (move ownership)
             $this->transferService->complete($transfer);
 
-            return redirect()->route('customer.tenants.show', $transfer->tenant)
+            return redirect()->route('central.account.tenants.show', $transfer->tenant)
                 ->with('status', 'transfer-accepted');
         } catch (\App\Exceptions\Central\TransferException $e) {
             return back()->withErrors(['transfer' => $e->getMessage()]);
@@ -147,7 +147,7 @@ class TransferController extends Controller
         try {
             $this->transferService->cancel($transfer, $customer);
 
-            return redirect()->route('customer.tenants.show', $transfer->tenant)
+            return redirect()->route('central.account.tenants.show', $transfer->tenant)
                 ->with('status', 'transfer-cancelled');
         } catch (\App\Exceptions\Central\TransferException $e) {
             return back()->withErrors(['transfer' => $e->getMessage()]);
@@ -164,7 +164,7 @@ class TransferController extends Controller
         try {
             $this->transferService->reject($transfer, $customer);
 
-            return redirect()->route('customer.dashboard')
+            return redirect()->route('central.account.dashboard')
                 ->with('status', 'transfer-rejected');
         } catch (\App\Exceptions\Central\TransferException $e) {
             return back()->withErrors(['transfer' => $e->getMessage()]);

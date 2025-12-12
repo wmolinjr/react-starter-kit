@@ -2,7 +2,7 @@ import CustomerLayout from '@/layouts/customer-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import customer from '@/routes/customer';
+import customer from '@/routes/central/account';
 import { Form, Head, Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CreditCard, Plus, Star, Trash2 } from 'lucide-react';

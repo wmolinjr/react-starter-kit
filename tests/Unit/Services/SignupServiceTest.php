@@ -51,11 +51,11 @@ class SignupServiceTest extends TestCase
     }
 
     // =========================================================================
-    // createPendingSignup Tests
+    // createPendingSignupWithCustomer Tests (Customer-First Flow)
     // =========================================================================
 
     #[Test]
-    public function it_creates_pending_signup_with_account_data(): void
+    public function it_creates_pending_signup_with_customer(): void
     {
         $data = [
             'name' => 'John Doe',
@@ -64,14 +64,29 @@ class SignupServiceTest extends TestCase
             'locale' => 'en',
         ];
 
-        $signup = $this->service->createPendingSignup($data);
+        $result = $this->service->createPendingSignupWithCustomer($data);
 
+        $this->assertArrayHasKey('customer', $result);
+        $this->assertArrayHasKey('signup', $result);
+
+        $customer = $result['customer'];
+        $signup = $result['signup'];
+
+        $this->assertInstanceOf(Customer::class, $customer);
         $this->assertInstanceOf(PendingSignup::class, $signup);
+
+        // Customer has account data
+        $this->assertEquals('John Doe', $customer->name);
+        $this->assertEquals('john@example.com', $customer->email);
+        $this->assertEquals('en', $customer->locale);
+        $this->assertTrue(Hash::check('secret123', $customer->password));
+
+        // Signup references customer (accessors work)
+        $this->assertEquals($customer->id, $signup->customer_id);
         $this->assertEquals('John Doe', $signup->name);
         $this->assertEquals('john@example.com', $signup->email);
         $this->assertEquals('en', $signup->locale);
         $this->assertEquals(PendingSignup::STATUS_PENDING, $signup->status);
-        $this->assertTrue(Hash::check('secret123', $signup->password));
         $this->assertNotNull($signup->expires_at);
         $this->assertTrue($signup->expires_at->isAfter(now()->addHours(23)));
     }
@@ -85,9 +100,27 @@ class SignupServiceTest extends TestCase
             'password' => 'secret123',
         ];
 
-        $signup = $this->service->createPendingSignup($data);
+        $result = $this->service->createPendingSignupWithCustomer($data);
 
-        $this->assertEquals(config('app.locale', 'pt_BR'), $signup->locale);
+        $this->assertEquals(config('app.locale', 'pt_BR'), $result['customer']->locale);
+        $this->assertEquals(config('app.locale', 'pt_BR'), $result['signup']->locale);
+    }
+
+    #[Test]
+    public function it_creates_pending_signup_for_existing_customer(): void
+    {
+        $customer = Customer::factory()->create([
+            'name' => 'Existing Customer',
+            'email' => 'existing@example.com',
+        ]);
+
+        $signup = $this->service->createPendingSignupForCustomer($customer);
+
+        $this->assertInstanceOf(PendingSignup::class, $signup);
+        $this->assertEquals($customer->id, $signup->customer_id);
+        $this->assertEquals('Existing Customer', $signup->name);
+        $this->assertEquals('existing@example.com', $signup->email);
+        $this->assertEquals(PendingSignup::STATUS_PENDING, $signup->status);
     }
 
     // =========================================================================

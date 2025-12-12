@@ -9,5 +9,7 @@
     "signup.account.password_placeholder": "Minimum 8 characters",
     "signup.account.password_confirmation": "Confirm password",
     "signup.account.password_confirmation_placeholder": "Enter password again",
-    "signup.account.continue": "Continue"
+    "signup.account.continue": "Continue",
+    "signup.account.have_account": "Already have an account?",
+    "signup.account.login_link": "Sign in"
 }

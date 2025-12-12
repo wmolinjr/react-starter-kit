@@ -14,21 +14,18 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
 /**
  * PendingSignup Model
  *
- * Stores signup data while waiting for payment confirmation.
- * After payment is confirmed via webhook, Customer and Tenant are created.
+ * Customer-First Flow: Stores workspace/payment data while waiting for payment.
+ * Customer is created FIRST (Step 1), then workspace configured, then payment.
  *
  * Status Flow:
- * - pending: Initial state, collecting data
+ * - pending: Initial state, Customer created, collecting workspace data
  * - processing: Payment initiated, waiting for confirmation
- * - completed: Payment confirmed, Customer + Tenant created
+ * - completed: Payment confirmed, Tenant created
  * - failed: Payment failed or declined
  * - expired: Signup expired (no payment within 24h)
  *
  * @property string $id UUID primary key
- * @property string $email
- * @property string $name
- * @property string $password Hashed password
- * @property string $locale
+ * @property string $customer_id Customer ID (required - created in Step 1)
  * @property string|null $workspace_name
  * @property string|null $workspace_slug
  * @property string|null $business_sector
@@ -39,20 +36,26 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property string|null $provider_session_id Stripe checkout session ID
  * @property string|null $provider_payment_id PIX/Boleto payment ID
  * @property string $status pending|processing|completed|failed|expired
- * @property string|null $customer_id Created customer ID
- * @property string|null $tenant_id Created tenant ID
+ * @property string|null $tenant_id Created tenant ID (after payment)
  * @property string|null $failure_reason
  * @property array|null $metadata
  * @property \Carbon\Carbon|null $expires_at
  * @property \Carbon\Carbon|null $paid_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property-read string $email Via customer relationship
+ * @property-read string $name Via customer relationship
+ * @property-read Customer $customer
+ * @property-read Tenant|null $tenant
+ * @property-read Plan|null $plan
  */
 class PendingSignup extends Model
 {
     use CentralConnection;
+
     /** @use HasFactory<PendingSignupFactory> */
     use HasFactory;
+
     use HasUuids;
 
     protected $table = 'pending_signups';
@@ -86,10 +89,7 @@ class PendingSignup extends Model
     public const PROVIDER_ASAAS = 'asaas';
 
     protected $fillable = [
-        'email',
-        'name',
-        'password',
-        'locale',
+        'customer_id',
         'workspace_name',
         'workspace_slug',
         'business_sector',
@@ -100,16 +100,11 @@ class PendingSignup extends Model
         'provider_session_id',
         'provider_payment_id',
         'status',
-        'customer_id',
         'tenant_id',
         'failure_reason',
         'metadata',
         'expires_at',
         'paid_at',
-    ];
-
-    protected $hidden = [
-        'password',
     ];
 
     protected function casts(): array
@@ -287,13 +282,14 @@ class PendingSignup extends Model
     }
 
     /**
-     * Mark signup as completed (after customer/tenant created).
+     * Mark signup as completed (after tenant created).
+     *
+     * Customer-First: Customer already exists, only tenant_id is set here.
      */
-    public function markAsCompleted(string $customerId, string $tenantId): void
+    public function markAsCompleted(string $tenantId): void
     {
         $this->update([
             'status' => self::STATUS_COMPLETED,
-            'customer_id' => $customerId,
             'tenant_id' => $tenantId,
             'paid_at' => $this->paid_at ?? now(),
         ]);
@@ -351,6 +347,30 @@ class PendingSignup extends Model
     // =========================================================================
     // Accessors
     // =========================================================================
+
+    /**
+     * Get email from customer (customer-first flow).
+     */
+    public function getEmailAttribute(): string
+    {
+        return $this->customer->email;
+    }
+
+    /**
+     * Get name from customer (customer-first flow).
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->customer->name;
+    }
+
+    /**
+     * Get locale from customer (customer-first flow).
+     */
+    public function getLocaleAttribute(): string
+    {
+        return $this->customer->locale ?? config('app.locale', 'pt_BR');
+    }
 
     /**
      * Get tenant URL after completion.

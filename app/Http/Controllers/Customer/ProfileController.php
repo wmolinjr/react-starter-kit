@@ -147,7 +147,7 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('customer.login');
+        return redirect()->route('central.account.login');
     }
 
     /**
@@ -168,7 +168,7 @@ class ProfileController extends Controller
         try {
             $portalUrl = $gateway->createBillingPortalSession(
                 $customer,
-                route('customer.dashboard')
+                route('central.account.dashboard')
             );
 
             return redirect()->away($portalUrl);

@@ -3,7 +3,7 @@ import { AppShell } from '@/components/shared/layout/app-shell';
 import { AppSidebarHeader } from '@/components/shared/navigation/sidebar-header';
 import { SidebarInset, SidebarProvider, Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type BreadcrumbItem } from '@/types';
-import customer from '@/routes/customer';
+import customer from '@/routes/central/account';
 import { Link, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import {

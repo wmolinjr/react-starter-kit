@@ -10,6 +10,8 @@ use App\Http\Resources\Concerns\HasTypescriptType;
  *
  * Transforms PendingSignup model for API responses.
  * Used in the signup wizard to track progress.
+ *
+ * Customer-First Flow: email/name come from customer relationship.
  */
 class PendingSignupResource extends BaseResource
 {
@@ -25,9 +27,10 @@ class PendingSignupResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'email' => $this->email,
-            'name' => $this->name,
-            'locale' => $this->locale,
+            'customer_id' => $this->customer_id,
+            'email' => $this->email, // Via customer accessor
+            'name' => $this->name, // Via customer accessor
+            'locale' => $this->locale, // Via customer accessor
             'workspace_name' => $this->workspace_name,
             'workspace_slug' => $this->workspace_slug,
             'business_sector' => $this->business_sector?->value,
@@ -55,6 +58,7 @@ class PendingSignupResource extends BaseResource
     {
         return [
             'id' => 'string',
+            'customer_id' => 'string',
             'email' => 'string',
             'name' => 'string',
             'locale' => 'string',

@@ -1,6 +1,7 @@
 {
     "signup.errors.email_already_registered": "This email is already registered",
     "signup.errors.slug_already_taken": "This URL is already taken",
+    "signup.errors.unauthorized": "You do not have permission to access this signup.",
     "signup.errors.signup_expired": "This signup attempt has expired. Please start again.",
     "signup.errors.signup_already_processed": "This signup has already been processed.",
     "signup.errors.workspace_data_required": "Workspace data is required.",

@@ -7,14 +7,15 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Central Migration: Pending Signups Table
  *
- * Stores signup data while waiting for payment confirmation.
- * After payment is confirmed, data is used to create Customer + Tenant.
+ * Customer-First Flow: Stores workspace/payment data while waiting for payment.
+ * Customer is created FIRST (Step 1), then workspace configured, then payment.
  *
  * Flow:
- * 1. User fills account + workspace data → PendingSignup created (status: pending)
- * 2. User initiates payment → payment session created
- * 3. Webhook confirms payment → Customer + Tenant created
- * 4. PendingSignup updated with customer_id + tenant_id (status: completed)
+ * 1. User creates account → Customer created + logged in + PendingSignup created
+ * 2. User configures workspace → PendingSignup updated with workspace data
+ * 3. User initiates payment → payment session created
+ * 4. Webhook confirms payment → Tenant created (Customer already exists)
+ * 5. PendingSignup updated with tenant_id (status: completed)
  */
 return new class extends Migration
 {
@@ -23,11 +24,9 @@ return new class extends Migration
         Schema::create('pending_signups', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            // Account data (Step 1)
-            $table->string('email')->unique();
-            $table->string('name');
-            $table->string('password'); // Already hashed
-            $table->string('locale', 10)->default('pt_BR');
+            // Customer reference (REQUIRED - customer-first flow)
+            // Customer is created in Step 1, before workspace/payment
+            $table->foreignUuid('customer_id')->constrained('customers')->cascadeOnDelete();
 
             // Workspace data (Step 2)
             $table->string('workspace_name')->nullable();
@@ -46,7 +45,6 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, processing, completed, failed, expired
 
             // Result (after completion)
-            $table->foreignUuid('customer_id')->nullable()->constrained('customers')->nullOnDelete();
             $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('failure_reason')->nullable();
 
@@ -56,7 +54,8 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
 
-            // Indexes for webhook lookups
+            // Indexes
+            $table->index(['customer_id', 'status']);
             $table->index(['provider_session_id', 'payment_provider']);
             $table->index(['provider_payment_id', 'payment_provider']);
             $table->index(['status', 'expires_at']);

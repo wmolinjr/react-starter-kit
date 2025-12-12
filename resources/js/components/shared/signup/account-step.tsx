@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,6 +158,21 @@ export function AccountStep({ existingSignup, onSuccess }: AccountStepProps) {
                             ? t('signup.account.continue_to_workspace', { default: 'Continue to Workspace' })
                             : t('signup.account.continue', { default: 'Continue' })}
                     </Button>
+
+                    {/* Login link for existing customers */}
+                    {!existingSignup && (
+                        <div className="mt-6 text-center">
+                            <p className="text-muted-foreground text-sm">
+                                {t('signup.account.have_account', { default: 'Already have an account?' })}{' '}
+                                <Link
+                                    href="/account/login"
+                                    className="text-primary font-medium hover:underline"
+                                >
+                                    {t('signup.account.login_link', { default: 'Sign in' })}
+                                </Link>
+                            </p>
+                        </div>
+                    )}
                 </form>
             </CardContent>
         </Card>

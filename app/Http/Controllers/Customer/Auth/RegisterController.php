@@ -43,6 +43,6 @@ class RegisterController extends Controller
 
         Auth::guard('customer')->login($customer);
 
-        return redirect()->route('customer.dashboard');
+        return redirect()->route('central.account.dashboard');
     }
 }

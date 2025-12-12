@@ -1891,13 +1891,15 @@ export type SidebarTranslationKey =
     | 'sidebar.item.users';
 
 /**
- * Signup namespace keys (117 keys)
+ * Signup namespace keys (120 keys)
  */
 export type SignupTranslationKey =
     | 'signup.account.continue'
     | 'signup.account.description'
     | 'signup.account.email'
     | 'signup.account.email_placeholder'
+    | 'signup.account.have_account'
+    | 'signup.account.login_link'
     | 'signup.account.name'
     | 'signup.account.name_placeholder'
     | 'signup.account.password'
@@ -1951,6 +1953,7 @@ export type SignupTranslationKey =
     | 'signup.errors.signup_already_processed'
     | 'signup.errors.signup_expired'
     | 'signup.errors.slug_already_taken'
+    | 'signup.errors.unauthorized'
     | 'signup.errors.workspace_data_required'
     | 'signup.errors.workspace_name_max'
     | 'signup.errors.workspace_name_required'
@@ -3850,6 +3853,8 @@ export type TranslationKey =
     | 'signup.account.description'
     | 'signup.account.email'
     | 'signup.account.email_placeholder'
+    | 'signup.account.have_account'
+    | 'signup.account.login_link'
     | 'signup.account.name'
     | 'signup.account.name_placeholder'
     | 'signup.account.password'
@@ -3903,6 +3908,7 @@ export type TranslationKey =
     | 'signup.errors.signup_already_processed'
     | 'signup.errors.signup_expired'
     | 'signup.errors.slug_already_taken'
+    | 'signup.errors.unauthorized'
     | 'signup.errors.workspace_data_required'
     | 'signup.errors.workspace_name_max'
     | 'signup.errors.workspace_name_required'

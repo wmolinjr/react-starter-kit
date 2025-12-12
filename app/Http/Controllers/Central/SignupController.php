@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\Signup\ProcessPaymentRequest;
 use App\Http\Requests\Central\Signup\StoreAccountRequest;
 use App\Http\Requests\Central\Signup\UpdateWorkspaceRequest;
+use App\Http\Resources\Central\CustomerSummaryResource;
 use App\Http\Resources\Central\PendingSignupResource;
 use App\Http\Resources\Central\PlanResource;
 use App\Models\Central\Customer;
@@ -26,6 +27,9 @@ use Inertia\Response;
  * SignupController
  *
  * Handles the WIX-like signup wizard flow.
+ *
+ * Customer-First Flow: Customer is created in Step 1 (account creation),
+ * logged in immediately, and Tenant is created after payment confirmation.
  */
 class SignupController extends Controller
 {
@@ -38,9 +42,14 @@ class SignupController extends Controller
      * Display the signup wizard.
      *
      * GET /signup/{plan}/{signup?}
+     *
+     * Customer-First: If customer is logged in without a signup,
+     * creates a PendingSignup automatically and redirects with it.
      */
-    public function create(Request $request, string $plan, ?PendingSignup $signup = null): Response
+    public function create(Request $request, string $plan, ?PendingSignup $signup = null): Response|RedirectResponse
     {
+        $customer = Auth::guard('customer')->user();
+
         $plans = Plan::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
@@ -52,12 +61,29 @@ class SignupController extends Controller
             $signup = null;
         }
 
+        // Customer-First: If logged in without a signup, create one and redirect
+        if ($customer && ! $signup) {
+            $signup = $this->signupService->createPendingSignupForCustomer($customer);
+
+            return redirect()->route('central.signup.index', [
+                'plan' => $plan,
+                'signup' => $signup->id,
+            ]);
+        }
+
+        // Security: Verify signup ownership (middleware handles this, but double-check)
+        if ($signup && $signup->customer_id && $customer && $signup->customer_id !== $customer->id) {
+            abort(403, __('signup.errors.unauthorized'));
+        }
+
         return Inertia::render('central/signup/index', [
             'plans' => PlanResource::collection($plans),
             'selectedPlan' => $plan,
             'signup' => $signup ? new PendingSignupResource($signup) : null,
             'businessSectors' => BusinessSector::toArray(),
             'paymentConfig' => $this->paymentSettingsService->getPaymentConfig(),
+            'customer' => $customer ? new CustomerSummaryResource($customer) : null,
+            'skipAccountStep' => (bool) $customer,
         ]);
     }
 
@@ -66,15 +92,20 @@ class SignupController extends Controller
      *
      * POST /signup/account
      *
+     * Customer-First: Creates Customer + PendingSignup, logs in immediately.
      * Uses Inertia redirect with flash data for CSRF protection.
      */
     public function storeAccount(StoreAccountRequest $request): RedirectResponse
     {
-        $signup = $this->signupService->createPendingSignup($request->validated());
+        $result = $this->signupService->createPendingSignupWithCustomer($request->validated());
+
+        // Login customer immediately after account creation
+        Auth::guard('customer')->login($result['customer']);
+        $request->session()->regenerate();
 
         return redirect()
             ->back()
-            ->with('pendingSignup', (new PendingSignupResource($signup))->toArray($request));
+            ->with('pendingSignup', (new PendingSignupResource($result['signup']))->toArray($request));
     }
 
     /**
@@ -190,25 +221,17 @@ class SignupController extends Controller
      * Validate email availability (AJAX).
      *
      * POST /signup/validate/email
+     *
+     * Customer-First: Only checks customers table (PendingSignup no longer stores email).
      */
     public function validateEmail(Request $request): JsonResponse
     {
         $email = $request->input('email');
-
-        $existsInCustomers = Customer::where('email', $email)->exists();
-        $existsInPending = PendingSignup::where('email', $email)
-            ->whereIn('status', ['pending', 'processing'])
-            ->where(function ($q) {
-                $q->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
-            ->exists();
-
-        $available = ! $existsInCustomers && ! $existsInPending;
+        $exists = Customer::where('email', $email)->exists();
 
         return response()->json([
-            'available' => $available,
-            'message' => $available ? null : __('signup.errors.email_already_registered'),
+            'available' => ! $exists,
+            'message' => $exists ? __('signup.errors.email_already_registered') : null,
         ]);
     }
 

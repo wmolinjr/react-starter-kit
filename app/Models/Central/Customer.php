@@ -386,7 +386,7 @@ class Customer extends Authenticatable implements MustVerifyEmail, SyncMaster
         // Create custom verification URL using customer route
         VerifyEmail::createUrlUsing(function ($notifiable) {
             return \Illuminate\Support\Facades\URL::temporarySignedRoute(
-                'customer.verification.verify',
+                'central.account.verification.verify',
                 now()->addMinutes(60),
                 ['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->getEmailForVerification())]
             );
@@ -403,7 +403,7 @@ class Customer extends Authenticatable implements MustVerifyEmail, SyncMaster
     {
         // Create custom reset URL using customer route
         ResetPassword::createUrlUsing(function ($notifiable, $token) {
-            return url(route('customer.password.reset', [
+            return url(route('central.account.password.reset', [
                 'token' => $token,
                 'email' => $notifiable->getEmailForPasswordReset(),
             ], false));
