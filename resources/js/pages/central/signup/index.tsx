@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import AppLogoIcon from '@/components/shared/branding/app-logo-icon';
+import MarketingLayout from '@/layouts/marketing-layout';
 import { SignupProgress } from '@/components/shared/signup/signup-progress';
 import { AccountStep } from '@/components/shared/signup/account-step';
 import { WorkspaceStep } from '@/components/shared/signup/workspace-step';
@@ -52,7 +51,6 @@ export default function SignupPage({
     skipAccountStep = false,
 }: SignupPageProps) {
     const { t } = useLaravelReactI18n();
-    const { name: appName } = usePage<{ name: string }>().props;
 
     /**
      * Determine initial step based on signup state.
@@ -135,25 +133,14 @@ export default function SignupPage({
     const currentPlan = plans.find((p) => p.slug === selectedPlanSlug) || plans[0];
 
     return (
-        <>
-            <Head title={t('signup.page.title', { default: 'Sign Up' })} />
-
-            <div className="bg-background min-h-svh">
-                {/* Header */}
-                <header className="border-b">
-                    <div className="mx-auto flex h-16 max-w-4xl items-center justify-center px-4">
-                        <div className="flex items-center gap-2">
-                            <AppLogoIcon className="text-foreground size-8" />
-                            <span className="text-lg font-semibold">
-                                {appName}
-                            </span>
-                        </div>
-                    </div>
-                </header>
-
+        <MarketingLayout
+            title={t('signup.page.title', { default: 'Sign Up' })}
+            showHeaderCta={false}
+        >
+            <div className="py-8">
                 {/* Progress indicator */}
                 {currentStep !== 'success' && (
-                    <div className="mx-auto max-w-4xl px-4 py-6">
+                    <div className="mx-auto max-w-4xl px-4 pb-6">
                         <SignupProgress
                             currentStep={currentStep}
                             skipAccountStep={skipAccountStep}
@@ -162,7 +149,7 @@ export default function SignupPage({
                 )}
 
                 {/* Step content */}
-                <main className="mx-auto max-w-2xl px-4 py-8">
+                <div className="mx-auto max-w-2xl px-4">
                     {currentStep === 'account' && (
                         <AccountStep
                             existingSignup={signup}
@@ -208,17 +195,8 @@ export default function SignupPage({
                             tenantUrl={signup.tenant_url || ''}
                         />
                     )}
-                </main>
-
-                {/* Footer */}
-                <footer className="border-t py-4">
-                    <div className="mx-auto max-w-4xl px-4 text-center">
-                        <p className="text-muted-foreground text-sm">
-                            {t('signup.footer.secure', { default: 'Secure checkout powered by Stripe' })}
-                        </p>
-                    </div>
-                </footer>
+                </div>
             </div>
-        </>
+        </MarketingLayout>
     );
 }

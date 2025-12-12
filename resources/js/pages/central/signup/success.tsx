@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CheckCircle, Loader2, ArrowRight, Rocket, AlertCircle } from 'lucide-react';
-import AppLogoIcon from '@/components/shared/branding/app-logo-icon';
+import MarketingLayout from '@/layouts/marketing-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { PendingSignupResource } from '@/types/resources';
@@ -30,11 +30,12 @@ export default function SuccessPage({ signup, tenantUrl, tenantName }: SuccessPa
     // If signup is still processing, show loading state
     if (signup && signup.status === 'processing') {
         return (
-            <>
-                <Head title={t('signup.success.processing_title', { default: 'Processing...' })} />
-                <div className="bg-background flex min-h-svh flex-col items-center justify-center p-6">
+            <MarketingLayout
+                title={t('signup.success.processing_title', { default: 'Processing...' })}
+                showHeaderCta={false}
+            >
+                <div className="flex flex-1 items-center justify-center p-6 py-24">
                     <div className="mx-auto w-full max-w-md text-center">
-                        <AppLogoIcon className="text-foreground mx-auto mb-6 size-12" />
                         <Loader2 className="text-primary mx-auto mb-4 h-12 w-12 animate-spin" />
                         <h1 className="text-xl font-semibold">
                             {t('signup.success.processing_title', { default: 'Setting up your workspace...' })}
@@ -46,18 +47,19 @@ export default function SuccessPage({ signup, tenantUrl, tenantName }: SuccessPa
                         </p>
                     </div>
                 </div>
-            </>
+            </MarketingLayout>
         );
     }
 
     // If no signup or failed, show error state
     if (!signup || signup.status === 'failed') {
         return (
-            <>
-                <Head title={t('signup.success.error_title', { default: 'Error' })} />
-                <div className="bg-background flex min-h-svh flex-col items-center justify-center p-6">
+            <MarketingLayout
+                title={t('signup.success.error_title', { default: 'Error' })}
+                showHeaderCta={false}
+            >
+                <div className="flex flex-1 items-center justify-center p-6 py-24">
                     <div className="mx-auto w-full max-w-md text-center">
-                        <AppLogoIcon className="text-foreground mx-auto mb-6 size-12" />
                         <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
                         <h1 className="text-xl font-semibold">
                             {t('signup.success.error_title', { default: 'Something went wrong' })}
@@ -73,15 +75,17 @@ export default function SuccessPage({ signup, tenantUrl, tenantName }: SuccessPa
                         </Button>
                     </div>
                 </div>
-            </>
+            </MarketingLayout>
         );
     }
 
     // Success state
     return (
-        <>
-            <Head title={t('signup.success.title', { default: 'Welcome!' })} />
-            <div className="bg-background flex min-h-svh flex-col items-center justify-center p-6">
+        <MarketingLayout
+            title={t('signup.success.title', { default: 'Welcome!' })}
+            showHeaderCta={false}
+        >
+            <div className="flex flex-1 items-center justify-center p-6 py-16">
                 <div className="mx-auto w-full max-w-md">
                     <Card className="overflow-hidden">
                         {/* Success Header */}
@@ -101,7 +105,7 @@ export default function SuccessPage({ signup, tenantUrl, tenantName }: SuccessPa
 
                         <CardContent className="p-6">
                             {/* Workspace Info */}
-                            <div className="mb-6 rounded-lg border bg-muted/30 p-4 text-center">
+                            <div className="bg-muted/30 mb-6 rounded-lg border p-4 text-center">
                                 <p className="text-muted-foreground text-sm">
                                     {t('signup.success.workspace_name', { default: 'Your workspace' })}
                                 </p>
@@ -141,6 +145,6 @@ export default function SuccessPage({ signup, tenantUrl, tenantName }: SuccessPa
                     </Card>
                 </div>
             </div>
-        </>
+        </MarketingLayout>
     );
 }
