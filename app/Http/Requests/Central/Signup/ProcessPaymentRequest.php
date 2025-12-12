@@ -20,17 +20,4 @@ class ProcessPaymentRequest extends FormRequest
             'payment_method' => ['required', 'in:card,pix,boleto'],
         ];
     }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'payment_method.required' => __('signup.errors.payment_method_required'),
-            'payment_method.in' => __('signup.errors.payment_method_invalid'),
-        ];
-    }
 }

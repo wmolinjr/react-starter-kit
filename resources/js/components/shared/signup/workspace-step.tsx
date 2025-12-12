@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,9 +62,9 @@ export function WorkspaceStep({
     onBack,
 }: WorkspaceStepProps) {
     const { t } = useLaravelReactI18n();
-    const page = usePage<PageProps>();
+    const { props } = usePage<PageProps>();
+    const { errors = {} } = props;
     const [isLoading, setIsLoading] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
     const [formData, setFormData] = useState({
         workspace_name: signup.workspace_name || '',
         workspace_slug: signup.workspace_slug || '',
@@ -76,12 +75,12 @@ export function WorkspaceStep({
 
     // Watch for flash data changes (pendingSignup from server)
     const handleFlashSuccess = useCallback(() => {
-        const pendingSignup = page.props.flash?.pendingSignup as PendingSignupResource | undefined;
+        const pendingSignup = props.flash?.pendingSignup as PendingSignupResource | undefined;
         // Only trigger if we have a signup with workspace data (meaning workspace step was completed)
         if (pendingSignup && pendingSignup.id && pendingSignup.workspace_slug) {
             onSuccess(pendingSignup);
         }
-    }, [page.props.flash?.pendingSignup, onSuccess]);
+    }, [props.flash?.pendingSignup, onSuccess]);
 
     useEffect(() => {
         handleFlashSuccess();
@@ -111,15 +110,10 @@ export function WorkspaceStep({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setErrors({});
 
         router.patch(updateWorkspace.url({ signup: signup.id }), formData, {
             preserveState: true,
             preserveScroll: true,
-            onError: (validationErrors) => {
-                setErrors(validationErrors as Record<string, string>);
-                setIsLoading(false);
-            },
             onFinish: () => {
                 setIsLoading(false);
             },
@@ -142,7 +136,7 @@ export function WorkspaceStep({
                 </CardHeader>
 
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div className="space-y-2">
                             <Label htmlFor="workspace_name">
                                 {t('signup.workspace.name', { default: 'Workspace Name' })}
@@ -160,7 +154,6 @@ export function WorkspaceStep({
                                 placeholder={t('signup.workspace.name_placeholder', {
                                     default: 'My Company',
                                 })}
-                                required
                             />
                             <InputError message={errors.workspace_name} />
                         </div>
@@ -187,9 +180,6 @@ export function WorkspaceStep({
                                         }))
                                     }
                                     placeholder="my-company"
-                                    required
-                                    minLength={3}
-                                    maxLength={50}
                                     className="flex-1"
                                 />
                             </div>

@@ -45,26 +45,13 @@ class UpdateWorkspaceRequest extends FormRequest
                     }
 
                     if ($query->exists()) {
-                        $fail(__('validation.unique', ['attribute' => $attribute]));
+                        $fail(__('signup.errors.slug_already_taken'));
                     }
                 },
             ],
             'business_sector' => ['required', Rule::enum(BusinessSector::class)],
             'plan_id' => ['required', 'uuid', 'exists:plans,id'],
             'billing_period' => ['required', 'in:monthly,yearly'],
-        ];
-    }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'workspace_slug.unique' => __('signup.errors.slug_already_taken'),
-            'workspace_slug.alpha_dash' => __('signup.errors.slug_invalid_format'),
         ];
     }
 }

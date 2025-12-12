@@ -30,7 +30,7 @@ class StoreAccountRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // Check if email exists in customers table
                     if (Customer::where('email', $value)->exists()) {
-                        $fail(__('validation.unique', ['attribute' => $attribute]));
+                        $fail(__('signup.errors.email_already_registered'));
                     }
                     // Check if email exists in pending signups (not expired)
                     if (PendingSignup::where('email', $value)
@@ -41,24 +41,12 @@ class StoreAccountRequest extends FormRequest
                         })
                         ->exists()
                     ) {
-                        $fail(__('validation.unique', ['attribute' => $attribute]));
+                        $fail(__('signup.errors.email_already_registered'));
                     }
                 },
             ],
             'password' => ['required', 'confirmed', Password::defaults()],
             'locale' => ['nullable', 'string', 'max:10'],
-        ];
-    }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'email.unique' => __('signup.errors.email_already_registered'),
         ];
     }
 }

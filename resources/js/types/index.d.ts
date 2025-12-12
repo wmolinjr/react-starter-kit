@@ -174,6 +174,7 @@ export interface PageProps extends LocaleConfig {
     auth: ExtendedAuth;
     tenant: Tenant | null;
     flash: FlashMessages;
+    errors: Record<string, string>;
     sidebarOpen: boolean;
     impersonation: Impersonation;
     currency: CurrencyConfig;

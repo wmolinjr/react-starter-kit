@@ -42,6 +42,7 @@ use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 
@@ -72,6 +73,11 @@ class AppServiceProvider extends ServiceProvider
         // Listen for database connections to enforce UTC at connection level
         // This catches dynamically created tenant connections
         Event::listen(ConnectionEstablished::class, SetDatabaseTimezone::class);
+
+        // ⭐ Register additional PHP translation path
+        // PHP files (like validation.php) are kept in lang-php/ to avoid Vite's php-parser
+        // which fails on PHP translation files. JSON translations remain in lang/
+        Lang::addPath(base_path('lang-php'));
 
         // ⭐ Disable 'data' wrapping for API Resources (Inertia compatibility)
         JsonResource::withoutWrapping();

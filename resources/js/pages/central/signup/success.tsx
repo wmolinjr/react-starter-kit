@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CheckCircle, Loader2, ArrowRight, Rocket, AlertCircle } from 'lucide-react';
 import AppLogoIcon from '@/components/shared/branding/app-logo-icon';
@@ -68,7 +68,7 @@ export default function SuccessPage({ signup, tenantUrl, tenantName }: SuccessPa
                                     default: 'We could not complete your signup. Please try again.',
                                 })}
                         </p>
-                        <Button className="mt-6" onClick={() => (window.location.href = '/signup')}>
+                        <Button className="mt-6" onClick={() => router.visit('/signup')}>
                             {t('signup.success.try_again', { default: 'Try Again' })}
                         </Button>
                     </div>

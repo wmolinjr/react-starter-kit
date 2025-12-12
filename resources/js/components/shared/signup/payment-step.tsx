@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { toast } from 'sonner';
 import { ArrowLeft, Shield, Lock, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import InputError from '@/components/shared/feedback/input-error';
 import {
     PaymentMethodSelector,
     type PaymentMethod,
@@ -39,17 +39,18 @@ export function PaymentStep({
     onBack,
 }: PaymentStepProps) {
     const { t } = useLaravelReactI18n();
-    const page = usePage<PageProps>();
+    const { props } = usePage<PageProps>();
+    const { errors = {} } = props;
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
 
     // Watch for flash data changes (paymentResult from server)
     const handleFlashSuccess = useCallback(() => {
-        const paymentResult = page.props.flash?.paymentResult as PaymentResult | undefined;
+        const paymentResult = props.flash?.paymentResult as PaymentResult | undefined;
         if (paymentResult) {
             onSuccess(paymentResult);
         }
-    }, [page.props.flash?.paymentResult, onSuccess]);
+    }, [props.flash?.paymentResult, onSuccess]);
 
     useEffect(() => {
         handleFlashSuccess();
@@ -68,6 +69,9 @@ export function PaymentStep({
         return ['card'];
     };
 
+    // Get first error message for display
+    const errorMessage = errors.payment || errors.payment_method || Object.values(errors)[0];
+
     const handleSubmit = () => {
         setIsLoading(true);
 
@@ -77,12 +81,6 @@ export function PaymentStep({
             {
                 preserveState: true,
                 preserveScroll: true,
-                onError: (errors) => {
-                    const errorMessage =
-                        errors.payment || Object.values(errors)[0] || t('signup.errors.payment_failed');
-                    toast.error(errorMessage as string);
-                    setIsLoading(false);
-                },
                 onFinish: () => {
                     setIsLoading(false);
                 },
@@ -159,6 +157,7 @@ export function PaymentStep({
                         availableMethods={getAvailableMethods()}
                         disabled={isLoading}
                     />
+                    <InputError message={errorMessage} className="mt-2" />
                 </CardContent>
             </Card>
 

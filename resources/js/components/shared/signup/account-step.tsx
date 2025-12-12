@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,9 +17,9 @@ interface AccountStepProps {
 
 export function AccountStep({ onSuccess }: AccountStepProps) {
     const { t } = useLaravelReactI18n();
-    const page = usePage<PageProps>();
+    const { props } = usePage<PageProps>();
+    const { errors = {} } = props;
     const [isLoading, setIsLoading] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -30,11 +29,11 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
 
     // Watch for flash data changes (pendingSignup from server)
     const handleFlashSuccess = useCallback(() => {
-        const pendingSignup = page.props.flash?.pendingSignup as PendingSignupResource | undefined;
+        const pendingSignup = props.flash?.pendingSignup as PendingSignupResource | undefined;
         if (pendingSignup && pendingSignup.id) {
             onSuccess(pendingSignup);
         }
-    }, [page.props.flash?.pendingSignup, onSuccess]);
+    }, [props.flash?.pendingSignup, onSuccess]);
 
     useEffect(() => {
         handleFlashSuccess();
@@ -43,15 +42,10 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setErrors({});
 
         router.post(storeAccount.url(), formData, {
             preserveState: true,
             preserveScroll: true,
-            onError: (validationErrors) => {
-                setErrors(validationErrors as Record<string, string>);
-                setIsLoading(false);
-            },
             onFinish: () => {
                 setIsLoading(false);
             },
@@ -72,7 +66,7 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
             </CardHeader>
 
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                     <div className="space-y-2">
                         <Label htmlFor="name">{t('signup.account.name')}</Label>
                         <Input
@@ -83,7 +77,6 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                                 setFormData((prev) => ({ ...prev, name: e.target.value }))
                             }
                             placeholder={t('signup.account.name_placeholder')}
-                            required
                             autoFocus
                         />
                         <InputError message={errors.name} />
@@ -99,7 +92,6 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                                 setFormData((prev) => ({ ...prev, email: e.target.value }))
                             }
                             placeholder={t('signup.account.email_placeholder')}
-                            required
                         />
                         <InputError message={errors.email} />
                     </div>
@@ -114,8 +106,6 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                                 setFormData((prev) => ({ ...prev, password: e.target.value }))
                             }
                             placeholder={t('signup.account.password_placeholder')}
-                            required
-                            minLength={8}
                         />
                         <InputError message={errors.password} />
                     </div>
@@ -135,7 +125,6 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                                 }))
                             }
                             placeholder={t('signup.account.password_confirmation_placeholder')}
-                            required
                         />
                         <InputError message={errors.password_confirmation} />
                     </div>
