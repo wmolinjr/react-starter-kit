@@ -80,6 +80,7 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
     |
     */
     Route::domain($domain)->middleware('web')->name('central.')->group(function () {
+
         Route::prefix('account')->name('account.')->group(function () {
 
             // ─────────────────────────────────────────────────────────────────────
@@ -179,9 +180,6 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                 });
             });
         });
-    });
-
-    Route::domain($domain)->middleware('web')->name('central.')->group(function () {
 
         /*
         |----------------------------------------------------------------------
