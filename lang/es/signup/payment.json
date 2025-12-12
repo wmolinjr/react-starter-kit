@@ -1,0 +1,18 @@
+{
+    "signup.payment.summary": "Resumen del Pedido",
+    "signup.payment.billed_monthly": "Facturación mensual",
+    "signup.payment.billed_yearly": "Facturación anual",
+    "signup.payment.yearly_savings": "Ahorras 20% con la facturación anual",
+    "signup.payment.total": "Total",
+    "signup.payment.method": "Método de Pago",
+    "signup.payment.method_description": "Elige cómo quieres pagar",
+    "signup.payment.security_title": "Checkout Seguro",
+    "signup.payment.security_description": "Tu pago está protegido con encriptación SSL de 256 bits",
+    "signup.payment.processing": "Procesando...",
+    "signup.payment.pay_with_card": "Pagar con Tarjeta",
+    "signup.payment.generate_pix": "Generar PIX",
+    "signup.payment.generate_boleto": "Generar Boleto",
+    "signup.payment.description": "Suscripción :plan - :workspace",
+    "signup.payment.no_methods_title": "Método de pago no disponible para tu país",
+    "signup.payment.no_methods_description": "Contacta con soporte para otras opciones de pago."
+}

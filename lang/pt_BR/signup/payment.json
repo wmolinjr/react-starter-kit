@@ -12,5 +12,7 @@
     "signup.payment.pay_with_card": "Pagar com Cartão",
     "signup.payment.generate_pix": "Gerar PIX",
     "signup.payment.generate_boleto": "Gerar Boleto",
-    "signup.payment.description": "Assinatura :plan - :workspace"
+    "signup.payment.description": "Assinatura :plan - :workspace",
+    "signup.payment.no_methods_title": "Método de pagamento não disponível para seu país",
+    "signup.payment.no_methods_description": "Entre em contato com o suporte para outras opções de pagamento."
 }

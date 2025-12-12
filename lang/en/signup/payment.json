@@ -12,5 +12,7 @@
     "signup.payment.pay_with_card": "Pay with Card",
     "signup.payment.generate_pix": "Generate PIX",
     "signup.payment.generate_boleto": "Generate Boleto",
-    "signup.payment.description": ":plan subscription - :workspace"
+    "signup.payment.description": ":plan subscription - :workspace",
+    "signup.payment.no_methods_title": "Payment method not available for your country",
+    "signup.payment.no_methods_description": "Please contact support for other payment options."
 }

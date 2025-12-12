@@ -1,0 +1,15 @@
+{
+    "signup.account.title": "Crea tu cuenta",
+    "signup.account.description": "Ingresa tu información para comenzar",
+    "signup.account.name": "Nombre completo",
+    "signup.account.name_placeholder": "Tu nombre",
+    "signup.account.email": "Correo electrónico",
+    "signup.account.email_placeholder": "tu@email.com",
+    "signup.account.password": "Contraseña",
+    "signup.account.password_placeholder": "Mínimo 8 caracteres",
+    "signup.account.password_confirmation": "Confirmar contraseña",
+    "signup.account.password_confirmation_placeholder": "Escribe la contraseña nuevamente",
+    "signup.account.continue": "Continuar",
+    "signup.account.have_account": "¿Ya tienes una cuenta?",
+    "signup.account.login_link": "Inicia sesión"
+}

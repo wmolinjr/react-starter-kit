@@ -1,0 +1,17 @@
+{
+    "signup.success.title": "¡Bienvenido a tu nuevo workspace!",
+    "signup.success.subtitle": "Tu cuenta ha sido creada exitosamente.",
+    "signup.success.workspace_name": "Tu workspace",
+    "signup.success.next_steps": "Próximos pasos",
+    "signup.success.step_1": "Accede a tu workspace y completa tu perfil",
+    "signup.success.step_2": "Invita a los miembros de tu equipo a colaborar",
+    "signup.success.step_3": "Comienza a construir y hacer crecer tu negocio",
+    "signup.success.go_to_workspace": "Ir al Workspace",
+    "signup.success.email_sent": "Enviamos un correo de confirmación a",
+    "signup.success.processing_title": "Configurando tu workspace...",
+    "signup.success.processing_description": "Esto puede tardar unos momentos. Por favor, espera.",
+    "signup.success.error_title": "Algo salió mal",
+    "signup.success.error_description": "No fue posible completar tu registro. Por favor, intenta de nuevo.",
+    "signup.success.try_again": "Intentar de Nuevo",
+    "signup.success.redirecting": "Redirigiendo automáticamente en unos segundos..."
+}

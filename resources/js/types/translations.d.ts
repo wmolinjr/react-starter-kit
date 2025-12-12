@@ -1949,7 +1949,7 @@ export type SidebarTranslationKey =
     | 'sidebar.item.users';
 
 /**
- * Signup namespace keys (120 keys)
+ * Signup namespace keys (122 keys)
  */
 export type SignupTranslationKey =
     | 'signup.account.continue'
@@ -2029,6 +2029,8 @@ export type SignupTranslationKey =
     | 'signup.payment.generate_pix'
     | 'signup.payment.method'
     | 'signup.payment.method_description'
+    | 'signup.payment.no_methods_description'
+    | 'signup.payment.no_methods_title'
     | 'signup.payment.pay_with_card'
     | 'signup.payment.processing'
     | 'signup.payment.security_description'
@@ -4037,6 +4039,8 @@ export type TranslationKey =
     | 'signup.payment.generate_pix'
     | 'signup.payment.method'
     | 'signup.payment.method_description'
+    | 'signup.payment.no_methods_description'
+    | 'signup.payment.no_methods_title'
     | 'signup.payment.pay_with_card'
     | 'signup.payment.processing'
     | 'signup.payment.security_description'

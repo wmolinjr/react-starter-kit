@@ -1,0 +1,13 @@
+{
+    "signup.workspace.title": "Configura tu workspace",
+    "signup.workspace.description": "Define los detalles de tu workspace",
+    "signup.workspace.name": "Nombre del Workspace",
+    "signup.workspace.name_placeholder": "Mi Empresa",
+    "signup.workspace.slug": "URL del Workspace",
+    "signup.workspace.business_sector": "Sector de Negocio",
+    "signup.workspace.business_sector_placeholder": "Selecciona tu sector",
+    "signup.workspace.select_plan": "Selecciona el Plan",
+    "signup.workspace.selected": "Seleccionado",
+    "signup.workspace.select": "Seleccionar",
+    "signup.workspace.continue": "Continuar al Pago"
+}

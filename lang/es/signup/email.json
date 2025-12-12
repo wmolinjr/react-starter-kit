@@ -1,0 +1,17 @@
+{
+    "signup.email.welcome_subject": "¡Bienvenido a :app_name!",
+    "signup.email.welcome_title": "¡Bienvenido!",
+    "signup.email.greeting": "Hola :name,",
+    "signup.email.workspace_created": "¡Tu workspace ha sido creado exitosamente!",
+    "signup.email.workspace_name": "Workspace",
+    "signup.email.plan": "Plan",
+    "signup.email.access_workspace": "Ya puedes acceder a tu workspace haciendo clic en el botón de abajo:",
+    "signup.email.access_button": "Acceder al Workspace",
+    "signup.email.next_steps_title": "Próximos pasos:",
+    "signup.email.next_step_1": "Completa tu perfil",
+    "signup.email.next_step_2": "Invita a tu equipo",
+    "signup.email.next_step_3": "Explora las funcionalidades",
+    "signup.email.direct_link": "O accede directamente:",
+    "signup.email.footer_thanks": "¡Gracias por elegir :app_name!",
+    "signup.email.footer_support": "Si necesitas ayuda, contacta a nuestro soporte."
+}

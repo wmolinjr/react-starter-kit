@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowLeft, Shield, Lock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -61,13 +61,9 @@ export function PaymentStep({
     const yearlyPrice = monthlyPrice * 12 * 0.8; // 20% discount
     const totalPrice = billingPeriod === 'yearly' ? yearlyPrice : monthlyPrice;
 
-    // Get available payment methods from config
-    const getAvailableMethods = (): PaymentMethod[] => {
-        if (paymentConfig.available_methods && paymentConfig.available_methods.length > 0) {
-            return paymentConfig.available_methods;
-        }
-        return ['card'];
-    };
+    // Get available payment methods from config (no fallback - must be configured)
+    const availableMethods: PaymentMethod[] = paymentConfig.available_methods ?? [];
+    const hasPaymentMethods = availableMethods.length > 0;
 
     // Get first error message for display
     const errorMessage = errors.payment || errors.payment_method || Object.values(errors)[0];
@@ -151,12 +147,30 @@ export function PaymentStep({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <PaymentMethodSelector
-                        value={paymentMethod}
-                        onChange={setPaymentMethod}
-                        availableMethods={getAvailableMethods()}
-                        disabled={isLoading}
-                    />
+                    {hasPaymentMethods ? (
+                        <PaymentMethodSelector
+                            value={paymentMethod}
+                            onChange={setPaymentMethod}
+                            availableMethods={availableMethods}
+                            disabled={isLoading}
+                        />
+                    ) : (
+                        <div className="flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-950/30">
+                            <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600 dark:text-yellow-400" />
+                            <div className="text-sm">
+                                <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                                    {t('signup.payment.no_methods_title', {
+                                        default: 'Payment methods not configured',
+                                    })}
+                                </p>
+                                <p className="text-yellow-700 dark:text-yellow-300">
+                                    {t('signup.payment.no_methods_description', {
+                                        default: 'Please contact support to complete your purchase.',
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                     <InputError message={errorMessage} className="mt-2" />
                 </CardContent>
             </Card>
@@ -182,7 +196,7 @@ export function PaymentStep({
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t('common.back', { default: 'Back' })}
                 </Button>
-                <Button onClick={handleSubmit} className="flex-1" disabled={isLoading}>
+                <Button onClick={handleSubmit} className="flex-1" disabled={isLoading || !hasPaymentMethods}>
                     {isLoading ? (
                         <>
                             <Spinner className="mr-2" />
