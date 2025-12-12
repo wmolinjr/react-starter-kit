@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
-import { Form, Head } from '@inertiajs/react';
+import MarketingAuthLayout from '@/layouts/marketing-auth-layout';
+import { Form } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface VerifyEmailProps {
@@ -12,12 +12,11 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
     const { t } = useLaravelReactI18n();
 
     return (
-        <AuthLayout
+        <MarketingAuthLayout
             title={t('auth.verify.verify')}
-            description={t('auth.verify_email_description')}
+            cardTitle={t('auth.verify.verify')}
+            cardDescription={t('auth.verify_email_description')}
         >
-            <Head title={t('auth.verify.verify')} />
-
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
                     {t('auth.verify.link_sent')}
@@ -58,6 +57,6 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
                     )}
                 </Form>
             </div>
-        </AuthLayout>
+        </MarketingAuthLayout>
     );
 }

@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
+import MarketingAuthLayout from '@/layouts/marketing-auth-layout';
 import customer from '@/routes/central/account';
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface ForgotPasswordProps {
@@ -18,12 +18,11 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
     const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
-        <AuthLayout
+        <MarketingAuthLayout
             title={t('auth.forgot.title')}
-            description={t('auth.forgot.description')}
+            cardTitle={t('auth.forgot.title')}
+            cardDescription={t('auth.forgot.description')}
         >
-            <Head title={t('auth.forgot.title')} />
-
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
                     {status}
@@ -63,7 +62,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-center text-sm">
                             {t('common.remember_password')}{' '}
                             <TextLink href={customer.login.url()}>
                                 {t('auth.login.button')}
@@ -72,6 +71,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                     </>
                 )}
             </Form>
-        </AuthLayout>
+        </MarketingAuthLayout>
     );
 }

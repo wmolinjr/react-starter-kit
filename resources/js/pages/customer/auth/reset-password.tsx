@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
-import { Form, Head, usePage } from '@inertiajs/react';
+import MarketingAuthLayout from '@/layouts/marketing-auth-layout';
+import { Form, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface ResetPasswordProps {
@@ -17,11 +17,11 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
-        <AuthLayout
+        <MarketingAuthLayout
             title={t('auth.reset.button')}
-            description={t('auth.reset_password_description')}
+            cardTitle={t('auth.reset.button')}
+            cardDescription={t('auth.reset_password_description')}
         >
-            <Head title={t('auth.reset.button')} />
 
             <Form
                 action="/account/reset-password"
@@ -89,6 +89,6 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     </div>
                 )}
             </Form>
-        </AuthLayout>
+        </MarketingAuthLayout>
     );
 }

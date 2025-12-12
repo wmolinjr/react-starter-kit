@@ -1,0 +1,19 @@
+{
+    "marketing.home.page_title": "Home",
+    "marketing.home.hero.title": "Build Your Business with :appName",
+    "marketing.home.hero.subtitle": "The all-in-one platform for managing your team, projects, and billing.",
+    "marketing.home.hero.cta.primary": "Start Free Trial",
+    "marketing.home.hero.cta.secondary": "Learn More",
+    "marketing.home.features.title": "Everything you need",
+    "marketing.home.features.subtitle": "Powerful features to help you grow your business.",
+    "marketing.home.features.team.title": "Team Management",
+    "marketing.home.features.team.description": "Invite team members, manage roles, and collaborate seamlessly.",
+    "marketing.home.features.projects.title": "Project Tracking",
+    "marketing.home.features.projects.description": "Organize tasks, track progress, and meet deadlines.",
+    "marketing.home.features.billing.title": "Integrated Billing",
+    "marketing.home.features.billing.description": "Manage subscriptions, invoices, and payments in one place.",
+    "marketing.home.features.security.title": "Enterprise Security",
+    "marketing.home.features.security.description": "Two-factor auth, role-based access, and data encryption.",
+    "marketing.home.cta_section.title": "Ready to get started?",
+    "marketing.home.cta_section.subtitle": "Create your workspace in minutes and start growing your business today."
+}

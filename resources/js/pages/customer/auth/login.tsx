@@ -5,9 +5,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
+import MarketingAuthLayout from '@/layouts/marketing-auth-layout';
 import customer from '@/routes/central/account';
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface LoginProps {
@@ -20,11 +20,16 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const { errors } = usePage().props as { errors?: Record<string, string> };
 
     return (
-        <AuthLayout
-            title={t('customer.login.title')}
-            description={t('customer.billing.manage')}
+        <MarketingAuthLayout
+            title={t('customer.login.button')}
+            cardTitle={t('customer.login.title')}
+            cardDescription={t('customer.billing.manage')}
         >
-            <Head title={t('customer.login.button')} />
+            {status && (
+                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                    {status}
+                </div>
+            )}
 
             <Form
                 {...customer.login.store.form()}
@@ -100,7 +105,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-center text-sm">
                             {t("Don't have an account?")}{' '}
                             <TextLink href={customer.register.url()} tabIndex={5}>
                                 {t('auth.register.sign_up')}
@@ -109,12 +114,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
-        </AuthLayout>
+        </MarketingAuthLayout>
     );
 }

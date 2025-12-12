@@ -1,0 +1,15 @@
+{
+    "marketing.contact.page_title": "Contact Us",
+    "marketing.contact.hero.title": "Get in Touch",
+    "marketing.contact.hero.subtitle": "Have questions? We'd love to hear from you.",
+    "marketing.contact.form.name": "Your Name",
+    "marketing.contact.form.email": "Email Address",
+    "marketing.contact.form.subject": "Subject",
+    "marketing.contact.form.message": "Message",
+    "marketing.contact.form.submit": "Send Message",
+    "marketing.contact.form.sending": "Sending...",
+    "marketing.contact.success": "Thank you for your message! We'll get back to you soon.",
+    "marketing.contact.info.title": "Contact Information",
+    "marketing.contact.info.email": "Email",
+    "marketing.contact.info.support": "support@example.com"
+}

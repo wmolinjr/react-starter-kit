@@ -1,0 +1,19 @@
+{
+    "marketing.home.page_title": "Inicio",
+    "marketing.home.hero.title": "Construye Tu Negocio con :appName",
+    "marketing.home.hero.subtitle": "La plataforma todo-en-uno para gestionar tu equipo, proyectos y facturación.",
+    "marketing.home.hero.cta.primary": "Comenzar Gratis",
+    "marketing.home.hero.cta.secondary": "Saber Más",
+    "marketing.home.features.title": "Todo lo que necesitas",
+    "marketing.home.features.subtitle": "Características poderosas para ayudar a tu negocio a crecer.",
+    "marketing.home.features.team.title": "Gestión de Equipo",
+    "marketing.home.features.team.description": "Invita miembros, gestiona roles y colabora fácilmente.",
+    "marketing.home.features.projects.title": "Seguimiento de Proyectos",
+    "marketing.home.features.projects.description": "Organiza tareas, rastrea el progreso y cumple plazos.",
+    "marketing.home.features.billing.title": "Facturación Integrada",
+    "marketing.home.features.billing.description": "Gestiona suscripciones, facturas y pagos en un solo lugar.",
+    "marketing.home.features.security.title": "Seguridad Empresarial",
+    "marketing.home.features.security.description": "Autenticación de dos factores, control de acceso y cifrado.",
+    "marketing.home.cta_section.title": "¿Listo para comenzar?",
+    "marketing.home.cta_section.subtitle": "Crea tu espacio de trabajo en minutos y comienza a hacer crecer tu negocio hoy."
+}

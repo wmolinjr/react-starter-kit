@@ -188,11 +188,14 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         */
 
         // Landing page
-        Route::get('/', function () {
-            return Inertia::render('central/welcome', [
-                'canRegister' => Features::enabled(Features::registration()),
-            ]);
-        })->name('home');
+        Route::get('/', fn() => Inertia::render('central/home'))->name('home');
+
+        // Features page
+        Route::get('/features', fn() => Inertia::render('central/features/index'))->name('features');
+
+        // Contact page
+        Route::get('/contact', [Controllers\Central\ContactController::class, 'create'])->name('contact');
+        Route::post('/contact', [Controllers\Central\ContactController::class, 'store'])->name('contact.store');
 
         /*
         |----------------------------------------------------------------------

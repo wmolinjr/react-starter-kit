@@ -1,0 +1,15 @@
+{
+    "marketing.contact.page_title": "Contato",
+    "marketing.contact.hero.title": "Entre em Contato",
+    "marketing.contact.hero.subtitle": "Tem dúvidas? Adoraríamos ouvir você.",
+    "marketing.contact.form.name": "Seu Nome",
+    "marketing.contact.form.email": "Endereço de Email",
+    "marketing.contact.form.subject": "Assunto",
+    "marketing.contact.form.message": "Mensagem",
+    "marketing.contact.form.submit": "Enviar Mensagem",
+    "marketing.contact.form.sending": "Enviando...",
+    "marketing.contact.success": "Obrigado pela sua mensagem! Entraremos em contato em breve.",
+    "marketing.contact.info.title": "Informações de Contato",
+    "marketing.contact.info.email": "Email",
+    "marketing.contact.info.support": "suporte@exemplo.com"
+}
