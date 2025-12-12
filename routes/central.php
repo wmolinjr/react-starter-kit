@@ -109,8 +109,10 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
 
         // Signup wizard routes
         Route::prefix('signup')->name('signup.')->group(function () {
-            // Show wizard
-            Route::get('/', [SignupController::class, 'create'])->name('index');
+            // Show wizard (with optional plan slug in URL)
+            Route::get('/{plan?}', [SignupController::class, 'create'])
+                ->where('plan', '^(?!account|success|validate).*$')
+                ->name('index');
 
             // Step 1: Account creation
             Route::post('/account', [SignupController::class, 'storeAccount'])->name('account.store');

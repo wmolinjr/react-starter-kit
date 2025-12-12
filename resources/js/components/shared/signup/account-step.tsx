@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,8 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import InputError from '@/components/shared/feedback/input-error';
 import { store as storeAccount } from '@/routes/central/signup/account';
-import { email as validateEmailRoute } from '@/routes/central/signup/validate';
 import type { PendingSignupResource } from '@/types/resources';
+import type { PageProps } from '@/types';
 
 interface AccountStepProps {
     onSuccess: (signup: PendingSignupResource) => void;
@@ -17,8 +18,8 @@ interface AccountStepProps {
 
 export function AccountStep({ onSuccess }: AccountStepProps) {
     const { t } = useLaravelReactI18n();
+    const page = usePage<PageProps>();
     const [isLoading, setIsLoading] = useState(false);
-    const [isValidatingEmail, setIsValidatingEmail] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [formData, setFormData] = useState({
         name: '',
@@ -27,79 +28,34 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
         password_confirmation: '',
     });
 
-    const validateEmailAsync = async (email: string) => {
-        if (!email || !email.includes('@')) return;
-
-        setIsValidatingEmail(true);
-        try {
-            const response = await fetch(validateEmailRoute.url(), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await response.json();
-            if (!data.available) {
-                setErrors((prev) => ({
-                    ...prev,
-                    email: data.message || t('signup.errors.email_already_registered'),
-                }));
-            } else {
-                setErrors((prev) => {
-                    const { email, ...rest } = prev;
-                    return rest;
-                });
-            }
-        } catch (error) {
-            // Ignore validation errors
-        } finally {
-            setIsValidatingEmail(false);
+    // Watch for flash data changes (pendingSignup from server)
+    const handleFlashSuccess = useCallback(() => {
+        const pendingSignup = page.props.flash?.pendingSignup as PendingSignupResource | undefined;
+        if (pendingSignup && pendingSignup.id) {
+            onSuccess(pendingSignup);
         }
-    };
+    }, [page.props.flash?.pendingSignup, onSuccess]);
 
-    const handleEmailBlur = () => {
-        validateEmailAsync(formData.email);
-    };
+    useEffect(() => {
+        handleFlashSuccess();
+    }, [handleFlashSuccess]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setErrors({});
 
-        try {
-            const response = await fetch(storeAccount.url(), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(formData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (data.errors) {
-                    setErrors(data.errors);
-                } else {
-                    toast.error(data.message || t('signup.errors.generic'));
-                }
-                return;
-            }
-
-            onSuccess(data.signup);
-        } catch (error) {
-            toast.error(t('signup.errors.network'));
-        } finally {
-            setIsLoading(false);
-        }
+        router.post(storeAccount.url(), formData, {
+            preserveState: true,
+            preserveScroll: true,
+            onError: (validationErrors) => {
+                setErrors(validationErrors as Record<string, string>);
+                setIsLoading(false);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
     return (
@@ -142,7 +98,6 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                             onChange={(e) =>
                                 setFormData((prev) => ({ ...prev, email: e.target.value }))
                             }
-                            onBlur={handleEmailBlur}
                             placeholder={t('signup.account.email_placeholder')}
                             required
                         />
@@ -185,11 +140,7 @@ export function AccountStep({ onSuccess }: AccountStepProps) {
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isLoading || isValidatingEmail || !!errors.email}
-                    >
+                    <Button type="submit" className="w-full" disabled={isLoading}>
                         {isLoading && <Spinner className="mr-2" />}
                         {t('signup.account.continue', { default: 'Continue' })}
                     </Button>

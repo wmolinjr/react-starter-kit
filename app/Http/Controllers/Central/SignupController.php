@@ -16,6 +16,7 @@ use App\Models\Central\Tenant;
 use App\Services\Central\PaymentSettingsService;
 use App\Services\Central\SignupService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -36,9 +37,9 @@ class SignupController extends Controller
     /**
      * Display the signup wizard.
      *
-     * GET /signup
+     * GET /signup/{plan?}
      */
-    public function create(Request $request): Response
+    public function create(Request $request, ?string $plan = null): Response
     {
         $plans = Plan::query()
             ->where('is_active', true)
@@ -57,7 +58,7 @@ class SignupController extends Controller
 
         return Inertia::render('central/signup/index', [
             'plans' => PlanResource::collection($plans),
-            'selectedPlan' => $request->get('plan'),
+            'selectedPlan' => $plan,
             'signup' => $signup ? new PendingSignupResource($signup) : null,
             'businessSectors' => BusinessSector::toArray(),
             'paymentConfig' => $this->paymentSettingsService->getPaymentConfig(),
@@ -68,33 +69,37 @@ class SignupController extends Controller
      * Store account data (Step 1).
      *
      * POST /signup/account
+     *
+     * Uses Inertia redirect with flash data for CSRF protection.
      */
-    public function storeAccount(StoreAccountRequest $request): JsonResponse
+    public function storeAccount(StoreAccountRequest $request): RedirectResponse
     {
         $signup = $this->signupService->createPendingSignup($request->validated());
 
-        return response()->json([
-            'signup' => new PendingSignupResource($signup),
-        ]);
+        return redirect()
+            ->back()
+            ->with('pendingSignup', (new PendingSignupResource($signup))->toArray($request));
     }
 
     /**
      * Update workspace data (Step 2).
      *
      * PATCH /signup/{signup}/workspace
+     *
+     * Uses Inertia redirect with flash data for CSRF protection.
      */
-    public function updateWorkspace(PendingSignup $signup, UpdateWorkspaceRequest $request): JsonResponse
+    public function updateWorkspace(PendingSignup $signup, UpdateWorkspaceRequest $request): RedirectResponse
     {
         try {
             $signup = $this->signupService->updateWorkspace($signup, $request->validated());
 
-            return response()->json([
-                'signup' => new PendingSignupResource($signup),
-            ]);
+            return redirect()
+                ->back()
+                ->with('pendingSignup', (new PendingSignupResource($signup))->toArray($request));
         } catch (\App\Exceptions\Central\AddonException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+            return redirect()
+                ->back()
+                ->withErrors(['workspace' => $e->getMessage()]);
         }
     }
 
@@ -102,8 +107,10 @@ class SignupController extends Controller
      * Process payment (Step 3).
      *
      * POST /signup/{signup}/payment
+     *
+     * Uses Inertia redirect with flash data for CSRF protection.
      */
-    public function processPayment(PendingSignup $signup, ProcessPaymentRequest $request): JsonResponse
+    public function processPayment(PendingSignup $signup, ProcessPaymentRequest $request): RedirectResponse
     {
         try {
             $result = $this->signupService->processPayment(
@@ -111,11 +118,13 @@ class SignupController extends Controller
                 $request->validated()['payment_method']
             );
 
-            return response()->json($result);
+            return redirect()
+                ->back()
+                ->with('paymentResult', $result);
         } catch (\App\Exceptions\Central\AddonException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+            return redirect()
+                ->back()
+                ->withErrors(['payment' => $e->getMessage()]);
         }
     }
 

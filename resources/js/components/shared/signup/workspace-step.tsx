@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { toast } from 'sonner';
-import { ArrowLeft, Check, X, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,7 @@ import { PricingToggle } from '@/components/shared/billing/primitives/pricing-to
 import { PlanCard } from '@/components/shared/billing/plans/plan-card';
 import { update as updateWorkspace } from '@/routes/central/signup/workspace';
 import type { PlanResource, PendingSignupResource } from '@/types/resources';
+import type { PageProps } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface BusinessSectorOption {
@@ -61,9 +63,8 @@ export function WorkspaceStep({
     onBack,
 }: WorkspaceStepProps) {
     const { t } = useLaravelReactI18n();
+    const page = usePage<PageProps>();
     const [isLoading, setIsLoading] = useState(false);
-    const [isValidatingSlug, setIsValidatingSlug] = useState(false);
-    const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [formData, setFormData] = useState({
         workspace_name: signup.workspace_name || '',
@@ -73,12 +74,24 @@ export function WorkspaceStep({
         billing_period: billingPeriod,
     });
 
+    // Watch for flash data changes (pendingSignup from server)
+    const handleFlashSuccess = useCallback(() => {
+        const pendingSignup = page.props.flash?.pendingSignup as PendingSignupResource | undefined;
+        // Only trigger if we have a signup with workspace data (meaning workspace step was completed)
+        if (pendingSignup && pendingSignup.id && pendingSignup.workspace_slug) {
+            onSuccess(pendingSignup);
+        }
+    }, [page.props.flash?.pendingSignup, onSuccess]);
+
+    useEffect(() => {
+        handleFlashSuccess();
+    }, [handleFlashSuccess]);
+
     // Auto-generate slug from workspace name
     useEffect(() => {
         if (formData.workspace_name && !signup.workspace_slug) {
             const newSlug = generateSlug(formData.workspace_name);
             setFormData((prev) => ({ ...prev, workspace_slug: newSlug }));
-            setSlugAvailable(null);
         }
     }, [formData.workspace_name, signup.workspace_slug]);
 
@@ -95,83 +108,22 @@ export function WorkspaceStep({
         setFormData((prev) => ({ ...prev, billing_period: billingPeriod }));
     }, [billingPeriod]);
 
-    const validateSlugAsync = async (slug: string) => {
-        if (!slug || slug.length < 3) {
-            setSlugAvailable(null);
-            return;
-        }
-
-        setIsValidatingSlug(true);
-        try {
-            const response = await fetch('/signup/validate/slug', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({ slug, signup_id: signup.id }),
-            });
-
-            const data = await response.json();
-            setSlugAvailable(data.available);
-            if (!data.available) {
-                setErrors((prev) => ({
-                    ...prev,
-                    workspace_slug: data.message || t('signup.errors.slug_already_taken'),
-                }));
-            } else {
-                setErrors((prev) => {
-                    const { workspace_slug, ...rest } = prev;
-                    return rest;
-                });
-            }
-        } catch (error) {
-            // Ignore validation errors
-        } finally {
-            setIsValidatingSlug(false);
-        }
-    };
-
-    const handleSlugBlur = () => {
-        validateSlugAsync(formData.workspace_slug);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setErrors({});
 
-        try {
-            const response = await fetch(updateWorkspace.url({ signup: signup.id }), {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(formData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (data.errors) {
-                    setErrors(data.errors);
-                } else {
-                    toast.error(data.message || t('signup.errors.generic'));
-                }
-                return;
-            }
-
-            onSuccess(data.signup);
-        } catch (error) {
-            toast.error(t('signup.errors.network'));
-        } finally {
-            setIsLoading(false);
-        }
+        router.patch(updateWorkspace.url({ signup: signup.id }), formData, {
+            preserveState: true,
+            preserveScroll: true,
+            onError: (validationErrors) => {
+                setErrors(validationErrors as Record<string, string>);
+                setIsLoading(false);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
     return (
@@ -222,38 +174,24 @@ export function WorkspaceStep({
                                     {window.location.host.replace('app.', '')}
                                     {'/'}
                                 </div>
-                                <div className="relative flex-1">
-                                    <Input
-                                        id="workspace_slug"
-                                        type="text"
-                                        value={formData.workspace_slug}
-                                        onChange={(e) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                workspace_slug: e.target.value
-                                                    .toLowerCase()
-                                                    .replace(/[^a-z0-9-]/g, ''),
-                                            }))
-                                        }
-                                        onBlur={handleSlugBlur}
-                                        placeholder="my-company"
-                                        required
-                                        minLength={3}
-                                        maxLength={50}
-                                        className="pr-10"
-                                    />
-                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                        {isValidatingSlug && (
-                                            <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
-                                        )}
-                                        {!isValidatingSlug && slugAvailable === true && (
-                                            <Check className="h-4 w-4 text-green-500" />
-                                        )}
-                                        {!isValidatingSlug && slugAvailable === false && (
-                                            <X className="h-4 w-4 text-red-500" />
-                                        )}
-                                    </div>
-                                </div>
+                                <Input
+                                    id="workspace_slug"
+                                    type="text"
+                                    value={formData.workspace_slug}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            workspace_slug: e.target.value
+                                                .toLowerCase()
+                                                .replace(/[^a-z0-9-]/g, ''),
+                                        }))
+                                    }
+                                    placeholder="my-company"
+                                    required
+                                    minLength={3}
+                                    maxLength={50}
+                                    className="flex-1"
+                                />
                             </div>
                             <InputError message={errors.workspace_slug} />
                         </div>
@@ -339,11 +277,7 @@ export function WorkspaceStep({
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 {t('common.back', { default: 'Back' })}
                             </Button>
-                            <Button
-                                type="submit"
-                                className="flex-1"
-                                disabled={isLoading || isValidatingSlug || slugAvailable === false}
-                            >
+                            <Button type="submit" className="flex-1" disabled={isLoading}>
                                 {isLoading && <Spinner className="mr-2" />}
                                 {t('signup.workspace.continue', { default: 'Continue to Payment' })}
                             </Button>

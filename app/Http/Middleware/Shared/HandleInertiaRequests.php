@@ -58,6 +58,9 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
+                // Signup wizard flash data
+                'pendingSignup' => fn () => $request->session()->get('pendingSignup'),
+                'paymentResult' => fn () => $request->session()->get('paymentResult'),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             // Stancl/Tenancy v4 native impersonation + Admin Mode (Option C)

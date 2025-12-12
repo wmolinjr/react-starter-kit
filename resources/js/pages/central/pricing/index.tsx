@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,8 @@ export default function PricingPage({ plans }: PricingPageProps) {
     const [billingPeriod, setBillingPeriod] = useState<PricingBillingPeriod>('monthly');
 
     const handleSelectPlan = (planSlug: string) => {
-        // Redirect to signup with plan pre-selected
-        window.location.href = signupIndex.url({ query: { plan: planSlug } });
+        // Navigate to signup with plan pre-selected (using clean URL: /signup/professional)
+        router.visit(signupIndex.url(planSlug));
     };
 
     return (

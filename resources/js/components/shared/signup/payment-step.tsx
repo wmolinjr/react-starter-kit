@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { toast } from 'sonner';
 import { ArrowLeft, Shield, Lock, CheckCircle } from 'lucide-react';
@@ -12,6 +13,7 @@ import {
 import { PriceDisplay } from '@/components/shared/billing/primitives/price-display';
 import { process as processPayment } from '@/routes/central/signup/payment';
 import type { PlanResource, PendingSignupResource, PaymentConfigResource } from '@/types/resources';
+import type { PageProps, PaymentResult } from '@/types';
 
 interface PaymentStepProps {
     signup: PendingSignupResource;
@@ -37,8 +39,21 @@ export function PaymentStep({
     onBack,
 }: PaymentStepProps) {
     const { t } = useLaravelReactI18n();
+    const page = usePage<PageProps>();
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
+
+    // Watch for flash data changes (paymentResult from server)
+    const handleFlashSuccess = useCallback(() => {
+        const paymentResult = page.props.flash?.paymentResult as PaymentResult | undefined;
+        if (paymentResult) {
+            onSuccess(paymentResult);
+        }
+    }, [page.props.flash?.paymentResult, onSuccess]);
+
+    useEffect(() => {
+        handleFlashSuccess();
+    }, [handleFlashSuccess]);
 
     // Calculate price based on billing period
     const monthlyPrice = plan.price;
@@ -53,34 +68,26 @@ export function PaymentStep({
         return ['card'];
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setIsLoading(true);
 
-        try {
-            const response = await fetch(processPayment.url({ signup: signup.id }), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
+        router.post(
+            processPayment.url({ signup: signup.id }),
+            { payment_method: paymentMethod },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onError: (errors) => {
+                    const errorMessage =
+                        errors.payment || Object.values(errors)[0] || t('signup.errors.payment_failed');
+                    toast.error(errorMessage as string);
+                    setIsLoading(false);
                 },
-                credentials: 'same-origin',
-                body: JSON.stringify({ payment_method: paymentMethod }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                toast.error(data.message || t('signup.errors.payment_failed'));
-                return;
+                onFinish: () => {
+                    setIsLoading(false);
+                },
             }
-
-            onSuccess(data);
-        } catch (error) {
-            toast.error(t('signup.errors.network'));
-        } finally {
-            setIsLoading(false);
-        }
+        );
     };
 
     return (

@@ -97,6 +97,25 @@ export interface FlashMessages {
     error?: string | null;
     warning?: string | null;
     info?: string | null;
+    // Signup wizard flash data
+    pendingSignup?: PendingSignupResource | null;
+    paymentResult?: PaymentResult | null;
+}
+
+export interface PaymentResult {
+    type: 'redirect' | 'pix' | 'boleto';
+    url?: string;
+    signup_id?: string;
+    pix?: {
+        qr_code: string;
+        qr_code_url: string;
+        expires_at: string;
+    };
+    boleto?: {
+        barcode: string;
+        pdf_url: string;
+        expires_at: string;
+    };
 }
 
 export interface BreadcrumbItem {
