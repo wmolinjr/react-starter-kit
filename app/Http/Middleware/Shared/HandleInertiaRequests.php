@@ -42,11 +42,10 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        // Check all guards: central (admins), customer (billing portal), tenant (default)
-        // This ensures auth.user is populated regardless of which guard authenticated the user
-        $user = auth('central')->user()
-            ?? auth('customer')->user()
-            ?? $request->user();
+        // Context-aware authentication: determine user based on current route context
+        // This ensures each area of the app shows only the relevant authenticated user
+        $authContext = $this->resolveAuthContext($request);
+        $user = $authContext['user'];
 
         return [
             ...parent::share($request),
@@ -77,6 +76,56 @@ class HandleInertiaRequests extends Middleware
                 ->only(config('app.locales'))
                 ->toArray(),
             'currency' => stripe_currency_config(),
+        ];
+    }
+
+    /**
+     * Resolve authentication context based on the current route.
+     *
+     * CONTEXT-AWARE AUTHENTICATION:
+     * Each area of the application has a specific guard context:
+     * - /admin/*        → 'central' guard (Central administrators)
+     * - /account/*      → 'customer' guard (Billing portal customers)
+     * - Public routes   → 'customer' guard (Customer-centric public pages)
+     * - Tenant routes   → 'tenant' guard (Tenant users)
+     *
+     * This prevents confusion when multiple guards have active sessions.
+     * Each context only sees its own authenticated user.
+     *
+     * @return array{user: mixed, guard: string}
+     */
+    protected function resolveAuthContext(Request $request): array
+    {
+        // Tenant context: tenancy is initialized
+        if (tenancy()->initialized) {
+            return [
+                'user' => $request->user('tenant'),
+                'guard' => 'tenant',
+            ];
+        }
+
+        // Central admin context: /admin/* routes
+        if ($request->routeIs('central.admin.*')) {
+            return [
+                'user' => auth('central')->user(),
+                'guard' => 'central',
+            ];
+        }
+
+        // Customer portal context: /account/* routes
+        if ($request->routeIs('central.account.*')) {
+            return [
+                'user' => auth('customer')->user(),
+                'guard' => 'customer',
+            ];
+        }
+
+        // Public central routes (/, /pricing, /signup/*, /features, /contact)
+        // These are customer-centric: show customer if logged in, otherwise null
+        // Central admins accessing public pages should NOT see their admin session
+        return [
+            'user' => auth('customer')->user(),
+            'guard' => 'customer',
         ];
     }
 
