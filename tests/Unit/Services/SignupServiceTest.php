@@ -8,10 +8,7 @@ use App\Models\Central\Customer;
 use App\Models\Central\PendingSignup;
 use App\Models\Central\Plan;
 use App\Models\Central\Tenant;
-use App\Services\Central\CustomerService;
-use App\Services\Central\PaymentSettingsService;
 use App\Services\Central\SignupService;
-use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
@@ -29,22 +26,8 @@ class SignupServiceTest extends TestCase
     {
         parent::setUp();
 
-        // Run central migrations
-        $this->artisan('migrate', [
-            '--path' => 'database/migrations',
-            '--database' => 'central',
-        ]);
-
-        // Create dependencies
-        $customerService = app(CustomerService::class);
-        $gatewayManager = app(PaymentGatewayManager::class);
-        $paymentSettingsService = app(PaymentSettingsService::class);
-
-        $this->service = new SignupService(
-            $customerService,
-            $gatewayManager,
-            $paymentSettingsService
-        );
+        // Resolve service from container (properly injected with dependencies)
+        $this->service = app(SignupService::class);
 
         // Create a plan
         $this->plan = Plan::factory()->starter()->create();

@@ -94,7 +94,7 @@ class CheckPendingPaymentsJob implements ShouldQueue
     {
         return AddonPurchase::query()
             ->where('status', 'pending')
-            ->whereNotNull('stripe_payment_intent_id') // Has provider payment ID
+            ->whereNotNull('provider_payment_intent_id') // Has provider payment ID
             ->where('created_at', '<', now()->subMinutes($this->olderThanMinutes))
             ->where('created_at', '>', now()->subDays(7)) // Don't check very old payments
             ->orderBy('created_at', 'asc')
@@ -107,8 +107,8 @@ class CheckPendingPaymentsJob implements ShouldQueue
      */
     protected function checkPaymentStatus(AddonPurchase $purchase, PaymentGatewayManager $gatewayManager): void
     {
-        // Determine provider from payment method or metadata
-        $provider = $purchase->metadata['provider'] ?? $this->detectProvider($purchase);
+        // Determine provider from purchase column or detect from payment data
+        $provider = $purchase->provider ?? $purchase->metadata['provider'] ?? $this->detectProvider($purchase);
 
         if (! $provider) {
             Log::warning('CheckPendingPaymentsJob: Cannot determine provider', [
@@ -129,8 +129,8 @@ class CheckPendingPaymentsJob implements ShouldQueue
             return;
         }
 
-        // Get payment ID (stored in stripe_payment_intent_id for all providers)
-        $paymentId = $purchase->stripe_payment_intent_id;
+        // Get payment ID from provider-agnostic column
+        $paymentId = $purchase->provider_payment_intent_id;
 
         if (! $paymentId) {
             return;
@@ -273,6 +273,11 @@ class CheckPendingPaymentsJob implements ShouldQueue
      */
     protected function detectProvider(AddonPurchase $purchase): ?string
     {
+        // First check the provider column directly
+        if ($purchase->provider) {
+            return $purchase->provider;
+        }
+
         $paymentMethod = $purchase->payment_method ?? '';
 
         // PIX and Boleto are typically Asaas
@@ -291,7 +296,7 @@ class CheckPendingPaymentsJob implements ShouldQueue
         }
 
         // Try to detect from payment ID format
-        $paymentId = $purchase->stripe_payment_intent_id ?? '';
+        $paymentId = $purchase->provider_payment_intent_id ?? '';
 
         if (str_starts_with($paymentId, 'pi_')) {
             return 'stripe';

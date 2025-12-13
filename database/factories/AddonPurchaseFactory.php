@@ -34,10 +34,12 @@ class AddonPurchaseFactory extends Factory
             'quantity' => $this->faker->numberBetween(1, 5),
             'amount_paid' => $this->faker->randomElement([1000, 2900, 4900, 9900]),
             'currency' => stripe_currency(),
-            'payment_method' => 'stripe_checkout',
-            'stripe_checkout_session_id' => null,
-            'stripe_payment_intent_id' => null,
-            'stripe_invoice_id' => null,
+            'payment_method' => 'checkout',
+            'provider' => null,
+            'provider_session_id' => null,
+            'provider_payment_intent_id' => null,
+            'provider_invoice_id' => null,
+            'provider_payment_id' => null,
             'status' => 'completed',
             'purchased_at' => now(),
             'refunded_at' => null,
@@ -118,23 +120,41 @@ class AddonPurchaseFactory extends Factory
     }
 
     /**
-     * Set with Stripe checkout session
+     * Set with provider checkout session
      */
-    public function withStripeCheckout(): static
+    public function withCheckout(string $provider = 'stripe'): static
     {
+        $sessionPrefix = match ($provider) {
+            'stripe' => 'cs_test_',
+            'asaas' => 'chk_',
+            'pagseguro' => 'CHKOUT',
+            'mercadopago' => 'pref_',
+            default => 'ses_',
+        };
+
         return $this->state(fn (array $attributes) => [
-            'payment_method' => 'stripe_checkout',
-            'stripe_checkout_session_id' => 'cs_test_'.fake()->regexify('[A-Za-z0-9]{24}'),
+            'payment_method' => 'checkout',
+            'provider' => $provider,
+            'provider_session_id' => $sessionPrefix.fake()->regexify('[A-Za-z0-9]{24}'),
         ]);
     }
 
     /**
-     * Set with Stripe payment intent
+     * Set with provider payment intent
      */
-    public function withStripePaymentIntent(): static
+    public function withPaymentIntent(string $provider = 'stripe'): static
     {
+        $intentPrefix = match ($provider) {
+            'stripe' => 'pi_',
+            'asaas' => 'pay_',
+            'pagseguro' => 'PAY',
+            'mercadopago' => 'mp_',
+            default => 'pi_',
+        };
+
         return $this->state(fn (array $attributes) => [
-            'stripe_payment_intent_id' => 'pi_'.fake()->regexify('[A-Za-z0-9]{24}'),
+            'provider' => $provider,
+            'provider_payment_intent_id' => $intentPrefix.fake()->regexify('[A-Za-z0-9]{24}'),
         ]);
     }
 

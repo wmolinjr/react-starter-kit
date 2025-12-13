@@ -5,14 +5,12 @@ namespace Tests\Feature;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonBundle;
 use App\Services\Central\StripeSyncService;
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\PaymentGatewayManager;
 use Database\Seeders\AddonBundleSeeder;
 use Database\Seeders\AddonSeeder;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
-use Stripe\Price;
-use Stripe\Service\PriceService;
-use Stripe\Service\ProductService;
-use Stripe\StripeClient;
 use Tests\TestCase;
 
 /**
@@ -29,6 +27,30 @@ class StripeSyncServiceTest extends TestCase
         // Seed addons and bundles for tests
         $this->seed(AddonSeeder::class);
         $this->seed(AddonBundleSeeder::class);
+    }
+
+    /**
+     * Create a mock StripeSyncService with mocked gateway
+     */
+    protected function createMockedService(array $productResponses = [], array $priceResponses = []): StripeSyncService
+    {
+        $mockGateway = Mockery::mock(StripeGateway::class);
+        $mockGateway->shouldReceive('isAvailable')->andReturn(true);
+        $mockGateway->shouldReceive('getIdentifier')->andReturn('stripe');
+
+        foreach ($productResponses as $method => $response) {
+            $mockGateway->shouldReceive($method)->andReturn($response);
+        }
+
+        foreach ($priceResponses as $method => $response) {
+            $mockGateway->shouldReceive($method)->andReturn($response);
+        }
+
+        $mockManager = Mockery::mock(PaymentGatewayManager::class);
+        $mockManager->shouldReceive('stripe')->andReturn($mockGateway);
+        $mockManager->shouldReceive('getDefaultDriver')->andReturn('stripe');
+
+        return new StripeSyncService($mockManager);
     }
 
     /*
@@ -60,9 +82,14 @@ class StripeSyncServiceTest extends TestCase
     {
         $service = app(StripeSyncService::class);
 
-        // Get addon without stripe_product_id
-        $addon = Addon::where('active', true)->whereNull('stripe_product_id')->first();
-        $this->assertNotNull($addon, 'Expected at least one addon without stripe_product_id');
+        // Get addon without provider_product_ids
+        $addon = Addon::where('active', true)
+            ->where(function ($q) {
+                $q->whereNull('provider_product_ids')
+                    ->orWhereJsonLength('provider_product_ids', 0);
+            })
+            ->first();
+        $this->assertNotNull($addon, 'Expected at least one addon without provider_product_ids');
 
         $preview = $service->dryRun($addon->slug);
 
@@ -73,11 +100,11 @@ class StripeSyncServiceTest extends TestCase
     #[Test]
     public function dry_run_shows_update_product_for_synced_addons(): void
     {
-        // Create an addon with stripe_product_id
+        // Create an addon with provider_product_ids
         $addon = Addon::factory()->create([
-            'stripe_product_id' => 'prod_test123',
             'active' => true,
         ]);
+        $addon->setProviderProductId('stripe', 'prod_test123');
 
         $service = app(StripeSyncService::class);
         $preview = $service->dryRun($addon->slug);
@@ -91,13 +118,16 @@ class StripeSyncServiceTest extends TestCase
     {
         $service = app(StripeSyncService::class);
 
-        // Get addon with prices but without stripe price IDs
+        // Get addon with prices but without provider price IDs
         $addon = Addon::where('active', true)
             ->whereNotNull('price_monthly')
-            ->whereNull('stripe_price_monthly_id')
+            ->where(function ($q) {
+                $q->whereNull('provider_price_ids')
+                    ->orWhereJsonLength('provider_price_ids', 0);
+            })
             ->first();
 
-        $this->assertNotNull($addon, 'Expected at least one addon with price but no stripe price ID');
+        $this->assertNotNull($addon, 'Expected at least one addon with price but no provider price ID');
 
         $preview = $service->dryRun($addon->slug);
 
@@ -137,9 +167,14 @@ class StripeSyncServiceTest extends TestCase
     {
         $service = app(StripeSyncService::class);
 
-        // Get bundle without stripe_product_id
-        $bundle = AddonBundle::where('active', true)->whereNull('stripe_product_id')->first();
-        $this->assertNotNull($bundle, 'Expected at least one bundle without stripe_product_id');
+        // Get bundle without provider_product_ids
+        $bundle = AddonBundle::where('active', true)
+            ->where(function ($q) {
+                $q->whereNull('provider_product_ids')
+                    ->orWhereJsonLength('provider_product_ids', 0);
+            })
+            ->first();
+        $this->assertNotNull($bundle, 'Expected at least one bundle without provider_product_ids');
 
         $preview = $service->dryRunBundles($bundle->slug);
 
@@ -150,11 +185,11 @@ class StripeSyncServiceTest extends TestCase
     #[Test]
     public function dry_run_bundles_shows_update_product_for_synced_bundles(): void
     {
-        // Create a bundle with stripe_product_id
+        // Create a bundle with provider_product_ids
         $bundle = AddonBundle::factory()->create([
-            'stripe_product_id' => 'prod_bundle_test123',
             'active' => true,
         ]);
+        $bundle->setProviderProductId('stripe', 'prod_bundle_test123');
 
         $service = app(StripeSyncService::class);
         $preview = $service->dryRunBundles($bundle->slug);
@@ -170,11 +205,14 @@ class StripeSyncServiceTest extends TestCase
 
         // Get bundle that should have prices calculated
         $bundle = AddonBundle::where('active', true)
-            ->whereNull('stripe_price_monthly_id')
+            ->where(function ($q) {
+                $q->whereNull('provider_price_ids')
+                    ->orWhereJsonLength('provider_price_ids', 0);
+            })
             ->with('addons')
             ->first();
 
-        $this->assertNotNull($bundle, 'Expected at least one bundle without stripe price IDs');
+        $this->assertNotNull($bundle, 'Expected at least one bundle without provider price IDs');
 
         $preview = $service->dryRunBundles($bundle->slug);
 
@@ -187,44 +225,21 @@ class StripeSyncServiceTest extends TestCase
 
     /*
     |--------------------------------------------------------------------------
-    | Bundle Sync Tests (with Mocked Stripe)
+    | Bundle Sync Tests (with Mocked Gateway)
     |--------------------------------------------------------------------------
     */
 
     #[Test]
     public function sync_bundle_creates_product_and_prices(): void
     {
-        // Create a mock StripeClient
-        $mockStripe = Mockery::mock(StripeClient::class);
-
-        // Mock products service
-        $mockProductService = Mockery::mock(ProductService::class);
-        // Use stdClass to avoid Stripe SDK static method issues with Mockery
-        $mockProduct = (object) ['id' => 'prod_test_bundle'];
-
-        $mockProductService->shouldReceive('create')
-            ->once()
-            ->andReturn($mockProduct);
-
-        $mockStripe->products = $mockProductService;
-
-        // Mock prices service
-        $mockPriceService = Mockery::mock(PriceService::class);
-
-        $mockPriceService->shouldReceive('create')
-            ->andReturnUsing(function ($data) {
-                // Use stdClass to avoid Stripe SDK static method issues with Mockery
-                return (object) ['id' => 'price_'.($data['metadata']['billing_period'] ?? 'test')];
-            });
-
-        $mockStripe->prices = $mockPriceService;
-
-        // Create service with mocked client
-        $service = new StripeSyncService;
-        $reflection = new \ReflectionClass($service);
-        $property = $reflection->getProperty('stripe');
-        $property->setAccessible(true);
-        $property->setValue($service, $mockStripe);
+        $service = $this->createMockedService(
+            productResponses: [
+                'createProduct' => ['id' => 'prod_test_bundle'],
+            ],
+            priceResponses: [
+                'createPrice' => ['id' => 'price_test'],
+            ]
+        );
 
         // Create a bundle with addons that have prices
         $addon1 = Addon::factory()->create([
@@ -253,56 +268,34 @@ class StripeSyncServiceTest extends TestCase
 
         $this->assertTrue($result['product_synced']);
         $this->assertEmpty($result['errors']);
-        $this->assertEquals('prod_test_bundle', $result['stripe_product_id']);
+        $this->assertEquals('prod_test_bundle', $result['provider_product_id']);
 
-        // Verify database was updated
+        // Verify database was updated with provider-agnostic column
         $bundle->refresh();
-        $this->assertEquals('prod_test_bundle', $bundle->stripe_product_id);
+        $this->assertEquals('prod_test_bundle', $bundle->getProviderProductId('stripe'));
     }
 
     #[Test]
     public function sync_bundle_updates_existing_product(): void
     {
-        // Create a mock StripeClient
-        $mockStripe = Mockery::mock(StripeClient::class);
+        $service = $this->createMockedService(
+            productResponses: [
+                'updateProduct' => ['id' => 'prod_existing'],
+            ]
+        );
 
-        // Mock products service - should update, not create
-        $mockProductService = Mockery::mock(ProductService::class);
-        // Use stdClass to avoid Stripe SDK static method issues with Mockery
-        $mockProduct = (object) ['id' => 'prod_existing'];
-
-        $mockProductService->shouldReceive('update')
-            ->once()
-            ->with('prod_existing', Mockery::any())
-            ->andReturn($mockProduct);
-
-        $mockProductService->shouldNotReceive('create');
-
-        $mockStripe->products = $mockProductService;
-
-        // Mock prices service (no prices to create since IDs exist)
-        $mockPriceService = Mockery::mock(PriceService::class);
-        $mockStripe->prices = $mockPriceService;
-
-        // Create service with mocked client
-        $service = new StripeSyncService;
-        $reflection = new \ReflectionClass($service);
-        $property = $reflection->getProperty('stripe');
-        $property->setAccessible(true);
-        $property->setValue($service, $mockStripe);
-
-        // Create a bundle that already has stripe IDs
+        // Create a bundle that already has provider IDs
         $addon = Addon::factory()->create([
             'price_monthly' => 5000,
             'active' => true,
         ]);
 
         $bundle = AddonBundle::factory()->create([
-            'stripe_product_id' => 'prod_existing',
-            'stripe_price_monthly_id' => 'price_existing_monthly',
-            'stripe_price_yearly_id' => 'price_existing_yearly',
             'active' => true,
         ]);
+        $bundle->setProviderProductId('stripe', 'prod_existing');
+        $bundle->setProviderPriceId('stripe', 'monthly', 'price_existing_monthly');
+        $bundle->setProviderPriceId('stripe', 'yearly', 'price_existing_yearly');
         $bundle->addons()->attach($addon->id, ['quantity' => 1, 'sort_order' => 0]);
         $bundle->load('addons');
 
@@ -331,31 +324,14 @@ class StripeSyncServiceTest extends TestCase
         $inactiveBundle = AddonBundle::factory()->create(['active' => false]);
         $inactiveBundle->addons()->attach($addon->id, ['quantity' => 1, 'sort_order' => 0]);
 
-        // Create a mock StripeClient that tracks calls
-        $mockStripe = Mockery::mock(StripeClient::class);
-
-        $mockProductService = Mockery::mock(ProductService::class);
-        $mockProductService->shouldReceive('create')
-            ->times(2) // Only 2 active bundles
-            ->andReturnUsing(function () {
-                // Use stdClass to avoid Stripe SDK static method issues with Mockery
-                return (object) ['id' => 'prod_'.uniqid()];
-            });
-
-        $mockStripe->products = $mockProductService;
-
-        $mockPriceService = Mockery::mock(PriceService::class);
-        $mockPriceService->shouldReceive('create')->andReturnUsing(function ($data) {
-            // Use stdClass to avoid Stripe SDK static method issues with Mockery
-            return (object) ['id' => 'price_'.uniqid()];
-        });
-        $mockStripe->prices = $mockPriceService;
-
-        $service = new StripeSyncService;
-        $reflection = new \ReflectionClass($service);
-        $property = $reflection->getProperty('stripe');
-        $property->setAccessible(true);
-        $property->setValue($service, $mockStripe);
+        $service = $this->createMockedService(
+            productResponses: [
+                'createProduct' => ['id' => 'prod_'.uniqid()],
+            ],
+            priceResponses: [
+                'createPrice' => ['id' => 'price_'.uniqid()],
+            ]
+        );
 
         $results = $service->syncAllBundles();
 

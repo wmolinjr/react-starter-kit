@@ -39,13 +39,13 @@ return new class extends Migration
             $table->integer('free_tier')->nullable(); // Free tier before metered kicks in
             $table->integer('validity_months')->nullable(); // For one-time purchases
 
-            // Stripe integration (populated by stripe:sync command)
-            $table->string('stripe_product_id')->nullable();
-            $table->string('stripe_price_monthly_id')->nullable();
-            $table->string('stripe_price_yearly_id')->nullable();
-            $table->string('stripe_price_one_time_id')->nullable();
-            $table->string('stripe_price_metered_id')->nullable();
-            $table->string('stripe_meter_id')->nullable();
+            // Provider-Agnostic Integration
+            // provider_product_ids: {"stripe": "prod_xxx", "asaas": "prod_yyy"}
+            $table->json('provider_product_ids')->nullable();
+            // provider_price_ids: {"stripe": {"monthly": "price_xxx", "yearly": "..."}, "asaas": {...}}
+            $table->json('provider_price_ids')->nullable();
+            // provider_meter_ids: {"stripe": "mtr_xxx"}
+            $table->json('provider_meter_ids')->nullable();
 
             // Feature unlock specific
             $table->json('features')->nullable(); // List of feature flags to enable

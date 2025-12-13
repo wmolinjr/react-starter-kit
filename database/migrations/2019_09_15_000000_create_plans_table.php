@@ -24,10 +24,11 @@ return new class extends Migration
             $table->string('currency', 3)->default('USD');
             $table->enum('billing_period', ['monthly', 'yearly'])->default('monthly');
 
-            // Stripe/Paddle Integration
-            $table->string('stripe_price_id')->nullable()->unique();
-            $table->string('stripe_product_id')->nullable();
-            $table->string('paddle_price_id')->nullable()->unique();
+            // Provider-Agnostic Integration
+            // provider_product_ids: {"stripe": "prod_xxx", "asaas": "prod_yyy"}
+            $table->json('provider_product_ids')->nullable();
+            // provider_price_ids: {"stripe": "price_xxx", "paddle": "pri_xxx", "asaas": "sub_yyy"}
+            $table->json('provider_price_ids')->nullable();
 
             // Features (JSON)
             // { "customRoles": true, "apiAccess": true, "advancedReports": false }

@@ -25,9 +25,8 @@ use Stancl\Tenancy\Database\Concerns\CentralConnection;
  * @property int $discount_percent
  * @property int|null $price_monthly
  * @property int|null $price_yearly
- * @property string|null $stripe_product_id
- * @property string|null $stripe_price_monthly_id
- * @property string|null $stripe_price_yearly_id
+ * @property array|null $provider_product_ids
+ * @property array|null $provider_price_ids
  * @property string|null $badge
  * @property string|null $icon
  * @property array|null $features
@@ -59,9 +58,8 @@ class AddonBundle extends Model
         'price_monthly',
         'price_yearly',
         'currency',
-        'stripe_product_id',
-        'stripe_price_monthly_id',
-        'stripe_price_yearly_id',
+        'provider_product_ids',
+        'provider_price_ids',
         'badge',
         'icon',
         'icon_color',
@@ -78,7 +76,62 @@ class AddonBundle extends Model
         'features' => 'array',
         'sort_order' => 'integer',
         'metadata' => 'array',
+        'provider_product_ids' => 'array',
+        'provider_price_ids' => 'array',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider-Agnostic Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get product ID for a specific provider.
+     */
+    public function getProviderProductId(string $provider): ?string
+    {
+        return $this->provider_product_ids[$provider] ?? null;
+    }
+
+    /**
+     * Set product ID for a specific provider.
+     */
+    public function setProviderProductId(string $provider, ?string $productId): void
+    {
+        $productIds = $this->provider_product_ids ?? [];
+        if ($productId === null) {
+            unset($productIds[$provider]);
+        } else {
+            $productIds[$provider] = $productId;
+        }
+        $this->update(['provider_product_ids' => $productIds]);
+    }
+
+    /**
+     * Get price ID for a specific provider and billing period.
+     */
+    public function getProviderPriceId(string $provider, string $billingPeriod): ?string
+    {
+        return $this->provider_price_ids[$provider][$billingPeriod] ?? null;
+    }
+
+    /**
+     * Set price ID for a specific provider and billing period.
+     */
+    public function setProviderPriceId(string $provider, string $billingPeriod, ?string $priceId): void
+    {
+        $priceIds = $this->provider_price_ids ?? [];
+        if (! isset($priceIds[$provider])) {
+            $priceIds[$provider] = [];
+        }
+        if ($priceId === null) {
+            unset($priceIds[$provider][$billingPeriod]);
+        } else {
+            $priceIds[$provider][$billingPeriod] = $priceId;
+        }
+        $this->update(['provider_price_ids' => $priceIds]);
+    }
 
     public array $translatable = ['name', 'description'];
 

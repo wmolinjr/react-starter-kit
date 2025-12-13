@@ -25,16 +25,13 @@ class CreateTenantsTable extends Migration
             $table->string('business_sector')->nullable();
             $table->json('data')->nullable(); // Stancl internal keys (tenancy_db_name, etc.)
             $table->json('settings')->nullable();
-            $table->string('stripe_id')->nullable()->index();
             $table->foreignUuid('customer_id')
                 ->nullable()
                 ->after('id')
                 ->constrained('customers')
                 ->nullOnDelete();
-            $table->string('payment_method_id')->nullable();
-            $table->string('pm_type')->nullable();
-            $table->string('pm_last_four', 4)->nullable();
             $table->timestamp('trial_ends_at')->nullable();
+            // Note: Billing info (payment methods, provider IDs) stored in Customer model
 
             $table->foreignUuid('plan_id')
                 ->nullable()

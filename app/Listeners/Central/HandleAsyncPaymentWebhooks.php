@@ -63,7 +63,7 @@ class HandleAsyncPaymentWebhooks implements ShouldQueue
 
         // Mark purchase as completed
         $purchase->update([
-            'stripe_payment_intent_id' => $event->paymentIntentId,
+            'provider_payment_intent_id' => $event->paymentIntentId,
             'metadata' => array_merge($purchase->metadata ?? [], $event->metadata),
         ]);
         $purchase->markAsCompleted();

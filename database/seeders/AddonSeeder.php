@@ -15,8 +15,9 @@ use Illuminate\Database\Seeder;
  * All addon definitions are maintained here. The database is the runtime source of truth.
  * To add/modify addons: update this seeder and run `sail artisan db:seed --class=AddonSeeder`
  *
- * Stripe IDs are NOT set here - use `sail artisan stripe:sync --addons` to create
- * products/prices in Stripe and automatically store the IDs in the database.
+ * Provider IDs (Stripe, Asaas, etc.) are NOT set here - use provider sync commands
+ * to create products/prices and automatically store the IDs in the database.
+ * Example: `sail artisan stripe:sync --addons`
  *
  * AddonTypes:
  * - QUOTA: Increases plan limits (storage, users, projects)
@@ -284,9 +285,9 @@ class AddonSeeder extends Seeder
     /**
      * Create or update an addon in the database.
      *
-     * Note: Stripe IDs (stripe_price_*_id, stripe_meter_id) are NOT set here.
-     * They are populated by `artisan stripe:sync --addons` after creating
-     * products/prices in Stripe.
+     * Note: Provider IDs (provider_product_ids, provider_price_ids, provider_meter_ids)
+     * are NOT set here. They are populated by provider sync commands after creating
+     * products/prices in the payment provider (e.g., Stripe, Asaas).
      */
     protected function createAddon(string $slug, array $data): Addon
     {
@@ -313,7 +314,7 @@ class AddonSeeder extends Seeder
                 'currency' => stripe_currency(),
                 'free_tier' => $data['free_tier'] ?? null,
                 'validity_months' => $data['validity_months'] ?? null,
-                // Stripe IDs are NOT set here - use stripe:sync command
+                // Provider IDs are NOT set here - use provider sync commands
                 'features' => $data['features'] ?? null,
                 'icon' => $data['icon'] ?? null,
                 'icon_color' => $data['icon_color'] ?? null,

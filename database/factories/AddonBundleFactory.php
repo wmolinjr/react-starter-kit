@@ -88,14 +88,36 @@ class AddonBundleFactory extends Factory
     }
 
     /**
-     * Configure as synced with Stripe
+     * Configure as synced with a provider
      */
-    public function synced(): static
+    public function synced(string $provider = 'stripe'): static
     {
+        $productId = match ($provider) {
+            'stripe' => 'prod_'.fake()->unique()->regexify('[A-Za-z0-9]{14}'),
+            'asaas' => 'sub_'.fake()->unique()->regexify('[A-Za-z0-9]{16}'),
+            default => 'prod_'.fake()->unique()->regexify('[A-Za-z0-9]{14}'),
+        };
+
+        $priceIdMonthly = match ($provider) {
+            'stripe' => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+            'asaas' => 'pln_'.fake()->unique()->regexify('[A-Za-z0-9]{16}'),
+            default => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+        };
+
+        $priceIdYearly = match ($provider) {
+            'stripe' => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+            'asaas' => 'pln_'.fake()->unique()->regexify('[A-Za-z0-9]{16}'),
+            default => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+        };
+
         return $this->state(fn (array $attributes) => [
-            'stripe_product_id' => 'prod_'.fake()->unique()->regexify('[A-Za-z0-9]{14}'),
-            'stripe_price_monthly_id' => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
-            'stripe_price_yearly_id' => 'price_'.fake()->unique()->regexify('[A-Za-z0-9]{24}'),
+            'provider_product_ids' => [$provider => $productId],
+            'provider_price_ids' => [
+                $provider => [
+                    'monthly' => $priceIdMonthly,
+                    'yearly' => $priceIdYearly,
+                ],
+            ],
         ]);
     }
 }

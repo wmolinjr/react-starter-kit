@@ -117,7 +117,7 @@ class SyncStripeProducts extends Command
         $this->line("{$status} {$result['slug']} (locale: {$result['locale']})");
 
         if ($result['product_synced']) {
-            $this->line("  Product: {$result['stripe_product_id']}");
+            $this->line("  Product: {$result['provider_product_id']}");
         }
 
         foreach ($result['prices_synced'] as $period => $priceId) {

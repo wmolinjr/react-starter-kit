@@ -58,9 +58,8 @@ class Plan extends Model
         'price',
         'currency',
         'billing_period',
-        'stripe_product_id',
-        'stripe_price_id',
-        'paddle_price_id',
+        'provider_product_ids',
+        'provider_price_ids',
         'features',
         'limits',
         'permission_map',
@@ -74,6 +73,8 @@ class Plan extends Model
 
     protected $casts = [
         'price' => 'integer',
+        'provider_product_ids' => 'array',
+        'provider_price_ids' => 'array',
         'features' => 'array',
         'limits' => 'array',
         'permission_map' => 'array',
@@ -202,14 +203,7 @@ class Plan extends Model
      */
     public function getProviderPriceId(string $provider): ?string
     {
-        return match ($provider) {
-            'stripe' => $this->stripe_price_id,
-            'paddle' => $this->paddle_price_id,
-            'asaas' => $this->asaas_price_id ?? null,
-            'pagseguro' => $this->pagseguro_price_id ?? null,
-            'mercadopago' => $this->mercadopago_price_id ?? null,
-            default => null,
-        };
+        return $this->provider_price_ids[$provider] ?? null;
     }
 
     /**
@@ -217,18 +211,15 @@ class Plan extends Model
      */
     public function setProviderPriceId(string $provider, ?string $priceId): void
     {
-        $field = match ($provider) {
-            'stripe' => 'stripe_price_id',
-            'paddle' => 'paddle_price_id',
-            'asaas' => 'asaas_price_id',
-            'pagseguro' => 'pagseguro_price_id',
-            'mercadopago' => 'mercadopago_price_id',
-            default => null,
-        };
+        $priceIds = $this->provider_price_ids ?? [];
 
-        if ($field) {
-            $this->{$field} = $priceId;
+        if ($priceId === null) {
+            unset($priceIds[$provider]);
+        } else {
+            $priceIds[$provider] = $priceId;
         }
+
+        $this->update(['provider_price_ids' => $priceIds]);
     }
 
     /**
@@ -236,14 +227,7 @@ class Plan extends Model
      */
     public function getProviderProductId(string $provider): ?string
     {
-        return match ($provider) {
-            'stripe' => $this->stripe_product_id,
-            'paddle' => $this->paddle_product_id ?? null,
-            'asaas' => $this->asaas_product_id ?? null,
-            'pagseguro' => $this->pagseguro_product_id ?? null,
-            'mercadopago' => $this->mercadopago_product_id ?? null,
-            default => null,
-        };
+        return $this->provider_product_ids[$provider] ?? null;
     }
 
     /**
@@ -251,18 +235,15 @@ class Plan extends Model
      */
     public function setProviderProductId(string $provider, ?string $productId): void
     {
-        $field = match ($provider) {
-            'stripe' => 'stripe_product_id',
-            'paddle' => 'paddle_product_id',
-            'asaas' => 'asaas_product_id',
-            'pagseguro' => 'pagseguro_product_id',
-            'mercadopago' => 'mercadopago_product_id',
-            default => null,
-        };
+        $productIds = $this->provider_product_ids ?? [];
 
-        if ($field) {
-            $this->{$field} = $productId;
+        if ($productId === null) {
+            unset($productIds[$provider]);
+        } else {
+            $productIds[$provider] = $productId;
         }
+
+        $this->update(['provider_product_ids' => $productIds]);
     }
 
     /**

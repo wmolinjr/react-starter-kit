@@ -1049,7 +1049,6 @@ TELESCOPE_MCP_PATH=telescope-mcp
 
 For in-depth technical documentation, see:
 
-- **[docs/CUSTOMER-PORTAL.md](docs/CUSTOMER-PORTAL.md)** - Customer Billing Portal (authentication, routes, controllers)
 - **[docs/PERMISSIONS.md](docs/PERMISSIONS.md)** - Permissions system (enums, roles, usage)
 - **[docs/ENUMS-SINGLE-SOURCE-OF-TRUTH.md](docs/ENUMS-SINGLE-SOURCE-OF-TRUTH.md)** - Enum system architecture and TypeScript generation
 - **[docs/SYSTEM-ARCHITECTURE.md](docs/SYSTEM-ARCHITECTURE.md)** - Plans, features, limits, addons
@@ -1065,4 +1064,3 @@ For in-depth technical documentation, see:
 - **[docs/FRONTEND-TYPES-MIGRATION-PLAN.md](docs/FRONTEND-TYPES-MIGRATION-PLAN.md)** - Frontend TypeScript types migration guide
 - **[docs/FORTIFY-REMOVAL-PLAN.md](docs/archive/FORTIFY-REMOVAL-PLAN.md)** - Custom auth controllers implementation
 - **[docs/USER-SYNC-FEDERATION.md](docs/USER-SYNC-FEDERATION.md)** - User sync across tenants (multi-branch companies)
-- Rode sempre testes paralelos (16)

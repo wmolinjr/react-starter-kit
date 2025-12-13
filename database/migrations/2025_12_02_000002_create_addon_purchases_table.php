@@ -29,14 +29,15 @@ return new class extends Migration
 
             // Payment
             $table->integer('amount_paid');
-            $table->string('currency')->default('usd');
+            $table->string('currency')->default('BRL');
             $table->string('payment_method');
 
-            // Stripe references
-            $table->string('stripe_checkout_session_id')->nullable()->unique();
-            $table->string('stripe_payment_intent_id')->nullable();
-            $table->string('stripe_invoice_id')->nullable();
-            $table->string('provider_payment_id')->nullable();
+            // Provider-Agnostic References
+            $table->string('provider')->nullable(); // 'stripe', 'asaas', 'pagseguro', 'mercadopago'
+            $table->string('provider_session_id')->nullable()->unique(); // checkout session ID
+            $table->string('provider_payment_intent_id')->nullable(); // payment intent ID
+            $table->string('provider_invoice_id')->nullable(); // invoice ID
+            $table->string('provider_payment_id')->nullable(); // generic payment ID
 
 
             // Status
@@ -59,7 +60,9 @@ return new class extends Migration
             // Indexes
             $table->index('status');
             $table->index('purchased_at');
+            $table->index('provider');
             $table->index('provider_payment_id');
+            $table->index(['provider', 'provider_session_id']);
             $table->index(['valid_from', 'valid_until']);
             $table->index(['tenant_id', 'status']);
         });

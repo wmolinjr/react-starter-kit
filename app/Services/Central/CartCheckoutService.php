@@ -797,14 +797,15 @@ class CartCheckoutService
         $this->validateAddonPurchase($tenant, $addon, $item['quantity'], $billingPeriod);
 
         $isRecurring = $billingPeriod !== BillingPeriod::ONE_TIME;
-        $stripePriceId = $addon->getStripePriceId($billingPeriod->value);
+        $provider = $this->gatewayManager->getDefaultDriver();
+        $providerPriceId = $addon->getProviderPriceId($provider, $billingPeriod->value);
         $price = $this->getAddonPrice($addon, $billingPeriod);
 
-        // Use existing Stripe price if available
-        if ($stripePriceId) {
+        // Use existing provider price if available
+        if ($providerPriceId) {
             return [
                 'stripe_item' => [
-                    'price' => $stripePriceId,
+                    'price' => $providerPriceId,
                     'quantity' => $item['quantity'],
                 ],
                 'is_recurring' => $isRecurring,

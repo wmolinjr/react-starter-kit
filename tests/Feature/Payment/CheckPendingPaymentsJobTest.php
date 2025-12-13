@@ -41,7 +41,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     {
         // Create a purchase that is too recent (created now)
         AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_test_recent',
+            'provider' => 'asaas',
+            'provider_payment_intent_id' => 'pay_test_recent',
             'payment_method' => 'pix',
             'metadata' => ['provider' => 'asaas'],
             'created_at' => now(), // Just created
@@ -61,7 +62,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     {
         // Create an old pending purchase
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_test_old',
+            'provider' => 'asaas',
+            'provider_payment_intent_id' => 'pay_test_old',
             'payment_method' => 'pix',
             'metadata' => ['provider' => 'asaas'],
             'created_at' => now()->subMinutes(10), // 10 minutes ago
@@ -89,7 +91,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     {
         // Create an old pending purchase
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_confirmed',
+            'provider' => 'asaas',
+            'provider_payment_intent_id' => 'pay_confirmed',
             'payment_method' => 'pix',
             'metadata' => ['provider' => 'asaas'],
             'created_at' => now()->subMinutes(10),
@@ -123,7 +126,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     {
         // Create an old pending purchase
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_overdue',
+            'provider' => 'asaas',
+            'provider_payment_intent_id' => 'pay_overdue',
             'payment_method' => 'boleto',
             'metadata' => ['provider' => 'asaas'],
             'created_at' => now()->subMinutes(10),
@@ -153,7 +157,7 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     public function job_detects_asaas_provider_from_pix_payment_method(): void
     {
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_pix_detect',
+            'provider_payment_intent_id' => 'pay_pix_detect',
             'payment_method' => 'pix',
             'metadata' => [], // No explicit provider
             'created_at' => now()->subMinutes(10),
@@ -179,7 +183,7 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     public function job_detects_asaas_provider_from_boleto_payment_method(): void
     {
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_boleto_detect',
+            'provider_payment_intent_id' => 'pay_boleto_detect',
             'payment_method' => 'boleto',
             'metadata' => [], // No explicit provider
             'created_at' => now()->subMinutes(10),
@@ -207,7 +211,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
         // Create 5 old pending purchases
         for ($i = 1; $i <= 5; $i++) {
             AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-                'stripe_payment_intent_id' => "pay_limit_{$i}",
+                'provider' => 'asaas',
+                'provider_payment_intent_id' => "pay_limit_{$i}",
                 'payment_method' => 'pix',
                 'metadata' => ['provider' => 'asaas'],
                 'created_at' => now()->subMinutes(10 + $i),
@@ -236,7 +241,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     {
         // Create a purchase older than 7 days
         AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_very_old',
+            'provider' => 'asaas',
+            'provider_payment_intent_id' => 'pay_very_old',
             'payment_method' => 'pix',
             'metadata' => ['provider' => 'asaas'],
             'created_at' => now()->subDays(10),
@@ -255,7 +261,7 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     {
         // Create a purchase without payment ID
         AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => null,
+            'provider_payment_intent_id' => null,
             'payment_method' => 'pix',
             'created_at' => now()->subMinutes(10),
         ]);
@@ -272,7 +278,8 @@ class CheckPendingPaymentsJobTest extends TenantTestCase
     public function job_handles_api_errors_gracefully(): void
     {
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pay_error',
+            'provider' => 'asaas',
+            'provider_payment_intent_id' => 'pay_error',
             'payment_method' => 'pix',
             'metadata' => ['provider' => 'asaas'],
             'created_at' => now()->subMinutes(10),

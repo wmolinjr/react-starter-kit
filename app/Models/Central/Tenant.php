@@ -79,7 +79,6 @@ class Tenant extends Model implements TenantWithDatabase
         'trial_ends_at',
         // Customer billing (new architecture)
         'customer_id',
-        'payment_method_id',
     ];
 
     protected $casts = [
@@ -118,7 +117,6 @@ class Tenant extends Model implements TenantWithDatabase
         return [
             'id',
             'customer_id',
-            'payment_method_id',
             'name',
             'slug',
             'business_sector',
@@ -244,16 +242,10 @@ class Tenant extends Model implements TenantWithDatabase
     }
 
     /**
-     * Get payment method (tenant override or customer default).
+     * Get payment method (delegates to customer).
      */
     public function getPaymentMethod(): ?PaymentMethod
     {
-        // First check if tenant has a specific payment method
-        if ($this->payment_method_id) {
-            return PaymentMethod::find($this->payment_method_id);
-        }
-
-        // Fallback to customer's default
         return $this->customer?->getDefaultPaymentMethod();
     }
 

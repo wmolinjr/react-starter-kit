@@ -74,8 +74,16 @@ class UpdateTenantLimits
 
         $tenants = $customer->ownedTenants;
 
-        $plan = Plan::whereJsonContains('prices', [['stripe_price_id' => $priceId]])->first()
-            ?? Plan::where('stripe_price_id', $priceId)->first();
+        // Search in the provider_price_ids JSON column
+        $plan = Plan::all()->first(function ($p) use ($priceId) {
+            $priceIds = $p->provider_price_ids ?? [];
+            foreach ($priceIds as $providerPriceId) {
+                if ($providerPriceId === $priceId) {
+                    return true;
+                }
+            }
+            return false;
+        });
 
         if (! $plan) {
             Log::warning('UpdateTenantLimits: Plan not found for price', [

@@ -163,7 +163,7 @@ class MeteredBillingService
     public function reportStorageUsage(Tenant $tenant): bool
     {
         $provider = $this->getProvider();
-        $providerCustomerId = $tenant->getProviderCustomerId($provider);
+        $providerCustomerId = $tenant->customer?->getProviderCustomerId($provider);
 
         if (! $providerCustomerId || ! $this->isConfigured() || ! $this->supportsMeteredBilling()) {
             return false;
@@ -235,7 +235,7 @@ class MeteredBillingService
     public function reportBandwidthUsage(Tenant $tenant): bool
     {
         $provider = $this->getProvider();
-        $providerCustomerId = $tenant->getProviderCustomerId($provider);
+        $providerCustomerId = $tenant->customer?->getProviderCustomerId($provider);
 
         if (! $providerCustomerId || ! $this->isConfigured() || ! $this->supportsMeteredBilling()) {
             return false;

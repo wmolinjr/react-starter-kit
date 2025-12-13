@@ -447,20 +447,10 @@ class PlanSyncService
      */
     protected function findPlanByProviderProductId(string $provider, string $productId): ?Plan
     {
-        $field = match ($provider) {
-            'stripe' => 'stripe_product_id',
-            'paddle' => 'paddle_product_id',
-            'asaas' => 'asaas_product_id',
-            'pagseguro' => 'pagseguro_product_id',
-            'mercadopago' => 'mercadopago_product_id',
-            default => null,
-        };
-
-        if (! $field) {
-            return null;
-        }
-
-        return Plan::where($field, $productId)->first();
+        // Search in the provider_product_ids JSON column
+        return Plan::all()->first(function ($plan) use ($provider, $productId) {
+            return $plan->getProviderProductId($provider) === $productId;
+        });
     }
 
     /**

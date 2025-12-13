@@ -248,9 +248,16 @@ class SyncPermissionsOnSubscriptionChange
      */
     protected function findPlanByPriceId(string $priceId): ?Plan
     {
-        // Plans have prices stored as JSON with stripe_price_id
-        return Plan::whereJsonContains('prices', [['stripe_price_id' => $priceId]])->first()
-            ?? Plan::where('stripe_price_id', $priceId)->first();
+        // Search in the provider_price_ids JSON column
+        return Plan::all()->first(function ($plan) use ($priceId) {
+            $priceIds = $plan->provider_price_ids ?? [];
+            foreach ($priceIds as $providerPriceId) {
+                if ($providerPriceId === $priceId) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     /**

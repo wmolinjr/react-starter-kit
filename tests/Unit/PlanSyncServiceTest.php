@@ -18,7 +18,8 @@ class PlanSyncServiceTest extends TestCase
         // Clean up any existing plans to avoid unique constraint violations
         Plan::query()->delete();
 
-        $this->service = new PlanSyncService;
+        // Resolve service from container (requires PaymentGatewayManager)
+        $this->service = app(PlanSyncService::class);
     }
 
     #[Test]

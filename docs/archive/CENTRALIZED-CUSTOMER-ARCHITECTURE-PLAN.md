@@ -1846,8 +1846,8 @@ Stripe webhook received
 
 ## Related Documentation
 
-- [SYSTEM-ARCHITECTURE.md](./SYSTEM-ARCHITECTURE.md) - Plans, features, limits
-- [USER-SYNC-FEDERATION.md](./USER-SYNC-FEDERATION.md) - Federated user concept
-- [ADDONS.md](./ADDONS.md) - Add-on system architecture
+- [SYSTEM-ARCHITECTURE.md](../SYSTEM-ARCHITECTURE.md) - Plans, features, limits
+- [USER-SYNC-FEDERATION.md](../USER-SYNC-FEDERATION.md) - Federated user concept
+- [ADDONS.md](../ADDONS.md) - Add-on system architecture
 - [Laravel Cashier Stripe](https://laravel.com/docs/billing) - Billing integration
 - [Stripe Customer Portal](https://stripe.com/docs/billing/subscriptions/customer-portal) - Self-service billing

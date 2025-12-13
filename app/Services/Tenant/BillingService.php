@@ -93,7 +93,7 @@ class BillingService
                 'slug' => $plan->slug,
                 'name' => $plan->name,
                 'price' => $plan->formatted_price,
-                'price_id' => $plan->stripe_price_id,
+                'price_id' => $plan->getProviderPriceId(config('payment.default', 'stripe')),
                 'interval' => $plan->billing_period,
                 'features' => collect($plan->features)->filter()->keys()->toArray(),
                 'limits' => $plan->limits,
@@ -254,7 +254,16 @@ class BillingService
         }
 
         $priceId = $subscription->provider_price_id;
-        $plan = Plan::where('stripe_price_id', $priceId)->first();
+        // Find plan by price ID in provider_price_ids JSON column
+        $plan = Plan::all()->first(function ($p) use ($priceId) {
+            $priceIds = $p->provider_price_ids ?? [];
+            foreach ($priceIds as $providerPriceId) {
+                if ($providerPriceId === $priceId) {
+                    return true;
+                }
+            }
+            return false;
+        });
 
         if ($plan) {
             $tenant->update(['max_users' => $plan->limits['max_users'] ?? null]);

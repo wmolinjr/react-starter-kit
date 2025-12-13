@@ -17,6 +17,11 @@ class StripeSyncService
      */
     protected string $defaultLocale = 'en';
 
+    /**
+     * Provider identifier for Stripe
+     */
+    protected const PROVIDER = 'stripe';
+
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
@@ -80,7 +85,7 @@ class StripeSyncService
             // Sync Product
             $productId = $this->syncProduct($addon, $locale);
             $result['product_synced'] = true;
-            $result['stripe_product_id'] = $productId;
+            $result['provider_product_id'] = $productId;
 
             // Sync Prices
             $result['prices_synced'] = $this->syncPrices($addon, $locale);
@@ -142,22 +147,24 @@ class StripeSyncService
             unset($productData['description']);
         }
 
-        if ($addon->stripe_product_id) {
+        $existingProductId = $addon->getProviderProductId(self::PROVIDER);
+
+        if ($existingProductId) {
             // Update existing product
-            $this->gateway->updateProduct($addon->stripe_product_id, $productData);
+            $this->gateway->updateProduct($existingProductId, $productData);
 
             Log::info('Updated Stripe product', [
                 'addon' => $addon->slug,
-                'product_id' => $addon->stripe_product_id,
+                'product_id' => $existingProductId,
                 'locale' => $locale,
             ]);
 
-            return $addon->stripe_product_id;
+            return $existingProductId;
         }
 
         // Create new product
         $product = $this->gateway->createProduct($productData);
-        $addon->update(['stripe_product_id' => $product['id']]);
+        $addon->setProviderProductId(self::PROVIDER, $product['id']);
 
         Log::info('Created Stripe product', [
             'addon' => $addon->slug,
@@ -206,23 +213,23 @@ class StripeSyncService
         $synced = [];
 
         // Monthly price
-        if ($addon->price_monthly && ! $addon->stripe_price_monthly_id) {
+        if ($addon->price_monthly && ! $addon->getProviderPriceId(self::PROVIDER, 'monthly')) {
             $priceId = $this->createPrice($addon, 'monthly', $addon->price_monthly, $locale);
-            $addon->update(['stripe_price_monthly_id' => $priceId]);
+            $addon->setProviderPriceId(self::PROVIDER, 'monthly', $priceId);
             $synced['monthly'] = $priceId;
         }
 
         // Yearly price
-        if ($addon->price_yearly && ! $addon->stripe_price_yearly_id) {
+        if ($addon->price_yearly && ! $addon->getProviderPriceId(self::PROVIDER, 'yearly')) {
             $priceId = $this->createPrice($addon, 'yearly', $addon->price_yearly, $locale);
-            $addon->update(['stripe_price_yearly_id' => $priceId]);
+            $addon->setProviderPriceId(self::PROVIDER, 'yearly', $priceId);
             $synced['yearly'] = $priceId;
         }
 
         // One-time price
-        if ($addon->price_one_time && ! $addon->stripe_price_one_time_id) {
+        if ($addon->price_one_time && ! $addon->getProviderPriceId(self::PROVIDER, 'one_time')) {
             $priceId = $this->createPrice($addon, 'one_time', $addon->price_one_time, $locale);
-            $addon->update(['stripe_price_one_time_id' => $priceId]);
+            $addon->setProviderPriceId(self::PROVIDER, 'one_time', $priceId);
             $synced['one_time'] = $priceId;
         }
 
@@ -235,7 +242,7 @@ class StripeSyncService
     protected function createPrice(Addon $addon, string $billingPeriod, int $amount, string $locale): string
     {
         $priceData = [
-            'product' => $addon->stripe_product_id,
+            'product' => $addon->getProviderProductId(self::PROVIDER),
             'currency' => config('payment.currency', 'BRL'),
             'unit_amount' => $amount,
             'metadata' => [
@@ -298,8 +305,10 @@ class StripeSyncService
             $product = $this->gateway->retrieveProduct($productId);
             $prices = $this->gateway->listPrices($productId);
 
-            // Check if addon already exists
-            $existingAddon = Addon::where('stripe_product_id', $productId)->first();
+            // Check if addon already exists by searching the provider_product_ids JSON
+            $existingAddon = Addon::all()->first(function ($addon) use ($productId) {
+                return $addon->getProviderProductId(self::PROVIDER) === $productId;
+            });
 
             // If addon exists, only update non-translatable fields
             if ($existingAddon) {
@@ -338,9 +347,8 @@ class StripeSyncService
                 $addonData['unit_label'] = $translations['unit_label'];
             }
 
-            $addon = Addon::create(array_merge($addonData, [
-                'stripe_product_id' => $productId,
-            ]));
+            $addon = Addon::create($addonData);
+            $addon->setProviderProductId(self::PROVIDER, $productId);
 
             // Import prices
             $this->importPrices($addon, $prices);
@@ -369,13 +377,12 @@ class StripeSyncService
     {
         foreach ($prices as $price) {
             $period = $price['metadata']['billing_period'] ?? $this->detectBillingPeriod($price);
-            $priceIdField = "stripe_price_{$period}_id";
             $priceAmountField = "price_{$period}";
 
             // Only update if not already set
-            if (! $addon->{$priceIdField}) {
+            if (! $addon->getProviderPriceId(self::PROVIDER, $period)) {
+                $addon->setProviderPriceId(self::PROVIDER, $period, $price['id']);
                 $addon->update([
-                    $priceIdField => $price['id'],
                     $priceAmountField => $price['unit_amount'],
                 ]);
             }
@@ -423,21 +430,21 @@ class StripeSyncService
                 'actions' => [],
             ];
 
-            if (! $addon->stripe_product_id) {
+            if (! $addon->getProviderProductId(self::PROVIDER)) {
                 $item['actions'][] = "Create Product: \"{$name}\"";
             } else {
                 $item['actions'][] = "Update Product: \"{$name}\"";
             }
 
-            if ($addon->price_monthly && ! $addon->stripe_price_monthly_id) {
+            if ($addon->price_monthly && ! $addon->getProviderPriceId(self::PROVIDER, 'monthly')) {
                 $item['actions'][] = 'Create Monthly Price ($'.number_format($addon->price_monthly / 100, 2).')';
             }
 
-            if ($addon->price_yearly && ! $addon->stripe_price_yearly_id) {
+            if ($addon->price_yearly && ! $addon->getProviderPriceId(self::PROVIDER, 'yearly')) {
                 $item['actions'][] = 'Create Yearly Price ($'.number_format($addon->price_yearly / 100, 2).')';
             }
 
-            if ($addon->price_one_time && ! $addon->stripe_price_one_time_id) {
+            if ($addon->price_one_time && ! $addon->getProviderPriceId(self::PROVIDER, 'one_time')) {
                 $item['actions'][] = 'Create One-Time Price ($'.number_format($addon->price_one_time / 100, 2).')';
             }
 
@@ -487,7 +494,7 @@ class StripeSyncService
             // Sync Product
             $productId = $this->syncBundleProduct($bundle, $locale);
             $result['product_synced'] = true;
-            $result['stripe_product_id'] = $productId;
+            $result['provider_product_id'] = $productId;
 
             // Sync Prices
             $result['prices_synced'] = $this->syncBundlePrices($bundle, $locale);
@@ -557,22 +564,24 @@ class StripeSyncService
             unset($productData['description']);
         }
 
-        if ($bundle->stripe_product_id) {
+        $existingProductId = $bundle->getProviderProductId(self::PROVIDER);
+
+        if ($existingProductId) {
             // Update existing product
-            $this->gateway->updateProduct($bundle->stripe_product_id, $productData);
+            $this->gateway->updateProduct($existingProductId, $productData);
 
             Log::info('Updated Stripe bundle product', [
                 'bundle' => $bundle->slug,
-                'product_id' => $bundle->stripe_product_id,
+                'product_id' => $existingProductId,
                 'locale' => $locale,
             ]);
 
-            return $bundle->stripe_product_id;
+            return $existingProductId;
         }
 
         // Create new product
         $product = $this->gateway->createProduct($productData);
-        $bundle->update(['stripe_product_id' => $product['id']]);
+        $bundle->setProviderProductId(self::PROVIDER, $product['id']);
 
         Log::info('Created Stripe bundle product', [
             'bundle' => $bundle->slug,
@@ -592,17 +601,17 @@ class StripeSyncService
 
         // Monthly price (effective = with discount applied)
         $monthlyPrice = $bundle->getEffectivePriceMonthly();
-        if ($monthlyPrice > 0 && ! $bundle->stripe_price_monthly_id) {
+        if ($monthlyPrice > 0 && ! $bundle->getProviderPriceId(self::PROVIDER, 'monthly')) {
             $priceId = $this->createBundlePrice($bundle, 'monthly', $monthlyPrice, $locale);
-            $bundle->update(['stripe_price_monthly_id' => $priceId]);
+            $bundle->setProviderPriceId(self::PROVIDER, 'monthly', $priceId);
             $synced['monthly'] = $priceId;
         }
 
         // Yearly price (effective = with discount applied)
         $yearlyPrice = $bundle->getEffectivePriceYearly();
-        if ($yearlyPrice > 0 && ! $bundle->stripe_price_yearly_id) {
+        if ($yearlyPrice > 0 && ! $bundle->getProviderPriceId(self::PROVIDER, 'yearly')) {
             $priceId = $this->createBundlePrice($bundle, 'yearly', $yearlyPrice, $locale);
-            $bundle->update(['stripe_price_yearly_id' => $priceId]);
+            $bundle->setProviderPriceId(self::PROVIDER, 'yearly', $priceId);
             $synced['yearly'] = $priceId;
         }
 
@@ -615,7 +624,7 @@ class StripeSyncService
     protected function createBundlePrice(AddonBundle $bundle, string $billingPeriod, int $amount, string $locale): string
     {
         $priceData = [
-            'product' => $bundle->stripe_product_id,
+            'product' => $bundle->getProviderProductId(self::PROVIDER),
             'currency' => $bundle->currency ?? config('payment.currency', 'brl'),
             'unit_amount' => $amount,
             'metadata' => [
@@ -673,19 +682,19 @@ class StripeSyncService
                 'actions' => [],
             ];
 
-            if (! $bundle->stripe_product_id) {
+            if (! $bundle->getProviderProductId(self::PROVIDER)) {
                 $item['actions'][] = "Create Product: \"{$name}\"";
             } else {
                 $item['actions'][] = "Update Product: \"{$name}\"";
             }
 
             $monthlyPrice = $bundle->getEffectivePriceMonthly();
-            if ($monthlyPrice > 0 && ! $bundle->stripe_price_monthly_id) {
+            if ($monthlyPrice > 0 && ! $bundle->getProviderPriceId(self::PROVIDER, 'monthly')) {
                 $item['actions'][] = 'Create Monthly Price ('.format_stripe_price($monthlyPrice, $bundle->currency).')';
             }
 
             $yearlyPrice = $bundle->getEffectivePriceYearly();
-            if ($yearlyPrice > 0 && ! $bundle->stripe_price_yearly_id) {
+            if ($yearlyPrice > 0 && ! $bundle->getProviderPriceId(self::PROVIDER, 'yearly')) {
                 $item['actions'][] = 'Create Yearly Price ('.format_stripe_price($yearlyPrice, $bundle->currency).')';
             }
 

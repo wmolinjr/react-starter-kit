@@ -67,12 +67,9 @@ class Addon extends Model
         'currency',
         'free_tier',
         'validity_months',
-        'stripe_product_id',
-        'stripe_price_monthly_id',
-        'stripe_price_yearly_id',
-        'stripe_price_one_time_id',
-        'stripe_price_metered_id',
-        'stripe_meter_id',
+        'provider_product_ids',
+        'provider_price_ids',
+        'provider_meter_ids',
         'features',
         'icon',
         'icon_color',
@@ -86,6 +83,9 @@ class Addon extends Model
             'type' => AddonType::class,
             'active' => 'boolean',
             'stackable' => 'boolean',
+            'provider_product_ids' => 'array',
+            'provider_price_ids' => 'array',
+            'provider_meter_ids' => 'array',
             'features' => 'array',
             'metadata' => 'array',
         ];
@@ -257,47 +257,78 @@ class Addon extends Model
     }
 
     /**
+     * Get provider product ID.
+     */
+    public function getProviderProductId(string $provider): ?string
+    {
+        return $this->provider_product_ids[$provider] ?? null;
+    }
+
+    /**
+     * Set provider product ID.
+     */
+    public function setProviderProductId(string $provider, string $productId): void
+    {
+        $this->update([
+            'provider_product_ids' => array_merge($this->provider_product_ids ?? [], [$provider => $productId]),
+        ]);
+    }
+
+    /**
      * Get provider price ID for billing period.
-     *
-     * Note: Currently uses Stripe-specific columns. For multi-provider support,
-     * consider a provider_prices JSON column or separate price_ids table.
      */
-    public function getProviderPriceId(string $billingPeriod, string $provider = 'stripe'): ?string
+    public function getProviderPriceId(string $provider, string $billingPeriod): ?string
     {
-        // Currently only Stripe is supported for addons
-        // Future: support other providers via provider_prices JSON or separate table
-        return match ($billingPeriod) {
-            'monthly' => $this->stripe_price_monthly_id,
-            'yearly' => $this->stripe_price_yearly_id,
-            'one_time' => $this->stripe_price_one_time_id,
-            'metered' => $this->stripe_price_metered_id,
-            default => null,
-        };
+        return $this->provider_price_ids[$provider][$billingPeriod] ?? null;
     }
 
     /**
-     * @deprecated Use getProviderPriceId() instead
+     * Set provider price ID for billing period.
      */
-    public function getStripePriceId(string $billingPeriod): ?string
+    public function setProviderPriceId(string $provider, string $billingPeriod, string $priceId): void
     {
-        return $this->getProviderPriceId($billingPeriod, 'stripe');
+        $priceIds = $this->provider_price_ids ?? [];
+        if (! isset($priceIds[$provider])) {
+            $priceIds[$provider] = [];
+        }
+        $priceIds[$provider][$billingPeriod] = $priceId;
+
+        $this->update(['provider_price_ids' => $priceIds]);
     }
 
     /**
-     * Check if this is a metered (usage-based) addon
+     * Get provider meter ID.
+     */
+    public function getProviderMeterId(string $provider): ?string
+    {
+        return $this->provider_meter_ids[$provider] ?? null;
+    }
+
+    /**
+     * Set provider meter ID.
+     */
+    public function setProviderMeterId(string $provider, string $meterId): void
+    {
+        $this->update([
+            'provider_meter_ids' => array_merge($this->provider_meter_ids ?? [], [$provider => $meterId]),
+        ]);
+    }
+
+    /**
+     * Check if this is a metered (usage-based) addon.
      */
     public function isMetered(): bool
     {
-        return $this->price_metered !== null && $this->stripe_meter_id !== null;
+        return $this->price_metered !== null && ! empty($this->provider_meter_ids);
     }
 
     /**
-     * Scope to get metered addons
+     * Scope to get metered addons.
      */
     public function scopeMetered($query)
     {
         return $query->whereNotNull('price_metered')
-            ->whereNotNull('stripe_meter_id');
+            ->whereNotNull('provider_meter_ids');
     }
 
     /**

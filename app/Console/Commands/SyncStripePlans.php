@@ -117,11 +117,11 @@ class SyncStripePlans extends Command
         $this->line("{$status} {$result['slug']} (locale: {$result['locale']})");
 
         if ($result['product_synced']) {
-            $this->line("  Product: {$result['stripe_product_id']}");
+            $this->line("  Product: {$result['provider_product_id']}");
         }
 
         if ($result['price_synced'] ?? false) {
-            $this->line("  Price: {$result['stripe_price_id']}");
+            $this->line("  Price: {$result['provider_price_id']}");
         }
 
         foreach ($result['errors'] as $error) {

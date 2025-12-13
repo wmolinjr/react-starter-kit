@@ -406,6 +406,6 @@ resources/js/hooks/billing/
 ## Referencias
 
 - [BILLING-AUDIT-PLAN.md](./BILLING-AUDIT-PLAN.md) - Auditoria inicial
-- [CUSTOMER-PORTAL.md](./CUSTOMER-PORTAL.md) - Documentacao atual
+- [CUSTOMER-PORTAL.md](archive/CUSTOMER-PORTAL.md) - Documentacao atual
 - [SYSTEM-ARCHITECTURE.md](./SYSTEM-ARCHITECTURE.md) - Arquitetura de planos
 - [ADDONS.md](./ADDONS.md) - Sistema de addons

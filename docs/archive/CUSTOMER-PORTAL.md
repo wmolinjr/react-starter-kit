@@ -468,10 +468,10 @@ Transfer fee: 5% of remaining subscription value
 
 ## Related Documentation
 
-- [SYSTEM-ARCHITECTURE.md](SYSTEM-ARCHITECTURE.md) - Plans, features, limits
-- [PERMISSIONS.md](PERMISSIONS.md) - Permission system
-- [SESSION-SECURITY.md](SESSION-SECURITY.md) - Session configuration
-- [ADDONS.md](ADDONS.md) - Add-ons and bundles
+- [SYSTEM-ARCHITECTURE.md](../SYSTEM-ARCHITECTURE.md) - Plans, features, limits
+- [PERMISSIONS.md](../PERMISSIONS.md) - Permission system
+- [SESSION-SECURITY.md](../SESSION-SECURITY.md) - Session configuration
+- [ADDONS.md](../ADDONS.md) - Add-ons and bundles
 
 ---
 

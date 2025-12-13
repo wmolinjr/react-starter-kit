@@ -29,10 +29,11 @@ return new class extends Migration
             $table->integer('price_yearly')->nullable(); // Override calculated price
             $table->string('currency', 3)->default('brl');
 
-            // Stripe IDs (populated by stripe:sync)
-            $table->string('stripe_product_id')->nullable();
-            $table->string('stripe_price_monthly_id')->nullable();
-            $table->string('stripe_price_yearly_id')->nullable();
+            // Provider-Agnostic Integration
+            // provider_product_ids: {"stripe": "prod_xxx", "asaas": "prod_yyy"}
+            $table->json('provider_product_ids')->nullable();
+            // provider_price_ids: {"stripe": {"monthly": "price_xxx", "yearly": "..."}, "asaas": {...}}
+            $table->json('provider_price_ids')->nullable();
 
             // Display
             $table->string('badge')->nullable(); // "Most Popular", "Best Value"

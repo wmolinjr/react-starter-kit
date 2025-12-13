@@ -36,7 +36,8 @@ class AsyncPaymentWebhookTest extends TenantTestCase
     public function payment_confirmed_marks_purchase_as_completed(): void
     {
         $purchase = AddonPurchase::factory()->pending()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => null,
+            'provider' => 'stripe',
+            'provider_payment_intent_id' => null,
         ]);
 
         $event = new PaymentConfirmed(
@@ -51,7 +52,7 @@ class AsyncPaymentWebhookTest extends TenantTestCase
         $purchase->refresh();
 
         $this->assertTrue($purchase->isCompleted());
-        $this->assertEquals('pi_test_123', $purchase->stripe_payment_intent_id);
+        $this->assertEquals('pi_test_123', $purchase->provider_payment_intent_id);
         $this->assertNotNull($purchase->purchased_at);
     }
 
@@ -59,7 +60,8 @@ class AsyncPaymentWebhookTest extends TenantTestCase
     public function payment_confirmed_skips_already_completed_purchase(): void
     {
         $purchase = AddonPurchase::factory()->completed()->forTenant($this->tenant)->create([
-            'stripe_payment_intent_id' => 'pi_original',
+            'provider' => 'stripe',
+            'provider_payment_intent_id' => 'pi_original',
             'purchased_at' => now()->subHour(),
         ]);
 
@@ -77,7 +79,7 @@ class AsyncPaymentWebhookTest extends TenantTestCase
         $purchase->refresh();
 
         // Should not change the original payment intent
-        $this->assertEquals('pi_original', $purchase->stripe_payment_intent_id);
+        $this->assertEquals('pi_original', $purchase->provider_payment_intent_id);
         $this->assertEquals($originalPurchasedAt, $purchase->purchased_at->toISOString());
     }
 

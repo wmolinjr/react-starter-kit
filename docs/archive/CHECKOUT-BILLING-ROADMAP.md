@@ -549,5 +549,5 @@ stripe listen --forward-to http://app.test/stripe/webhook
 - [Asaas API Docs](https://docs.asaas.com/)
 - [Stripe Webhooks](https://stripe.com/docs/webhooks)
 - [Laravel Cashier](https://laravel.com/docs/billing)
-- [docs/ADDONS.md](./ADDONS.md)
-- [docs/SYSTEM-ARCHITECTURE.md](./SYSTEM-ARCHITECTURE.md)
+- [docs/ADDONS.md](../ADDONS.md)
+- [docs/SYSTEM-ARCHITECTURE.md](../SYSTEM-ARCHITECTURE.md)

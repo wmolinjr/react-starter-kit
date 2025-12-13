@@ -156,7 +156,10 @@ class CheckoutService
                 ],
             ]);
 
-            $purchase->update(['provider_checkout_session_id' => $session['id']]);
+            $purchase->update([
+                'provider' => $provider,
+                'provider_session_id' => $session['id'],
+            ]);
 
             return [
                 'session_id' => $session['id'],
@@ -308,7 +311,7 @@ class CheckoutService
         /** @var CheckoutGatewayInterface $gateway */
         $gateway = $this->gateway;
 
-        $purchase = AddonPurchase::where('provider_checkout_session_id', $sessionId)->first();
+        $purchase = AddonPurchase::where('provider_session_id', $sessionId)->first();
 
         if (! $purchase) {
             Log::warning('Purchase not found for checkout session', ['session_id' => $sessionId]);

@@ -44,9 +44,8 @@ class BundleResource extends BaseResource
             'addons' => 'BundleAddonResource[]',
             'plan_ids' => 'string[]',
             'plans' => 'BundlePlanSummary[]',
-            'stripe_product_id' => 'string | null',
-            'stripe_price_monthly_id' => 'string | null',
-            'stripe_price_yearly_id' => 'string | null',
+            'provider_product_ids' => 'Record<string, string> | null',
+            'provider_price_ids' => 'Record<string, Record<string, string>> | null',
             'is_synced' => 'boolean',
         ];
     }
@@ -99,10 +98,9 @@ class BundleResource extends BaseResource
                     'slug' => $p->slug,
                 ])
             ),
-            'stripe_product_id' => $this->stripe_product_id,
-            'stripe_price_monthly_id' => $this->stripe_price_monthly_id,
-            'stripe_price_yearly_id' => $this->stripe_price_yearly_id,
-            'is_synced' => (bool) $this->stripe_product_id,
+            'provider_product_ids' => $this->provider_product_ids,
+            'provider_price_ids' => $this->provider_price_ids,
+            'is_synced' => ! empty($this->provider_product_ids),
         ];
     }
 }

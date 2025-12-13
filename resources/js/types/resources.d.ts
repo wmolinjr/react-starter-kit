@@ -144,9 +144,8 @@ export interface BundleResource {
     addons: BundleAddonResource[];
     plan_ids: string[];
     plans: BundlePlanSummary[];
-    stripe_product_id: string | null;
-    stripe_price_monthly_id: string | null;
-    stripe_price_yearly_id: string | null;
+    provider_product_ids: Record<string, string> | null;
+    provider_price_ids: Record<string, Record<string, string>> | null;
     is_synced: boolean;
 }
 
@@ -428,8 +427,8 @@ export interface PlanDetailResource {
     formatted_price: string;
     currency: string;
     billing_period: BillingPeriod;
-    stripe_product_id: string | null;
-    stripe_price_id: string | null;
+    provider_product_ids: Record<string, string> | null;
+    provider_price_ids: Record<string, string> | null;
     features: PlanFeatures;
     limits: PlanLimits;
     permission_map: Record<string, string[]>;
@@ -454,8 +453,8 @@ export interface PlanEditResource {
     price: number;
     currency: string;
     billing_period: BillingPeriod;
-    stripe_price_id: string | null;
-    stripe_product_id: string | null;
+    provider_product_ids: Record<string, string> | null;
+    provider_price_ids: Record<string, string> | null;
     features: PlanFeatures;
     limits: PlanLimits;
     permission_map: Record<string, string[]>;
@@ -477,7 +476,7 @@ export interface PlanResource {
     formatted_price: string;
     currency: string;
     billing_period: BillingPeriod;
-    stripe_price_id: string | null;
+    provider_price_ids: Record<string, string> | null;
     features: PlanFeatures;
     limits: PlanLimits;
     is_active: boolean;

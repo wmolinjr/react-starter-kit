@@ -18,7 +18,7 @@ class StripeSyncServiceTest extends TestCase
         // Clean up any existing addons to avoid unique constraint violations
         Addon::query()->delete();
 
-        $this->service = new StripeSyncService;
+        $this->service = app(StripeSyncService::class);
     }
 
     #[Test]
@@ -77,13 +77,13 @@ class StripeSyncServiceTest extends TestCase
     #[Test]
     public function dry_run_shows_update_product_action_for_existing_addon(): void
     {
-        Addon::create([
+        $addon = Addon::create([
             'slug' => 'test-addon',
             'name' => ['en' => 'Test Addon'],
             'type' => 'feature',
             'active' => true,
-            'stripe_product_id' => 'prod_existing123',
         ]);
+        $addon->setProviderProductId('stripe', 'prod_existing123');
 
         $preview = $this->service->dryRun(null, 'en');
 
@@ -176,16 +176,16 @@ class StripeSyncServiceTest extends TestCase
     }
 
     #[Test]
-    public function dry_run_skips_prices_that_already_have_stripe_ids(): void
+    public function dry_run_skips_prices_that_already_have_provider_ids(): void
     {
-        Addon::create([
+        $addon = Addon::create([
             'slug' => 'test-addon',
             'name' => ['en' => 'Test Addon'],
             'type' => 'feature',
             'active' => true,
             'price_monthly' => 1999,
-            'stripe_price_monthly_id' => 'price_existing123',
         ]);
+        $addon->setProviderPriceId('stripe', 'monthly', 'price_existing123');
 
         $preview = $this->service->dryRun(null, 'en');
 

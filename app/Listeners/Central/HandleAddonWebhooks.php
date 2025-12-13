@@ -81,7 +81,7 @@ class HandleAddonWebhooks implements ShouldQueue
 
         Log::info('Async payment succeeded', ['session_id' => $session['id'] ?? 'unknown']);
 
-        $purchase = AddonPurchase::where('stripe_checkout_session_id', $session['id'])->first();
+        $purchase = AddonPurchase::where('provider_session_id', $session['id'])->first();
 
         if (! $purchase) {
             Log::warning('Purchase not found for async payment', ['session_id' => $session['id']]);
@@ -113,7 +113,7 @@ class HandleAddonWebhooks implements ShouldQueue
 
         Log::info('Async payment failed', ['session_id' => $session['id'] ?? 'unknown']);
 
-        $purchase = AddonPurchase::where('stripe_checkout_session_id', $session['id'])->first();
+        $purchase = AddonPurchase::where('provider_session_id', $session['id'])->first();
 
         if (! $purchase) {
             Log::warning('Purchase not found for async payment failure', ['session_id' => $session['id']]);
@@ -146,7 +146,7 @@ class HandleAddonWebhooks implements ShouldQueue
      */
     protected function processOneTimePurchase(array $session): void
     {
-        $purchase = AddonPurchase::where('stripe_checkout_session_id', $session['id'])->first();
+        $purchase = AddonPurchase::where('provider_session_id', $session['id'])->first();
 
         if (! $purchase) {
             Log::warning('Purchase not found for checkout session', ['session_id' => $session['id']]);
@@ -160,7 +160,7 @@ class HandleAddonWebhooks implements ShouldQueue
 
         if ($session['payment_status'] === 'paid') {
             $purchase->update([
-                'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
+                'provider_payment_intent_id' => $session['payment_intent'] ?? null,
             ]);
             $purchase->markAsCompleted();
 
@@ -263,7 +263,8 @@ class HandleAddonWebhooks implements ShouldQueue
                 'quantity' => $quantity,
                 'price' => $price ?? 0,
                 'status' => 'active',
-                'stripe_subscription_id' => $subscription['id'],
+                'provider' => $event->provider,
+                'provider_item_id' => $subscription['id'],
                 'started_at' => now(),
             ]
         );
@@ -380,7 +381,7 @@ class HandleAddonWebhooks implements ShouldQueue
         $paymentIntentId = $charge['payment_intent'] ?? null;
 
         if ($paymentIntentId) {
-            $purchase = AddonPurchase::where('stripe_payment_intent_id', $paymentIntentId)->first();
+            $purchase = AddonPurchase::where('provider_payment_intent_id', $paymentIntentId)->first();
 
             if ($purchase && ! $purchase->isRefunded()) {
                 $purchase->refund();
