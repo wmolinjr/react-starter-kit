@@ -10,6 +10,7 @@ import {
     PaymentMethodSelector,
     type PaymentMethod,
 } from '@/components/shared/billing/payment-method-selector';
+import { unformatCpfCnpj, isValidCpfCnpjLength } from '@/components/shared/billing/cpf-cnpj-input';
 import { PriceDisplay } from '@/components/shared/billing/primitives/price-display';
 import { process as processPayment } from '@/routes/central/signup/payment';
 import type { PlanResource, PendingSignupResource, PaymentConfigResource } from '@/types/resources';
@@ -43,6 +44,11 @@ export function PaymentStep({
     const { errors = {} } = props;
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
+    const [cpfCnpj, setCpfCnpj] = useState('');
+
+    // Check if current method needs CPF/CNPJ
+    const needsCpfCnpj = paymentMethod === 'pix' || paymentMethod === 'boleto';
+    const cpfCnpjValid = !needsCpfCnpj || isValidCpfCnpjLength(cpfCnpj);
 
     // Watch for flash data changes (paymentResult from server)
     const handleFlashSuccess = useCallback(() => {
@@ -66,22 +72,32 @@ export function PaymentStep({
     const hasPaymentMethods = availableMethods.length > 0;
 
     // Get first error message for display
-    const errorMessage = errors.payment || errors.payment_method || Object.values(errors)[0];
+    const errorMessage = errors.payment || errors.payment_method || errors.cpf_cnpj || Object.values(errors)[0];
 
     const handleSubmit = () => {
+        // Client-side validation for CPF/CNPJ
+        if (needsCpfCnpj && !cpfCnpjValid) {
+            return;
+        }
+
         setIsLoading(true);
 
-        router.post(
-            processPayment.url({ signup: signup.id }),
-            { payment_method: paymentMethod },
-            {
-                preserveState: true,
-                preserveScroll: true,
-                onFinish: () => {
-                    setIsLoading(false);
-                },
-            }
-        );
+        const data: { payment_method: string; cpf_cnpj?: string } = {
+            payment_method: paymentMethod,
+        };
+
+        // Include CPF/CNPJ for PIX and Boleto (raw digits)
+        if (needsCpfCnpj && cpfCnpj) {
+            data.cpf_cnpj = unformatCpfCnpj(cpfCnpj);
+        }
+
+        router.post(processPayment.url({ signup: signup.id }), data, {
+            preserveState: true,
+            preserveScroll: true,
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
     return (
@@ -153,6 +169,10 @@ export function PaymentStep({
                             onChange={setPaymentMethod}
                             availableMethods={availableMethods}
                             disabled={isLoading}
+                            cpfCnpj={cpfCnpj}
+                            onCpfCnpjChange={setCpfCnpj}
+                            cpfCnpjError={errors.cpf_cnpj}
+                            requireCpfCnpj={true}
                         />
                     ) : (
                         <div className="flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-950/30">
@@ -196,7 +216,7 @@ export function PaymentStep({
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t('common.back', { default: 'Back' })}
                 </Button>
-                <Button onClick={handleSubmit} className="flex-1" disabled={isLoading || !hasPaymentMethods}>
+                <Button onClick={handleSubmit} className="flex-1" disabled={isLoading || !hasPaymentMethods || !cpfCnpjValid}>
                     {isLoading ? (
                         <>
                             <Spinner className="mr-2" />

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { formatCpfCnpj, formatCep, formatCardNumber, unformatCpfCnpj, unformatCep, unformatCardNumber } from '@/lib/formatters';
 
 interface CardData {
     holder_name: string;
@@ -85,37 +86,6 @@ export function AsaasCardForm({
         phone: defaultHolder?.phone || '',
     });
 
-    // Format card number with spaces
-    const formatCardNumber = (value: string) => {
-        const digits = value.replace(/\D/g, '').slice(0, 19);
-        return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
-    };
-
-    // Format CPF/CNPJ
-    const formatCpfCnpj = (value: string) => {
-        const digits = value.replace(/\D/g, '');
-        if (digits.length <= 11) {
-            // CPF: 000.000.000-00
-            return digits
-                .replace(/(\d{3})(\d)/, '$1.$2')
-                .replace(/(\d{3})(\d)/, '$1.$2')
-                .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        }
-        // CNPJ: 00.000.000/0000-00
-        return digits
-            .replace(/^(\d{2})(\d)/, '$1.$2')
-            .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-            .replace(/\.(\d{3})(\d)/, '.$1/$2')
-            .replace(/(\d{4})(\d)/, '$1-$2')
-            .slice(0, 18);
-    };
-
-    // Format CEP
-    const formatPostalCode = (value: string) => {
-        const digits = value.replace(/\D/g, '').slice(0, 8);
-        return digits.replace(/(\d{5})(\d)/, '$1-$2');
-    };
-
     // Handle card data change
     const handleCardChange = (field: keyof CardData, value: string) => {
         let formattedValue = value;
@@ -140,7 +110,7 @@ export function AsaasCardForm({
         if (field === 'cpf_cnpj') {
             formattedValue = formatCpfCnpj(value);
         } else if (field === 'postal_code') {
-            formattedValue = formatPostalCode(value);
+            formattedValue = formatCep(value);
         }
 
         setHolderData(prev => ({ ...prev, [field]: formattedValue }));
@@ -149,7 +119,7 @@ export function AsaasCardForm({
     // Validate form
     const validateForm = useCallback((): string | null => {
         // Card validation
-        const cardNumber = cardData.number.replace(/\s/g, '');
+        const cardNumber = unformatCardNumber(cardData.number);
         if (!cardNumber || cardNumber.length < 13) {
             return t('billing.form.invalid_card_number', { default: 'Invalid card number' });
         }
@@ -173,11 +143,11 @@ export function AsaasCardForm({
         if (!holderData.email.trim() || !holderData.email.includes('@')) {
             return t('billing.form.invalid_email', { default: 'Invalid email' });
         }
-        const cpfCnpj = holderData.cpf_cnpj.replace(/\D/g, '');
+        const cpfCnpj = unformatCpfCnpj(holderData.cpf_cnpj);
         if (!cpfCnpj || (cpfCnpj.length !== 11 && cpfCnpj.length !== 14)) {
             return t('billing.form.invalid_cpf_cnpj', { default: 'Invalid CPF/CNPJ' });
         }
-        const postalCode = holderData.postal_code.replace(/\D/g, '');
+        const postalCode = unformatCep(holderData.postal_code);
         if (!postalCode || postalCode.length !== 8) {
             return t('billing.form.invalid_postal_code', { default: 'Invalid postal code' });
         }
@@ -219,7 +189,7 @@ export function AsaasCardForm({
                     purchase_id: purchaseId,
                     card: {
                         holder_name: cardData.holder_name,
-                        number: cardData.number.replace(/\s/g, ''),
+                        number: unformatCardNumber(cardData.number),
                         exp_month: cardData.exp_month.padStart(2, '0'),
                         exp_year: cardData.exp_year,
                         cvv: cardData.cvv,
@@ -227,8 +197,8 @@ export function AsaasCardForm({
                     holder: {
                         name: holderData.name,
                         email: holderData.email,
-                        cpf_cnpj: holderData.cpf_cnpj.replace(/\D/g, ''),
-                        postal_code: holderData.postal_code.replace(/\D/g, ''),
+                        cpf_cnpj: unformatCpfCnpj(holderData.cpf_cnpj),
+                        postal_code: unformatCep(holderData.postal_code),
                         address_number: holderData.address_number,
                         address_complement: holderData.address_complement || null,
                         phone: holderData.phone?.replace(/\D/g, '') || null,

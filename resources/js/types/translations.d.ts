@@ -194,7 +194,7 @@ export type AuthTranslationKey =
     | 'auth.verify.verify';
 
 /**
- * Billing namespace keys (274 keys)
+ * Billing namespace keys (276 keys)
  */
 export type BillingTranslationKey =
     | 'billing.addon.access_until'
@@ -295,6 +295,8 @@ export type BillingTranslationKey =
     | 'billing.form.complement'
     | 'billing.form.complement_placeholder'
     | 'billing.form.cpf_cnpj'
+    | 'billing.form.cpf_cnpj_help'
+    | 'billing.form.cpf_cnpj_required'
     | 'billing.form.cvv'
     | 'billing.form.email'
     | 'billing.form.exp_month'
@@ -2479,6 +2481,8 @@ export type TranslationKey =
     | 'billing.form.complement'
     | 'billing.form.complement_placeholder'
     | 'billing.form.cpf_cnpj'
+    | 'billing.form.cpf_cnpj_help'
+    | 'billing.form.cpf_cnpj_required'
     | 'billing.form.cvv'
     | 'billing.form.email'
     | 'billing.form.exp_month'

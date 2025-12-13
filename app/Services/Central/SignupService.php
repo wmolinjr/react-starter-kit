@@ -174,9 +174,10 @@ class SignupService
      *
      * Routes to appropriate gateway based on payment method.
      *
+     * @param  string|null  $cpfCnpj  CPF/CNPJ for PIX/Boleto payments (Brazilian tax ID)
      * @return array{type: string, ...}
      */
-    public function processPayment(PendingSignup $signup, string $paymentMethod): array
+    public function processPayment(PendingSignup $signup, string $paymentMethod, ?string $cpfCnpj = null): array
     {
         if ($signup->isExpired()) {
             throw new AddonException(__('signup.errors.signup_expired'));
@@ -184,6 +185,16 @@ class SignupService
 
         if (! $signup->hasWorkspaceData()) {
             throw new AddonException(__('signup.errors.workspace_data_required'));
+        }
+
+        // For PIX and Boleto, update customer's tax_id before creating charge
+        if (in_array($paymentMethod, ['pix', 'boleto']) && $cpfCnpj) {
+            $customer = $signup->customer;
+            if ($customer) {
+                // Remove formatting (keep only digits)
+                $taxId = preg_replace('/\D/', '', $cpfCnpj);
+                $customer->update(['tax_id' => $taxId]);
+            }
         }
 
         // Resolve gateway from PaymentSettings

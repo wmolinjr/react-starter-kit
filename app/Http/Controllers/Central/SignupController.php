@@ -140,9 +140,12 @@ class SignupController extends Controller
     public function processPayment(PendingSignup $signup, ProcessPaymentRequest $request): RedirectResponse
     {
         try {
+            $validated = $request->validated();
+
             $result = $this->signupService->processPayment(
                 $signup,
-                $request->validated()['payment_method']
+                $validated['payment_method'],
+                $validated['cpf_cnpj'] ?? null
             );
 
             return redirect()

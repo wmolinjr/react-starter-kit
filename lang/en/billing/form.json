@@ -7,6 +7,8 @@
     "billing.form.complement": "Complement (optional)",
     "billing.form.complement_placeholder": "Apt, Suite, etc.",
     "billing.form.cpf_cnpj": "CPF/CNPJ",
+    "billing.form.cpf_cnpj_help": "Required for PIX and Boleto payments",
+    "billing.form.cpf_cnpj_required": "CPF/CNPJ is required for this payment method",
     "billing.form.cvv": "CVV",
     "billing.form.email": "Email",
     "billing.form.exp_month": "Month",
