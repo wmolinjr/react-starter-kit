@@ -1,5 +1,6 @@
 {
     "signup.processing.title": "Processing Payment",
+    "signup.processing.card_description": "Your card payment is being processed",
     "signup.processing.pix_description": "Complete your PIX payment to proceed",
     "signup.processing.boleto_description": "Complete your Boleto payment to proceed",
     "signup.processing.waiting": "Waiting for payment confirmation...",

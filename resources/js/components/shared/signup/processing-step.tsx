@@ -104,9 +104,13 @@ export function ProcessingStep({ signup, onComplete }: ProcessingStepProps) {
                         ? t('signup.processing.pix_description', {
                               default: 'Complete your PIX payment to proceed',
                           })
-                        : t('signup.processing.boleto_description', {
-                              default: 'Complete your Boleto payment to proceed',
-                          })}
+                        : signup.payment_method === 'boleto'
+                          ? t('signup.processing.boleto_description', {
+                                default: 'Complete your Boleto payment to proceed',
+                            })
+                          : t('signup.processing.card_description', {
+                                default: 'Your card payment is being processed',
+                            })}
                 </CardDescription>
             </CardHeader>
 
