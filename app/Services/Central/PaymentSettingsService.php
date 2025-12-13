@@ -268,12 +268,14 @@ class PaymentSettingsService
             ];
         }
 
+        // Use URLs from config (single source of truth)
         $baseUrl = $setting->is_sandbox
-            ? 'https://sandbox.asaas.com/api/v3'
-            : 'https://www.asaas.com/api/v3';
+            ? config('payment.drivers.asaas.sandbox_url')
+            : config('payment.drivers.asaas.api_url');
 
         $response = \Illuminate\Support\Facades\Http::withHeaders([
             'access_token' => $apiKey,
+            'User-Agent' => config('app.name', 'Laravel').' API Client',
         ])->get($baseUrl.'/myAccount');
 
         if ($response->successful()) {
@@ -308,12 +310,14 @@ class PaymentSettingsService
             ];
         }
 
+        // Use URLs from config (single source of truth)
         $baseUrl = $setting->is_sandbox
-            ? 'https://sandbox.api.pagseguro.com'
-            : 'https://api.pagseguro.com';
+            ? config('payment.drivers.pagseguro.sandbox_url')
+            : config('payment.drivers.pagseguro.api_url');
 
         $response = \Illuminate\Support\Facades\Http::withHeaders([
             'Authorization' => 'Bearer '.$apiKey,
+            'User-Agent' => config('app.name', 'Laravel').' API Client',
         ])->get($baseUrl.'/orders');
 
         if ($response->successful() || $response->status() === 401) {
@@ -349,9 +353,13 @@ class PaymentSettingsService
             ];
         }
 
+        // Use URL from config (single source of truth)
+        $baseUrl = config('payment.drivers.mercadopago.api_url');
+
         $response = \Illuminate\Support\Facades\Http::withHeaders([
             'Authorization' => 'Bearer '.$accessToken,
-        ])->get('https://api.mercadopago.com/users/me');
+            'User-Agent' => config('app.name', 'Laravel').' API Client',
+        ])->get($baseUrl.'/users/me');
 
         if ($response->successful()) {
             return [

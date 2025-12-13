@@ -36,6 +36,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Currency Locale
+    |--------------------------------------------------------------------------
+    |
+    | The locale used for formatting currency values.
+    |
+    */
+
+    'currency_locale' => env('PAYMENT_CURRENCY_LOCALE', 'pt_BR'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Payment Drivers
     |--------------------------------------------------------------------------
     |
@@ -82,21 +93,21 @@ return [
         |----------------------------------------------------------------------
         | Asaas Configuration (Brazilian Gateway)
         |----------------------------------------------------------------------
+        |
+        | Note: Credentials, sandbox mode, and enabled status are managed
+        | in the database via PaymentSetting model (Admin > Payment Settings).
+        | Only API URLs are configured here as they rarely change.
+        |
         */
         'asaas' => [
-            'enabled' => env('ASAAS_ENABLED', false),
-            'api_key' => env('ASAAS_API_KEY'),
-            'webhook_token' => env('ASAAS_WEBHOOK_TOKEN'),
-            'sandbox' => env('ASAAS_SANDBOX', true),
-
-            // API URLs
+            // API URLs (single source of truth)
             'api_url' => env('ASAAS_API_URL', 'https://api.asaas.com/v3'),
-            'sandbox_url' => env('ASAAS_SANDBOX_URL', 'https://sandbox.asaas.com/api/v3'),
+            'sandbox_url' => env('ASAAS_SANDBOX_URL', 'https://api-sandbox.asaas.com/v3'),
 
-            // Supported payment types
+            // Supported payment types (static per gateway)
             'payment_types' => ['card', 'pix', 'boleto'],
 
-            // Features
+            // Features supported by this gateway
             'features' => [
                 'subscriptions' => true,
                 'payment_methods' => true,
@@ -109,16 +120,16 @@ return [
                 'boleto' => true,
             ],
 
-            // PIX configuration
+            // PIX configuration defaults
             'pix' => [
-                'expiration_minutes' => env('ASAAS_PIX_EXPIRATION', 30),
+                'expiration_minutes' => 30,
             ],
 
-            // Boleto configuration
+            // Boleto configuration defaults
             'boleto' => [
-                'due_days' => env('ASAAS_BOLETO_DUE_DAYS', 3),
-                'interest_percent' => env('ASAAS_BOLETO_INTEREST', 1.0),
-                'fine_percent' => env('ASAAS_BOLETO_FINE', 2.0),
+                'due_days' => 3,
+                'interest_percent' => 1.0,
+                'fine_percent' => 2.0,
             ],
         ],
 
@@ -128,21 +139,14 @@ return [
         |----------------------------------------------------------------------
         */
         'pagseguro' => [
-            'enabled' => env('PAGSEGURO_ENABLED', false),
-            'api_key' => env('PAGSEGURO_API_KEY'),      // Bearer token for API v4
-            'public_key' => env('PAGSEGURO_PUBLIC_KEY'), // For client-side encryption
-            'receiver_email' => env('PAGSEGURO_EMAIL'), // For subscriptions
-            'webhook_token' => env('PAGSEGURO_WEBHOOK_TOKEN'),
-            'sandbox' => env('PAGSEGURO_SANDBOX', true),
-
-            // API URLs
+            // API URLs (single source of truth)
             'api_url' => env('PAGSEGURO_API_URL', 'https://api.pagseguro.com'),
             'sandbox_url' => env('PAGSEGURO_SANDBOX_URL', 'https://sandbox.api.pagseguro.com'),
 
             // Supported payment types
             'payment_types' => ['card', 'pix', 'boleto'],
 
-            // Features
+            // Features supported by this gateway
             'features' => [
                 'subscriptions' => true,
                 'payment_methods' => true,
@@ -162,13 +166,7 @@ return [
         |----------------------------------------------------------------------
         */
         'mercadopago' => [
-            'enabled' => env('MERCADOPAGO_ENABLED', false),
-            'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
-            'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
-            'webhook_secret' => env('MERCADOPAGO_WEBHOOK_SECRET'),
-            'sandbox' => env('MERCADOPAGO_SANDBOX', true),
-
-            // API URL
+            // API URL (same for sandbox/production, uses different credentials)
             'api_url' => env('MERCADOPAGO_API_URL', 'https://api.mercadopago.com'),
 
             // Supported payment types
@@ -177,7 +175,7 @@ return [
             // Supported currencies (Latin America)
             'currencies' => ['BRL', 'ARS', 'CLP', 'COP', 'MXN', 'PEN', 'UYU'],
 
-            // Features
+            // Features supported by this gateway
             'features' => [
                 'subscriptions' => true,
                 'payment_methods' => true,
@@ -188,7 +186,7 @@ return [
                 'proration' => false,
                 'pix' => true,
                 'boleto' => true,
-                'installments' => true, // Parcelamento
+                'installments' => true,
             ],
         ],
     ],

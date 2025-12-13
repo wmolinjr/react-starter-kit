@@ -50,18 +50,18 @@ class TenantConfigKeyTest extends TestCase
         $this->assertContains('mail.from.name', $configKeys);
     }
 
-    public function test_currency_maps_to_cashier_currency(): void
+    public function test_currency_maps_to_payment_currency(): void
     {
         $configKeys = TenantConfigKey::CURRENCY->configKeys();
 
-        $this->assertContains('cashier.currency', $configKeys);
+        $this->assertContains('payment.currency', $configKeys);
     }
 
-    public function test_currency_locale_maps_to_cashier_currency_locale(): void
+    public function test_currency_locale_maps_to_payment_currency_locale(): void
     {
         $configKeys = TenantConfigKey::CURRENCY_LOCALE->configKeys();
 
-        $this->assertContains('cashier.currency_locale', $configKeys);
+        $this->assertContains('payment.currency_locale', $configKeys);
     }
 
     public function test_settings_path_returns_config_prefixed_value(): void
@@ -186,8 +186,8 @@ class TenantConfigKeyTest extends TestCase
         $this->assertEquals('app.timezone', $map['config.timezone']);
         $this->assertEquals('mail.from.address', $map['config.mail_from_address']);
         $this->assertEquals('mail.from.name', $map['config.mail_from_name']);
-        $this->assertEquals('cashier.currency', $map['config.currency']);
-        $this->assertEquals('cashier.currency_locale', $map['config.currency_locale']);
+        $this->assertEquals('payment.currency', $map['config.currency']);
+        $this->assertEquals('payment.currency_locale', $map['config.currency_locale']);
     }
 
     public function test_available_currencies_returns_array(): void

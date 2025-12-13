@@ -22,8 +22,8 @@ class AddonSubscriptionTest extends TenantTestCase
 
         // Set locale to 'en' and currency to USD for consistent formatting in tests
         app()->setLocale('en');
-        config(['cashier.currency_locale' => 'en']);
-        config(['cashier.currency' => 'usd']);
+        config(['payment.currency_locale' => 'en']);
+        config(['payment.currency' => 'usd']);
 
         // Update tenant's plan limits for addon testing (don't change slug - conflicts with seeded plans)
         $this->tenant->plan->update([

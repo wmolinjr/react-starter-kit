@@ -19,7 +19,7 @@ class MeteredBillingService
 
     public function __construct()
     {
-        $secret = config('cashier.secret');
+        $secret = config('payment.drivers.stripe.secret');
         if ($secret) {
             $this->stripe = new StripeClient($secret);
         }

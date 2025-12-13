@@ -103,7 +103,7 @@ class AsaasGatewayTest extends TestCase
     {
         Http::fake([
             // Payment creation
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'id' => 'pay_test_pix_123',
                 'status' => 'PENDING',
                 'billingType' => 'PIX',
@@ -112,7 +112,7 @@ class AsaasGatewayTest extends TestCase
                 'invoiceUrl' => 'https://asaas.com/invoice/123',
             ], 200),
             // QR code retrieval
-            'sandbox.asaas.com/api/v3/payments/pay_test_pix_123/pixQrCode' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/pay_test_pix_123/pixQrCode' => Http::response([
                 'encodedImage' => 'base64_qr_code_image_data',
                 'payload' => '00020126580014br.gov.bcb.pix0136example-pix-key',
                 'expirationDate' => '2025-12-15T23:59:59Z',
@@ -140,7 +140,7 @@ class AsaasGatewayTest extends TestCase
     public function create_pix_charge_handles_api_failure(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'errors' => [
                     ['description' => 'Invalid customer'],
                 ],
@@ -157,7 +157,7 @@ class AsaasGatewayTest extends TestCase
     public function get_pix_qr_code_retrieves_existing_payment_qr(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments/pay_existing_123/pixQrCode' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/pay_existing_123/pixQrCode' => Http::response([
                 'encodedImage' => 'refreshed_qr_code_data',
                 'payload' => '00020126580014br.gov.bcb.pix',
                 'expirationDate' => '2025-12-20T23:59:59Z',
@@ -177,7 +177,7 @@ class AsaasGatewayTest extends TestCase
     public function get_pix_qr_code_returns_null_on_failure(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments/invalid_123/pixQrCode' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/invalid_123/pixQrCode' => Http::response([
                 'errors' => [['description' => 'Payment not found']],
             ], 404),
         ]);
@@ -196,7 +196,7 @@ class AsaasGatewayTest extends TestCase
     {
         Http::fake([
             // Payment creation
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'id' => 'pay_test_boleto_123',
                 'status' => 'PENDING',
                 'billingType' => 'BOLETO',
@@ -207,7 +207,7 @@ class AsaasGatewayTest extends TestCase
                 'invoiceUrl' => 'https://asaas.com/invoice/123',
             ], 200),
             // Identification field retrieval
-            'sandbox.asaas.com/api/v3/payments/pay_test_boleto_123/identificationField' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/pay_test_boleto_123/identificationField' => Http::response([
                 'identificationField' => '23793.38128 60000.000003 00000.000406 1 84660000014990',
                 'barCode' => '23791846600000149909381286000000000000000040',
             ], 200),
@@ -236,14 +236,14 @@ class AsaasGatewayTest extends TestCase
     public function create_boleto_charge_includes_fine_and_interest(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'id' => 'pay_test_boleto_fine',
                 'status' => 'PENDING',
                 'billingType' => 'BOLETO',
                 'value' => 100.00,
                 'dueDate' => '2025-12-20',
             ], 200),
-            'sandbox.asaas.com/api/v3/payments/*/identificationField' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/*/identificationField' => Http::response([
                 'identificationField' => '12345',
                 'barCode' => '12345',
             ], 200),
@@ -260,7 +260,7 @@ class AsaasGatewayTest extends TestCase
         Http::assertSent(function ($request) {
             $body = json_decode($request->body(), true);
 
-            return $request->url() === 'https://sandbox.asaas.com/api/v3/payments'
+            return $request->url() === 'https://api-sandbox.asaas.com/v3/payments'
                 && isset($body['fine'])
                 && $body['fine']['value'] === 2
                 && $body['fine']['type'] === 'PERCENTAGE'
@@ -273,7 +273,7 @@ class AsaasGatewayTest extends TestCase
     public function get_boleto_identification_field_retrieves_existing(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments/pay_boleto_456/identificationField' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/pay_boleto_456/identificationField' => Http::response([
                 'identificationField' => '23793.38128 60000.000003 00000.000406 1 84660000014990',
                 'barCode' => '23791846600000149909381286000000000000000040',
             ], 200),
@@ -468,7 +468,7 @@ class AsaasGatewayTest extends TestCase
     public function retrieve_payment_returns_payment_data(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments/pay_123' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/pay_123' => Http::response([
                 'id' => 'pay_123',
                 'status' => 'CONFIRMED',
                 'billingType' => 'PIX',
@@ -486,7 +486,7 @@ class AsaasGatewayTest extends TestCase
     public function retrieve_payment_throws_on_failure(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments/invalid' => Http::response([
+            'api-sandbox.asaas.com/v3/payments/invalid' => Http::response([
                 'errors' => [['description' => 'Payment not found']],
             ], 404),
         ]);
@@ -501,7 +501,7 @@ class AsaasGatewayTest extends TestCase
     public function list_payments_returns_customer_payments(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments*' => Http::response([
+            'api-sandbox.asaas.com/v3/payments*' => Http::response([
                 'data' => [
                     ['id' => 'pay_1', 'status' => 'CONFIRMED'],
                     ['id' => 'pay_2', 'status' => 'PENDING'],
@@ -574,7 +574,7 @@ class AsaasGatewayTest extends TestCase
     public function create_card_charge_with_token_returns_success(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'id' => 'pay_card_123',
                 'status' => 'CONFIRMED',
                 'billingType' => 'CREDIT_CARD',
@@ -609,7 +609,7 @@ class AsaasGatewayTest extends TestCase
     public function create_card_charge_with_installments(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'id' => 'pay_installment_123',
                 'status' => 'CONFIRMED',
                 'billingType' => 'CREDIT_CARD',
@@ -640,7 +640,7 @@ class AsaasGatewayTest extends TestCase
     public function create_card_charge_handles_api_failure(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'errors' => [
                     ['description' => 'Card declined'],
                 ],
@@ -661,7 +661,7 @@ class AsaasGatewayTest extends TestCase
     public function create_card_charge_with_data_returns_success_and_token(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'api-sandbox.asaas.com/v3/payments' => Http::response([
                 'id' => 'pay_direct_123',
                 'status' => 'CONFIRMED',
                 'billingType' => 'CREDIT_CARD',
@@ -706,7 +706,7 @@ class AsaasGatewayTest extends TestCase
     public function tokenize_card_returns_token(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/creditCard/tokenize' => Http::response([
+            'api-sandbox.asaas.com/v3/creditCard/tokenize' => Http::response([
                 'creditCardNumber' => '4242',
                 'creditCardBrand' => 'VISA',
                 'creditCardToken' => 'token_generated_123',
@@ -741,7 +741,7 @@ class AsaasGatewayTest extends TestCase
     public function tokenize_card_handles_failure(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/creditCard/tokenize' => Http::response([
+            'api-sandbox.asaas.com/v3/creditCard/tokenize' => Http::response([
                 'errors' => [
                     ['description' => 'Invalid card data'],
                 ],
@@ -774,7 +774,7 @@ class AsaasGatewayTest extends TestCase
     public function tokenize_card_removes_formatting_from_cpf_and_postal_code(): void
     {
         Http::fake([
-            'sandbox.asaas.com/api/v3/creditCard/tokenize' => Http::response([
+            'api-sandbox.asaas.com/v3/creditCard/tokenize' => Http::response([
                 'creditCardNumber' => '4242',
                 'creditCardBrand' => 'VISA',
                 'creditCardToken' => 'token_123',

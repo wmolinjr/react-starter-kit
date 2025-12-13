@@ -211,8 +211,8 @@ enum TenantConfigKey: string
             self::WEEK_STARTS_ON => ['app.week_starts_on'],
             self::MAIL_FROM_ADDRESS => ['mail.from.address'],
             self::MAIL_FROM_NAME => ['mail.from.name'],
-            self::CURRENCY => ['cashier.currency'],
-            self::CURRENCY_LOCALE => ['cashier.currency_locale'],
+            self::CURRENCY => ['payment.currency'],
+            self::CURRENCY_LOCALE => ['payment.currency_locale'],
         };
     }
 

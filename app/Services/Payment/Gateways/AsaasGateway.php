@@ -43,9 +43,11 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
     {
         $this->apiKey = $config['api_key'] ?? '';
         $this->sandbox = $config['sandbox'] ?? true;
+
+        // Use URLs from config (single source of truth)
         $this->baseUrl = $this->sandbox
-            ? 'https://sandbox.asaas.com/api/v3'
-            : 'https://api.asaas.com/api/v3';
+            ? ($config['sandbox_url'] ?? config('payment.drivers.asaas.sandbox_url'))
+            : ($config['api_url'] ?? config('payment.drivers.asaas.api_url'));
     }
 
     /**
@@ -56,6 +58,7 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
         return Http::withHeaders([
             'access_token' => $this->apiKey,
             'Content-Type' => 'application/json',
+            'User-Agent' => config('app.name', 'Laravel').' API Client',
         ])->baseUrl($this->baseUrl);
     }
 
@@ -1712,7 +1715,7 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
      * Mobile phones: 11 digits (DDD + 9 + 8 digits)
      * Landlines: 10 digits (DDD + 8 digits)
      *
-     * @param string|null $phone Raw phone number (any format)
+     * @param  string|null  $phone  Raw phone number (any format)
      * @return string|null Normalized phone or null if invalid/non-Brazilian
      */
     protected function normalizePhoneForAsaas(?string $phone): ?string

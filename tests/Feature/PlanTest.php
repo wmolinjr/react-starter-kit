@@ -15,8 +15,8 @@ class PlanTest extends TestCase
 
         // Set locale to 'en' and currency to USD for consistent formatting in tests
         app()->setLocale('en');
-        config(['cashier.currency_locale' => 'en']);
-        config(['cashier.currency' => 'usd']);
+        config(['payment.currency_locale' => 'en']);
+        config(['payment.currency' => 'usd']);
     }
 
     #[Test]
@@ -92,8 +92,9 @@ class PlanTest extends TestCase
     #[Test]
     public function it_returns_formatted_price(): void
     {
+        // Factory uses stripe_currency() which reads payment.currency (set to 'usd' in setUp)
         $plan = Plan::factory()->create(['price' => 2900]);
-        $this->assertEquals('R$29.00', $plan->formatted_price);
+        $this->assertEquals('$29.00', $plan->formatted_price);
 
         $plan = Plan::factory()->create(['price' => 0]);
         $this->assertEquals('Custom', $plan->formatted_price);

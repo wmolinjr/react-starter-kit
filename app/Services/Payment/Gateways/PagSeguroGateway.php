@@ -42,9 +42,11 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
     {
         $this->apiKey = $config['api_key'] ?? '';
         $this->sandbox = $config['sandbox'] ?? true;
+
+        // Use URLs from config (single source of truth)
         $this->baseUrl = $this->sandbox
-            ? 'https://sandbox.api.pagseguro.com'
-            : 'https://api.pagseguro.com';
+            ? ($config['sandbox_url'] ?? config('payment.drivers.pagseguro.sandbox_url'))
+            : ($config['api_url'] ?? config('payment.drivers.pagseguro.api_url'));
     }
 
     /**
@@ -53,7 +55,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
     protected function http(): PendingRequest
     {
         return Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Authorization' => 'Bearer '.$this->apiKey,
             'Content-Type' => 'application/json',
             'x-api-version' => '4.0',
         ])->baseUrl($this->baseUrl);
@@ -133,7 +135,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
                     ],
                 ],
                 'notification_urls' => [
-                    config('app.url') . '/webhooks/pagseguro',
+                    config('app.url').'/webhooks/pagseguro',
                 ],
             ]);
 
@@ -208,7 +210,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
                             'boleto' => [
                                 'due_date' => $dueDate,
                                 'instruction_lines' => [
-                                    'line_1' => 'Pagamento referente a ' . ($options['description'] ?? 'serviço'),
+                                    'line_1' => 'Pagamento referente a '.($options['description'] ?? 'serviço'),
                                     'line_2' => 'Não receber após o vencimento',
                                 ],
                                 'holder' => [
@@ -221,7 +223,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
                     ],
                 ],
                 'notification_urls' => [
-                    config('app.url') . '/webhooks/pagseguro',
+                    config('app.url').'/webhooks/pagseguro',
                 ],
             ]);
 
@@ -313,7 +315,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
                 ],
                 'charges' => [$chargeData],
                 'notification_urls' => [
-                    config('app.url') . '/webhooks/pagseguro',
+                    config('app.url').'/webhooks/pagseguro',
                 ],
             ]);
 
@@ -529,7 +531,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
     public function createSetupIntent(Customer $customer): SetupIntentResult
     {
         // PagSeguro tokenization is done client-side with PagSeguro.js
-        $intentId = 'pagseguro_setup_' . uniqid();
+        $intentId = 'pagseguro_setup_'.uniqid();
 
         return SetupIntentResult::success(
             clientSecret: $intentId,
@@ -594,7 +596,7 @@ class PagSeguroGateway implements PaymentGatewayInterface, PaymentMethodGatewayI
                 ],
                 'receiver_email' => config('payment.drivers.pagseguro.receiver_email'),
                 'redirect_url' => $options['success_url'] ?? config('app.url'),
-                'notification_url' => config('app.url') . '/webhooks/pagseguro',
+                'notification_url' => config('app.url').'/webhooks/pagseguro',
             ]);
 
             if ($response->failed()) {

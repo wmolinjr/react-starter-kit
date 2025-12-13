@@ -38,7 +38,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
 
     protected string $publicKey;
 
-    protected string $baseUrl = 'https://api.mercadopago.com';
+    protected string $baseUrl;
 
     protected bool $sandbox;
 
@@ -47,6 +47,10 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
         $this->accessToken = $config['access_token'] ?? '';
         $this->publicKey = $config['public_key'] ?? '';
         $this->sandbox = $config['sandbox'] ?? true;
+
+        // Use URL from config (single source of truth)
+        // MercadoPago uses same API URL for sandbox/production (different credentials)
+        $this->baseUrl = $config['api_url'] ?? config('payment.drivers.mercadopago.api_url');
     }
 
     /**
@@ -55,7 +59,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
     protected function http(): PendingRequest
     {
         return Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->accessToken,
+            'Authorization' => 'Bearer '.$this->accessToken,
             'Content-Type' => 'application/json',
             'X-Idempotency-Key' => uniqid('mp_'),
         ])->baseUrl($this->baseUrl);
@@ -127,7 +131,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
                 'payment_method_id' => 'pix',
                 'payer' => $this->buildPayerData($customer),
                 'external_reference' => $options['reference'] ?? null,
-                'notification_url' => config('app.url') . '/webhooks/mercadopago',
+                'notification_url' => config('app.url').'/webhooks/mercadopago',
             ]);
 
             if ($response->failed()) {
@@ -185,7 +189,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
                 'payer' => $this->buildPayerData($customer, true), // Boleto requires address
                 'external_reference' => $options['reference'] ?? null,
                 'date_of_expiration' => $dueDate,
-                'notification_url' => config('app.url') . '/webhooks/mercadopago',
+                'notification_url' => config('app.url').'/webhooks/mercadopago',
             ]);
 
             if ($response->failed()) {
@@ -240,7 +244,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
                 'installments' => $installments,
                 'payer' => $this->buildPayerData($customer),
                 'external_reference' => $options['reference'] ?? null,
-                'notification_url' => config('app.url') . '/webhooks/mercadopago',
+                'notification_url' => config('app.url').'/webhooks/mercadopago',
             ];
 
             // Use card token from MercadoPago.js
@@ -501,7 +505,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
     public function createSetupIntent(Customer $customer): SetupIntentResult
     {
         // MercadoPago uses card tokens created client-side
-        $intentId = 'mp_setup_' . uniqid();
+        $intentId = 'mp_setup_'.uniqid();
 
         return SetupIntentResult::success(
             clientSecret: $intentId,
@@ -647,7 +651,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
                     'start_date' => now()->toIso8601String(),
                     'end_date' => now()->addYears(10)->toIso8601String(),
                 ],
-                'notification_url' => config('app.url') . '/webhooks/mercadopago',
+                'notification_url' => config('app.url').'/webhooks/mercadopago',
             ]);
 
             if ($response->failed()) {
@@ -813,7 +817,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
                     'failure' => $options['cancel_url'] ?? config('app.url'),
                     'pending' => $options['success_url'] ?? config('app.url'),
                 ],
-                'notification_url' => config('app.url') . '/webhooks/mercadopago',
+                'notification_url' => config('app.url').'/webhooks/mercadopago',
                 'auto_return' => 'approved',
             ]);
 
@@ -954,7 +958,7 @@ class MercadoPagoGateway implements PaymentGatewayInterface, PaymentMethodGatewa
             ]);
 
             if ($response->failed()) {
-                throw new \RuntimeException('Failed to create MercadoPago customer: ' . $response->json('message', 'Unknown error'));
+                throw new \RuntimeException('Failed to create MercadoPago customer: '.$response->json('message', 'Unknown error'));
             }
 
             $mpCustomerId = $response->json('id');

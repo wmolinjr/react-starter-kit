@@ -19,7 +19,7 @@ class StripeSyncService
 
     public function __construct()
     {
-        $secret = config('cashier.secret');
+        $secret = config('payment.drivers.stripe.secret');
         if ($secret) {
             $this->stripe = new StripeClient($secret);
         }
@@ -219,7 +219,7 @@ class StripeSyncService
     {
         $priceData = [
             'product' => $addon->stripe_product_id,
-            'currency' => config('cashier.currency', 'usd'),
+            'currency' => config('payment.currency', 'BRL'),
             'unit_amount' => $amount,
             'metadata' => [
                 'addon_slug' => $addon->slug,

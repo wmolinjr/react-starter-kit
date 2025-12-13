@@ -18,7 +18,7 @@ class PlanSyncService
 
     public function __construct()
     {
-        $secret = config('cashier.secret');
+        $secret = config('payment.drivers.stripe.secret');
         if ($secret) {
             $this->stripe = new StripeClient($secret);
         }
@@ -197,7 +197,7 @@ class PlanSyncService
 
         $priceData = [
             'product' => $plan->stripe_product_id,
-            'currency' => $plan->currency ?? config('cashier.currency', 'usd'),
+            'currency' => $plan->currency ?? config('payment.currency', 'BRL'),
             'unit_amount' => $plan->price,
             'metadata' => [
                 'plan_slug' => $plan->slug,

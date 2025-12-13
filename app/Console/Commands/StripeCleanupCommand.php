@@ -48,8 +48,8 @@ class StripeCleanupCommand extends Command
         }
 
         // Check if using test key
-        $stripeKey = config('cashier.secret');
-        if (! str_starts_with($stripeKey, 'sk_test_')) {
+        $stripeKey = config('payment.drivers.stripe.secret');
+        if (! str_starts_with($stripeKey ?? '', 'sk_test_')) {
             error('This command only works with Stripe TEST keys (sk_test_*)');
             error('Current key starts with: '.substr($stripeKey, 0, 10).'...');
 
