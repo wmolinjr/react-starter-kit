@@ -103,18 +103,23 @@ export interface FlashMessages {
 }
 
 export interface PaymentResult {
-    type: 'redirect' | 'pix' | 'boleto';
+    type: 'redirect' | 'pix' | 'boleto' | 'asaas_card';
     url?: string;
     signup_id?: string;
+    amount?: number;
+    gateway?: string;
+    requires_card_data?: boolean;
     pix?: {
         qr_code: string;
-        qr_code_url: string;
+        qr_code_base64?: string;
+        qr_code_text?: string;
+        copy_paste?: string;
         expires_at: string;
     };
     boleto?: {
         barcode: string;
         pdf_url: string;
-        expires_at: string;
+        due_date: string;
     };
 }
 

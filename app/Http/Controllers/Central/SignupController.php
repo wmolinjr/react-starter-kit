@@ -142,6 +142,14 @@ class SignupController extends Controller
         try {
             $validated = $request->validated();
 
+            \Log::info('SignupController.processPayment received', [
+                'signup_id' => $signup->id,
+                'all_input' => $request->all(),
+                'validated' => $validated,
+                'payment_method' => $validated['payment_method'] ?? null,
+                'cpf_cnpj' => $validated['cpf_cnpj'] ?? 'NOT_SET',
+            ]);
+
             $result = $this->signupService->processPayment(
                 $signup,
                 $validated['payment_method'],

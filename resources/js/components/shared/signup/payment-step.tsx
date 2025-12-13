@@ -21,13 +21,7 @@ interface PaymentStepProps {
     plan: PlanResource;
     billingPeriod: 'monthly' | 'yearly';
     paymentConfig: PaymentConfigResource;
-    onSuccess: (result: {
-        type: string;
-        url?: string;
-        signup_id?: string;
-        pix?: object;
-        boleto?: object;
-    }) => void;
+    onSuccess: (result: PaymentResult) => void;
     onBack: () => void;
 }
 

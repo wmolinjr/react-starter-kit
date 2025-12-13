@@ -19,6 +19,7 @@ import {
     BoletoPayment,
 } from '@/components/shared/billing';
 import { PriceDisplay } from '@/components/shared/billing/primitives';
+import { isValidCpfCnpjLength, unformatCpfCnpj } from '@/lib/formatters';
 import customer from '@/routes/central/account';
 import { type BreadcrumbItem, type PlanResource } from '@/types';
 import { Head, router } from '@inertiajs/react';
@@ -50,6 +51,12 @@ function TenantCheckout({ signup, paymentConfig }: CheckoutProps) {
     const [boletoData, setBoletoData] = useState<{ barcode: string; pdf_url: string; due_date: string } | null>(null);
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [cpfCnpj, setCpfCnpj] = useState('');
+    const [cpfCnpjError, setCpfCnpjError] = useState<string | undefined>();
+
+    // Check if CPF/CNPJ is required for the selected payment method
+    const needsCpfCnpj = paymentMethod === 'pix' || paymentMethod === 'boleto';
+    const cpfCnpjValid = !needsCpfCnpj || isValidCpfCnpjLength(cpfCnpj);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('customer.dashboard.title'), href: customer.dashboard.url() },
@@ -62,20 +69,49 @@ function TenantCheckout({ signup, paymentConfig }: CheckoutProps) {
     const price = plan ? (signup.billing_period === 'yearly' ? (plan.price * 12 * 0.8) : plan.price) : 0;
 
     const handlePayment = async () => {
+        // Validate CPF/CNPJ for PIX/Boleto
+        if (needsCpfCnpj && !cpfCnpjValid) {
+            setCpfCnpjError(t('billing.form.invalid_cpf_cnpj'));
+            return;
+        }
+
         setProcessing(true);
         setError(null);
+        setCpfCnpjError(undefined);
 
         try {
+            // Build request body
+            const body: { payment_method: string; cpf_cnpj?: string } = {
+                payment_method: paymentMethod,
+            };
+
+            // Add CPF/CNPJ for PIX and Boleto payments
+            if (needsCpfCnpj && cpfCnpj) {
+                body.cpf_cnpj = unformatCpfCnpj(cpfCnpj);
+            }
+
             const response = await fetch(`/account/tenants/checkout/${signup.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                 },
-                body: JSON.stringify({ payment_method: paymentMethod }),
+                body: JSON.stringify(body),
             });
 
             const data = await response.json();
+
+            // Check for validation errors
+            if (data.errors) {
+                if (data.errors.cpf_cnpj) {
+                    setCpfCnpjError(data.errors.cpf_cnpj[0]);
+                } else if (data.errors.payment) {
+                    setError(data.errors.payment[0]);
+                } else {
+                    setError(t('billing.errors.payment_failed'));
+                }
+                return;
+            }
 
             if (data.type === 'redirect') {
                 // Stripe checkout - redirect
@@ -201,6 +237,10 @@ function TenantCheckout({ signup, paymentConfig }: CheckoutProps) {
                                             value={paymentMethod}
                                             onChange={(method) => setPaymentMethod(method as 'card' | 'pix' | 'boleto')}
                                             availableMethods={availableMethods}
+                                            cpfCnpj={cpfCnpj}
+                                            onCpfCnpjChange={setCpfCnpj}
+                                            cpfCnpjError={cpfCnpjError}
+                                            requireCpfCnpj={needsCpfCnpj}
                                         />
 
                                         {error && (
@@ -212,7 +252,7 @@ function TenantCheckout({ signup, paymentConfig }: CheckoutProps) {
                                         <div className="flex gap-4 pt-4">
                                             <Button
                                                 onClick={handlePayment}
-                                                disabled={processing}
+                                                disabled={processing || !cpfCnpjValid}
                                                 className="flex-1"
                                                 size="lg"
                                             >

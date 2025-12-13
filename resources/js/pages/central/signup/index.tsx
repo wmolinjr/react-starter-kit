@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import MarketingLayout from '@/layouts/marketing-layout';
+import type { PageProps, PaymentResult } from '@/types';
 import { SignupProgress } from '@/components/shared/signup/signup-progress';
 import { AccountStep } from '@/components/shared/signup/account-step';
 import { WorkspaceStep } from '@/components/shared/signup/workspace-step';
@@ -19,6 +21,20 @@ interface AsaasCardPaymentResult {
     amount: number;
     gateway: string;
     requires_card_data: boolean;
+}
+
+interface PixPaymentData {
+    qr_code: string;
+    qr_code_base64?: string;
+    qr_code_text?: string;
+    copy_paste?: string;
+    expires_at: string;
+}
+
+interface BoletoPaymentData {
+    barcode: string;
+    pdf_url: string;
+    due_date: string;
 }
 
 interface BusinessSectorOption {
@@ -90,6 +106,29 @@ export default function SignupPage({
         selectedPlan || plans[0]?.slug || ''
     );
     const [asaasCardResult, setAsaasCardResult] = useState<AsaasCardPaymentResult | null>(null);
+    const [pixData, setPixData] = useState<PixPaymentData | null>(null);
+    const [boletoData, setBoletoData] = useState<BoletoPaymentData | null>(null);
+
+    // Get Inertia page props for flash data
+    const { props } = usePage<PageProps>();
+
+    // Read flash data when it changes (handles payment redirect)
+    // This is critical because:
+    // 1. When signup.status === 'processing', we skip PaymentStep and go directly to ProcessingStep
+    // 2. With preserveState: true in Inertia, the component doesn't remount
+    // So we need to watch for flash data changes, not just mount.
+    useEffect(() => {
+        const paymentResult = props.flash?.paymentResult as PaymentResult | undefined;
+        if (paymentResult) {
+            if (paymentResult.type === 'pix' && paymentResult.pix) {
+                setPixData(paymentResult.pix as PixPaymentData);
+                setCurrentStep('processing');
+            } else if (paymentResult.type === 'boleto' && paymentResult.boleto) {
+                setBoletoData(paymentResult.boleto as BoletoPaymentData);
+                setCurrentStep('processing');
+            }
+        }
+    }, [props.flash?.paymentResult]); // Run when flash data changes
 
     // Handle step navigation
     const goToStep = (step: SignupStepType, signupData?: PendingSignupResource | null) => {
@@ -117,16 +156,7 @@ export default function SignupPage({
     };
 
     // Handle payment initiation
-    const handlePaymentStarted = (result: {
-        type: string;
-        url?: string;
-        signup_id?: string;
-        amount?: number;
-        gateway?: string;
-        requires_card_data?: boolean;
-        pix?: object;
-        boleto?: object;
-    }) => {
+    const handlePaymentStarted = (result: PaymentResult) => {
         if (result.type === 'redirect' && result.url) {
             // Card payment - redirect to Stripe
             window.location.href = result.url;
@@ -134,8 +164,13 @@ export default function SignupPage({
             // Asaas card payment - show card form
             setAsaasCardResult(result as AsaasCardPaymentResult);
             goToStep('asaas-card');
-        } else if (result.type === 'pix' || result.type === 'boleto') {
-            // Async payment - show processing
+        } else if (result.type === 'pix' && result.pix) {
+            // PIX payment - store data and show processing with QR code
+            setPixData(result.pix);
+            goToStep('processing');
+        } else if (result.type === 'boleto' && result.boleto) {
+            // Boleto payment - store data and show processing with barcode
+            setBoletoData(result.boleto);
             goToStep('processing');
         }
     };
@@ -217,6 +252,8 @@ export default function SignupPage({
                     {currentStep === 'processing' && signup && (
                         <ProcessingStep
                             signup={signup}
+                            pixData={pixData}
+                            boletoData={boletoData}
                             onComplete={handlePaymentComplete}
                         />
                     )}

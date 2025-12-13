@@ -238,6 +238,36 @@ class Customer extends Authenticatable implements MustVerifyEmail, SyncMaster
     }
 
     // =========================================================================
+    // Tax ID Accessor/Mutator (CPF/CNPJ)
+    // =========================================================================
+
+    /**
+     * Get the primary tax ID (CPF/CNPJ).
+     *
+     * Retrieves from the tax_ids array for Brazilian payment methods.
+     */
+    public function getTaxIdAttribute(): ?string
+    {
+        $taxIds = $this->tax_ids ?? [];
+
+        // Return the 'default' key or first available
+        return $taxIds['default'] ?? ($taxIds[0] ?? null);
+    }
+
+    /**
+     * Set the primary tax ID (CPF/CNPJ).
+     *
+     * Stores in the tax_ids array for Brazilian payment methods.
+     */
+    public function setTaxIdAttribute(?string $value): void
+    {
+        $taxIds = $this->tax_ids ?? [];
+        $taxIds['default'] = $value;
+
+        $this->attributes['tax_ids'] = json_encode($taxIds);
+    }
+
+    // =========================================================================
     // Provider IDs (Multi-Provider Support)
     // =========================================================================
 

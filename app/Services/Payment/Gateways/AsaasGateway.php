@@ -1281,6 +1281,18 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
      */
     public function createPixCharge(Customer $customer, int $amount, array $options = []): ChargeResult
     {
+        // PIX requires CPF/CNPJ - validate before creating charge
+        if (empty($customer->tax_id)) {
+            Log::warning('PIX charge attempted without CPF/CNPJ', [
+                'customer_id' => $customer->id,
+                'email' => $customer->email,
+            ]);
+
+            return ChargeResult::failed(
+                __('billing.form.cpf_cnpj_required', ['default' => 'Para criar esta cobrança é necessário preencher o CPF ou CNPJ do cliente.'])
+            );
+        }
+
         $asaasId = $this->ensureCustomer($customer);
 
         $dueDate = $options['due_date'] ?? now()->addDays(1)->format('Y-m-d');
@@ -1403,6 +1415,18 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
      */
     public function createBoletoCharge(Customer $customer, int $amount, array $options = []): ChargeResult
     {
+        // Boleto requires CPF/CNPJ - validate before creating charge
+        if (empty($customer->tax_id)) {
+            Log::warning('Boleto charge attempted without CPF/CNPJ', [
+                'customer_id' => $customer->id,
+                'email' => $customer->email,
+            ]);
+
+            return ChargeResult::failed(
+                __('billing.form.cpf_cnpj_required', ['default' => 'Para criar esta cobrança é necessário preencher o CPF ou CNPJ do cliente.'])
+            );
+        }
+
         $asaasId = $this->ensureCustomer($customer);
 
         $dueDate = $options['due_date'] ?? now()->addDays(3)->format('Y-m-d');
@@ -1687,22 +1711,98 @@ class AsaasGateway implements PaymentGatewayInterface, PaymentMethodGatewayInter
      */
     protected function createAsaasCustomer(Customer $customer): string
     {
-        $response = $this->http()->post('/customers', [
+        $customerData = [
             'name' => $customer->name ?? $customer->email,
             'email' => $customer->email,
             'cpfCnpj' => $customer->tax_id ?? null,
             'phone' => $this->normalizePhoneForAsaas($customer->phone),
             'externalReference' => $customer->id,
+        ];
+
+        Log::info('Creating Asaas customer', [
+            'customer_id' => $customer->id,
+            'email' => $customer->email,
+            'has_cpf_cnpj' => ! empty($customer->tax_id),
+            'cpf_cnpj_length' => $customer->tax_id ? strlen($customer->tax_id) : 0,
         ]);
 
+        $response = $this->http()->post('/customers', $customerData);
+
         if ($response->failed()) {
+            Log::error('Failed to create Asaas customer', [
+                'customer_id' => $customer->id,
+                'response' => $response->json(),
+            ]);
+
             throw new \RuntimeException('Failed to create Asaas customer: '.$response->json('errors.0.description', 'Unknown error'));
         }
 
         $asaasId = $response->json('id');
         $customer->setProviderId('asaas', $asaasId);
 
+        Log::info('Asaas customer created', [
+            'customer_id' => $customer->id,
+            'asaas_id' => $asaasId,
+        ]);
+
         return $asaasId;
+    }
+
+    /**
+     * Update customer data in Asaas.
+     *
+     * Used when customer data changes after initial creation (e.g., adding CPF/CNPJ).
+     *
+     * @param  Customer  $customer  The customer model with updated data
+     * @return bool True if update was successful
+     */
+    public function updateAsaasCustomer(Customer $customer): bool
+    {
+        $asaasId = $customer->getProviderId('asaas');
+
+        if (! $asaasId) {
+            Log::warning('Cannot update Asaas customer: no Asaas ID found', [
+                'customer_id' => $customer->id,
+            ]);
+
+            return false;
+        }
+
+        $data = array_filter([
+            'name' => $customer->name ?? $customer->email,
+            'email' => $customer->email,
+            'cpfCnpj' => $customer->tax_id,
+            'phone' => $this->normalizePhoneForAsaas($customer->phone),
+        ], fn ($value) => $value !== null);
+
+        try {
+            $response = $this->http()->put("/customers/{$asaasId}", $data);
+
+            if ($response->failed()) {
+                Log::error('Failed to update Asaas customer', [
+                    'customer_id' => $customer->id,
+                    'asaas_id' => $asaasId,
+                    'response' => $response->json(),
+                ]);
+
+                return false;
+            }
+
+            Log::info('Asaas customer updated', [
+                'customer_id' => $customer->id,
+                'asaas_id' => $asaasId,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Exception updating Asaas customer', [
+                'customer_id' => $customer->id,
+                'asaas_id' => $asaasId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     /**

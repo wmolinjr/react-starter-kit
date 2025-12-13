@@ -134,12 +134,32 @@ class TenantController extends Controller
             abort(403, 'You do not have access to this signup.');
         }
 
-        $validated = $request->validate([
+        $rules = [
             'payment_method' => ['required', 'in:card,pix,boleto'],
-        ]);
+        ];
+
+        // CPF/CNPJ is required for PIX and Boleto payments
+        if (in_array($request->input('payment_method'), ['pix', 'boleto'])) {
+            $rules['cpf_cnpj'] = [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $digits = preg_replace('/\D/', '', $value);
+                    if (strlen($digits) !== 11 && strlen($digits) !== 14) {
+                        $fail(__('billing.form.invalid_cpf_cnpj'));
+                    }
+                },
+            ];
+        }
+
+        $validated = $request->validate($rules);
 
         try {
-            $result = $this->signupService->processPayment($signup, $validated['payment_method']);
+            $result = $this->signupService->processPayment(
+                $signup,
+                $validated['payment_method'],
+                $validated['cpf_cnpj'] ?? null
+            );
 
             // Card payment - redirect to Stripe
             if ($result['type'] === 'redirect') {

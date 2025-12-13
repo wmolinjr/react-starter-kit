@@ -2,18 +2,36 @@ import { useEffect, useState } from 'react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PixPayment, BoletoPayment } from '@/components/shared/billing';
 import { status as checkStatus } from '@/routes/central/signup';
 import type { PendingSignupResource } from '@/types/resources';
 
+interface PixPaymentData {
+    qr_code: string;
+    qr_code_base64?: string;
+    qr_code_text?: string;
+    copy_paste?: string;
+    expires_at: string;
+}
+
+interface BoletoPaymentData {
+    barcode: string;
+    pdf_url: string;
+    due_date: string;
+}
+
 interface ProcessingStepProps {
     signup: PendingSignupResource;
+    pixData?: PixPaymentData | null;
+    boletoData?: BoletoPaymentData | null;
     onComplete: (tenantUrl: string) => void;
 }
 
-export function ProcessingStep({ signup, onComplete }: ProcessingStepProps) {
+export function ProcessingStep({ signup, pixData, boletoData, onComplete }: ProcessingStepProps) {
     const { t } = useLaravelReactI18n();
     const [isCompleted, setIsCompleted] = useState(false);
     const [tenantUrl, setTenantUrl] = useState<string | null>(null);
+    const [pixExpired, setPixExpired] = useState(false);
 
     // Poll for payment status
     useEffect(() => {
@@ -75,6 +93,16 @@ export function ProcessingStep({ signup, onComplete }: ProcessingStepProps) {
         };
     }, [signup.id, onComplete]);
 
+    // Handle PIX payment success
+    const handlePixSuccess = () => {
+        setIsCompleted(true);
+    };
+
+    // Handle PIX expired
+    const handlePixExpired = () => {
+        setPixExpired(true);
+    };
+
     if (isCompleted) {
         return (
             <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
@@ -93,6 +121,62 @@ export function ProcessingStep({ signup, onComplete }: ProcessingStepProps) {
         );
     }
 
+    // Show PIX QR code if data is available
+    if (pixData && !pixExpired) {
+        return (
+            <div className="space-y-4">
+                <Card>
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl">
+                            {t('signup.processing.title', { default: 'Processing Payment' })}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('signup.processing.pix_description', {
+                                default: 'Complete your PIX payment to proceed',
+                            })}
+                        </CardDescription>
+                    </CardHeader>
+                </Card>
+                <PixPayment
+                    qrCodeUrl={pixData.qr_code_base64 || pixData.qr_code}
+                    qrCodeData={pixData.copy_paste || pixData.qr_code_text || ''}
+                    expiresAt={pixData.expires_at}
+                    purchaseId={signup.id}
+                    statusEndpoint={checkStatus.url({ signup: signup.id })}
+                    onSuccess={handlePixSuccess}
+                    onExpired={handlePixExpired}
+                />
+            </div>
+        );
+    }
+
+    // Show Boleto if data is available
+    if (boletoData) {
+        return (
+            <div className="space-y-4">
+                <Card>
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl">
+                            {t('signup.processing.title', { default: 'Processing Payment' })}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('signup.processing.boleto_description', {
+                                default: 'Complete your Boleto payment to proceed',
+                            })}
+                        </CardDescription>
+                    </CardHeader>
+                </Card>
+                <BoletoPayment
+                    barcode={boletoData.barcode}
+                    boletoUrl={boletoData.pdf_url}
+                    dueDate={boletoData.due_date}
+                    amount=""
+                />
+            </div>
+        );
+    }
+
+    // Default: show loading spinner
     return (
         <Card>
             <CardHeader className="text-center">

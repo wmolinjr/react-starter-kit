@@ -193,7 +193,34 @@ class SignupService
             if ($customer) {
                 // Remove formatting (keep only digits)
                 $taxId = preg_replace('/\D/', '', $cpfCnpj);
-                $customer->update(['tax_id' => $taxId]);
+
+                // Use property assignment to trigger the mutator (stores in tax_ids array)
+                $customer->tax_id = $taxId;
+                $customer->save();
+
+                // Refresh both the relationship AND the customer variable
+                $signup->load('customer');
+                $customer = $customer->fresh();
+
+                Log::info('Customer tax_id updated for PIX/Boleto', [
+                    'customer_id' => $customer->id,
+                    'tax_id' => $customer->tax_id,
+                    'has_asaas_id' => (bool) $customer->getProviderId('asaas'),
+                ]);
+
+                // Sync with Asaas if customer already exists there
+                $asaasId = $customer->getProviderId('asaas');
+                if ($asaasId) {
+                    Log::info('Updating existing Asaas customer with CPF/CNPJ', [
+                        'customer_id' => $customer->id,
+                        'asaas_id' => $asaasId,
+                    ]);
+
+                    $asaasGateway = $this->gatewayManager->gateway('asaas');
+                    if ($asaasGateway instanceof \App\Services\Payment\Gateways\AsaasGateway) {
+                        $asaasGateway->updateAsaasCustomer($customer);
+                    }
+                }
             }
         }
 
@@ -357,7 +384,8 @@ class SignupService
             throw new AddonException(__('signup.errors.plan_not_found'));
         }
 
-        $customer = $signup->customer;
+        // Get fresh customer to ensure updated data (e.g., tax_id)
+        $customer = $signup->customer?->fresh();
         if (! $customer) {
             throw new AddonException(__('signup.errors.customer_not_found'));
         }
@@ -421,7 +449,8 @@ class SignupService
             throw new AddonException(__('signup.errors.plan_not_found'));
         }
 
-        $customer = $signup->customer;
+        // Get fresh customer to ensure updated data (e.g., tax_id)
+        $customer = $signup->customer?->fresh();
         if (! $customer) {
             throw new AddonException(__('signup.errors.customer_not_found'));
         }
