@@ -2,15 +2,15 @@
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\CheckoutGatewayInterface;
+use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Enums\PaymentGateway;
 use App\Exceptions\Central\AddonException;
 use App\Models\Central\Customer;
 use App\Models\Central\PaymentSetting;
 use App\Models\Central\PendingSignup;
-use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -31,27 +31,38 @@ use Illuminate\Support\Facades\Log;
  */
 class SignupService
 {
-    protected ?StripeGateway $stripeGateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     public function __construct(
         protected CustomerService $customerService,
         protected PaymentGatewayManager $gatewayManager,
         protected PaymentSettingsService $paymentSettingsService
     ) {
-        // Get the Stripe gateway (will be null if not configured)
-        try {
-            $this->stripeGateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if payment gateway is configured.
      */
-    public function isStripeConfigured(): bool
+    public function isGatewayConfigured(): bool
     {
-        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
+        return $this->gateway !== null && $this->gateway->isAvailable();
+    }
+
+    /**
+     * Check if gateway supports checkout operations.
+     */
+    protected function supportsCheckout(): bool
+    {
+        return $this->gateway instanceof CheckoutGatewayInterface;
+    }
+
+    /**
+     * Get the current provider identifier.
+     */
+    public function getProvider(): string
+    {
+        return $this->gateway?->getIdentifier() ?? 'unknown';
     }
 
     // =========================================================================
@@ -218,7 +229,9 @@ class SignupService
      */
     protected function processStripeCardPayment(PendingSignup $signup): array
     {
-        if (! $this->isStripeConfigured()) {
+        // Get Stripe gateway specifically for Stripe card payment
+        $stripeGateway = $this->gatewayManager->stripe();
+        if (! $stripeGateway || ! $stripeGateway->isAvailable()) {
             throw new AddonException(__('billing.errors.stripe_not_configured'));
         }
 
@@ -229,8 +242,8 @@ class SignupService
 
         // Get Stripe price ID based on billing period
         $stripePriceId = $signup->billing_period === 'yearly'
-            ? $plan->stripe_yearly_price_id
-            : $plan->stripe_price_id;
+            ? $plan->getProviderPriceId('stripe_yearly')
+            : $plan->getProviderPriceId('stripe');
 
         if (! $stripePriceId) {
             throw new AddonException(__('signup.errors.plan_not_synced_to_stripe'));
@@ -249,7 +262,7 @@ class SignupService
             ],
         ];
 
-        $session = $this->stripeGateway->createCheckoutSessionRaw([
+        $session = $stripeGateway->createCheckoutSessionRaw([
             'mode' => 'subscription',
             'locale' => stripe_locale(),
             'line_items' => $lineItems,
@@ -599,11 +612,21 @@ class SignupService
     }
 
     /**
+     * Find pending signup by provider session ID.
+     */
+    public function findByProviderSession(string $sessionId, string $provider = 'stripe'): ?PendingSignup
+    {
+        return PendingSignup::bySession($sessionId, $provider)->first();
+    }
+
+    /**
      * Find pending signup by Stripe session ID.
+     *
+     * @deprecated Use findByProviderSession() instead
      */
     public function findByStripeSession(string $sessionId): ?PendingSignup
     {
-        return PendingSignup::bySession($sessionId, 'stripe')->first();
+        return $this->findByProviderSession($sessionId, 'stripe');
     }
 
     /**

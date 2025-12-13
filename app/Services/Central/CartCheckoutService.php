@@ -2,6 +2,8 @@
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\CheckoutGatewayInterface;
+use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Enums\BillingPeriod;
 use App\Enums\PaymentGateway;
 use App\Exceptions\Central\AddonException;
@@ -10,33 +12,43 @@ use App\Models\Central\AddonBundle;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\PaymentSetting;
 use App\Models\Central\Tenant;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
 
 class CartCheckoutService
 {
-    protected ?StripeGateway $stripeGateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     public function __construct(
         protected AddonService $addonService,
         protected PaymentGatewayManager $gatewayManager,
         protected PaymentSettingsService $paymentSettingsService
     ) {
-        // Get the Stripe gateway (will be null if not configured)
-        try {
-            $this->stripeGateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if payment gateway is configured.
      */
-    public function isStripeConfigured(): bool
+    public function isGatewayConfigured(): bool
     {
-        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
+        return $this->gateway !== null && $this->gateway->isAvailable();
+    }
+
+    /**
+     * Check if gateway supports checkout operations.
+     */
+    protected function supportsCheckout(): bool
+    {
+        return $this->gateway instanceof CheckoutGatewayInterface;
+    }
+
+    /**
+     * Get the current provider identifier.
+     */
+    public function getProvider(): string
+    {
+        return $this->gateway?->getIdentifier() ?? 'unknown';
     }
 
     /**
@@ -150,23 +162,25 @@ class CartCheckoutService
         array $lineItems,
         bool $hasRecurring
     ): array {
-        if (! $this->isStripeConfigured()) {
+        // Get Stripe gateway specifically for Stripe card checkout
+        $stripeGateway = $this->gatewayManager->stripe();
+        if (! $stripeGateway || ! $stripeGateway->isAvailable()) {
             throw new AddonException('Stripe is not configured');
         }
 
-        // Ensure tenant has a Stripe customer ID
+        // Ensure tenant has a customer for billing
         $customer = $tenant->customer;
         if (! $customer) {
             throw new AddonException('Tenant has no associated customer for billing');
         }
 
         // Gateway handles customer creation
-        $this->stripeGateway->ensureCustomer($customer);
+        $stripeGateway->ensureCustomer($customer);
 
         $stripeLineItems = array_map(fn ($item) => $item['stripe_item'], $lineItems);
         $mode = $hasRecurring ? 'subscription' : 'payment';
 
-        $session = $this->stripeGateway->createCheckoutWithItems($customer, $stripeLineItems, [
+        $session = $stripeGateway->createCheckoutWithItems($customer, $stripeLineItems, [
             'mode' => $mode,
             'locale' => stripe_locale(),
             'success_url' => $tenant->url().route('tenant.admin.billing.cart-success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
@@ -702,17 +716,20 @@ class CartCheckoutService
      */
     public function createCartCheckoutSession(Tenant $tenant, array $items): array
     {
-        if (! $this->isStripeConfigured()) {
+        // Get Stripe gateway specifically for Stripe checkout sessions
+        $stripeGateway = $this->gatewayManager->stripe();
+        if (! $stripeGateway || ! $stripeGateway->isAvailable()) {
             throw new AddonException('Stripe is not configured');
         }
 
-        // Ensure tenant has a Stripe customer ID
+        // Ensure tenant has a customer for billing
         $customer = $tenant->customer;
         if (! $customer) {
             throw new AddonException('Tenant has no associated customer for billing');
         }
 
-        $this->stripeGateway->ensureCustomer($customer);
+        // Gateway handles customer creation
+        $stripeGateway->ensureCustomer($customer);
 
         $lineItems = [];
         $hasRecurring = false;
@@ -727,7 +744,7 @@ class CartCheckoutService
 
         $mode = $hasRecurring ? 'subscription' : 'payment';
 
-        $session = $this->stripeGateway->createCheckoutWithItems($customer, $lineItems, [
+        $session = $stripeGateway->createCheckoutWithItems($customer, $lineItems, [
             'mode' => $mode,
             'locale' => stripe_locale(),
             'success_url' => $tenant->url().route('tenant.admin.billing.cart-success', [], false).'?session_id={CHECKOUT_SESSION_ID}',

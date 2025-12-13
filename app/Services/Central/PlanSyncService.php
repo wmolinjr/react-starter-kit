@@ -2,37 +2,49 @@
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\PaymentGatewayInterface;
+use App\Contracts\Payment\ProductPriceGatewayInterface;
 use App\Models\Central\Plan;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
 
 class PlanSyncService
 {
-    protected ?StripeGateway $gateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     /**
-     * Default locale for Stripe product names (universal display)
+     * Default locale for product names (universal display)
      */
     protected string $defaultLocale = 'en';
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        // Get the Stripe gateway (will be null if not configured)
-        try {
-            $this->gateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if payment gateway is configured.
      */
     public function isConfigured(): bool
     {
         return $this->gateway !== null && $this->gateway->isAvailable();
+    }
+
+    /**
+     * Check if gateway supports product/price operations.
+     */
+    protected function supportsProducts(): bool
+    {
+        return $this->gateway instanceof ProductPriceGatewayInterface;
+    }
+
+    /**
+     * Get the current provider identifier.
+     */
+    public function getProvider(): string
+    {
+        return $this->gateway?->getIdentifier() ?? 'unknown';
     }
 
     /**
@@ -54,15 +66,17 @@ class PlanSyncService
     }
 
     /**
-     * Sync a single plan to Stripe
+     * Sync a single plan to the payment provider
      */
     public function syncPlan(Plan $plan, ?string $locale = null): array
     {
         $locale = $locale ?? $this->defaultLocale;
+        $provider = $this->getProvider();
 
         $result = [
             'plan_id' => $plan->id,
             'slug' => $plan->slug,
+            'provider' => $provider,
             'locale' => $locale,
             'product_synced' => false,
             'price_synced' => false,
@@ -70,7 +84,13 @@ class PlanSyncService
         ];
 
         if (! $this->isConfigured()) {
-            $result['errors'][] = 'Stripe gateway not configured';
+            $result['errors'][] = 'Payment gateway not configured';
+
+            return $result;
+        }
+
+        if (! $this->supportsProducts()) {
+            $result['errors'][] = "Payment gateway '{$provider}' does not support product/price management";
 
             return $result;
         }
@@ -79,19 +99,20 @@ class PlanSyncService
             // Sync Product
             $productId = $this->syncProduct($plan, $locale);
             $result['product_synced'] = true;
-            $result['stripe_product_id'] = $productId;
+            $result['provider_product_id'] = $productId;
 
             // Sync Price
             $priceResult = $this->syncPrice($plan, $locale);
             if ($priceResult) {
                 $result['price_synced'] = true;
-                $result['stripe_price_id'] = $priceResult;
+                $result['provider_price_id'] = $priceResult;
             }
 
         } catch (\Exception $e) {
             $result['errors'][] = $e->getMessage();
-            Log::error('Stripe plan sync failed', [
+            Log::error('Plan sync to payment provider failed', [
                 'plan' => $plan->slug,
+                'provider' => $provider,
                 'locale' => $locale,
                 'error' => $e->getMessage(),
             ]);
@@ -101,7 +122,7 @@ class PlanSyncService
     }
 
     /**
-     * Sync all active plans to Stripe
+     * Sync all active plans to the payment provider
      */
     public function syncAll(?string $locale = null): array
     {
@@ -117,10 +138,14 @@ class PlanSyncService
     }
 
     /**
-     * Create or update Stripe Product for plan with i18n support
+     * Create or update Product for plan with i18n support
      */
     protected function syncProduct(Plan $plan, string $locale): string
     {
+        /** @var ProductPriceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $this->getProvider();
+
         // Get translated name and description
         $name = $this->getTranslatedValue($plan, 'name', $locale);
         $description = $this->getTranslatedValue($plan, 'description', $locale);
@@ -128,7 +153,7 @@ class PlanSyncService
         // Collect all translations for metadata
         $translations = $this->collectTranslations($plan, ['name', 'description']);
 
-        // Build features list for Stripe
+        // Build features list
         $featuresList = $this->buildFeaturesList($plan);
 
         $productData = [
@@ -143,39 +168,44 @@ class PlanSyncService
             ],
         ];
 
-        // Add marketing features if Stripe supports it
+        // Add marketing features if provider supports it (Stripe-specific, may be ignored by other providers)
         if (! empty($featuresList)) {
             $productData['marketing_features'] = array_slice(
                 array_map(fn ($f) => ['name' => $f], $featuresList),
                 0,
-                15 // Stripe limit
+                15
             );
         }
 
-        // Remove null description (Stripe doesn't accept null)
+        // Remove null description (some providers don't accept null)
         if ($productData['description'] === null) {
             unset($productData['description']);
         }
 
-        if ($plan->stripe_product_id) {
-            // Update existing product
-            $this->gateway->updateProduct($plan->stripe_product_id, $productData);
+        $existingProductId = $plan->getProviderProductId($provider);
 
-            Log::info('Updated Stripe plan product', [
+        if ($existingProductId) {
+            // Update existing product
+            $gateway->updateProduct($existingProductId, $productData);
+
+            Log::info('Updated plan product on payment provider', [
                 'plan' => $plan->slug,
-                'product_id' => $plan->stripe_product_id,
+                'provider' => $provider,
+                'product_id' => $existingProductId,
                 'locale' => $locale,
             ]);
 
-            return $plan->stripe_product_id;
+            return $existingProductId;
         }
 
         // Create new product
-        $product = $this->gateway->createProduct($productData);
-        $plan->update(['stripe_product_id' => $product['id']]);
+        $product = $gateway->createProduct($productData);
+        $plan->setProviderProductId($provider, $product['id']);
+        $plan->save();
 
-        Log::info('Created Stripe plan product', [
+        Log::info('Created plan product on payment provider', [
             'plan' => $plan->slug,
+            'provider' => $provider,
             'product_id' => $product['id'],
             'locale' => $locale,
         ]);
@@ -207,13 +237,20 @@ class PlanSyncService
      */
     protected function syncPrice(Plan $plan, string $locale): ?string
     {
-        // Skip if no price or already has Stripe price
-        if (! $plan->price || $plan->stripe_price_id) {
-            return $plan->stripe_price_id;
+        /** @var ProductPriceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $this->getProvider();
+
+        // Skip if no price or already has provider price
+        $existingPriceId = $plan->getProviderPriceId($provider);
+        if (! $plan->price || $existingPriceId) {
+            return $existingPriceId;
         }
 
+        $productId = $plan->getProviderProductId($provider);
+
         $priceData = [
-            'product' => $plan->stripe_product_id,
+            'product' => $productId,
             'currency' => $plan->currency ?? config('payment.currency', 'BRL'),
             'unit_amount' => $plan->price,
             'metadata' => [
@@ -229,11 +266,13 @@ class PlanSyncService
             $priceData['recurring'] = ['interval' => $interval];
         }
 
-        $price = $this->gateway->createPrice($priceData);
-        $plan->update(['stripe_price_id' => $price['id']]);
+        $price = $gateway->createPrice($priceData);
+        $plan->setProviderPriceId($provider, $price['id']);
+        $plan->save();
 
-        Log::info('Created Stripe plan price', [
+        Log::info('Created plan price on payment provider', [
             'plan' => $plan->slug,
+            'provider' => $provider,
             'price_id' => $price['id'],
             'locale' => $locale,
         ]);
@@ -242,7 +281,7 @@ class PlanSyncService
     }
 
     /**
-     * Convert billing period to Stripe interval
+     * Convert billing period to provider interval format
      */
     protected function getBillingInterval(string $billingPeriod): ?string
     {
@@ -284,19 +323,23 @@ class PlanSyncService
     }
 
     /**
-     * Archive a Stripe Price (prices are immutable, so we archive)
+     * Archive a Price (prices are immutable, so we archive)
      */
     public function archivePrice(string $priceId): bool
     {
-        if (! $this->isConfigured()) {
+        if (! $this->isConfigured() || ! $this->supportsProducts()) {
             return false;
         }
 
+        /** @var ProductPriceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         try {
-            return $this->gateway->archivePrice($priceId);
+            return $gateway->archivePrice($priceId);
         } catch (\Exception $e) {
             Log::error('Failed to archive plan price', [
                 'price_id' => $priceId,
+                'provider' => $this->getProvider(),
                 'error' => $e->getMessage(),
             ]);
 
@@ -305,20 +348,24 @@ class PlanSyncService
     }
 
     /**
-     * Import plan from Stripe (preserves existing translations)
+     * Import plan from payment provider (preserves existing translations)
      */
-    public function importFromStripe(string $productId): ?Plan
+    public function importFromProvider(string $productId): ?Plan
     {
-        if (! $this->isConfigured()) {
+        if (! $this->isConfigured() || ! $this->supportsProducts()) {
             return null;
         }
 
-        try {
-            $product = $this->gateway->retrieveProduct($productId);
-            $prices = $this->gateway->listPrices($productId);
+        /** @var ProductPriceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $this->getProvider();
 
-            // Check if plan already exists
-            $existingPlan = Plan::where('stripe_product_id', $productId)->first();
+        try {
+            $product = $gateway->retrieveProduct($productId);
+            $prices = $gateway->listPrices($productId);
+
+            // Check if plan already exists with this provider product ID
+            $existingPlan = $this->findPlanByProviderProductId($provider, $productId);
 
             if ($existingPlan) {
                 $existingPlan->update([
@@ -326,16 +373,17 @@ class PlanSyncService
                 ]);
 
                 // Import price if not set
-                if (! $existingPlan->stripe_price_id && ! empty($prices)) {
+                $existingPriceId = $existingPlan->getProviderPriceId($provider);
+                if (! $existingPriceId && ! empty($prices)) {
                     $price = $prices[0];
-                    $existingPlan->update([
-                        'stripe_price_id' => $price['id'],
-                        'price' => $price['unit_amount'],
-                    ]);
+                    $existingPlan->setProviderPriceId($provider, $price['id']);
+                    $existingPlan->price = $price['unit_amount'];
+                    $existingPlan->save();
                 }
 
-                Log::info('Updated plan from Stripe (preserved translations)', [
+                Log::info('Updated plan from payment provider (preserved translations)', [
                     'plan' => $existingPlan->slug,
+                    'provider' => $provider,
                     'product_id' => $productId,
                 ]);
 
@@ -353,7 +401,6 @@ class PlanSyncService
                 'slug' => $product['metadata']['plan_slug'] ?? \Str::slug($product['name']),
                 'billing_period' => $product['metadata']['billing_period'] ?? 'monthly',
                 'is_active' => $product['active'] ?? true,
-                'stripe_product_id' => $productId,
             ];
 
             // Set translated fields
@@ -363,23 +410,31 @@ class PlanSyncService
             // Set price from first active price
             if (! empty($prices)) {
                 $price = $prices[0];
-                $planData['stripe_price_id'] = $price['id'];
                 $planData['price'] = $price['unit_amount'];
                 $planData['currency'] = $price['currency'];
             }
 
             $plan = Plan::create($planData);
 
-            Log::info('Imported plan from Stripe', [
+            // Set provider-specific IDs
+            $plan->setProviderProductId($provider, $productId);
+            if (! empty($prices)) {
+                $plan->setProviderPriceId($provider, $prices[0]['id']);
+            }
+            $plan->save();
+
+            Log::info('Imported plan from payment provider', [
                 'plan' => $plan->slug,
+                'provider' => $provider,
                 'product_id' => $productId,
             ]);
 
             return $plan;
 
         } catch (\Exception $e) {
-            Log::error('Failed to import plan from Stripe', [
+            Log::error('Failed to import plan from payment provider', [
                 'product_id' => $productId,
+                'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
 
@@ -388,11 +443,33 @@ class PlanSyncService
     }
 
     /**
+     * Find a plan by provider product ID
+     */
+    protected function findPlanByProviderProductId(string $provider, string $productId): ?Plan
+    {
+        $field = match ($provider) {
+            'stripe' => 'stripe_product_id',
+            'paddle' => 'paddle_product_id',
+            'asaas' => 'asaas_product_id',
+            'pagseguro' => 'pagseguro_product_id',
+            'mercadopago' => 'mercadopago_product_id',
+            default => null,
+        };
+
+        if (! $field) {
+            return null;
+        }
+
+        return Plan::where($field, $productId)->first();
+    }
+
+    /**
      * Dry run - show what would be synced
      */
     public function dryRun(?string $planSlug = null, ?string $locale = null): array
     {
         $locale = $locale ?? $this->defaultLocale;
+        $provider = $this->getProvider();
         $query = Plan::where('is_active', true);
 
         if ($planSlug) {
@@ -404,21 +481,24 @@ class PlanSyncService
 
         foreach ($plans as $plan) {
             $name = $this->getTranslatedValue($plan, 'name', $locale) ?? $plan->slug;
+            $productId = $plan->getProviderProductId($provider);
+            $priceId = $plan->getProviderPriceId($provider);
 
             $item = [
                 'slug' => $plan->slug,
                 'name' => $name,
+                'provider' => $provider,
                 'locale' => $locale,
                 'actions' => [],
             ];
 
-            if (! $plan->stripe_product_id) {
+            if (! $productId) {
                 $item['actions'][] = "Create Product: \"{$name}\"";
             } else {
                 $item['actions'][] = "Update Product: \"{$name}\"";
             }
 
-            if ($plan->price && ! $plan->stripe_price_id) {
+            if ($plan->price && ! $priceId) {
                 $item['actions'][] = 'Create Price ($'.number_format($plan->price / 100, 2).'/'.$plan->billing_period.')';
             }
 

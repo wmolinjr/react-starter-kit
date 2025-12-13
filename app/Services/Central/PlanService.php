@@ -3,6 +3,8 @@
 namespace App\Services\Central;
 
 use App\Console\Commands\SyncPlanPermissions;
+use App\Contracts\Payment\PaymentGatewayInterface;
+use App\Contracts\Payment\ProductPriceGatewayInterface;
 use App\Enums\PlanFeature;
 use App\Enums\PlanLimit;
 use App\Http\Resources\Central\AddonOptionForPlanResource;
@@ -11,7 +13,6 @@ use App\Http\Resources\Shared\FeatureDefinitionResource;
 use App\Http\Resources\Shared\LimitDefinitionResource;
 use App\Models\Central\Addon;
 use App\Models\Central\Plan;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -21,28 +22,32 @@ use Illuminate\Support\Str;
  * PlanService
  *
  * Handles all business logic for plan management in central admin.
- * Includes CRUD operations and Stripe synchronization.
+ * Includes CRUD operations and provider synchronization.
  */
 class PlanService
 {
-    protected ?StripeGateway $stripeGateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        try {
-            $this->stripeGateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if gateway is configured.
      */
-    protected function isStripeConfigured(): bool
+    public function isGatewayConfigured(): bool
     {
-        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
+        return $this->gateway !== null && $this->gateway->isAvailable();
+    }
+
+    /**
+     * Check if gateway supports products/prices.
+     */
+    protected function supportsProducts(): bool
+    {
+        return $this->gateway instanceof ProductPriceGatewayInterface;
     }
 
     /**
@@ -224,36 +229,47 @@ class PlanService
     }
 
     /**
-     * Sync a single plan to Stripe.
+     * Sync a single plan to the payment provider.
      *
      * @throws \Exception
      */
-    public function syncToStripe(Plan $plan): void
+    public function syncToProvider(Plan $plan): void
     {
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured. Please set STRIPE_SECRET in .env');
+        if (! $this->isGatewayConfigured()) {
+            throw new \RuntimeException('Payment gateway is not configured');
         }
 
+        if (! $this->supportsProducts()) {
+            throw new \RuntimeException('Payment gateway does not support product/price management');
+        }
+
+        /** @var ProductPriceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $gateway->getIdentifier();
+
         try {
-            // Create or update Stripe product
-            if ($plan->stripe_product_id) {
-                $this->stripeGateway->updateProduct($plan->stripe_product_id, [
+            // Create or update product
+            $productId = $plan->getProviderProductId($provider);
+            if ($productId) {
+                $gateway->updateProduct($productId, [
                     'name' => $plan->name,
                     'description' => $plan->description,
                 ]);
             } else {
-                $product = $this->stripeGateway->createProduct([
+                $product = $gateway->createProduct([
                     'name' => $plan->name,
                     'description' => $plan->description,
                     'metadata' => ['plan_slug' => $plan->slug],
                 ]);
-                $plan->stripe_product_id = $product['id'];
+                $plan->setProviderProductId($provider, $product['id']);
             }
 
             // Create price if needed
-            if ($plan->price > 0 && ! $plan->stripe_price_id) {
-                $price = $this->stripeGateway->createPrice([
-                    'product' => $plan->stripe_product_id,
+            $priceId = $plan->getProviderPriceId($provider);
+            if ($plan->price > 0 && ! $priceId) {
+                $productId = $plan->getProviderProductId($provider);
+                $price = $gateway->createPrice([
+                    'product' => $productId,
                     'unit_amount' => $plan->price,
                     'currency' => $plan->currency ?? stripe_currency(),
                     'recurring' => [
@@ -261,13 +277,14 @@ class PlanService
                     ],
                     'metadata' => ['plan_slug' => $plan->slug],
                 ]);
-                $plan->stripe_price_id = $price['id'];
+                $plan->setProviderPriceId($provider, $price['id']);
             }
 
             $plan->save();
         } catch (\Exception $e) {
-            Log::error('Failed to sync plan to Stripe', [
+            Log::error('Failed to sync plan to payment provider', [
                 'plan_id' => $plan->id,
+                'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
             throw $e;
@@ -275,22 +292,24 @@ class PlanService
     }
 
     /**
-     * Sync all active plans to Stripe.
+     * Sync all active plans to the payment provider.
      *
      * @return int Number of plans synced
      */
-    public function syncAllToStripe(): int
+    public function syncAllToProvider(): int
     {
         $plans = Plan::active()->get();
         $synced = 0;
+        $provider = $this->gateway?->getIdentifier() ?? 'unknown';
 
         foreach ($plans as $plan) {
             try {
-                $this->syncToStripe($plan);
+                $this->syncToProvider($plan);
                 $synced++;
             } catch (\Exception $e) {
-                Log::warning('Failed to sync plan to Stripe during batch sync', [
+                Log::warning('Failed to sync plan to payment provider during batch sync', [
                     'plan_id' => $plan->id,
+                    'provider' => $provider,
                     'error' => $e->getMessage(),
                 ]);
                 // Continue with other plans

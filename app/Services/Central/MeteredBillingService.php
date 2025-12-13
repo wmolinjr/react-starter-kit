@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\MeteredBillingGatewayInterface;
+use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Tenant;
 use App\Models\Central\UsageRecord;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -16,25 +17,36 @@ use Illuminate\Support\Facades\Log;
 
 class MeteredBillingService
 {
-    protected ?StripeGateway $gateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        // Get the Stripe gateway (will be null if not configured)
-        try {
-            $this->gateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if payment gateway is configured.
      */
     public function isConfigured(): bool
     {
         return $this->gateway !== null && $this->gateway->isAvailable();
+    }
+
+    /**
+     * Check if gateway supports metered billing.
+     */
+    protected function supportsMeteredBilling(): bool
+    {
+        return $this->gateway instanceof MeteredBillingGatewayInterface;
+    }
+
+    /**
+     * Get the current provider identifier.
+     */
+    public function getProvider(): string
+    {
+        return $this->gateway?->getIdentifier() ?? 'unknown';
     }
 
     /**
@@ -146,17 +158,24 @@ class MeteredBillingService
     }
 
     /**
-     * Report storage usage to Stripe
+     * Report storage usage to payment provider
      */
     public function reportStorageUsage(Tenant $tenant): bool
     {
-        if (! $tenant->stripe_id || ! $this->isConfigured()) {
+        $provider = $this->getProvider();
+        $providerCustomerId = $tenant->getProviderCustomerId($provider);
+
+        if (! $providerCustomerId || ! $this->isConfigured() || ! $this->supportsMeteredBilling()) {
             return false;
         }
 
+        /** @var MeteredBillingGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         $addon = $this->getStorageOverageAddon();
-        if (! $addon || ! $addon->stripe_meter_id) {
-            Log::warning('Storage overage addon not configured in database');
+        $meterId = $addon?->getProviderMeterId($provider);
+        if (! $addon || ! $meterId) {
+            Log::warning('Storage overage addon not configured for provider', ['provider' => $provider]);
 
             return false;
         }
@@ -176,9 +195,9 @@ class MeteredBillingService
         }
 
         try {
-            $meterEvent = $this->gateway->createMeterEvent([
-                'event_name' => $addon->stripe_meter_id,
-                'identifier' => $tenant->stripe_id,
+            $meterEvent = $gateway->createMeterEvent([
+                'event_name' => $meterId,
+                'identifier' => $providerCustomerId,
                 'value' => (int) round($overageGB, 2),
             ]);
 
@@ -189,7 +208,7 @@ class MeteredBillingService
                 quantity: $storageUsedMB,
                 unit: 'MB',
                 addon: $addon,
-                metadata: ['stripe_event' => $meterEvent['id'] ?? null]
+                metadata: ['provider_event' => $meterEvent['id'] ?? null, 'provider' => $provider]
             );
 
             // Mark as reported
@@ -200,8 +219,9 @@ class MeteredBillingService
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Failed to report storage usage to Stripe', [
+            Log::error('Failed to report storage usage to payment provider', [
                 'tenant_id' => $tenant->id,
+                'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
 
@@ -210,17 +230,24 @@ class MeteredBillingService
     }
 
     /**
-     * Report bandwidth usage to Stripe
+     * Report bandwidth usage to payment provider
      */
     public function reportBandwidthUsage(Tenant $tenant): bool
     {
-        if (! $tenant->stripe_id || ! $this->isConfigured()) {
+        $provider = $this->getProvider();
+        $providerCustomerId = $tenant->getProviderCustomerId($provider);
+
+        if (! $providerCustomerId || ! $this->isConfigured() || ! $this->supportsMeteredBilling()) {
             return false;
         }
 
+        /** @var MeteredBillingGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         $addon = $this->getBandwidthOverageAddon();
-        if (! $addon || ! $addon->stripe_meter_id) {
-            Log::warning('Bandwidth overage addon not configured in database');
+        $meterId = $addon?->getProviderMeterId($provider);
+        if (! $addon || ! $meterId) {
+            Log::warning('Bandwidth overage addon not configured for provider', ['provider' => $provider]);
 
             return false;
         }
@@ -240,9 +267,9 @@ class MeteredBillingService
         }
 
         try {
-            $meterEvent = $this->gateway->createMeterEvent([
-                'event_name' => $addon->stripe_meter_id,
-                'identifier' => $tenant->stripe_id,
+            $meterEvent = $gateway->createMeterEvent([
+                'event_name' => $meterId,
+                'identifier' => $providerCustomerId,
                 'value' => (int) round($overageGB, 2),
             ]);
 
@@ -253,7 +280,7 @@ class MeteredBillingService
                 quantity: $bandwidthUsedMB,
                 unit: 'MB',
                 addon: $addon,
-                metadata: ['stripe_event' => $meterEvent['id'] ?? null]
+                metadata: ['provider_event' => $meterEvent['id'] ?? null, 'provider' => $provider]
             );
 
             // Mark as reported
@@ -263,8 +290,9 @@ class MeteredBillingService
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Failed to report bandwidth usage to Stripe', [
+            Log::error('Failed to report bandwidth usage to payment provider', [
                 'tenant_id' => $tenant->id,
+                'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
 
@@ -305,9 +333,21 @@ class MeteredBillingService
     public function reportAllTenants(): int
     {
         $count = 0;
+        $provider = $this->getProvider();
 
+        // Get tenants that have a customer ID for the current provider
         Tenant::query()
-            ->whereNotNull('stripe_id')
+            ->whereHas('customer', function ($query) use ($provider) {
+                $field = match ($provider) {
+                    'stripe' => 'stripe_id',
+                    'paddle' => 'paddle_id',
+                    'asaas' => 'asaas_id',
+                    'pagseguro' => 'pagseguro_id',
+                    'mercadopago' => 'mercadopago_id',
+                    default => 'stripe_id',
+                };
+                $query->whereNotNull($field);
+            })
             ->chunk(100, function ($tenants) use (&$count) {
                 foreach ($tenants as $tenant) {
                     try {
@@ -459,13 +499,17 @@ class MeteredBillingService
     }
 
     /**
-     * Process and report all unreported usage records to Stripe.
+     * Process and report all unreported usage records to payment provider.
      */
     public function processUnreportedRecords(): int
     {
-        if (! $this->isConfigured()) {
+        if (! $this->isConfigured() || ! $this->supportsMeteredBilling()) {
             return 0;
         }
+
+        /** @var MeteredBillingGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $this->getProvider();
 
         $processed = 0;
         $records = $this->getUnreportedRecords();
@@ -473,21 +517,23 @@ class MeteredBillingService
         foreach ($records as $record) {
             try {
                 $tenant = $record->tenant;
-                if (! $tenant || ! $tenant->stripe_id) {
+                $providerCustomerId = $tenant?->getProviderCustomerId($provider);
+                if (! $tenant || ! $providerCustomerId) {
                     continue;
                 }
 
                 $addon = $record->addon;
-                if (! $addon || ! $addon->stripe_meter_id) {
+                $meterId = $addon?->getProviderMeterId($provider);
+                if (! $addon || ! $meterId) {
                     continue;
                 }
 
                 // Convert overage to appropriate unit
                 $value = $record->unit === 'MB' ? $record->overage / 1024 : $record->overage;
 
-                $meterEvent = $this->gateway->createMeterEvent([
-                    'event_name' => $addon->stripe_meter_id,
-                    'identifier' => $tenant->stripe_id,
+                $meterEvent = $gateway->createMeterEvent([
+                    'event_name' => $meterId,
+                    'identifier' => $providerCustomerId,
                     'value' => (int) round($value, 2),
                 ]);
 
@@ -496,6 +542,7 @@ class MeteredBillingService
             } catch (\Exception $e) {
                 Log::error('Failed to process usage record', [
                     'record_id' => $record->id,
+                    'provider' => $provider,
                     'error' => $e->getMessage(),
                 ]);
             }

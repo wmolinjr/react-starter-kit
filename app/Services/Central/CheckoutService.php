@@ -4,32 +4,28 @@ declare(strict_types=1);
 
 namespace App\Services\Central;
 
+use App\Contracts\Payment\CheckoutGatewayInterface;
+use App\Contracts\Payment\PaymentGatewayInterface;
+use App\Contracts\Payment\RefundGatewayInterface;
 use App\Exceptions\Central\AddonException;
 use App\Models\Central\Addon;
 use App\Models\Central\AddonPurchase;
-use App\Models\Central\Customer;
 use App\Models\Central\Tenant;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
 
 class CheckoutService
 {
-    protected ?StripeGateway $gateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        // Get the Stripe gateway (will be null if not configured)
-        try {
-            $this->gateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if payment gateway is configured.
      */
     public function isConfigured(): bool
     {
@@ -37,7 +33,31 @@ class CheckoutService
     }
 
     /**
-     * Create Stripe Checkout session for one-time addon purchase.
+     * Check if gateway supports checkout operations.
+     */
+    protected function supportsCheckout(): bool
+    {
+        return $this->gateway instanceof CheckoutGatewayInterface;
+    }
+
+    /**
+     * Check if gateway supports refund operations.
+     */
+    protected function supportsRefunds(): bool
+    {
+        return $this->gateway instanceof RefundGatewayInterface;
+    }
+
+    /**
+     * Get the current provider identifier.
+     */
+    public function getProvider(): string
+    {
+        return $this->gateway?->getIdentifier() ?? 'unknown';
+    }
+
+    /**
+     * Create Checkout session for one-time addon purchase.
      */
     public function createCheckoutSession(
         Tenant $tenant,
@@ -47,8 +67,16 @@ class CheckoutService
         ?string $cancelUrl = null
     ): array {
         if (! $this->isConfigured()) {
-            throw new AddonException('Stripe gateway not configured');
+            throw new AddonException('Payment gateway not configured');
         }
+
+        if (! $this->supportsCheckout()) {
+            throw new AddonException("Payment gateway '{$this->getProvider()}' does not support checkout");
+        }
+
+        /** @var CheckoutGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $this->getProvider();
 
         $addon = Addon::where('slug', $addonSlug)->first();
 
@@ -69,14 +97,14 @@ class CheckoutService
             throw new AddonException("Maximum quantity is {$addon->max_quantity}");
         }
 
-        // Ensure customer has Stripe customer ID
+        // Ensure customer exists
         $customer = $tenant->customer;
         if (! $customer) {
             throw new AddonException('Tenant has no associated customer for billing');
         }
 
         // Gateway handles customer creation
-        $this->gateway->ensureCustomer($customer);
+        $gateway->ensureCustomer($customer);
 
         // Create pending purchase record
         $purchase = AddonPurchase::create([
@@ -85,19 +113,21 @@ class CheckoutService
             'addon_type' => $addon->type->value,
             'quantity' => $quantity,
             'amount_paid' => $addon->price_one_time * $quantity,
-            'payment_method' => 'stripe_checkout',
+            'payment_method' => "{$provider}_checkout",
             'status' => 'pending',
             'valid_from' => now(),
             'valid_until' => now()->addMonths($addon->validity_months ?? 12),
             'metadata' => [
                 'addon_name' => $addon->name,
                 'unit_value' => $addon->unit_value,
+                'provider' => $provider,
             ],
         ]);
 
-        // Build line items
-        $lineItems = $addon->stripe_price_one_time_id
-            ? [['price' => $addon->stripe_price_one_time_id, 'quantity' => $quantity]]
+        // Build line items - use provider-specific price ID if available
+        $priceId = $addon->getProviderPriceId($provider, 'one_time');
+        $lineItems = $priceId
+            ? [['price' => $priceId, 'quantity' => $quantity]]
             : [[
                 'price_data' => [
                     'currency' => config('payment.currency', 'brl'),
@@ -111,7 +141,7 @@ class CheckoutService
             ]];
 
         try {
-            $session = $this->gateway->createCheckoutWithItems($customer, $lineItems, [
+            $session = $gateway->createCheckoutWithItems($customer, $lineItems, [
                 'mode' => 'payment',
                 'locale' => stripe_locale(),
                 'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
@@ -126,7 +156,7 @@ class CheckoutService
                 ],
             ]);
 
-            $purchase->update(['stripe_checkout_session_id' => $session['id']]);
+            $purchase->update(['provider_checkout_session_id' => $session['id']]);
 
             return [
                 'session_id' => $session['id'],
@@ -135,9 +165,10 @@ class CheckoutService
             ];
         } catch (\Exception $e) {
             $purchase->markAsFailed('Checkout session creation failed: '.$e->getMessage());
-            Log::error('Failed to create Stripe checkout session', [
+            Log::error('Failed to create checkout session', [
                 'tenant_id' => $tenant->id,
                 'addon_slug' => $addon->slug,
+                'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
             throw new AddonException('Failed to create checkout session: '.$e->getMessage());
@@ -145,7 +176,7 @@ class CheckoutService
     }
 
     /**
-     * Create Stripe Checkout session for subscription addon purchase.
+     * Create Checkout session for subscription addon purchase.
      */
     public function createSubscriptionCheckout(
         Tenant $tenant,
@@ -156,8 +187,16 @@ class CheckoutService
         ?string $cancelUrl = null
     ): array {
         if (! $this->isConfigured()) {
-            throw new AddonException('Stripe gateway not configured');
+            throw new AddonException('Payment gateway not configured');
         }
+
+        if (! $this->supportsCheckout()) {
+            throw new AddonException("Payment gateway '{$this->getProvider()}' does not support checkout");
+        }
+
+        /** @var CheckoutGatewayInterface $gateway */
+        $gateway = $this->gateway;
+        $provider = $this->getProvider();
 
         $addon = Addon::where('slug', $addonSlug)->first();
 
@@ -166,7 +205,6 @@ class CheckoutService
         }
 
         $priceField = $billingPeriod === 'yearly' ? 'price_yearly' : 'price_monthly';
-        $stripePriceField = $billingPeriod === 'yearly' ? 'stripe_price_yearly_id' : 'stripe_price_monthly_id';
 
         if (! $addon->{$priceField}) {
             throw new AddonException("Addon {$addonSlug} does not support {$billingPeriod} billing");
@@ -181,18 +219,19 @@ class CheckoutService
             throw new AddonException("Maximum quantity is {$addon->max_quantity}");
         }
 
-        // Ensure customer has Stripe customer ID
+        // Ensure customer exists
         $customer = $tenant->customer;
         if (! $customer) {
             throw new AddonException('Tenant has no associated customer for billing');
         }
 
         // Gateway handles customer creation
-        $this->gateway->ensureCustomer($customer);
+        $gateway->ensureCustomer($customer);
 
-        // Build line items
-        $lineItems = $addon->{$stripePriceField}
-            ? [['price' => $addon->{$stripePriceField}, 'quantity' => $quantity]]
+        // Build line items - use provider-specific price ID if available
+        $priceId = $addon->getProviderPriceId($provider, $billingPeriod);
+        $lineItems = $priceId
+            ? [['price' => $priceId, 'quantity' => $quantity]]
             : [[
                 'price_data' => [
                     'currency' => config('payment.currency', 'brl'),
@@ -211,7 +250,7 @@ class CheckoutService
             ]];
 
         try {
-            $session = $this->gateway->createCheckoutWithItems($customer, $lineItems, [
+            $session = $gateway->createCheckoutWithItems($customer, $lineItems, [
                 'mode' => 'subscription',
                 'locale' => stripe_locale(),
                 'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
@@ -238,6 +277,7 @@ class CheckoutService
                 'tenant_id' => $tenant->id,
                 'addon_slug' => $addon->slug,
                 'billing_period' => $billingPeriod,
+                'provider' => $provider,
                 'session_id' => $session['id'],
             ]);
 
@@ -249,6 +289,7 @@ class CheckoutService
             Log::error('Failed to create subscription checkout session', [
                 'tenant_id' => $tenant->id,
                 'addon_slug' => $addon->slug,
+                'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
             throw new AddonException('Failed to create checkout session: '.$e->getMessage());
@@ -260,11 +301,14 @@ class CheckoutService
      */
     public function handleCheckoutCompleted(string $sessionId): ?AddonPurchase
     {
-        if (! $this->isConfigured()) {
+        if (! $this->isConfigured() || ! $this->supportsCheckout()) {
             return null;
         }
 
-        $purchase = AddonPurchase::where('stripe_checkout_session_id', $sessionId)->first();
+        /** @var CheckoutGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
+        $purchase = AddonPurchase::where('provider_checkout_session_id', $sessionId)->first();
 
         if (! $purchase) {
             Log::warning('Purchase not found for checkout session', ['session_id' => $sessionId]);
@@ -276,13 +320,13 @@ class CheckoutService
             return $purchase; // Already processed
         }
 
-        // Verify with Stripe
+        // Verify with payment provider
         try {
-            $session = $this->gateway->retrieveCheckoutSession($sessionId);
+            $session = $gateway->retrieveCheckoutSession($sessionId);
 
             if (($session['payment_status'] ?? null) === 'paid') {
                 $purchase->update([
-                    'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
+                    'provider_payment_intent_id' => $session['payment_intent'] ?? null,
                 ]);
                 $purchase->markAsCompleted();
 
@@ -291,6 +335,7 @@ class CheckoutService
         } catch (\Exception $e) {
             Log::error('Failed to verify checkout session', [
                 'session_id' => $sessionId,
+                'provider' => $this->getProvider(),
                 'error' => $e->getMessage(),
             ]);
         }
@@ -303,12 +348,15 @@ class CheckoutService
      */
     public function getSessionStatus(string $sessionId): ?array
     {
-        if (! $this->isConfigured()) {
+        if (! $this->isConfigured() || ! $this->supportsCheckout()) {
             return null;
         }
 
+        /** @var CheckoutGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         try {
-            $session = $this->gateway->retrieveCheckoutSession($sessionId);
+            $session = $gateway->retrieveCheckoutSession($sessionId);
 
             return [
                 'status' => $session['status'] ?? null,
@@ -319,6 +367,7 @@ class CheckoutService
         } catch (\Exception $e) {
             Log::error('Failed to retrieve checkout session', [
                 'session_id' => $sessionId,
+                'provider' => $this->getProvider(),
                 'error' => $e->getMessage(),
             ]);
 
@@ -332,10 +381,17 @@ class CheckoutService
     public function refundPurchase(AddonPurchase $purchase, ?int $amount = null): bool
     {
         if (! $this->isConfigured()) {
-            throw new AddonException('Stripe gateway not configured');
+            throw new AddonException('Payment gateway not configured');
         }
 
-        if (! $purchase->stripe_payment_intent_id) {
+        if (! $this->supportsRefunds()) {
+            throw new AddonException("Payment gateway '{$this->getProvider()}' does not support refunds");
+        }
+
+        /** @var RefundGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
+        if (! $purchase->provider_payment_intent_id) {
             throw new AddonException('No payment intent found for this purchase');
         }
 
@@ -344,13 +400,14 @@ class CheckoutService
         }
 
         try {
-            $this->gateway->createRefund($purchase->stripe_payment_intent_id, $amount);
+            $gateway->createRefund($purchase->provider_payment_intent_id, $amount);
             $purchase->refund();
 
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to process refund', [
                 'purchase_id' => $purchase->id,
+                'provider' => $this->getProvider(),
                 'error' => $e->getMessage(),
             ]);
 

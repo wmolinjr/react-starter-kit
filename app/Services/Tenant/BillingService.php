@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\Tenant;
 
+use App\Contracts\Payment\CheckoutGatewayInterface;
+use App\Contracts\Payment\InvoiceGatewayInterface;
+use App\Contracts\Payment\PaymentGatewayInterface;
+use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\Models\Central\Payment;
 use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
-use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -21,25 +24,45 @@ use Illuminate\Support\Facades\Log;
  */
 class BillingService
 {
-    protected ?StripeGateway $stripeGateway = null;
+    protected ?PaymentGatewayInterface $gateway = null;
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        // Get the Stripe gateway (will be null if not configured)
-        try {
-            $this->stripeGateway = $this->gatewayManager->stripe();
-        } catch (\Exception $e) {
-            // Gateway not available
-        }
+        // Get the default configured gateway
+        $this->gateway = $this->gatewayManager->driver();
     }
 
     /**
-     * Check if Stripe is configured.
+     * Check if gateway is configured and available.
      */
-    public function isStripeConfigured(): bool
+    public function isGatewayConfigured(): bool
     {
-        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
+        return $this->gateway !== null && $this->gateway->isAvailable();
+    }
+
+    /**
+     * Check if gateway supports checkout operations.
+     */
+    protected function supportsCheckout(): bool
+    {
+        return $this->gateway instanceof CheckoutGatewayInterface;
+    }
+
+    /**
+     * Check if gateway supports subscription operations.
+     */
+    protected function supportsSubscriptions(): bool
+    {
+        return $this->gateway instanceof SubscriptionGatewayInterface;
+    }
+
+    /**
+     * Check if gateway supports invoice operations.
+     */
+    protected function supportsInvoices(): bool
+    {
+        return $this->gateway instanceof InvoiceGatewayInterface;
     }
 
     /**
@@ -168,22 +191,34 @@ class BillingService
     public function createCheckout(Tenant $tenant, string $planSlug): array
     {
         $plan = Plan::where('slug', $planSlug)->firstOrFail();
-        $priceId = $plan->stripe_price_id;
 
         $customer = $tenant->customer;
         if (! $customer) {
             throw new \RuntimeException('Tenant has no associated customer for billing');
         }
 
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured');
+        if (! $this->isGatewayConfigured()) {
+            throw new \RuntimeException('Payment gateway is not configured');
+        }
+
+        if (! $this->supportsCheckout()) {
+            throw new \RuntimeException('Payment gateway does not support checkout sessions');
+        }
+
+        /** @var CheckoutGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
+        // Get the price ID for the current gateway
+        $priceId = $plan->getProviderPriceId($this->gateway->getIdentifier());
+        if (! $priceId) {
+            throw new \RuntimeException("Plan has no price configured for gateway: {$this->gateway->getIdentifier()}");
         }
 
         try {
-            $session = $this->stripeGateway->createSubscriptionCheckout($customer, $priceId, [
+            $session = $gateway->createSubscriptionCheckout($customer, $priceId, [
                 'success_url' => route('tenant.admin.billing.success').'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('tenant.admin.billing.index'),
-                'locale' => stripe_locale(),
+                'locale' => app()->getLocale(),
                 'trial_days' => 14,
                 'metadata' => [
                     'tenant_id' => $tenant->id,
@@ -200,6 +235,7 @@ class BillingService
             Log::error('Failed to create checkout session', [
                 'tenant_id' => $tenant->id,
                 'plan_slug' => $planSlug,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to create checkout session: '.$e->getMessage());
@@ -227,7 +263,7 @@ class BillingService
     }
 
     /**
-     * Get URL to Stripe billing portal.
+     * Get URL to billing portal.
      */
     public function getPortalUrl(Tenant $tenant): ?string
     {
@@ -236,17 +272,25 @@ class BillingService
             return null;
         }
 
-        if (! $this->isStripeConfigured()) {
+        if (! $this->isGatewayConfigured()) {
             return null;
         }
 
-        $stripeId = $customer->getProviderCustomerId('stripe');
-        if (! $stripeId) {
+        // Portal session requires CheckoutGatewayInterface
+        if (! $this->supportsCheckout()) {
             return null;
         }
+
+        $providerId = $customer->getProviderCustomerId($this->gateway->getIdentifier());
+        if (! $providerId) {
+            return null;
+        }
+
+        /** @var CheckoutGatewayInterface $gateway */
+        $gateway = $this->gateway;
 
         try {
-            $session = $this->stripeGateway->createPortalSession(
+            $session = $gateway->createPortalSession(
                 $customer,
                 route('tenant.admin.billing.index')
             );
@@ -255,6 +299,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to create billing portal session', [
                 'tenant_id' => $tenant->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
 
@@ -288,12 +333,19 @@ class BillingService
             abort(404, 'Invoice not found');
         }
 
-        if (! $this->isStripeConfigured()) {
-            abort(500, 'Stripe is not configured');
+        if (! $this->isGatewayConfigured()) {
+            abort(500, 'Payment gateway is not configured');
         }
 
+        if (! $this->supportsInvoices()) {
+            abort(500, 'Payment gateway does not support invoices');
+        }
+
+        /** @var InvoiceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         try {
-            $pdfUrl = $this->stripeGateway->getInvoicePdfUrl($payment->provider_invoice_id);
+            $pdfUrl = $gateway->getInvoicePdfUrl($payment->provider_invoice_id);
 
             if ($pdfUrl) {
                 return redirect($pdfUrl);
@@ -303,6 +355,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to retrieve invoice', [
                 'payment_id' => $paymentId,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             abort(500, 'Failed to retrieve invoice');
@@ -492,12 +545,15 @@ class BillingService
             return null;
         }
 
-        if (! $this->isStripeConfigured()) {
+        if (! $this->isGatewayConfigured() || ! $this->supportsInvoices()) {
             return null;
         }
 
+        /** @var InvoiceGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         try {
-            $upcomingInvoice = $this->stripeGateway->getUpcomingInvoice($customer);
+            $upcomingInvoice = $gateway->getUpcomingInvoice($customer);
 
             if (! $upcomingInvoice) {
                 return null;
@@ -613,29 +669,31 @@ class BillingService
             throw new \RuntimeException('Subscription has no provider ID');
         }
 
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured');
+        if (! $this->isGatewayConfigured()) {
+            throw new \RuntimeException('Payment gateway is not configured');
         }
 
+        if (! $this->supportsSubscriptions()) {
+            throw new \RuntimeException('Payment gateway does not support subscriptions');
+        }
+
+        /** @var SubscriptionGatewayInterface $gateway */
+        $gateway = $this->gateway;
+
         try {
-            if ($immediately) {
-                $this->stripeGateway->cancelSubscriptionRaw($subscription->provider_subscription_id);
+            $result = $gateway->cancelSubscription($subscription, $immediately);
+
+            if ($result->success) {
                 $subscription->update([
-                    'status' => 'canceled',
-                    'ends_at' => now(),
-                ]);
-            } else {
-                $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
-                    'cancel_at_period_end' => true,
-                ]);
-                $subscription->update([
-                    'ends_at' => $subscription->current_period_end,
+                    'status' => $immediately ? 'canceled' : $subscription->status,
+                    'ends_at' => $immediately ? now() : $subscription->current_period_end,
                 ]);
             }
 
             Log::info('Subscription canceled', [
                 'tenant_id' => $tenant->id,
                 'subscription_id' => $subscription->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'immediately' => $immediately,
             ]);
 
@@ -648,6 +706,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to cancel subscription', [
                 'tenant_id' => $tenant->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to cancel subscription: '.$e->getMessage());
@@ -669,22 +728,26 @@ class BillingService
             throw new \RuntimeException('Subscription is not on grace period and cannot be resumed');
         }
 
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured');
+        if (! $this->isGatewayConfigured() || ! $this->supportsSubscriptions()) {
+            throw new \RuntimeException('Payment gateway does not support subscriptions');
         }
 
-        try {
-            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
-                'cancel_at_period_end' => false,
-            ]);
+        /** @var SubscriptionGatewayInterface $gateway */
+        $gateway = $this->gateway;
 
-            $subscription->update([
-                'ends_at' => null,
-            ]);
+        try {
+            $result = $gateway->resumeSubscription($subscription);
+
+            if ($result->success) {
+                $subscription->update([
+                    'ends_at' => null,
+                ]);
+            }
 
             Log::info('Subscription resumed', [
                 'tenant_id' => $tenant->id,
                 'subscription_id' => $subscription->id,
+                'gateway' => $this->gateway->getIdentifier(),
             ]);
 
             return [
@@ -694,6 +757,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to resume subscription', [
                 'tenant_id' => $tenant->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to resume subscription: '.$e->getMessage());
@@ -701,7 +765,7 @@ class BillingService
     }
 
     /**
-     * Pause subscription (Stripe payment collection).
+     * Pause subscription payment collection.
      */
     public function pauseSubscription(Tenant $tenant): array
     {
@@ -711,24 +775,26 @@ class BillingService
             throw new \RuntimeException('No active subscription found');
         }
 
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured');
+        if (! $this->isGatewayConfigured() || ! $this->supportsSubscriptions()) {
+            throw new \RuntimeException('Payment gateway does not support subscriptions');
         }
 
-        try {
-            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
-                'pause_collection' => [
-                    'behavior' => 'void',
-                ],
-            ]);
+        /** @var SubscriptionGatewayInterface $gateway */
+        $gateway = $this->gateway;
 
-            $subscription->update([
-                'status' => 'paused',
-            ]);
+        try {
+            $result = $gateway->pauseSubscription($subscription);
+
+            if ($result->success) {
+                $subscription->update([
+                    'status' => 'paused',
+                ]);
+            }
 
             Log::info('Subscription paused', [
                 'tenant_id' => $tenant->id,
                 'subscription_id' => $subscription->id,
+                'gateway' => $this->gateway->getIdentifier(),
             ]);
 
             return [
@@ -738,6 +804,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to pause subscription', [
                 'tenant_id' => $tenant->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to pause subscription: '.$e->getMessage());
@@ -759,22 +826,26 @@ class BillingService
             throw new \RuntimeException('Subscription is not paused');
         }
 
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured');
+        if (! $this->isGatewayConfigured() || ! $this->supportsSubscriptions()) {
+            throw new \RuntimeException('Payment gateway does not support subscriptions');
         }
 
-        try {
-            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
-                'pause_collection' => '',
-            ]);
+        /** @var SubscriptionGatewayInterface $gateway */
+        $gateway = $this->gateway;
 
-            $subscription->update([
-                'status' => 'active',
-            ]);
+        try {
+            $result = $gateway->resumeSubscription($subscription);
+
+            if ($result->success) {
+                $subscription->update([
+                    'status' => 'active',
+                ]);
+            }
 
             Log::info('Subscription unpaused', [
                 'tenant_id' => $tenant->id,
                 'subscription_id' => $subscription->id,
+                'gateway' => $this->gateway->getIdentifier(),
             ]);
 
             return [
@@ -784,6 +855,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to unpause subscription', [
                 'tenant_id' => $tenant->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to unpause subscription: '.$e->getMessage());
@@ -803,45 +875,37 @@ class BillingService
 
         $newPlan = Plan::where('slug', $newPlanSlug)->firstOrFail();
 
-        if (! $newPlan->stripe_price_id) {
-            throw new \RuntimeException('Plan has no Stripe price configured');
+        if (! $this->isGatewayConfigured() || ! $this->supportsSubscriptions()) {
+            throw new \RuntimeException('Payment gateway does not support subscriptions');
         }
 
-        if (! $this->isStripeConfigured()) {
-            throw new \RuntimeException('Stripe is not configured');
+        $newPriceId = $newPlan->getProviderPriceId($this->gateway->getIdentifier());
+        if (! $newPriceId) {
+            throw new \RuntimeException("Plan has no price configured for gateway: {$this->gateway->getIdentifier()}");
         }
+
+        /** @var SubscriptionGatewayInterface $gateway */
+        $gateway = $this->gateway;
 
         try {
-            // Get current subscription item
-            $stripeSubscription = $this->stripeGateway->retrieveSubscription($subscription->provider_subscription_id);
-            $subscriptionItemId = $stripeSubscription['items']['data'][0]['id'] ?? null;
+            $result = $gateway->updateSubscription($subscription, $newPriceId, [
+                'prorate' => true,
+            ]);
 
-            if (! $subscriptionItemId) {
-                throw new \RuntimeException('Could not find subscription item');
+            if ($result->success) {
+                // Update local subscription
+                $subscription->update([
+                    'provider_price_id' => $newPriceId,
+                ]);
+
+                // Update tenant plan
+                $tenant->update(['plan_id' => $newPlan->id]);
             }
-
-            // Update the subscription with new price
-            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
-                'items' => [
-                    [
-                        'id' => $subscriptionItemId,
-                        'price' => $newPlan->stripe_price_id,
-                    ],
-                ],
-                'proration_behavior' => 'create_prorations',
-            ]);
-
-            // Update local subscription
-            $subscription->update([
-                'provider_price_id' => $newPlan->stripe_price_id,
-            ]);
-
-            // Update tenant plan
-            $tenant->update(['plan_id' => $newPlan->id]);
 
             Log::info('Subscription plan changed', [
                 'tenant_id' => $tenant->id,
                 'subscription_id' => $subscription->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'new_plan' => $newPlanSlug,
             ]);
 
@@ -852,6 +916,7 @@ class BillingService
         } catch (\Exception $e) {
             Log::error('Failed to change subscription plan', [
                 'tenant_id' => $tenant->id,
+                'gateway' => $this->gateway->getIdentifier(),
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to change plan: '.$e->getMessage());
