@@ -61,9 +61,14 @@ return [
         |----------------------------------------------------------------------
         | Stripe Configuration
         |----------------------------------------------------------------------
+        |
+        | Note: Credentials are managed in the database via PaymentSetting model
+        | (Admin > Payment Settings). ENV vars below are fallbacks for development
+        | or initial setup before database configuration.
+        |
         */
         'stripe' => [
-            'enabled' => env('STRIPE_ENABLED', true),
+            // Credentials (DB takes precedence, ENV is fallback)
             'key' => env('STRIPE_KEY'),
             'secret' => env('STRIPE_SECRET'),
             'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
@@ -74,10 +79,10 @@ return [
                 'api_version' => env('STRIPE_API_VERSION', '2024-06-20'),
             ],
 
-            // Supported payment types
+            // Supported payment types (static per gateway)
             'payment_types' => ['card'],
 
-            // Features
+            // Features supported by this gateway
             'features' => [
                 'subscriptions' => true,
                 'payment_methods' => true,

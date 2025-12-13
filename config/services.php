@@ -35,17 +35,7 @@ return [
         ],
     ],
 
-    'stripe' => [
-        'key' => env('STRIPE_KEY'),
-        'secret' => env('STRIPE_SECRET'),
-        'webhook' => [
-            'secret' => env('STRIPE_WEBHOOK_SECRET'),
-        ],
-        'prices' => [
-            'starter' => env('STRIPE_PRICE_STARTER', 'price_starter_placeholder'),
-            'professional' => env('STRIPE_PRICE_PROFESSIONAL', 'price_pro_placeholder'),
-            'enterprise' => env('STRIPE_PRICE_ENTERPRISE', 'price_enterprise_placeholder'),
-        ],
-    ],
+    // Note: Stripe configuration moved to config/payment.php
+    // Credentials are managed via PaymentSetting model (Admin > Payment Settings)
 
 ];

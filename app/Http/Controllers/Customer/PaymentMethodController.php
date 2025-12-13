@@ -50,10 +50,11 @@ class PaymentMethodController extends Controller
 
         if ($providerName === 'stripe') {
             try {
-                $setupIntent = $gateway->createSetupIntent($customer);
+                $stripeGateway = $this->gatewayManager->stripe();
+                $setupIntent = $stripeGateway->createSetupIntent($customer);
                 $setupData = [
                     'client_secret' => $setupIntent->providerData['client_secret'] ?? null,
-                    'publishable_key' => config('services.stripe.key'),
+                    'publishable_key' => $stripeGateway->getPublishableKey(),
                 ];
             } catch (\Exception $e) {
                 report($e);
@@ -172,7 +173,7 @@ class PaymentMethodController extends Controller
             $gateway = $this->gatewayManager->driver($paymentMethod->provider);
 
             if ($paymentMethod->provider_method_id && method_exists($gateway, 'detachPaymentMethod')) {
-                $gateway->detachPaymentMethod($customer, $paymentMethod->provider_method_id);
+                $gateway->detachPaymentMethod($paymentMethod);
             }
         } catch (\Exception $e) {
             report($e);
@@ -205,7 +206,7 @@ class PaymentMethodController extends Controller
             $gateway = $this->gatewayManager->driver($paymentMethod->provider);
 
             if ($paymentMethod->provider_method_id && method_exists($gateway, 'setDefaultPaymentMethod')) {
-                $gateway->setDefaultPaymentMethod($customer, $paymentMethod->provider_method_id);
+                $gateway->setDefaultPaymentMethod($customer, $paymentMethod);
             }
         } catch (\Exception $e) {
             report($e);

@@ -9,21 +9,31 @@ use App\Models\Central\Addon;
 use App\Models\Central\AddonPurchase;
 use App\Models\Central\Customer;
 use App\Models\Central\Tenant;
+use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
-use Stripe\StripeClient;
 
 class CheckoutService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $gateway = null;
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+        // Get the Stripe gateway (will be null if not configured)
+        try {
+            $this->gateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    public function isConfigured(): bool
+    {
+        return $this->gateway !== null && $this->gateway->isAvailable();
     }
 
     /**
@@ -36,6 +46,10 @@ class CheckoutService
         ?string $successUrl = null,
         ?string $cancelUrl = null
     ): array {
+        if (! $this->isConfigured()) {
+            throw new AddonException('Stripe gateway not configured');
+        }
+
         $addon = Addon::where('slug', $addonSlug)->first();
 
         if (! $addon) {
@@ -61,7 +75,8 @@ class CheckoutService
             throw new AddonException('Tenant has no associated customer for billing');
         }
 
-        $stripeCustomerId = $this->ensureStripeCustomer($customer);
+        // Gateway handles customer creation
+        $this->gateway->ensureCustomer($customer);
 
         // Create pending purchase record
         $purchase = AddonPurchase::create([
@@ -80,51 +95,42 @@ class CheckoutService
             ],
         ]);
 
-        // Build checkout session
-        $sessionParams = [
-            'customer' => $stripeCustomerId,
-            'mode' => 'payment',
-            'locale' => stripe_locale(),
-            'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => $cancelUrl ?? $tenant->url().route('tenant.admin.addons.index', [], false),
-            'metadata' => [
-                'tenant_id' => $tenant->id,
-                'customer_id' => $customer->id,
-                'addon_slug' => $addon->slug,
-                'quantity' => $quantity,
-                'purchase_id' => $purchase->id,
-                'purchase_type' => 'one_time',
-            ],
-        ];
-
-        // Use Stripe Price ID if available, otherwise ad-hoc
-        if ($addon->stripe_price_one_time_id) {
-            $sessionParams['line_items'] = [
-                ['price' => $addon->stripe_price_one_time_id, 'quantity' => $quantity],
-            ];
-        } else {
-            $sessionParams['line_items'] = [
-                [
-                    'price_data' => [
-                        'currency' => config('payment.currency', 'usd'),
-                        'product_data' => [
-                            'name' => $addon->name,
-                            'description' => $addon->description,
-                        ],
-                        'unit_amount' => $addon->price_one_time,
+        // Build line items
+        $lineItems = $addon->stripe_price_one_time_id
+            ? [['price' => $addon->stripe_price_one_time_id, 'quantity' => $quantity]]
+            : [[
+                'price_data' => [
+                    'currency' => config('payment.currency', 'brl'),
+                    'product_data' => [
+                        'name' => $addon->name,
+                        'description' => $addon->description,
                     ],
-                    'quantity' => $quantity,
+                    'unit_amount' => $addon->price_one_time,
                 ],
-            ];
-        }
+                'quantity' => $quantity,
+            ]];
 
         try {
-            $session = $this->stripe->checkout->sessions->create($sessionParams);
-            $purchase->update(['stripe_checkout_session_id' => $session->id]);
+            $session = $this->gateway->createCheckoutWithItems($customer, $lineItems, [
+                'mode' => 'payment',
+                'locale' => stripe_locale(),
+                'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => $cancelUrl ?? $tenant->url().route('tenant.admin.addons.index', [], false),
+                'metadata' => [
+                    'tenant_id' => $tenant->id,
+                    'customer_id' => $customer->id,
+                    'addon_slug' => $addon->slug,
+                    'quantity' => $quantity,
+                    'purchase_id' => $purchase->id,
+                    'purchase_type' => 'one_time',
+                ],
+            ]);
+
+            $purchase->update(['stripe_checkout_session_id' => $session['id']]);
 
             return [
-                'session_id' => $session->id,
-                'url' => $session->url,
+                'session_id' => $session['id'],
+                'url' => $session['url'],
                 'purchase_id' => $purchase->id,
             ];
         } catch (\Exception $e) {
@@ -149,6 +155,10 @@ class CheckoutService
         ?string $successUrl = null,
         ?string $cancelUrl = null
     ): array {
+        if (! $this->isConfigured()) {
+            throw new AddonException('Stripe gateway not configured');
+        }
+
         $addon = Addon::where('slug', $addonSlug)->first();
 
         if (! $addon) {
@@ -177,73 +187,63 @@ class CheckoutService
             throw new AddonException('Tenant has no associated customer for billing');
         }
 
-        $stripeCustomerId = $this->ensureStripeCustomer($customer);
+        // Gateway handles customer creation
+        $this->gateway->ensureCustomer($customer);
 
-        // Build checkout session
-        $sessionParams = [
-            'customer' => $stripeCustomerId,
-            'mode' => 'subscription',
-            'locale' => stripe_locale(),
-            'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => $cancelUrl ?? $tenant->url().route('tenant.admin.addons.index', [], false),
-            'metadata' => [
-                'tenant_id' => $tenant->id,
-                'customer_id' => $customer->id,
-                'addon_slug' => $addon->slug,
+        // Build line items
+        $lineItems = $addon->{$stripePriceField}
+            ? [['price' => $addon->{$stripePriceField}, 'quantity' => $quantity]]
+            : [[
+                'price_data' => [
+                    'currency' => config('payment.currency', 'brl'),
+                    'product_data' => [
+                        'name' => $addon->name,
+                        'description' => $addon->description,
+                        'metadata' => [
+                            'addon_slug' => $addon->slug,
+                            'addon_type' => $addon->type->value,
+                        ],
+                    ],
+                    'unit_amount' => $addon->{$priceField},
+                    'recurring' => ['interval' => $billingPeriod === 'yearly' ? 'year' : 'month'],
+                ],
                 'quantity' => $quantity,
-                'billing_period' => $billingPeriod,
-                'purchase_type' => 'subscription',
-            ],
-            'subscription_data' => [
+            ]];
+
+        try {
+            $session = $this->gateway->createCheckoutWithItems($customer, $lineItems, [
+                'mode' => 'subscription',
+                'locale' => stripe_locale(),
+                'success_url' => $successUrl ?? $tenant->url().route('tenant.admin.addons.success', [], false).'?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => $cancelUrl ?? $tenant->url().route('tenant.admin.addons.index', [], false),
                 'metadata' => [
                     'tenant_id' => $tenant->id,
                     'customer_id' => $customer->id,
                     'addon_slug' => $addon->slug,
-                    'billing_period' => $billingPeriod,
-                ],
-            ],
-        ];
-
-        // Use Stripe Price ID if available
-        if ($addon->{$stripePriceField}) {
-            $sessionParams['line_items'] = [
-                ['price' => $addon->{$stripePriceField}, 'quantity' => $quantity],
-            ];
-        } else {
-            $interval = $billingPeriod === 'yearly' ? 'year' : 'month';
-            $sessionParams['line_items'] = [
-                [
-                    'price_data' => [
-                        'currency' => config('payment.currency', 'usd'),
-                        'product_data' => [
-                            'name' => $addon->name,
-                            'description' => $addon->description,
-                            'metadata' => [
-                                'addon_slug' => $addon->slug,
-                                'addon_type' => $addon->type->value,
-                            ],
-                        ],
-                        'unit_amount' => $addon->{$priceField},
-                        'recurring' => ['interval' => $interval],
-                    ],
                     'quantity' => $quantity,
+                    'billing_period' => $billingPeriod,
+                    'purchase_type' => 'subscription',
                 ],
-            ];
-        }
-
-        try {
-            $session = $this->stripe->checkout->sessions->create($sessionParams);
+                'subscription_data' => [
+                    'metadata' => [
+                        'tenant_id' => $tenant->id,
+                        'customer_id' => $customer->id,
+                        'addon_slug' => $addon->slug,
+                        'billing_period' => $billingPeriod,
+                    ],
+                ],
+            ]);
 
             Log::info('Subscription checkout session created', [
                 'tenant_id' => $tenant->id,
                 'addon_slug' => $addon->slug,
                 'billing_period' => $billingPeriod,
-                'session_id' => $session->id,
+                'session_id' => $session['id'],
             ]);
 
             return [
-                'session_id' => $session->id,
-                'url' => $session->url,
+                'session_id' => $session['id'],
+                'url' => $session['url'],
             ];
         } catch (\Exception $e) {
             Log::error('Failed to create subscription checkout session', [
@@ -260,6 +260,10 @@ class CheckoutService
      */
     public function handleCheckoutCompleted(string $sessionId): ?AddonPurchase
     {
+        if (! $this->isConfigured()) {
+            return null;
+        }
+
         $purchase = AddonPurchase::where('stripe_checkout_session_id', $sessionId)->first();
 
         if (! $purchase) {
@@ -274,11 +278,11 @@ class CheckoutService
 
         // Verify with Stripe
         try {
-            $session = $this->stripe->checkout->sessions->retrieve($sessionId);
+            $session = $this->gateway->retrieveCheckoutSession($sessionId);
 
-            if ($session->payment_status === 'paid') {
+            if (($session['payment_status'] ?? null) === 'paid') {
                 $purchase->update([
-                    'stripe_payment_intent_id' => $session->payment_intent,
+                    'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
                 ]);
                 $purchase->markAsCompleted();
 
@@ -299,14 +303,18 @@ class CheckoutService
      */
     public function getSessionStatus(string $sessionId): ?array
     {
+        if (! $this->isConfigured()) {
+            return null;
+        }
+
         try {
-            $session = $this->stripe->checkout->sessions->retrieve($sessionId);
+            $session = $this->gateway->retrieveCheckoutSession($sessionId);
 
             return [
-                'status' => $session->status,
-                'payment_status' => $session->payment_status,
-                'customer_email' => $session->customer_details?->email,
-                'amount_total' => $session->amount_total,
+                'status' => $session['status'] ?? null,
+                'payment_status' => $session['payment_status'] ?? null,
+                'customer_email' => $session['customer_details']['email'] ?? null,
+                'amount_total' => $session['amount_total'] ?? null,
             ];
         } catch (\Exception $e) {
             Log::error('Failed to retrieve checkout session', [
@@ -323,6 +331,10 @@ class CheckoutService
      */
     public function refundPurchase(AddonPurchase $purchase, ?int $amount = null): bool
     {
+        if (! $this->isConfigured()) {
+            throw new AddonException('Stripe gateway not configured');
+        }
+
         if (! $purchase->stripe_payment_intent_id) {
             throw new AddonException('No payment intent found for this purchase');
         }
@@ -332,16 +344,7 @@ class CheckoutService
         }
 
         try {
-            $refundParams = [
-                'payment_intent' => $purchase->stripe_payment_intent_id,
-            ];
-
-            if ($amount) {
-                $refundParams['amount'] = $amount;
-            }
-
-            $this->stripe->refunds->create($refundParams);
-
+            $this->gateway->createRefund($purchase->stripe_payment_intent_id, $amount);
             $purchase->refund();
 
             return true;
@@ -352,39 +355,6 @@ class CheckoutService
             ]);
 
             throw new AddonException('Failed to process refund: '.$e->getMessage());
-        }
-    }
-
-    /**
-     * Ensure customer has a Stripe customer ID.
-     */
-    protected function ensureStripeCustomer(Customer $customer): string
-    {
-        $stripeId = $customer->getProviderId('stripe');
-
-        if ($stripeId) {
-            return $stripeId;
-        }
-
-        // Create Stripe customer
-        try {
-            $stripeCustomer = $this->stripe->customers->create([
-                'email' => $customer->email,
-                'name' => $customer->name ?? $customer->email,
-                'metadata' => [
-                    'customer_id' => $customer->id,
-                ],
-            ]);
-
-            $customer->setProviderId('stripe', $stripeCustomer->id);
-
-            return $stripeCustomer->id;
-        } catch (\Exception $e) {
-            Log::error('Failed to create Stripe customer', [
-                'customer_id' => $customer->id,
-                'error' => $e->getMessage(),
-            ]);
-            throw new AddonException('Failed to create payment customer: '.$e->getMessage());
         }
     }
 }

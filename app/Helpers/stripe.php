@@ -175,3 +175,7 @@ if (! function_exists('stripe_currency_config')) {
         ];
     }
 }
+
+// NOTE: Credential-related helpers (stripe_config, stripe_secret, stripe_key,
+// stripe_webhook_secret, stripe_is_sandbox) have been removed.
+// Use PaymentGatewayManager->stripe() to get Stripe configuration and credentials.

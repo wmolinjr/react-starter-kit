@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Payment;
 
+use App\Contracts\Payment\CheckoutGatewayInterface;
+use App\Contracts\Payment\InvoiceGatewayInterface;
+use App\Contracts\Payment\MeteredBillingGatewayInterface;
 use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Contracts\Payment\PaymentMethodGatewayInterface;
+use App\Contracts\Payment\ProductPriceGatewayInterface;
 use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\Enums\PaymentGateway;
 use App\Services\Central\PaymentSettingsService;
@@ -146,6 +150,88 @@ class PaymentGatewayManager extends Manager
         }
 
         return $gateway;
+    }
+
+    /**
+     * Get gateway with product/price management capabilities.
+     *
+     * @throws InvalidArgumentException if driver doesn't support product management
+     */
+    public function productPriceGateway(?string $driver = null): ProductPriceGatewayInterface
+    {
+        $gateway = $this->driver($driver);
+
+        if (! $gateway instanceof ProductPriceGatewayInterface) {
+            throw new InvalidArgumentException(
+                "Driver [{$driver}] does not support product/price management."
+            );
+        }
+
+        return $gateway;
+    }
+
+    /**
+     * Get gateway with checkout capabilities.
+     *
+     * @throws InvalidArgumentException if driver doesn't support checkout
+     */
+    public function checkoutGateway(?string $driver = null): CheckoutGatewayInterface
+    {
+        $gateway = $this->driver($driver);
+
+        if (! $gateway instanceof CheckoutGatewayInterface) {
+            throw new InvalidArgumentException(
+                "Driver [{$driver}] does not support checkout."
+            );
+        }
+
+        return $gateway;
+    }
+
+    /**
+     * Get gateway with invoice capabilities.
+     *
+     * @throws InvalidArgumentException if driver doesn't support invoices
+     */
+    public function invoiceGateway(?string $driver = null): InvoiceGatewayInterface
+    {
+        $gateway = $this->driver($driver);
+
+        if (! $gateway instanceof InvoiceGatewayInterface) {
+            throw new InvalidArgumentException(
+                "Driver [{$driver}] does not support invoices."
+            );
+        }
+
+        return $gateway;
+    }
+
+    /**
+     * Get gateway with metered billing capabilities.
+     *
+     * @throws InvalidArgumentException if driver doesn't support metered billing
+     */
+    public function meteredBillingGateway(?string $driver = null): MeteredBillingGatewayInterface
+    {
+        $gateway = $this->driver($driver);
+
+        if (! $gateway instanceof MeteredBillingGatewayInterface) {
+            throw new InvalidArgumentException(
+                "Driver [{$driver}] does not support metered billing."
+            );
+        }
+
+        return $gateway;
+    }
+
+    /**
+     * Get the Stripe gateway directly (type-safe).
+     *
+     * @return Gateways\StripeGateway
+     */
+    public function stripe(): Gateways\StripeGateway
+    {
+        return $this->driver('stripe');
     }
 
     // =========================================================================

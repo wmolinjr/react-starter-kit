@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services\Tenant;
 
-use App\Models\Central\Customer;
 use App\Models\Central\Payment;
 use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
+use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Stripe\StripeClient;
 
 /**
  * BillingService
@@ -22,15 +21,25 @@ use Stripe\StripeClient;
  */
 class BillingService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $stripeGateway = null;
 
     public function __construct(
         protected PaymentGatewayManager $gatewayManager
     ) {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+        // Get the Stripe gateway (will be null if not configured)
+        try {
+            $this->stripeGateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    public function isStripeConfigured(): bool
+    {
+        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
     }
 
     /**
@@ -166,38 +175,26 @@ class BillingService
             throw new \RuntimeException('Tenant has no associated customer for billing');
         }
 
-        $stripeCustomerId = $this->ensureStripeCustomer($customer);
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured');
+        }
 
-        $sessionParams = [
-            'customer' => $stripeCustomerId,
-            'mode' => 'subscription',
-            'locale' => stripe_locale(),
-            'success_url' => route('tenant.admin.billing.success').'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('tenant.admin.billing.index'),
-            'metadata' => [
-                'tenant_id' => $tenant->id,
-                'customer_id' => $customer->id,
-                'plan_slug' => $planSlug,
-            ],
-            'subscription_data' => [
-                'trial_period_days' => 14,
+        try {
+            $session = $this->stripeGateway->createSubscriptionCheckout($customer, $priceId, [
+                'success_url' => route('tenant.admin.billing.success').'?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('tenant.admin.billing.index'),
+                'locale' => stripe_locale(),
+                'trial_days' => 14,
                 'metadata' => [
                     'tenant_id' => $tenant->id,
                     'customer_id' => $customer->id,
                     'plan_slug' => $planSlug,
                 ],
-            ],
-            'line_items' => [
-                ['price' => $priceId, 'quantity' => 1],
-            ],
-        ];
-
-        try {
-            $session = $this->stripe->checkout->sessions->create($sessionParams);
+            ]);
 
             return [
-                'session_id' => $session->id,
-                'url' => $session->url,
+                'session_id' => $session['id'],
+                'url' => $session['url'],
             ];
         } catch (\Exception $e) {
             Log::error('Failed to create checkout session', [
@@ -239,19 +236,22 @@ class BillingService
             return null;
         }
 
-        $stripeId = $customer->getProviderId('stripe');
+        if (! $this->isStripeConfigured()) {
+            return null;
+        }
+
+        $stripeId = $customer->getProviderCustomerId('stripe');
         if (! $stripeId) {
             return null;
         }
 
         try {
-            $session = $this->stripe->billingPortal->sessions->create([
-                'customer' => $stripeId,
-                'return_url' => route('tenant.admin.billing.index'),
-                'locale' => stripe_locale(),
-            ]);
+            $session = $this->stripeGateway->createPortalSession(
+                $customer,
+                route('tenant.admin.billing.index')
+            );
 
-            return $session->url;
+            return $session['url'];
         } catch (\Exception $e) {
             Log::error('Failed to create billing portal session', [
                 'tenant_id' => $tenant->id,
@@ -288,11 +288,15 @@ class BillingService
             abort(404, 'Invoice not found');
         }
 
-        try {
-            $invoice = $this->stripe->invoices->retrieve($payment->provider_invoice_id);
+        if (! $this->isStripeConfigured()) {
+            abort(500, 'Stripe is not configured');
+        }
 
-            if ($invoice->invoice_pdf) {
-                return redirect($invoice->invoice_pdf);
+        try {
+            $pdfUrl = $this->stripeGateway->getInvoicePdfUrl($payment->provider_invoice_id);
+
+            if ($pdfUrl) {
+                return redirect($pdfUrl);
             }
 
             abort(404, 'Invoice PDF not available');
@@ -488,28 +492,29 @@ class BillingService
             return null;
         }
 
-        $stripeId = $customer->getProviderId('stripe');
-        if (! $stripeId) {
+        if (! $this->isStripeConfigured()) {
             return null;
         }
 
         try {
-            $upcomingInvoice = $this->stripe->invoices->upcoming([
-                'customer' => $stripeId,
-            ]);
+            $upcomingInvoice = $this->stripeGateway->getUpcomingInvoice($customer);
+
+            if (! $upcomingInvoice) {
+                return null;
+            }
 
             return [
-                'total' => '$'.number_format($upcomingInvoice->total / 100, 2),
-                'formattedTotal' => '$'.number_format($upcomingInvoice->total / 100, 2),
-                'dueDate' => $upcomingInvoice->due_date
-                    ? \Carbon\Carbon::createFromTimestamp($upcomingInvoice->due_date)->toISOString()
+                'total' => '$'.number_format($upcomingInvoice['total'] / 100, 2),
+                'formattedTotal' => '$'.number_format($upcomingInvoice['total'] / 100, 2),
+                'dueDate' => isset($upcomingInvoice['due_date'])
+                    ? \Carbon\Carbon::createFromTimestamp($upcomingInvoice['due_date'])->toISOString()
                     : null,
-                'formattedDueDate' => $upcomingInvoice->due_date
-                    ? \Carbon\Carbon::createFromTimestamp($upcomingInvoice->due_date)->toFormattedDateString()
+                'formattedDueDate' => isset($upcomingInvoice['due_date'])
+                    ? \Carbon\Carbon::createFromTimestamp($upcomingInvoice['due_date'])->toFormattedDateString()
                     : null,
-                'items' => collect($upcomingInvoice->lines->data)->map(fn ($line) => [
-                    'description' => $line->description,
-                    'amount' => '$'.number_format($line->amount / 100, 2),
+                'items' => collect($upcomingInvoice['lines']['data'] ?? [])->map(fn ($line) => [
+                    'description' => $line['description'] ?? '',
+                    'amount' => '$'.number_format(($line['amount'] ?? 0) / 100, 2),
                 ])->toArray(),
             ];
         } catch (\Exception $e) {
@@ -608,15 +613,19 @@ class BillingService
             throw new \RuntimeException('Subscription has no provider ID');
         }
 
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured');
+        }
+
         try {
             if ($immediately) {
-                $this->stripe->subscriptions->cancel($subscription->provider_subscription_id);
+                $this->stripeGateway->cancelSubscriptionRaw($subscription->provider_subscription_id);
                 $subscription->update([
                     'status' => 'canceled',
                     'ends_at' => now(),
                 ]);
             } else {
-                $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+                $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
                     'cancel_at_period_end' => true,
                 ]);
                 $subscription->update([
@@ -660,8 +669,12 @@ class BillingService
             throw new \RuntimeException('Subscription is not on grace period and cannot be resumed');
         }
 
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured');
+        }
+
         try {
-            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
                 'cancel_at_period_end' => false,
             ]);
 
@@ -698,8 +711,12 @@ class BillingService
             throw new \RuntimeException('No active subscription found');
         }
 
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured');
+        }
+
         try {
-            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
                 'pause_collection' => [
                     'behavior' => 'void',
                 ],
@@ -742,9 +759,13 @@ class BillingService
             throw new \RuntimeException('Subscription is not paused');
         }
 
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured');
+        }
+
         try {
-            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
-                'pause_collection' => null,
+            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
+                'pause_collection' => '',
             ]);
 
             $subscription->update([
@@ -786,17 +807,21 @@ class BillingService
             throw new \RuntimeException('Plan has no Stripe price configured');
         }
 
+        if (! $this->isStripeConfigured()) {
+            throw new \RuntimeException('Stripe is not configured');
+        }
+
         try {
             // Get current subscription item
-            $stripeSubscription = $this->stripe->subscriptions->retrieve($subscription->provider_subscription_id);
-            $subscriptionItemId = $stripeSubscription->items->data[0]->id ?? null;
+            $stripeSubscription = $this->stripeGateway->retrieveSubscription($subscription->provider_subscription_id);
+            $subscriptionItemId = $stripeSubscription['items']['data'][0]['id'] ?? null;
 
             if (! $subscriptionItemId) {
                 throw new \RuntimeException('Could not find subscription item');
             }
 
             // Update the subscription with new price
-            $this->stripe->subscriptions->update($subscription->provider_subscription_id, [
+            $this->stripeGateway->updateSubscriptionRaw($subscription->provider_subscription_id, [
                 'items' => [
                     [
                         'id' => $subscriptionItemId,
@@ -848,37 +873,5 @@ class BillingService
             ->where('type', 'default')
             ->whereIn('status', ['active', 'trialing', 'past_due'])
             ->first();
-    }
-
-    /**
-     * Ensure customer has a Stripe customer ID.
-     */
-    protected function ensureStripeCustomer(Customer $customer): string
-    {
-        $stripeId = $customer->getProviderId('stripe');
-
-        if ($stripeId) {
-            return $stripeId;
-        }
-
-        try {
-            $stripeCustomer = $this->stripe->customers->create([
-                'email' => $customer->email,
-                'name' => $customer->name ?? $customer->email,
-                'metadata' => [
-                    'customer_id' => $customer->id,
-                ],
-            ]);
-
-            $customer->setProviderId('stripe', $stripeCustomer->id);
-
-            return $stripeCustomer->id;
-        } catch (\Exception $e) {
-            Log::error('Failed to create Stripe customer', [
-                'customer_id' => $customer->id,
-                'error' => $e->getMessage(),
-            ]);
-            throw new \RuntimeException('Failed to create payment customer: '.$e->getMessage());
-        }
     }
 }

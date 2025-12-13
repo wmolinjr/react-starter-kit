@@ -3,25 +3,36 @@
 namespace App\Services\Central;
 
 use App\Models\Central\Plan;
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
-use Stripe\Exception\ApiErrorException;
-use Stripe\StripeClient;
 
 class PlanSyncService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $gateway = null;
 
     /**
      * Default locale for Stripe product names (universal display)
      */
     protected string $defaultLocale = 'en';
 
-    public function __construct()
-    {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        // Get the Stripe gateway (will be null if not configured)
+        try {
+            $this->gateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    public function isConfigured(): bool
+    {
+        return $this->gateway !== null && $this->gateway->isAvailable();
     }
 
     /**
@@ -58,6 +69,12 @@ class PlanSyncService
             'errors' => [],
         ];
 
+        if (! $this->isConfigured()) {
+            $result['errors'][] = 'Stripe gateway not configured';
+
+            return $result;
+        }
+
         try {
             // Sync Product
             $productId = $this->syncProduct($plan, $locale);
@@ -71,7 +88,7 @@ class PlanSyncService
                 $result['stripe_price_id'] = $priceResult;
             }
 
-        } catch (ApiErrorException $e) {
+        } catch (\Exception $e) {
             $result['errors'][] = $e->getMessage();
             Log::error('Stripe plan sync failed', [
                 'plan' => $plan->slug,
@@ -142,7 +159,7 @@ class PlanSyncService
 
         if ($plan->stripe_product_id) {
             // Update existing product
-            $this->stripe->products->update($plan->stripe_product_id, $productData);
+            $this->gateway->updateProduct($plan->stripe_product_id, $productData);
 
             Log::info('Updated Stripe plan product', [
                 'plan' => $plan->slug,
@@ -154,16 +171,16 @@ class PlanSyncService
         }
 
         // Create new product
-        $product = $this->stripe->products->create($productData);
-        $plan->update(['stripe_product_id' => $product->id]);
+        $product = $this->gateway->createProduct($productData);
+        $plan->update(['stripe_product_id' => $product['id']]);
 
         Log::info('Created Stripe plan product', [
             'plan' => $plan->slug,
-            'product_id' => $product->id,
+            'product_id' => $product['id'],
             'locale' => $locale,
         ]);
 
-        return $product->id;
+        return $product['id'];
     }
 
     /**
@@ -212,16 +229,16 @@ class PlanSyncService
             $priceData['recurring'] = ['interval' => $interval];
         }
 
-        $price = $this->stripe->prices->create($priceData);
-        $plan->update(['stripe_price_id' => $price->id]);
+        $price = $this->gateway->createPrice($priceData);
+        $plan->update(['stripe_price_id' => $price['id']]);
 
         Log::info('Created Stripe plan price', [
             'plan' => $plan->slug,
-            'price_id' => $price->id,
+            'price_id' => $price['id'],
             'locale' => $locale,
         ]);
 
-        return $price->id;
+        return $price['id'];
     }
 
     /**
@@ -271,11 +288,13 @@ class PlanSyncService
      */
     public function archivePrice(string $priceId): bool
     {
-        try {
-            $this->stripe->prices->update($priceId, ['active' => false]);
+        if (! $this->isConfigured()) {
+            return false;
+        }
 
-            return true;
-        } catch (ApiErrorException $e) {
+        try {
+            return $this->gateway->archivePrice($priceId);
+        } catch (\Exception $e) {
             Log::error('Failed to archive plan price', [
                 'price_id' => $priceId,
                 'error' => $e->getMessage(),
@@ -290,24 +309,28 @@ class PlanSyncService
      */
     public function importFromStripe(string $productId): ?Plan
     {
+        if (! $this->isConfigured()) {
+            return null;
+        }
+
         try {
-            $product = $this->stripe->products->retrieve($productId);
-            $prices = $this->stripe->prices->all(['product' => $productId, 'active' => true]);
+            $product = $this->gateway->retrieveProduct($productId);
+            $prices = $this->gateway->listPrices($productId);
 
             // Check if plan already exists
             $existingPlan = Plan::where('stripe_product_id', $productId)->first();
 
             if ($existingPlan) {
                 $existingPlan->update([
-                    'is_active' => $product->active,
+                    'is_active' => $product['active'] ?? true,
                 ]);
 
                 // Import price if not set
-                if (! $existingPlan->stripe_price_id && ! empty($prices->data)) {
-                    $price = $prices->data[0];
+                if (! $existingPlan->stripe_price_id && ! empty($prices)) {
+                    $price = $prices[0];
                     $existingPlan->update([
-                        'stripe_price_id' => $price->id,
-                        'price' => $price->unit_amount,
+                        'stripe_price_id' => $price['id'],
+                        'price' => $price['unit_amount'],
                     ]);
                 }
 
@@ -321,28 +344,28 @@ class PlanSyncService
 
             // New plan - try to restore translations from metadata
             $translations = [];
-            if (isset($product->metadata['translations'])) {
-                $translations = json_decode($product->metadata['translations'], true) ?: [];
+            if (isset($product['metadata']['translations'])) {
+                $translations = json_decode($product['metadata']['translations'], true) ?: [];
             }
 
             // Build plan data
             $planData = [
-                'slug' => $product->metadata['plan_slug'] ?? \Str::slug($product->name),
-                'billing_period' => $product->metadata['billing_period'] ?? 'monthly',
-                'is_active' => $product->active,
+                'slug' => $product['metadata']['plan_slug'] ?? \Str::slug($product['name']),
+                'billing_period' => $product['metadata']['billing_period'] ?? 'monthly',
+                'is_active' => $product['active'] ?? true,
                 'stripe_product_id' => $productId,
             ];
 
             // Set translated fields
-            $planData['name'] = $translations['name'] ?? ['en' => $product->name];
-            $planData['description'] = $translations['description'] ?? ($product->description ? ['en' => $product->description] : null);
+            $planData['name'] = $translations['name'] ?? ['en' => $product['name']];
+            $planData['description'] = $translations['description'] ?? (($product['description'] ?? null) ? ['en' => $product['description']] : null);
 
             // Set price from first active price
-            if (! empty($prices->data)) {
-                $price = $prices->data[0];
-                $planData['stripe_price_id'] = $price->id;
-                $planData['price'] = $price->unit_amount;
-                $planData['currency'] = $price->currency;
+            if (! empty($prices)) {
+                $price = $prices[0];
+                $planData['stripe_price_id'] = $price['id'];
+                $planData['price'] = $price['unit_amount'];
+                $planData['currency'] = $price['currency'];
             }
 
             $plan = Plan::create($planData);
@@ -354,7 +377,7 @@ class PlanSyncService
 
             return $plan;
 
-        } catch (ApiErrorException $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to import plan from Stripe', [
                 'product_id' => $productId,
                 'error' => $e->getMessage(),

@@ -11,10 +11,11 @@ use App\Http\Resources\Shared\FeatureDefinitionResource;
 use App\Http\Resources\Shared\LimitDefinitionResource;
 use App\Models\Central\Addon;
 use App\Models\Central\Plan;
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Stripe\StripeClient;
 
 /**
  * PlanService
@@ -24,13 +25,15 @@ use Stripe\StripeClient;
  */
 class PlanService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $stripeGateway = null;
 
-    public function __construct()
-    {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        try {
+            $this->stripeGateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
     }
 
@@ -39,7 +42,7 @@ class PlanService
      */
     protected function isStripeConfigured(): bool
     {
-        return $this->stripe !== null;
+        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
     }
 
     /**
@@ -234,22 +237,22 @@ class PlanService
         try {
             // Create or update Stripe product
             if ($plan->stripe_product_id) {
-                $this->stripe->products->update($plan->stripe_product_id, [
+                $this->stripeGateway->updateProduct($plan->stripe_product_id, [
                     'name' => $plan->name,
                     'description' => $plan->description,
                 ]);
             } else {
-                $product = $this->stripe->products->create([
+                $product = $this->stripeGateway->createProduct([
                     'name' => $plan->name,
                     'description' => $plan->description,
                     'metadata' => ['plan_slug' => $plan->slug],
                 ]);
-                $plan->stripe_product_id = $product->id;
+                $plan->stripe_product_id = $product['id'];
             }
 
             // Create price if needed
             if ($plan->price > 0 && ! $plan->stripe_price_id) {
-                $price = $this->stripe->prices->create([
+                $price = $this->stripeGateway->createPrice([
                     'product' => $plan->stripe_product_id,
                     'unit_amount' => $plan->price,
                     'currency' => $plan->currency ?? stripe_currency(),
@@ -258,7 +261,7 @@ class PlanService
                     ],
                     'metadata' => ['plan_slug' => $plan->slug],
                 ]);
-                $plan->stripe_price_id = $price->id;
+                $plan->stripe_price_id = $price['id'];
             }
 
             $plan->save();

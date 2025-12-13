@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Gateways;
 
+use App\Contracts\Payment\CheckoutGatewayInterface;
+use App\Contracts\Payment\InvoiceGatewayInterface;
+use App\Contracts\Payment\MeteredBillingGatewayInterface;
 use App\Contracts\Payment\PaymentGatewayInterface;
 use App\Contracts\Payment\PaymentMethodGatewayInterface;
+use App\Contracts\Payment\ProductPriceGatewayInterface;
 use App\Contracts\Payment\SubscriptionGatewayInterface;
 use App\DTOs\Payment\ChargeResult;
 use App\DTOs\Payment\PaymentMethodResult;
@@ -37,7 +41,7 @@ use Stripe\Webhook;
  * - Payment methods management
  * - Webhook processing
  */
-class StripeGateway implements PaymentGatewayInterface, PaymentMethodGatewayInterface, SubscriptionGatewayInterface
+class StripeGateway implements CheckoutGatewayInterface, InvoiceGatewayInterface, MeteredBillingGatewayInterface, PaymentGatewayInterface, PaymentMethodGatewayInterface, ProductPriceGatewayInterface, SubscriptionGatewayInterface
 {
     protected array $config;
 
@@ -882,5 +886,483 @@ class StripeGateway implements PaymentGatewayInterface, PaymentMethodGatewayInte
             'paused' => 'paused',
             default => $status,
         };
+    }
+
+    // =========================================================================
+    // ProductPriceGatewayInterface Implementation
+    // =========================================================================
+
+    public function createProduct(array $data): array
+    {
+        try {
+            $product = \Stripe\Product::create($data);
+
+            return $product->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create product: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function updateProduct(string $productId, array $data): array
+    {
+        try {
+            $product = \Stripe\Product::update($productId, $data);
+
+            return $product->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to update product: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function retrieveProduct(string $productId): array
+    {
+        try {
+            $product = \Stripe\Product::retrieve($productId);
+
+            return $product->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to retrieve product: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function archiveProduct(string $productId): bool
+    {
+        try {
+            \Stripe\Product::update($productId, ['active' => false]);
+
+            return true;
+        } catch (ApiErrorException $e) {
+            return false;
+        }
+    }
+
+    public function createPrice(array $data): array
+    {
+        try {
+            $price = \Stripe\Price::create($data);
+
+            return $price->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create price: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function updatePrice(string $priceId, array $data): array
+    {
+        try {
+            $price = \Stripe\Price::update($priceId, $data);
+
+            return $price->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to update price: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function listPrices(string $productId, bool $activeOnly = true): array
+    {
+        try {
+            $params = ['product' => $productId];
+            if ($activeOnly) {
+                $params['active'] = true;
+            }
+
+            $prices = \Stripe\Price::all($params);
+
+            return array_map(fn ($p) => $p->toArray(), $prices->data);
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to list prices: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function archivePrice(string $priceId): bool
+    {
+        try {
+            \Stripe\Price::update($priceId, ['active' => false]);
+
+            return true;
+        } catch (ApiErrorException $e) {
+            return false;
+        }
+    }
+
+    // =========================================================================
+    // CheckoutGatewayInterface Implementation
+    // =========================================================================
+
+    public function createSubscriptionCheckout(
+        Customer $customer,
+        string $priceId,
+        array $options = []
+    ): array {
+        try {
+            $stripeCustomerId = $this->ensureCustomer($customer);
+
+            $params = [
+                'customer' => $stripeCustomerId,
+                'mode' => 'subscription',
+                'line_items' => [
+                    [
+                        'price' => $priceId,
+                        'quantity' => 1,
+                    ],
+                ],
+                'success_url' => $options['success_url'],
+                'cancel_url' => $options['cancel_url'],
+                'metadata' => $options['metadata'] ?? [],
+            ];
+
+            if (! empty($options['trial_days'])) {
+                $params['subscription_data'] = [
+                    'trial_period_days' => $options['trial_days'],
+                ];
+            }
+
+            if (! empty($options['locale'])) {
+                $params['locale'] = $options['locale'];
+            }
+
+            if (! empty($options['allow_promotion_codes'])) {
+                $params['allow_promotion_codes'] = true;
+            }
+
+            $session = CheckoutSession::create($params);
+
+            return [
+                'id' => $session->id,
+                'url' => $session->url,
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create subscription checkout: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function createOneTimeCheckout(
+        Customer $customer,
+        array $lineItem,
+        array $options = []
+    ): array {
+        try {
+            $stripeCustomerId = $this->ensureCustomer($customer);
+
+            $params = [
+                'customer' => $stripeCustomerId,
+                'mode' => 'payment',
+                'line_items' => [
+                    [
+                        'price_data' => [
+                            'currency' => strtolower($options['currency'] ?? config('payment.currency', 'brl')),
+                            'product_data' => [
+                                'name' => $lineItem['name'],
+                                'description' => $lineItem['description'] ?? null,
+                            ],
+                            'unit_amount' => $lineItem['price'],
+                        ],
+                        'quantity' => $lineItem['quantity'] ?? 1,
+                    ],
+                ],
+                'success_url' => $options['success_url'],
+                'cancel_url' => $options['cancel_url'],
+                'metadata' => $options['metadata'] ?? [],
+            ];
+
+            if (! empty($options['locale'])) {
+                $params['locale'] = $options['locale'];
+            }
+
+            $session = CheckoutSession::create($params);
+
+            return [
+                'id' => $session->id,
+                'url' => $session->url,
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create one-time checkout: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function createCheckoutWithItems(
+        Customer $customer,
+        array $lineItems,
+        array $options = []
+    ): array {
+        try {
+            $stripeCustomerId = $this->ensureCustomer($customer);
+
+            $params = [
+                'customer' => $stripeCustomerId,
+                'mode' => $options['mode'] ?? 'payment',
+                'line_items' => $lineItems,
+                'success_url' => $options['success_url'],
+                'cancel_url' => $options['cancel_url'],
+                'metadata' => $options['metadata'] ?? [],
+            ];
+
+            if (! empty($options['locale'])) {
+                $params['locale'] = $options['locale'];
+            }
+
+            if (! empty($options['subscription_data'])) {
+                $params['subscription_data'] = $options['subscription_data'];
+            }
+
+            $session = CheckoutSession::create($params);
+
+            return [
+                'id' => $session->id,
+                'url' => $session->url,
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create checkout: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function retrieveCheckoutSession(string $sessionId): array
+    {
+        try {
+            $session = CheckoutSession::retrieve($sessionId);
+
+            return $session->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to retrieve checkout session: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Create a checkout session with raw parameters.
+     *
+     * Used for signup flows where we don't have a Customer yet.
+     */
+    public function createCheckoutSessionRaw(array $params): array
+    {
+        try {
+            $session = CheckoutSession::create($params);
+
+            return [
+                'id' => $session->id,
+                'url' => $session->url,
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create checkout session: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function createPortalSession(Customer $customer, string $returnUrl): array
+    {
+        try {
+            $stripeCustomerId = $this->ensureCustomer($customer);
+
+            $session = \Stripe\BillingPortal\Session::create([
+                'customer' => $stripeCustomerId,
+                'return_url' => $returnUrl,
+            ]);
+
+            return [
+                'id' => $session->id,
+                'url' => $session->url,
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create portal session: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    // =========================================================================
+    // InvoiceGatewayInterface Implementation
+    // =========================================================================
+
+    public function retrieveInvoice(string $invoiceId): array
+    {
+        try {
+            $invoice = \Stripe\Invoice::retrieve($invoiceId);
+
+            return $invoice->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to retrieve invoice: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function getUpcomingInvoice(Customer $customer, ?string $subscriptionId = null): ?array
+    {
+        try {
+            $stripeCustomerId = $customer->getProviderCustomerId('stripe');
+            if (! $stripeCustomerId) {
+                return null;
+            }
+
+            $params = ['customer' => $stripeCustomerId];
+            if ($subscriptionId) {
+                $params['subscription'] = $subscriptionId;
+            }
+
+            $invoice = \Stripe\Invoice::upcoming($params);
+
+            return $invoice->toArray();
+        } catch (ApiErrorException $e) {
+            // Upcoming invoice may not exist
+            return null;
+        }
+    }
+
+    public function listInvoices(Customer $customer, int $limit = 10): array
+    {
+        try {
+            $stripeCustomerId = $customer->getProviderCustomerId('stripe');
+            if (! $stripeCustomerId) {
+                return [];
+            }
+
+            $invoices = \Stripe\Invoice::all([
+                'customer' => $stripeCustomerId,
+                'limit' => $limit,
+            ]);
+
+            return array_map(fn ($i) => $i->toArray(), $invoices->data);
+        } catch (ApiErrorException $e) {
+            return [];
+        }
+    }
+
+    public function getInvoicePdfUrl(string $invoiceId): ?string
+    {
+        try {
+            $invoice = \Stripe\Invoice::retrieve($invoiceId);
+
+            return $invoice->invoice_pdf;
+        } catch (ApiErrorException $e) {
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // MeteredBillingGatewayInterface Implementation
+    // =========================================================================
+
+    public function createMeterEvent(array $usage): array
+    {
+        try {
+            $meterEvent = \Stripe\Billing\MeterEvent::create([
+                'event_name' => $usage['event_name'],
+                'payload' => [
+                    'stripe_customer_id' => $usage['identifier'],
+                    'value' => (string) $usage['value'],
+                ],
+                'timestamp' => $usage['timestamp'] ?? time(),
+            ]);
+
+            return $meterEvent->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create meter event: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    public function getUsageSummary(string $subscriptionItemId): array
+    {
+        try {
+            $summaries = \Stripe\SubscriptionItem::allUsageRecordSummaries($subscriptionItemId);
+
+            $total = 0;
+            foreach ($summaries->data as $summary) {
+                $total += $summary->total_usage;
+            }
+
+            return [
+                'total_usage' => $total,
+                'summaries' => array_map(fn ($s) => $s->toArray(), $summaries->data),
+            ];
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to get usage summary: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    // =========================================================================
+    // Additional Helper Methods
+    // =========================================================================
+
+    /**
+     * Create a refund by payment intent ID.
+     */
+    public function createRefund(string $paymentIntentId, ?int $amount = null): array
+    {
+        try {
+            $params = ['payment_intent' => $paymentIntentId];
+            if ($amount !== null) {
+                $params['amount'] = $amount;
+            }
+
+            $refund = Refund::create($params);
+
+            return $refund->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create refund: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Create a customer directly with custom data.
+     */
+    public function createCustomer(array $data): array
+    {
+        try {
+            $customer = StripeCustomer::create($data);
+
+            return $customer->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to create customer: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Update subscription directly with custom params.
+     */
+    public function updateSubscriptionRaw(string $subscriptionId, array $params): array
+    {
+        try {
+            $subscription = StripeSubscription::update($subscriptionId, $params);
+
+            return $subscription->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to update subscription: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Cancel subscription directly.
+     */
+    public function cancelSubscriptionRaw(string $subscriptionId): array
+    {
+        try {
+            $subscription = StripeSubscription::retrieve($subscriptionId);
+            $subscription->cancel();
+
+            return $subscription->toArray();
+        } catch (ApiErrorException $e) {
+            throw new \RuntimeException("Failed to cancel subscription: {$e->getMessage()}", 0, $e);
+        }
+    }
+
+    /**
+     * Get the Stripe publishable key.
+     */
+    public function getPublishableKey(): ?string
+    {
+        return $this->config['key'] ?? null;
+    }
+
+    /**
+     * Get the Stripe secret key.
+     * Used for admin operations that require direct API access.
+     */
+    public function getSecretKey(): ?string
+    {
+        return $this->config['secret'] ?? null;
+    }
+
+    /**
+     * Check if we're using a test key.
+     */
+    public function isTestMode(): bool
+    {
+        $secretKey = $this->getSecretKey();
+
+        return $secretKey && str_starts_with($secretKey, 'sk_test_');
     }
 }

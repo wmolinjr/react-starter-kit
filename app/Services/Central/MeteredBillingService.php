@@ -8,21 +8,33 @@ use App\Models\Central\Addon;
 use App\Models\Central\AddonSubscription;
 use App\Models\Central\Tenant;
 use App\Models\Central\UsageRecord;
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\PaymentGatewayManager;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Stripe\StripeClient;
 
 class MeteredBillingService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $gateway = null;
 
-    public function __construct()
-    {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        // Get the Stripe gateway (will be null if not configured)
+        try {
+            $this->gateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    public function isConfigured(): bool
+    {
+        return $this->gateway !== null && $this->gateway->isAvailable();
     }
 
     /**
@@ -138,7 +150,7 @@ class MeteredBillingService
      */
     public function reportStorageUsage(Tenant $tenant): bool
     {
-        if (! $tenant->stripe_id || ! $this->stripe) {
+        if (! $tenant->stripe_id || ! $this->isConfigured()) {
             return false;
         }
 
@@ -164,12 +176,10 @@ class MeteredBillingService
         }
 
         try {
-            $meterEvent = $this->stripe->billing->meterEvents->create([
+            $meterEvent = $this->gateway->createMeterEvent([
                 'event_name' => $addon->stripe_meter_id,
-                'payload' => [
-                    'stripe_customer_id' => $tenant->stripe_id,
-                    'value' => (string) round($overageGB, 2),
-                ],
+                'identifier' => $tenant->stripe_id,
+                'value' => (int) round($overageGB, 2),
             ]);
 
             // Record locally
@@ -179,11 +189,11 @@ class MeteredBillingService
                 quantity: $storageUsedMB,
                 unit: 'MB',
                 addon: $addon,
-                metadata: ['stripe_event' => $meterEvent->id ?? null]
+                metadata: ['stripe_event' => $meterEvent['id'] ?? null]
             );
 
             // Mark as reported
-            $record->markAsReported($meterEvent->id ?? null);
+            $record->markAsReported($meterEvent['id'] ?? null);
 
             // Update metered addon record if exists
             $this->updateMeteredAddon($tenant, 'storage_overage', $overageGB);
@@ -204,7 +214,7 @@ class MeteredBillingService
      */
     public function reportBandwidthUsage(Tenant $tenant): bool
     {
-        if (! $tenant->stripe_id || ! $this->stripe) {
+        if (! $tenant->stripe_id || ! $this->isConfigured()) {
             return false;
         }
 
@@ -230,12 +240,10 @@ class MeteredBillingService
         }
 
         try {
-            $meterEvent = $this->stripe->billing->meterEvents->create([
+            $meterEvent = $this->gateway->createMeterEvent([
                 'event_name' => $addon->stripe_meter_id,
-                'payload' => [
-                    'stripe_customer_id' => $tenant->stripe_id,
-                    'value' => (string) round($overageGB, 2),
-                ],
+                'identifier' => $tenant->stripe_id,
+                'value' => (int) round($overageGB, 2),
             ]);
 
             // Record locally
@@ -245,11 +253,11 @@ class MeteredBillingService
                 quantity: $bandwidthUsedMB,
                 unit: 'MB',
                 addon: $addon,
-                metadata: ['stripe_event' => $meterEvent->id ?? null]
+                metadata: ['stripe_event' => $meterEvent['id'] ?? null]
             );
 
             // Mark as reported
-            $record->markAsReported($meterEvent->id ?? null);
+            $record->markAsReported($meterEvent['id'] ?? null);
 
             $this->updateMeteredAddon($tenant, 'bandwidth_overage', $overageGB);
 
@@ -455,7 +463,7 @@ class MeteredBillingService
      */
     public function processUnreportedRecords(): int
     {
-        if (! $this->stripe) {
+        if (! $this->isConfigured()) {
             return 0;
         }
 
@@ -477,15 +485,13 @@ class MeteredBillingService
                 // Convert overage to appropriate unit
                 $value = $record->unit === 'MB' ? $record->overage / 1024 : $record->overage;
 
-                $meterEvent = $this->stripe->billing->meterEvents->create([
+                $meterEvent = $this->gateway->createMeterEvent([
                     'event_name' => $addon->stripe_meter_id,
-                    'payload' => [
-                        'stripe_customer_id' => $tenant->stripe_id,
-                        'value' => (string) round($value, 2),
-                    ],
+                    'identifier' => $tenant->stripe_id,
+                    'value' => (int) round($value, 2),
                 ]);
 
-                $record->markAsReported($meterEvent->id ?? null);
+                $record->markAsReported($meterEvent['id'] ?? null);
                 $processed++;
             } catch (\Exception $e) {
                 Log::error('Failed to process usage record', [

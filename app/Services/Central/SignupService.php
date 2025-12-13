@@ -10,10 +10,10 @@ use App\Models\Central\PendingSignup;
 use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
+use App\Services\Payment\Gateways\StripeGateway;
 use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Stripe\StripeClient;
 
 /**
  * SignupService
@@ -31,17 +31,27 @@ use Stripe\StripeClient;
  */
 class SignupService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $stripeGateway = null;
 
     public function __construct(
         protected CustomerService $customerService,
         protected PaymentGatewayManager $gatewayManager,
         protected PaymentSettingsService $paymentSettingsService
     ) {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+        // Get the Stripe gateway (will be null if not configured)
+        try {
+            $this->stripeGateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    public function isStripeConfigured(): bool
+    {
+        return $this->stripeGateway !== null && $this->stripeGateway->isAvailable();
     }
 
     // =========================================================================
@@ -208,7 +218,7 @@ class SignupService
      */
     protected function processStripeCardPayment(PendingSignup $signup): array
     {
-        if (! $this->stripe) {
+        if (! $this->isStripeConfigured()) {
             throw new AddonException(__('billing.errors.stripe_not_configured'));
         }
 
@@ -231,16 +241,18 @@ class SignupService
         $successUrl = $baseUrl.'/signup/success?session_id={CHECKOUT_SESSION_ID}';
         $cancelUrl = $baseUrl.'/signup?signup_id='.$signup->id;
 
-        // Create Stripe Checkout session
-        $session = $this->stripe->checkout->sessions->create([
+        // Create Stripe Checkout session using gateway
+        $lineItems = [
+            [
+                'price' => $stripePriceId,
+                'quantity' => 1,
+            ],
+        ];
+
+        $session = $this->stripeGateway->createCheckoutSessionRaw([
             'mode' => 'subscription',
             'locale' => stripe_locale(),
-            'line_items' => [
-                [
-                    'price' => $stripePriceId,
-                    'quantity' => 1,
-                ],
-            ],
+            'line_items' => $lineItems,
             'customer_email' => $signup->email,
             'success_url' => $successUrl,
             'cancel_url' => $cancelUrl,
@@ -257,19 +269,19 @@ class SignupService
         ]);
 
         // Update signup with session info
-        $signup->setPaymentSession($session->id, 'stripe');
+        $signup->setPaymentSession($session['id'], 'stripe');
 
         Log::info('Signup Stripe checkout session created', [
             'signup_id' => $signup->id,
-            'session_id' => $session->id,
+            'session_id' => $session['id'],
             'plan_id' => $plan->id,
             'billing_period' => $signup->billing_period,
         ]);
 
         return [
             'type' => 'redirect',
-            'session_id' => $session->id,
-            'url' => $session->url,
+            'session_id' => $session['id'],
+            'url' => $session['url'],
         ];
     }
 

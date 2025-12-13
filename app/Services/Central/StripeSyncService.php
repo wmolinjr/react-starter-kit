@@ -4,25 +4,36 @@ namespace App\Services\Central;
 
 use App\Models\Central\Addon;
 use App\Models\Central\AddonBundle;
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Support\Facades\Log;
-use Stripe\Exception\ApiErrorException;
-use Stripe\StripeClient;
 
 class StripeSyncService
 {
-    protected ?StripeClient $stripe = null;
+    protected ?StripeGateway $gateway = null;
 
     /**
      * Default locale for Stripe product names (universal display)
      */
     protected string $defaultLocale = 'en';
 
-    public function __construct()
-    {
-        $secret = config('payment.drivers.stripe.secret');
-        if ($secret) {
-            $this->stripe = new StripeClient($secret);
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        // Get the Stripe gateway (will be null if not configured)
+        try {
+            $this->gateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            // Gateway not available
         }
+    }
+
+    /**
+     * Check if Stripe is configured.
+     */
+    public function isConfigured(): bool
+    {
+        return $this->gateway !== null && $this->gateway->isAvailable();
     }
 
     /**
@@ -59,6 +70,12 @@ class StripeSyncService
             'errors' => [],
         ];
 
+        if (! $this->isConfigured()) {
+            $result['errors'][] = 'Stripe gateway not configured';
+
+            return $result;
+        }
+
         try {
             // Sync Product
             $productId = $this->syncProduct($addon, $locale);
@@ -68,7 +85,7 @@ class StripeSyncService
             // Sync Prices
             $result['prices_synced'] = $this->syncPrices($addon, $locale);
 
-        } catch (ApiErrorException $e) {
+        } catch (\Exception $e) {
             $result['errors'][] = $e->getMessage();
             Log::error('Stripe sync failed', [
                 'addon' => $addon->slug,
@@ -127,7 +144,7 @@ class StripeSyncService
 
         if ($addon->stripe_product_id) {
             // Update existing product
-            $this->stripe->products->update($addon->stripe_product_id, $productData);
+            $this->gateway->updateProduct($addon->stripe_product_id, $productData);
 
             Log::info('Updated Stripe product', [
                 'addon' => $addon->slug,
@@ -139,16 +156,16 @@ class StripeSyncService
         }
 
         // Create new product
-        $product = $this->stripe->products->create($productData);
-        $addon->update(['stripe_product_id' => $product->id]);
+        $product = $this->gateway->createProduct($productData);
+        $addon->update(['stripe_product_id' => $product['id']]);
 
         Log::info('Created Stripe product', [
             'addon' => $addon->slug,
-            'product_id' => $product->id,
+            'product_id' => $product['id'],
             'locale' => $locale,
         ]);
 
-        return $product->id;
+        return $product['id'];
     }
 
     /**
@@ -235,16 +252,16 @@ class StripeSyncService
             $priceData['recurring'] = ['interval' => 'year'];
         }
 
-        $price = $this->stripe->prices->create($priceData);
+        $price = $this->gateway->createPrice($priceData);
 
         Log::info('Created Stripe price', [
             'addon' => $addon->slug,
             'billing_period' => $billingPeriod,
-            'price_id' => $price->id,
+            'price_id' => $price['id'],
             'locale' => $locale,
         ]);
 
-        return $price->id;
+        return $price['id'];
     }
 
     /**
@@ -252,11 +269,13 @@ class StripeSyncService
      */
     public function archivePrice(string $priceId): bool
     {
-        try {
-            $this->stripe->prices->update($priceId, ['active' => false]);
+        if (! $this->isConfigured()) {
+            return false;
+        }
 
-            return true;
-        } catch (ApiErrorException $e) {
+        try {
+            return $this->gateway->archivePrice($priceId);
+        } catch (\Exception $e) {
             Log::error('Failed to archive price', [
                 'price_id' => $priceId,
                 'error' => $e->getMessage(),
@@ -271,9 +290,13 @@ class StripeSyncService
      */
     public function importFromStripe(string $productId): ?Addon
     {
+        if (! $this->isConfigured()) {
+            return null;
+        }
+
         try {
-            $product = $this->stripe->products->retrieve($productId);
-            $prices = $this->stripe->prices->all(['product' => $productId, 'active' => true]);
+            $product = $this->gateway->retrieveProduct($productId);
+            $prices = $this->gateway->listPrices($productId);
 
             // Check if addon already exists
             $existingAddon = Addon::where('stripe_product_id', $productId)->first();
@@ -281,11 +304,11 @@ class StripeSyncService
             // If addon exists, only update non-translatable fields
             if ($existingAddon) {
                 $existingAddon->update([
-                    'active' => $product->active,
+                    'active' => $product['active'] ?? true,
                 ]);
 
                 // Import prices without overwriting translations
-                $this->importPrices($existingAddon, $prices->data);
+                $this->importPrices($existingAddon, $prices);
 
                 Log::info('Updated addon from Stripe (preserved translations)', [
                     'addon' => $existingAddon->slug,
@@ -297,20 +320,20 @@ class StripeSyncService
 
             // New addon - try to restore translations from metadata
             $translations = [];
-            if (isset($product->metadata['translations'])) {
-                $translations = json_decode($product->metadata['translations'], true) ?: [];
+            if (isset($product['metadata']['translations'])) {
+                $translations = json_decode($product['metadata']['translations'], true) ?: [];
             }
 
             // Build addon data
             $addonData = [
-                'slug' => $product->metadata['addon_slug'] ?? \Str::slug($product->name),
-                'type' => $product->metadata['addon_type'] ?? 'feature',
-                'active' => $product->active,
+                'slug' => $product['metadata']['addon_slug'] ?? \Str::slug($product['name']),
+                'type' => $product['metadata']['addon_type'] ?? 'feature',
+                'active' => $product['active'] ?? true,
             ];
 
             // Set translated fields - use stored translations or fallback to Stripe name
-            $addonData['name'] = $translations['name'] ?? ['en' => $product->name];
-            $addonData['description'] = $translations['description'] ?? ($product->description ? ['en' => $product->description] : null);
+            $addonData['name'] = $translations['name'] ?? ['en' => $product['name']];
+            $addonData['description'] = $translations['description'] ?? (($product['description'] ?? null) ? ['en' => $product['description']] : null);
             if (isset($translations['unit_label'])) {
                 $addonData['unit_label'] = $translations['unit_label'];
             }
@@ -320,7 +343,7 @@ class StripeSyncService
             ]));
 
             // Import prices
-            $this->importPrices($addon, $prices->data);
+            $this->importPrices($addon, $prices);
 
             Log::info('Imported addon from Stripe', [
                 'addon' => $addon->slug,
@@ -329,7 +352,7 @@ class StripeSyncService
 
             return $addon;
 
-        } catch (ApiErrorException $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to import from Stripe', [
                 'product_id' => $productId,
                 'error' => $e->getMessage(),
@@ -345,15 +368,15 @@ class StripeSyncService
     protected function importPrices(Addon $addon, array $prices): void
     {
         foreach ($prices as $price) {
-            $period = $price->metadata['billing_period'] ?? $this->detectBillingPeriod($price);
+            $period = $price['metadata']['billing_period'] ?? $this->detectBillingPeriod($price);
             $priceIdField = "stripe_price_{$period}_id";
             $priceAmountField = "price_{$period}";
 
             // Only update if not already set
             if (! $addon->{$priceIdField}) {
                 $addon->update([
-                    $priceIdField => $price->id,
-                    $priceAmountField => $price->unit_amount,
+                    $priceIdField => $price['id'],
+                    $priceAmountField => $price['unit_amount'],
                 ]);
             }
         }
@@ -362,13 +385,13 @@ class StripeSyncService
     /**
      * Detect billing period from Stripe price
      */
-    protected function detectBillingPeriod($price): string
+    protected function detectBillingPeriod(array $price): string
     {
-        if (! $price->recurring) {
+        if (empty($price['recurring'])) {
             return 'one_time';
         }
 
-        return match ($price->recurring->interval) {
+        return match ($price['recurring']['interval'] ?? null) {
             'month' => 'monthly',
             'year' => 'yearly',
             default => 'monthly',
@@ -454,6 +477,12 @@ class StripeSyncService
             'errors' => [],
         ];
 
+        if (! $this->isConfigured()) {
+            $result['errors'][] = 'Stripe gateway not configured';
+
+            return $result;
+        }
+
         try {
             // Sync Product
             $productId = $this->syncBundleProduct($bundle, $locale);
@@ -463,7 +492,7 @@ class StripeSyncService
             // Sync Prices
             $result['prices_synced'] = $this->syncBundlePrices($bundle, $locale);
 
-        } catch (ApiErrorException $e) {
+        } catch (\Exception $e) {
             $result['errors'][] = $e->getMessage();
             Log::error('Stripe bundle sync failed', [
                 'bundle' => $bundle->slug,
@@ -530,7 +559,7 @@ class StripeSyncService
 
         if ($bundle->stripe_product_id) {
             // Update existing product
-            $this->stripe->products->update($bundle->stripe_product_id, $productData);
+            $this->gateway->updateProduct($bundle->stripe_product_id, $productData);
 
             Log::info('Updated Stripe bundle product', [
                 'bundle' => $bundle->slug,
@@ -542,16 +571,16 @@ class StripeSyncService
         }
 
         // Create new product
-        $product = $this->stripe->products->create($productData);
-        $bundle->update(['stripe_product_id' => $product->id]);
+        $product = $this->gateway->createProduct($productData);
+        $bundle->update(['stripe_product_id' => $product['id']]);
 
         Log::info('Created Stripe bundle product', [
             'bundle' => $bundle->slug,
-            'product_id' => $product->id,
+            'product_id' => $product['id'],
             'locale' => $locale,
         ]);
 
-        return $product->id;
+        return $product['id'];
     }
 
     /**
@@ -587,7 +616,7 @@ class StripeSyncService
     {
         $priceData = [
             'product' => $bundle->stripe_product_id,
-            'currency' => $bundle->currency ?? stripe_currency(),
+            'currency' => $bundle->currency ?? config('payment.currency', 'brl'),
             'unit_amount' => $amount,
             'metadata' => [
                 'bundle_slug' => $bundle->slug,
@@ -604,17 +633,17 @@ class StripeSyncService
             $priceData['recurring'] = ['interval' => 'year'];
         }
 
-        $price = $this->stripe->prices->create($priceData);
+        $price = $this->gateway->createPrice($priceData);
 
         Log::info('Created Stripe bundle price', [
             'bundle' => $bundle->slug,
             'billing_period' => $billingPeriod,
-            'price_id' => $price->id,
+            'price_id' => $price['id'],
             'amount' => $amount,
             'locale' => $locale,
         ]);
 
-        return $price->id;
+        return $price['id'];
     }
 
     /**

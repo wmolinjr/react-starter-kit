@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Payment\Gateways\StripeGateway;
+use App\Services\Payment\PaymentGatewayManager;
 use Illuminate\Console\Command;
 use Stripe\StripeClient;
 
@@ -28,6 +30,8 @@ class StripeCleanupCommand extends Command
 
     private StripeClient $stripe;
 
+    private ?StripeGateway $gateway = null;
+
     private int $deletedProducts = 0;
 
     private int $archivedProducts = 0;
@@ -38,6 +42,12 @@ class StripeCleanupCommand extends Command
 
     private int $cancelledSubscriptions = 0;
 
+    public function __construct(
+        protected PaymentGatewayManager $gatewayManager
+    ) {
+        parent::__construct();
+    }
+
     public function handle(): int
     {
         // Safety check - only allow in local/testing environments
@@ -47,16 +57,31 @@ class StripeCleanupCommand extends Command
             return self::FAILURE;
         }
 
-        // Check if using test key
-        $stripeKey = config('payment.drivers.stripe.secret');
-        if (! str_starts_with($stripeKey ?? '', 'sk_test_')) {
-            error('This command only works with Stripe TEST keys (sk_test_*)');
-            error('Current key starts with: '.substr($stripeKey, 0, 10).'...');
+        // Get Stripe gateway
+        try {
+            $this->gateway = $this->gatewayManager->stripe();
+        } catch (\Exception $e) {
+            error('Stripe gateway is not configured');
 
             return self::FAILURE;
         }
 
-        $this->stripe = new StripeClient($stripeKey);
+        if (! $this->gateway->isAvailable()) {
+            error('Stripe gateway is not available');
+
+            return self::FAILURE;
+        }
+
+        // Check if using test key
+        if (! $this->gateway->isTestMode()) {
+            $stripeKey = $this->gateway->getSecretKey();
+            error('This command only works with Stripe TEST keys (sk_test_*)');
+            error('Current key starts with: '.substr($stripeKey ?? '', 0, 10).'...');
+
+            return self::FAILURE;
+        }
+
+        $this->stripe = new StripeClient($this->gateway->getSecretKey());
 
         info('Stripe Cleanup Tool - Development Environment');
         info('Using Stripe TEST mode');
