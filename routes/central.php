@@ -266,6 +266,9 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
 
                 // Refresh PIX QR code
                 Route::post('/{signup}/refresh-pix', [SignupController::class, 'refreshPix'])->name('refresh-pix');
+
+                // Complete card payment (Asaas)
+                Route::post('/{signup}/card-payment', [SignupController::class, 'completeCardPayment'])->name('card-payment');
             });
 
             // Success page

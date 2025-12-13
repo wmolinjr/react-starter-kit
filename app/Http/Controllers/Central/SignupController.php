@@ -186,6 +186,53 @@ class SignupController extends Controller
     }
 
     /**
+     * Complete Asaas card payment with card data.
+     *
+     * POST /signup/{signup}/card-payment
+     *
+     * Called after frontend collects card data for Asaas gateway.
+     */
+    public function completeCardPayment(PendingSignup $signup, Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'card' => ['required', 'array'],
+            'card.holder_name' => ['required', 'string', 'max:100'],
+            'card.number' => ['required', 'string', 'digits_between:13,19'],
+            'card.exp_month' => ['required', 'string', 'digits:2'],
+            'card.exp_year' => ['required', 'string', 'digits:4'],
+            'card.cvv' => ['required', 'string', 'digits_between:3,4'],
+            'holder' => ['required', 'array'],
+            'holder.name' => ['required', 'string', 'max:100'],
+            'holder.email' => ['required', 'email', 'max:100'],
+            'holder.cpf_cnpj' => ['required', 'string', 'max:18'],
+            'holder.postal_code' => ['required', 'string', 'max:10'],
+            'holder.address_number' => ['required', 'string', 'max:10'],
+            'holder.address_complement' => ['nullable', 'string', 'max:100'],
+            'holder.phone' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        try {
+            $result = $this->signupService->completeAsaasCardPayment(
+                $signup,
+                $validated['card'],
+                $validated['holder'],
+                ['remote_ip' => $request->ip()]
+            );
+
+            if ($result['success']) {
+                return response()->json($result);
+            }
+
+            return response()->json($result, 422);
+        } catch (\App\Exceptions\Central\AddonException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
      * Signup success page.
      *
      * GET /signup/success

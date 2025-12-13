@@ -7,10 +7,19 @@ import { WorkspaceStep } from '@/components/shared/signup/workspace-step';
 import { PaymentStep } from '@/components/shared/signup/payment-step';
 import { ProcessingStep } from '@/components/shared/signup/processing-step';
 import { SuccessStep } from '@/components/shared/signup/success-step';
+import { AsaasCardStep } from '@/components/shared/signup/asaas-card-step';
 import type { PlanResource, PendingSignupResource } from '@/types/resources';
 import type { PaymentConfigResource } from '@/types/resources';
 
-export type SignupStepType = 'account' | 'workspace' | 'payment' | 'processing' | 'success';
+export type SignupStepType = 'account' | 'workspace' | 'payment' | 'asaas-card' | 'processing' | 'success';
+
+interface AsaasCardPaymentResult {
+    type: 'asaas_card';
+    signup_id: string;
+    amount: number;
+    gateway: string;
+    requires_card_data: boolean;
+}
 
 interface BusinessSectorOption {
     value: string;
@@ -80,6 +89,7 @@ export default function SignupPage({
     const [selectedPlanSlug, setSelectedPlanSlug] = useState<string>(
         selectedPlan || plans[0]?.slug || ''
     );
+    const [asaasCardResult, setAsaasCardResult] = useState<AsaasCardPaymentResult | null>(null);
 
     // Handle step navigation
     const goToStep = (step: SignupStepType, signupData?: PendingSignupResource | null) => {
@@ -111,16 +121,28 @@ export default function SignupPage({
         type: string;
         url?: string;
         signup_id?: string;
+        amount?: number;
+        gateway?: string;
+        requires_card_data?: boolean;
         pix?: object;
         boleto?: object;
     }) => {
         if (result.type === 'redirect' && result.url) {
             // Card payment - redirect to Stripe
             window.location.href = result.url;
+        } else if (result.type === 'asaas_card') {
+            // Asaas card payment - show card form
+            setAsaasCardResult(result as AsaasCardPaymentResult);
+            goToStep('asaas-card');
         } else if (result.type === 'pix' || result.type === 'boleto') {
             // Async payment - show processing
             goToStep('processing');
         }
+    };
+
+    // Handle Asaas card payment success
+    const handleAsaasCardSuccess = (tenantUrl: string) => {
+        window.location.href = tenantUrl;
     };
 
     // Handle payment completion
@@ -179,6 +201,16 @@ export default function SignupPage({
                             paymentConfig={paymentConfig}
                             onSuccess={handlePaymentStarted}
                             onBack={() => goToStep('workspace')}
+                        />
+                    )}
+
+                    {currentStep === 'asaas-card' && signup && asaasCardResult && currentPlan && (
+                        <AsaasCardStep
+                            signup={signup}
+                            plan={currentPlan}
+                            amount={asaasCardResult.amount}
+                            onSuccess={handleAsaasCardSuccess}
+                            onBack={() => goToStep('payment')}
                         />
                     )}
 

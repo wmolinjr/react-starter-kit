@@ -2002,7 +2002,7 @@ export type SidebarTranslationKey =
     | 'sidebar.item.users';
 
 /**
- * Signup namespace keys (122 keys)
+ * Signup namespace keys (123 keys)
  */
 export type SignupTranslationKey =
     | 'signup.account.continue'
@@ -2093,6 +2093,7 @@ export type SignupTranslationKey =
     | 'signup.payment.yearly_savings'
     | 'signup.processing.auto_redirect'
     | 'signup.processing.boleto_description'
+    | 'signup.processing.card_description'
     | 'signup.processing.payment_confirmed'
     | 'signup.processing.pix_description'
     | 'signup.processing.redirecting'
@@ -4156,6 +4157,7 @@ export type TranslationKey =
     | 'signup.payment.yearly_savings'
     | 'signup.processing.auto_redirect'
     | 'signup.processing.boleto_description'
+    | 'signup.processing.card_description'
     | 'signup.processing.payment_confirmed'
     | 'signup.processing.pix_description'
     | 'signup.processing.redirecting'

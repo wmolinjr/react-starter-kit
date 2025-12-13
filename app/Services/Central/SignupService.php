@@ -314,7 +314,8 @@ class SignupService
             ? ($plan->price * 12 * 0.8) // 20% discount for yearly
             : $plan->price;
 
-        $signup->markAsProcessing();
+        // NOTE: Don't mark as processing here - the frontend will show a card form
+        // and the status will be updated when card data is submitted via completeAsaasCardPayment
 
         Log::info('Signup Asaas card checkout initiated', [
             'signup_id' => $signup->id,
@@ -345,6 +346,11 @@ class SignupService
             throw new AddonException(__('signup.errors.plan_not_found'));
         }
 
+        $customer = $signup->customer;
+        if (! $customer) {
+            throw new AddonException(__('signup.errors.customer_not_found'));
+        }
+
         // PIX only for first payment, subscription will be card-based
         $amount = $signup->billing_period === 'yearly'
             ? ($plan->price * 12 * 0.8)
@@ -353,22 +359,21 @@ class SignupService
         $gatewayInstance = $this->gatewayManager->gateway($gateway->value);
 
         $result = $gatewayInstance->createPixCharge(
-            null, // No customer yet
+            $customer,
             (int) $amount,
             [
                 'description' => __('signup.payment.description', [
                     'plan' => $plan->name,
                     'workspace' => $signup->workspace_name,
                 ]),
-                'customer_name' => $signup->name,
-                'customer_email' => $signup->email,
                 'reference' => 'signup_'.$signup->id,
                 'expires_in_seconds' => 3600, // 1 hour
             ]
         );
 
         if (! $result->success) {
-            $signup->markAsFailed($result->failureMessage ?? 'PIX creation failed');
+            // Don't mark as failed - charge creation failed, not the payment itself
+            // User should be able to retry (e.g., add CPF/CNPJ and try again)
             throw new AddonException($result->failureMessage ?? __('signup.errors.pix_creation_failed'));
         }
 
@@ -380,15 +385,17 @@ class SignupService
             'amount' => $amount,
         ]);
 
+        $pixData = $result->providerData['pix'] ?? [];
+
         return [
             'type' => 'pix',
             'signup_id' => $signup->id,
             'payment_id' => $result->providerPaymentId,
             'pix' => [
-                'qr_code' => $result->providerData['qr_code'] ?? null,
-                'qr_code_base64' => $result->providerData['qr_code_base64'] ?? null,
-                'copy_paste' => $result->providerData['copy_paste'] ?? null,
-                'expires_at' => $result->providerData['expires_at'] ?? now()->addHour()->toIso8601String(),
+                'qr_code' => $pixData['qr_code'] ?? null,
+                'qr_code_base64' => $pixData['qr_code_base64'] ?? null,
+                'copy_paste' => $pixData['copy_paste'] ?? $pixData['payload'] ?? null,
+                'expires_at' => $pixData['expiration'] ?? $pixData['expiration_date'] ?? now()->addHour()->toIso8601String(),
             ],
         ];
     }
@@ -403,6 +410,11 @@ class SignupService
             throw new AddonException(__('signup.errors.plan_not_found'));
         }
 
+        $customer = $signup->customer;
+        if (! $customer) {
+            throw new AddonException(__('signup.errors.customer_not_found'));
+        }
+
         $amount = $signup->billing_period === 'yearly'
             ? ($plan->price * 12 * 0.8)
             : $plan->price;
@@ -410,22 +422,21 @@ class SignupService
         $gatewayInstance = $this->gatewayManager->gateway($gateway->value);
 
         $result = $gatewayInstance->createBoletoCharge(
-            null, // No customer yet
+            $customer,
             (int) $amount,
             [
                 'description' => __('signup.payment.description', [
                     'plan' => $plan->name,
                     'workspace' => $signup->workspace_name,
                 ]),
-                'customer_name' => $signup->name,
-                'customer_email' => $signup->email,
                 'reference' => 'signup_'.$signup->id,
                 'due_date' => now()->addDays(3)->format('Y-m-d'),
             ]
         );
 
         if (! $result->success) {
-            $signup->markAsFailed($result->failureMessage ?? 'Boleto creation failed');
+            // Don't mark as failed - charge creation failed, not the payment itself
+            // User should be able to retry (e.g., add CPF/CNPJ and try again)
             throw new AddonException($result->failureMessage ?? __('signup.errors.boleto_creation_failed'));
         }
 
@@ -437,14 +448,16 @@ class SignupService
             'amount' => $amount,
         ]);
 
+        $boletoData = $result->providerData['boleto'] ?? [];
+
         return [
             'type' => 'boleto',
             'signup_id' => $signup->id,
             'payment_id' => $result->providerPaymentId,
             'boleto' => [
-                'barcode' => $result->providerData['barcode'] ?? null,
-                'barcode_image' => $result->providerData['barcode_image'] ?? null,
-                'pdf_url' => $result->providerData['pdf_url'] ?? null,
+                'barcode' => $boletoData['barcode'] ?? $boletoData['bar_code'] ?? null,
+                'digitable_line' => $boletoData['digitable_line'] ?? $boletoData['identification_field'] ?? null,
+                'pdf_url' => $boletoData['url'] ?? $boletoData['bank_slip_url'] ?? null,
                 'due_date' => $result->providerData['due_date'] ?? now()->addDays(3)->toDateString(),
             ],
         ];
@@ -589,6 +602,114 @@ class SignupService
         $gateway = PaymentGateway::from($signup->payment_provider);
 
         return $this->processPixPayment($signup, $gateway);
+    }
+
+    /**
+     * Complete Asaas card payment with card data.
+     *
+     * This is called after the frontend collects card data for Asaas gateway.
+     *
+     * @param  PendingSignup  $signup  The pending signup
+     * @param  array  $cardData  Card details: holder_name, number, exp_month, exp_year, cvv
+     * @param  array  $holderInfo  Holder details: name, email, cpf_cnpj, postal_code, address_number
+     * @param  array  $options  Additional options (remote_ip, installments)
+     * @return array{success: bool, message?: string, tenant_url?: string}
+     */
+    public function completeAsaasCardPayment(
+        PendingSignup $signup,
+        array $cardData,
+        array $holderInfo,
+        array $options = []
+    ): array {
+        // Validate signup is ready for card payment (pending or processing)
+        if (! in_array($signup->status, ['pending', 'processing'])) {
+            throw new AddonException(__('signup.errors.invalid_signup_status'));
+        }
+
+        if ($signup->payment_method !== 'card') {
+            throw new AddonException(__('signup.errors.invalid_payment_method'));
+        }
+
+        // Mark as processing now that we're about to charge
+        $signup->markAsProcessing();
+
+        $customer = $signup->customer;
+        if (! $customer) {
+            throw new AddonException(__('signup.errors.customer_not_found'));
+        }
+
+        $plan = $signup->plan;
+        if (! $plan) {
+            throw new AddonException(__('signup.errors.plan_not_found'));
+        }
+
+        // Calculate amount
+        $amount = $signup->billing_period === 'yearly'
+            ? (int) ($plan->price * 12 * 0.8) // 20% discount for yearly
+            : (int) $plan->price;
+
+        // Get Asaas gateway instance
+        $gateway = $this->gatewayManager->gateway('asaas');
+
+        try {
+            // Create card charge with Asaas
+            $chargeResult = $gateway->createCardChargeWithData(
+                $customer,
+                $amount,
+                $cardData,
+                $holderInfo,
+                [
+                    'description' => __('signup.payment.description', [
+                        'plan' => $plan->name,
+                        'workspace' => $signup->workspace_name,
+                    ]),
+                    'reference' => 'signup_'.$signup->id,
+                    'remote_ip' => $options['remote_ip'] ?? null,
+                    'installments' => $options['installments'] ?? 1,
+                ]
+            );
+
+            if (! $chargeResult->success) {
+                $signup->markAsFailed($chargeResult->failureMessage ?? 'Card payment failed');
+
+                return [
+                    'success' => false,
+                    'message' => $chargeResult->failureMessage ?? __('signup.errors.card_payment_failed'),
+                ];
+            }
+
+            // Store payment ID
+            $signup->setPaymentId($chargeResult->providerPaymentId, 'asaas');
+
+            Log::info('Signup Asaas card payment completed', [
+                'signup_id' => $signup->id,
+                'payment_id' => $chargeResult->providerPaymentId,
+                'amount' => $amount,
+            ]);
+
+            // Create tenant immediately (card payment is synchronous)
+            $result = $this->createTenantFromSignup($signup);
+
+            return [
+                'success' => true,
+                'tenant_url' => $result['tenant']->url(),
+                'card' => [
+                    'last_four' => substr($cardData['number'], -4),
+                ],
+            ];
+        } catch (\Exception $e) {
+            Log::error('Signup Asaas card payment failed', [
+                'signup_id' => $signup->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $signup->markAsFailed($e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
     }
 
     // =========================================================================
