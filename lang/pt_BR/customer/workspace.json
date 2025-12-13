@@ -6,6 +6,8 @@
     "customer.workspace.create_account": "Criar Conta",
     "customer.workspace.create_description": "Crie um novo workspace para sua equipe.",
     "customer.workspace.create_first": "Criar Primeiro Workspace",
+    "customer.workspace.created_successfully": "Seu workspace foi criado com sucesso.",
+    "customer.workspace.creating_for": "Criando workspace: :name",
     "customer.workspace.details": "Detalhes do Workspace",
     "customer.workspace.details_description": "Informações básicas sobre o novo workspace.",
     "customer.workspace.domain": "Domínio",
@@ -16,10 +18,13 @@
     "customer.workspace.no_workspaces": "Nenhum Workspace",
     "customer.workspace.no_workspaces_description": "Crie seu primeiro workspace para começar.",
     "customer.workspace.open": "Abrir Workspace",
+    "customer.workspace.ready_to_use": "Pronto para usar",
     "customer.workspace.slug": "Subdomínio",
     "customer.workspace.slug_help": "Este será o endereço do seu workspace. Use apenas letras, números e hífens.",
+    "customer.workspace.start_again": "Começar Novamente",
     "customer.workspace.team_members": "Membros da Equipe",
     "customer.workspace.title": "Workspaces",
+    "customer.workspace.view_workspaces": "Ver Workspaces",
     "customer.workspace.workspaces_description": "Seus workspaces e suas assinaturas.",
     "customer.workspace.your_workspaces": "Seus Workspaces"
 }

@@ -6,5 +6,6 @@
     "customer.subscription.no_plan": "No plan",
     "customer.subscription.per_month": "per month",
     "customer.subscription.plan": "Plan",
+    "customer.subscription.select_plan": "Select a Plan",
     "customer.subscription.title": "Subscriptions"
 }

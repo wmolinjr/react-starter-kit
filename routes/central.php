@@ -142,6 +142,9 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
                     Route::get('tenants', [CustomerTenantController::class, 'index'])->name('tenants.index');
                     Route::get('tenants/create', [CustomerTenantController::class, 'create'])->name('tenants.create');
                     Route::post('tenants', [CustomerTenantController::class, 'store'])->name('tenants.store');
+                    Route::get('tenants/checkout/{signup}', [CustomerTenantController::class, 'checkout'])->name('tenants.checkout');
+                    Route::post('tenants/checkout/{signup}', [CustomerTenantController::class, 'processCheckout'])->name('tenants.checkout.process');
+                    Route::get('tenants/checkout/{signup}/success', [CustomerTenantController::class, 'checkoutSuccess'])->name('tenants.checkout.success');
                     Route::get('tenants/{tenant}', [CustomerTenantController::class, 'show'])->name('tenants.show');
                     Route::get('tenants/{tenant}/billing', [CustomerTenantController::class, 'billing'])->name('tenants.billing');
                     Route::patch('tenants/{tenant}/payment-method', [CustomerTenantController::class, 'updatePaymentMethod'])
@@ -193,9 +196,9 @@ foreach (config('tenancy.identification.central_domains') as $domain) {
         // Features page
         Route::get('/features', fn() => Inertia::render('central/features/index'))->name('features');
 
-        // Contact page
-        Route::get('/contact', [Controllers\Central\ContactController::class, 'create'])->name('contact');
-        Route::post('/contact', [Controllers\Central\ContactController::class, 'store'])->name('contact.store');
+        // Contact page - uncomment when ContactController is implemented
+        // Route::get('/contact', [Controllers\Central\ContactController::class, 'create'])->name('contact');
+        // Route::post('/contact', [Controllers\Central\ContactController::class, 'store'])->name('contact.store');
 
         /*
         |----------------------------------------------------------------------

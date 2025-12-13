@@ -2,9 +2,15 @@
     "customer.billing.address": "Billing Address",
     "customer.billing.address_description": "This address will appear on your invoices.",
     "customer.billing.description": "Manage the subscription and billing for this workspace.",
+    "customer.billing.invoices_description": "Recent invoices for this workspace.",
     "customer.billing.manage": "Manage Billing",
+    "customer.billing.manage_in_workspace": "Manage in Workspace",
     "customer.billing.monthly": "Monthly Billing",
+    "customer.billing.payment_method_description": "Payment method used for this workspace's subscription.",
+    "customer.billing.payment_method_help": "You can assign a specific payment method for this workspace or use your default.",
+    "customer.billing.plan_description": "Current subscription plan for this workspace.",
     "customer.billing.portal": "Billing Portal",
+    "customer.billing.select_payment_method": "Select Payment Method",
     "customer.billing.title": "Billing",
     "customer.billing.updated": "Billing information updated successfully."
 }

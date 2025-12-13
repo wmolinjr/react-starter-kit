@@ -1,5 +1,13 @@
 {
     "billing.page.active_bundles": "Active Bundles",
+    "billing.page.billing_cycle": "Billing Cycle",
+    "billing.page.checkout": "Checkout",
+    "billing.page.checkout_expired": "Checkout Expired",
+    "billing.page.checkout_expired_description": "Your checkout session has expired. Please start the process again.",
+    "billing.page.complete_purchase": "Complete your purchase",
+    "billing.page.continue_to_checkout": "Continue to Checkout",
+    "billing.page.payment_successful": "Payment Successful",
+    "billing.page.plan": "Plan",
     "billing.page.active_subscriptions": "Active Subscriptions",
     "billing.page.addons": "Add-ons",
     "billing.page.addons_included": "add-ons included",

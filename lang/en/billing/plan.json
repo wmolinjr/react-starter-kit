@@ -3,6 +3,7 @@
     "billing.plan.current": "Current Plan",
     "billing.plan.no_plan": "No Plan",
     "billing.plan.select": "Select Plan",
+    "billing.plan.selected": "Selected",
     "billing.plan.title": "Plan",
     "billing.plan.upgrade": "Upgrade",
     "billing.plan.whats_included": "What's included"

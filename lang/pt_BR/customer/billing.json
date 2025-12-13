@@ -2,9 +2,15 @@
     "customer.billing.address": "Endereço de Cobrança",
     "customer.billing.address_description": "Este endereço aparecerá nas suas faturas.",
     "customer.billing.description": "Gerencie a assinatura e cobrança deste workspace.",
+    "customer.billing.invoices_description": "Faturas recentes deste workspace.",
     "customer.billing.manage": "Gerenciar Cobrança",
+    "customer.billing.manage_in_workspace": "Gerenciar no Workspace",
     "customer.billing.monthly": "Cobrança Mensal",
+    "customer.billing.payment_method_description": "Método de pagamento usado para a assinatura deste workspace.",
+    "customer.billing.payment_method_help": "Você pode atribuir um método de pagamento específico para este workspace ou usar o padrão.",
+    "customer.billing.plan_description": "Plano de assinatura atual deste workspace.",
     "customer.billing.portal": "Portal de Cobrança",
+    "customer.billing.select_payment_method": "Selecionar Método de Pagamento",
     "customer.billing.title": "Cobrança",
     "customer.billing.updated": "Informações de cobrança atualizadas com sucesso."
 }

@@ -17,10 +17,13 @@ use Illuminate\Support\Facades\Log;
  * Listens for payment provider webhook events related to subscription changes
  * and syncs tenant permissions accordingly.
  *
- * Handles:
- * - customer.subscription.updated (plan upgrade/downgrade)
- * - customer.subscription.deleted (subscription canceled)
- * - customer.subscription.created (new subscription)
+ * SUPPORTED PROVIDERS:
+ * - Stripe: Handles subscription lifecycle events
+ *   - customer.subscription.updated (plan upgrade/downgrade)
+ *   - customer.subscription.deleted (subscription canceled)
+ *   - customer.subscription.created (new subscription)
+ * - Asaas: Handles one-time payment confirmations
+ *   - Permission sync is done in checkout completion flow
  *
  * ARCHITECTURE:
  * - Updates tenant's plan_id based on provider price ID
@@ -30,12 +33,26 @@ use Illuminate\Support\Facades\Log;
 class SyncPermissionsOnSubscriptionChange
 {
     /**
-     * Event types we handle (Stripe format).
+     * Provider-specific event handlers.
+     */
+    protected array $providerHandlers = [
+        'stripe' => 'handleStripeEvent',
+        'asaas' => 'handleAsaasEvent',
+    ];
+
+    /**
+     * Event types we handle per provider.
      */
     protected array $handledEvents = [
-        'customer.subscription.updated',
-        'customer.subscription.deleted',
-        'customer.subscription.created',
+        'stripe' => [
+            'customer.subscription.updated',
+            'customer.subscription.deleted',
+            'customer.subscription.created',
+        ],
+        'asaas' => [
+            'PAYMENT_CONFIRMED',
+            'PAYMENT_RECEIVED',
+        ],
     ];
 
     /**
@@ -43,19 +60,27 @@ class SyncPermissionsOnSubscriptionChange
      */
     public function handle(WebhookReceived $event): void
     {
-        // Only handle Stripe for now
-        // TODO: Add support for other providers
-        if (! $event->isFromProvider('stripe')) {
+        $handler = $this->providerHandlers[$event->provider] ?? null;
+
+        if (! $handler || ! method_exists($this, $handler)) {
             return;
         }
 
+        $this->{$handler}($event);
+    }
+
+    /**
+     * Handle Stripe subscription events.
+     */
+    protected function handleStripeEvent(WebhookReceived $event): void
+    {
         $eventType = $event->getType();
 
-        if (! in_array($eventType, $this->handledEvents)) {
+        if (! in_array($eventType, $this->handledEvents['stripe'] ?? [])) {
             return;
         }
 
-        Log::info("SyncPermissionsOnSubscriptionChange: Handling {$eventType}");
+        Log::info("SyncPermissionsOnSubscriptionChange: Handling Stripe {$eventType}");
 
         match ($eventType) {
             'customer.subscription.updated' => $this->handleSubscriptionUpdated($event),
@@ -63,6 +88,23 @@ class SyncPermissionsOnSubscriptionChange
             'customer.subscription.created' => $this->handleSubscriptionCreated($event),
             default => null,
         };
+    }
+
+    /**
+     * Handle Asaas payment events.
+     *
+     * Asaas is used for PIX and Boleto payments which don't have native
+     * subscription support. Permission sync for Asaas payments is handled
+     * in the checkout completion flow when the payment is confirmed.
+     */
+    protected function handleAsaasEvent(WebhookReceived $event): void
+    {
+        // Asaas payment confirmations are typically handled in the checkout flow
+        // where the SignupService completes the signup after payment confirmation.
+        // This is a placeholder for future Asaas subscription-like features.
+
+        $eventType = $event->getType();
+        Log::debug("SyncPermissionsOnSubscriptionChange: Asaas event {$eventType} - handled in checkout flow");
     }
 
     /**

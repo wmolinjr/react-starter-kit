@@ -422,23 +422,18 @@ class PaymentSettingsService
 
     /**
      * Get the default enabled gateway for a country.
+     *
+     * Priority: country-specific gateways > global gateways, then is_default.
      */
     public function getDefaultGatewayForCountry(string $countryCode): ?PaymentSetting
     {
-        // First try to find an explicit default
-        $default = PaymentSetting::enabled()
-            ->default()
-            ->availableIn($countryCode)
-            ->first();
+        $countryCode = strtoupper($countryCode);
 
-        if ($default) {
-            return $default;
-        }
-
-        // Fall back to first enabled gateway for the country
-        return PaymentSetting::enabled()
+        $settings = PaymentSetting::enabled()
             ->availableIn($countryCode)
-            ->first();
+            ->get();
+
+        return $this->sortByCountryPriority($settings, $countryCode)->first();
     }
 
     /**
@@ -448,6 +443,8 @@ class PaymentSettingsService
      */
     public function getAvailableGatewaysForCheckout(string $countryCode, ?string $paymentType = null): Collection
     {
+        $countryCode = strtoupper($countryCode);
+
         $query = PaymentSetting::enabled()
             ->availableIn($countryCode);
 
@@ -455,7 +452,36 @@ class PaymentSettingsService
             $query->supporting($paymentType);
         }
 
-        return $query->get();
+        return $this->sortByCountryPriority($query->get(), $countryCode);
+    }
+
+    /**
+     * Sort payment settings by country priority.
+     *
+     * Priority order:
+     * 1. Country-specific + is_default (highest)
+     * 2. Country-specific
+     * 3. Global + is_default
+     * 4. Global (lowest)
+     *
+     * @param  Collection<int, PaymentSetting>  $settings
+     * @return Collection<int, PaymentSetting>
+     */
+    protected function sortByCountryPriority(Collection $settings, string $countryCode): Collection
+    {
+        return $settings->sortBy(function ($setting) use ($countryCode) {
+            $countries = $setting->available_countries ?? [];
+            $isCountrySpecific = ! empty($countries) && in_array($countryCode, $countries);
+            $isDefault = $setting->is_default;
+
+            // Lower number = higher priority
+            return match (true) {
+                $isCountrySpecific && $isDefault => 0,
+                $isCountrySpecific => 1,
+                $isDefault => 2,
+                default => 3,
+            };
+        })->values();
     }
 
     /**
@@ -474,10 +500,14 @@ class PaymentSettingsService
      */
     public function getAvailablePaymentMethods(string $countryCode = 'BR'): array
     {
+        $countryCode = strtoupper($countryCode);
+
         $enabledSettings = PaymentSetting::enabled()
             ->availableIn($countryCode)
-            ->orderByDesc('is_default')
             ->get();
+
+        // Sort by priority: country-specific first, then is_default
+        $enabledSettings = $this->sortByCountryPriority($enabledSettings, $countryCode);
 
         $availableMethods = [];
         $gateways = [];
@@ -485,10 +515,10 @@ class PaymentSettingsService
 
         foreach ($enabledSettings as $setting) {
             foreach ($setting->enabled_payment_types as $paymentType) {
-                // Only add if not already added (first gateway wins - by is_default priority)
+                // Only add if not already added (first gateway wins - by priority order)
                 if (! isset($gateways[$paymentType])) {
                     $availableMethods[] = $paymentType;
-                    $gateways[$paymentType] = $setting->gateway;
+                    $gateways[$paymentType] = $setting->gateway->value;
 
                     // Card payments support recurring
                     if ($paymentType === 'card') {
@@ -519,11 +549,14 @@ class PaymentSettingsService
      */
     public function getEnabledGatewayForMethod(string $paymentMethod, string $countryCode = 'BR'): ?PaymentSetting
     {
-        return PaymentSetting::enabled()
+        $countryCode = strtoupper($countryCode);
+
+        $settings = PaymentSetting::enabled()
             ->availableIn($countryCode)
             ->supporting($paymentMethod)
-            ->orderByDesc('is_default')
-            ->first();
+            ->get();
+
+        return $this->sortByCountryPriority($settings, $countryCode)->first();
     }
 
     /**
@@ -544,7 +577,6 @@ class PaymentSettingsService
      * Alias for getAvailablePaymentMethods with PaymentConfigResource compatibility.
      *
      * @param  string  $countryCode  ISO country code (e.g., 'BR', 'US')
-     * @return \App\Http\Resources\Central\PaymentConfigResource
      */
     public function getPaymentConfig(string $countryCode = 'BR'): \App\Http\Resources\Central\PaymentConfigResource
     {

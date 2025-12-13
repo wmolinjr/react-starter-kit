@@ -1,5 +1,13 @@
 {
     "billing.page.active_bundles": "Pacotes Ativos",
+    "billing.page.billing_cycle": "Ciclo de Cobrança",
+    "billing.page.checkout": "Pagamento",
+    "billing.page.checkout_expired": "Sessão Expirada",
+    "billing.page.checkout_expired_description": "Sua sessão de pagamento expirou. Por favor, inicie o processo novamente.",
+    "billing.page.complete_purchase": "Complete sua compra",
+    "billing.page.continue_to_checkout": "Continuar para Pagamento",
+    "billing.page.payment_successful": "Pagamento Realizado",
+    "billing.page.plan": "Plano",
     "billing.page.active_subscriptions": "Assinaturas Ativas",
     "billing.page.addons": "Add-ons",
     "billing.page.addons_included": "add-ons incluídos",

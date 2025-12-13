@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Central\PlanResource;
 use App\Http\Resources\Central\TenantDetailResource;
 use App\Http\Resources\Central\TenantSummaryResource;
 use App\Models\Central\AddonPurchase;
+use App\Models\Central\PendingSignup;
+use App\Models\Central\Plan;
 use App\Models\Central\Tenant;
 use App\Services\Central\CustomerService;
+use App\Services\Central\PaymentSettingsService;
+use App\Services\Central\SignupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +22,9 @@ use Inertia\Response;
 class TenantController extends Controller
 {
     public function __construct(
-        protected CustomerService $customerService
+        protected CustomerService $customerService,
+        protected SignupService $signupService,
+        protected PaymentSettingsService $paymentSettingsService
     ) {}
 
     /**
@@ -39,18 +46,25 @@ class TenantController extends Controller
 
     /**
      * Show the form for creating a new tenant.
+     * Step 1: Workspace details + Plan selection
      */
     public function create(Request $request): Response
     {
         $customer = $request->user('customer');
 
+        $plans = Plan::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
         return Inertia::render('central/customer/tenants/create', [
             'hasPaymentMethod' => $customer->hasDefaultPaymentMethod(),
+            'plans' => PlanResource::collection($plans),
         ]);
     }
 
     /**
-     * Store a newly created tenant.
+     * Store a newly created tenant (creates PendingSignup and redirects to checkout).
      */
     public function store(Request $request): RedirectResponse
     {
@@ -59,19 +73,114 @@ class TenantController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:63', 'alpha_dash', 'unique:tenants,slug'],
+            'plan_id' => ['required', 'uuid', 'exists:plans,id'],
+            'billing_period' => ['required', 'in:monthly,yearly'],
         ]);
 
-        // Build domain from slug
-        $domain = $validated['slug'].'.'.config('tenancy.central_domains')[0];
+        // Create PendingSignup for existing customer
+        $signup = $this->signupService->createPendingSignupForCustomer($customer);
 
-        $tenant = $this->customerService->createTenant($customer, [
-            'name' => $validated['name'],
-            'slug' => $validated['slug'],
-            'domain' => $domain,
+        // Update with workspace data
+        $this->signupService->updateWorkspace($signup, [
+            'workspace_name' => $validated['name'],
+            'workspace_slug' => $validated['slug'],
+            'business_sector' => 'other',
+            'plan_id' => $validated['plan_id'],
+            'billing_period' => $validated['billing_period'],
         ]);
 
-        return redirect()->route('central.account.tenants.show', $tenant)
-            ->with('status', 'tenant-created');
+        return redirect()->route('central.account.tenants.checkout', $signup);
+    }
+
+    /**
+     * Show checkout page for tenant creation.
+     */
+    public function checkout(Request $request, PendingSignup $signup): Response
+    {
+        $customer = $request->user('customer');
+
+        // Verify ownership
+        if ($signup->customer_id !== $customer->id) {
+            abort(403, 'You do not have access to this signup.');
+        }
+
+        if ($signup->isExpired()) {
+            return Inertia::render('central/customer/tenants/checkout-expired');
+        }
+
+        $signup->load('plan');
+
+        return Inertia::render('central/customer/tenants/checkout', [
+            'signup' => [
+                'id' => $signup->id,
+                'workspace_name' => $signup->workspace_name,
+                'workspace_slug' => $signup->workspace_slug,
+                'billing_period' => $signup->billing_period,
+                'plan' => $signup->plan ? new PlanResource($signup->plan) : null,
+            ],
+            'paymentConfig' => $this->paymentSettingsService->getPaymentConfig(),
+        ]);
+    }
+
+    /**
+     * Process checkout payment.
+     */
+    public function processCheckout(Request $request, PendingSignup $signup): RedirectResponse|JsonResponse
+    {
+        $customer = $request->user('customer');
+
+        // Verify ownership
+        if ($signup->customer_id !== $customer->id) {
+            abort(403, 'You do not have access to this signup.');
+        }
+
+        $validated = $request->validate([
+            'payment_method' => ['required', 'in:card,pix,boleto'],
+        ]);
+
+        try {
+            $result = $this->signupService->processPayment($signup, $validated['payment_method']);
+
+            // Card payment - redirect to Stripe
+            if ($result['type'] === 'redirect') {
+                return redirect()->away($result['url']);
+            }
+
+            // Async payment (PIX/Boleto) - return JSON for frontend handling
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return back()->withErrors(['payment' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Show checkout success page.
+     */
+    public function checkoutSuccess(Request $request, PendingSignup $signup): Response|RedirectResponse
+    {
+        $customer = $request->user('customer');
+
+        // Verify ownership
+        if ($signup->customer_id !== $customer->id) {
+            abort(403, 'You do not have access to this signup.');
+        }
+
+        // If signup is completed, find the tenant and redirect
+        if ($signup->isCompleted()) {
+            $tenant = Tenant::where('slug', $signup->workspace_slug)->first();
+            if ($tenant) {
+                return redirect()->route('central.account.tenants.show', $tenant)
+                    ->with('status', 'tenant-created');
+            }
+        }
+
+        return Inertia::render('central/customer/tenants/checkout-success', [
+            'signup' => [
+                'id' => $signup->id,
+                'workspace_name' => $signup->workspace_name,
+                'status' => $signup->status,
+            ],
+        ]);
     }
 
     /**
