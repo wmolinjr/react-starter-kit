@@ -219,14 +219,14 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                     <>
                                         <ToggleRight className="h-4 w-4" />
                                         {t(
-                                            'admin.payments.settings.actions.switch_to_production'
+                                            'payments.settings.actions.switch_to_production'
                                         )}
                                     </>
                                 ) : (
                                     <>
                                         <ToggleLeft className="h-4 w-4" />
                                         {t(
-                                            'admin.payments.settings.actions.switch_to_sandbox'
+                                            'payments.settings.actions.switch_to_sandbox'
                                         )}
                                     </>
                                 )}
@@ -309,7 +309,7 @@ function PaymentSettingsIndex({ settings, gateways }: Props) {
                                 <AlertTriangle className="h-5 w-5 shrink-0" />
                                 <span className="text-sm">
                                     {t(
-                                        'admin.payments.settings.warnings.no_credentials',
+                                        'payments.settings.warnings.no_credentials',
                                         {
                                             mode: setting.is_sandbox
                                                 ? t('payments.settings.mode.sandbox')

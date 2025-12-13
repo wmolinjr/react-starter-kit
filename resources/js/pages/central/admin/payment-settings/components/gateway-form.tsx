@@ -55,9 +55,9 @@ interface Props {
 }
 
 const PAYMENT_TYPE_LABELS: Record<string, string> = {
-    card: 'admin.payments.settings.payment_types.card',
-    pix: 'admin.payments.settings.payment_types.pix',
-    boleto: 'admin.payments.settings.payment_types.boleto',
+    card: 'payments.settings.payment_types.card',
+    pix: 'payments.settings.payment_types.pix',
+    boleto: 'payments.settings.payment_types.boleto',
 };
 
 const COUNTRY_LABELS: Record<string, string> = {
@@ -148,7 +148,7 @@ export function GatewayForm({ setting }: Props) {
             <div className="space-y-2">
                 <div className="flex items-center gap-2">
                     <Label htmlFor={key}>
-                        {field.label}
+                        {t(field.label)}
                         {field.required && <span className="text-red-500 ml-1">*</span>}
                     </Label>
                     {field.help && (
@@ -158,7 +158,7 @@ export function GatewayForm({ setting }: Props) {
                                     <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p className="max-w-xs">{field.help}</p>
+                                    <p className="max-w-xs">{t(field.help)}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
