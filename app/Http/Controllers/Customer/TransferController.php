@@ -26,7 +26,7 @@ class TransferController extends Controller
 
         $tenant->load(['plan', 'domains']);
 
-        return Inertia::render('customer/transfers/create', [
+        return Inertia::render('central/customer/transfers/create', [
             'tenant' => [
                 'id' => $tenant->id,
                 'name' => $tenant->name,
@@ -80,16 +80,16 @@ class TransferController extends Controller
             ->firstOrFail();
 
         if ($transfer->isExpired()) {
-            return Inertia::render('customer/transfers/expired');
+            return Inertia::render('central/customer/transfers/expired');
         }
 
         if (! $transfer->canBeAccepted()) {
-            return Inertia::render('customer/transfers/invalid', [
+            return Inertia::render('central/customer/transfers/invalid', [
                 'status' => $transfer->status,
             ]);
         }
 
-        return Inertia::render('customer/transfers/accept', [
+        return Inertia::render('central/customer/transfers/accept', [
             'transfer' => [
                 'token' => $transfer->token,
                 'to_email' => $transfer->to_email,

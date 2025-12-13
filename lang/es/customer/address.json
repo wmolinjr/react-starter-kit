@@ -1,0 +1,9 @@
+{
+    "customer.address.city": "Ciudad",
+    "customer.address.country": "País",
+    "customer.address.line1": "Dirección",
+    "customer.address.line2": "Línea 2 de Dirección",
+    "customer.address.phone": "Teléfono",
+    "customer.address.postal_code": "Código Postal",
+    "customer.address.state": "Estado/Provincia"
+}

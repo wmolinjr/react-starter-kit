@@ -1,0 +1,4 @@
+{
+    "customer.account.delete": "Eliminar Cuenta",
+    "customer.account.delete_warning": "Esta acción es irreversible. Todos tus datos serán eliminados permanentemente."
+}

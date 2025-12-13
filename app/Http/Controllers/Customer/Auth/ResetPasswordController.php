@@ -20,7 +20,7 @@ class ResetPasswordController extends Controller
      */
     public function create(Request $request, string $token): Response
     {
-        return Inertia::render('customer/auth/reset-password', [
+        return Inertia::render('central/customer/auth/reset-password', [
             'email' => $request->email,
             'token' => $token,
         ]);

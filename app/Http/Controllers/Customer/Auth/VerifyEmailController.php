@@ -19,7 +19,7 @@ class VerifyEmailController extends Controller
     {
         return $request->user('customer')->hasVerifiedEmail()
             ? redirect()->intended(route('central.account.dashboard'))
-            : Inertia::render('customer/auth/verify-email', [
+            : Inertia::render('central/customer/auth/verify-email', [
                 'status' => session('status'),
             ]);
     }

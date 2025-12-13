@@ -25,7 +25,7 @@ class InvoiceController extends Controller
             ->orderByDesc('created_at')
             ->paginate(20);
 
-        return Inertia::render('customer/invoices/index', [
+        return Inertia::render('central/customer/invoices/index', [
             'invoices' => PaymentResource::collection($payments),
         ]);
     }
@@ -45,7 +45,7 @@ class InvoiceController extends Controller
         // Load relationships
         $invoice->load(['paymentMethod', 'tenant']);
 
-        return Inertia::render('customer/invoices/show', [
+        return Inertia::render('central/customer/invoices/show', [
             'invoice' => [
                 'id' => $invoice->id,
                 'number' => $this->generateInvoiceNumber($invoice),

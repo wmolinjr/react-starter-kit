@@ -6,5 +6,6 @@
     "sidebar.group.general": "General",
     "sidebar.group.marketplace": "Marketplace",
     "sidebar.group.platform": "Platform",
-    "sidebar.group.tenant_management": "Tenant Management"
+    "sidebar.group.tenant_management": "Tenant Management",
+    "sidebar.group.navigation": "Navigation"
 }

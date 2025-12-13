@@ -16,7 +16,7 @@ class ForgotPasswordController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('customer/auth/forgot-password', [
+        return Inertia::render('central/customer/auth/forgot-password', [
             'status' => session('status'),
         ]);
     }

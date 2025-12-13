@@ -1,0 +1,10 @@
+{
+    "customer.billing.address": "Dirección de Facturación",
+    "customer.billing.address_description": "Esta dirección aparecerá en tus facturas.",
+    "customer.billing.description": "Administra la suscripción y facturación de este espacio de trabajo.",
+    "customer.billing.manage": "Administrar Facturación",
+    "customer.billing.monthly": "Facturación Mensual",
+    "customer.billing.portal": "Portal de Facturación",
+    "customer.billing.title": "Facturación",
+    "customer.billing.updated": "Información de facturación actualizada exitosamente."
+}

@@ -30,5 +30,14 @@
     "sidebar.tenant_management": "Gestión de Inquilinos",
     "sidebar.tenants": "Inquilinos",
     "sidebar.usage": "Uso",
-    "sidebar.users": "Usuarios"
+    "sidebar.users": "Usuarios",
+    "sidebar.group.access_control": "Control de Acceso",
+    "sidebar.group.administration": "Administración",
+    "sidebar.group.billing": "Facturación",
+    "sidebar.group.catalog": "Catálogo",
+    "sidebar.group.general": "General",
+    "sidebar.group.marketplace": "Tienda",
+    "sidebar.group.navigation": "Navegación",
+    "sidebar.group.platform": "Plataforma",
+    "sidebar.group.tenant_management": "Gestión de Inquilinos"
 }

@@ -1911,7 +1911,7 @@ export type SettingsTranslationKey =
     | 'settings.yes_delete_all';
 
 /**
- * Sidebar namespace keys (33 keys)
+ * Sidebar namespace keys (34 keys)
  */
 export type SidebarTranslationKey =
     | 'sidebar.group.access_control'
@@ -1920,6 +1920,7 @@ export type SidebarTranslationKey =
     | 'sidebar.group.catalog'
     | 'sidebar.group.general'
     | 'sidebar.group.marketplace'
+    | 'sidebar.group.navigation'
     | 'sidebar.group.platform'
     | 'sidebar.group.tenant_management'
     | 'sidebar.item.active_addons'
@@ -3935,6 +3936,7 @@ export type TranslationKey =
     | 'sidebar.group.catalog'
     | 'sidebar.group.general'
     | 'sidebar.group.marketplace'
+    | 'sidebar.group.navigation'
     | 'sidebar.group.platform'
     | 'sidebar.group.tenant_management'
     | 'sidebar.item.active_addons'

@@ -17,7 +17,7 @@ class LoginController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('customer/auth/login', [
+        return Inertia::render('central/customer/auth/login', [
             'canResetPassword' => true,
             'status' => session('status'),
         ]);

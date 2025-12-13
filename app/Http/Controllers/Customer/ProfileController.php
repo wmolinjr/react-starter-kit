@@ -27,7 +27,7 @@ class ProfileController extends Controller
     {
         $customer = $request->user('customer');
 
-        return Inertia::render('customer/profile/edit', [
+        return Inertia::render('central/customer/profile/edit', [
             'customer' => [
                 'id' => $customer->id,
                 'name' => $customer->name,

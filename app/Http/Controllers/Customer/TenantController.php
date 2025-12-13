@@ -32,7 +32,7 @@ class TenantController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('customer/tenants/index', [
+        return Inertia::render('central/customer/tenants/index', [
             'tenants' => TenantSummaryResource::collection($tenants),
         ]);
     }
@@ -44,7 +44,7 @@ class TenantController extends Controller
     {
         $customer = $request->user('customer');
 
-        return Inertia::render('customer/tenants/create', [
+        return Inertia::render('central/customer/tenants/create', [
             'hasPaymentMethod' => $customer->hasDefaultPaymentMethod(),
         ]);
     }
@@ -86,7 +86,7 @@ class TenantController extends Controller
         // Get subscription info
         $subscription = $tenant->customer?->subscriptionForTenant($tenant);
 
-        return Inertia::render('customer/tenants/show', [
+        return Inertia::render('central/customer/tenants/show', [
             'tenant' => new TenantDetailResource($tenant),
             'subscription' => $subscription ? [
                 'status' => $subscription->stripe_status,
@@ -122,7 +122,7 @@ class TenantController extends Controller
                 'status' => $invoice->status,
             ]);
 
-        return Inertia::render('customer/tenants/billing', [
+        return Inertia::render('central/customer/tenants/billing', [
             'tenant' => [
                 'id' => $tenant->id,
                 'name' => $tenant->name,

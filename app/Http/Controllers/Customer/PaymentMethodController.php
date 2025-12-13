@@ -30,7 +30,7 @@ class PaymentMethodController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return Inertia::render('customer/payment-methods/index', [
+        return Inertia::render('central/customer/payment-methods/index', [
             'paymentMethods' => PaymentMethodResource::collection($paymentMethods),
             'status' => session('status'),
         ]);
@@ -60,7 +60,7 @@ class PaymentMethodController extends Controller
             }
         }
 
-        return Inertia::render('customer/payment-methods/create', [
+        return Inertia::render('central/customer/payment-methods/create', [
             'provider' => $providerName,
             'setupData' => $setupData,
             'supportedTypes' => $this->getSupportedPaymentTypes($providerName),

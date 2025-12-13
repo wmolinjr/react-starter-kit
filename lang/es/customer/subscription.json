@@ -1,0 +1,10 @@
+{
+    "customer.subscription.active": "Suscripciones activas",
+    "customer.subscription.current_plan": "Plan Actual",
+    "customer.subscription.days_remaining": "días restantes",
+    "customer.subscription.no_active": "No hay suscripción activa para este espacio de trabajo.",
+    "customer.subscription.no_plan": "Sin plan",
+    "customer.subscription.per_month": "por mes",
+    "customer.subscription.plan": "Plan",
+    "customer.subscription.title": "Suscripciones"
+}

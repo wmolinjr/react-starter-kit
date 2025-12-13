@@ -30,7 +30,7 @@ class DashboardController extends Controller
             ->where('expires_at', '>', now())
             ->count();
 
-        return Inertia::render('customer/dashboard', [
+        return Inertia::render('central/customer/dashboard', [
             'customer' => [
                 'id' => $customer->id,
                 'name' => $customer->name,

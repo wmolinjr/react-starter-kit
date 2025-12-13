@@ -1,0 +1,18 @@
+{
+    "customer.invoice.amount": "Monto",
+    "customer.invoice.date": "Fecha",
+    "customer.invoice.description": "Descripción",
+    "customer.invoice.details": "Detalles de la Factura",
+    "customer.invoice.download_pdf": "Descargar PDF",
+    "customer.invoice.due_date": "Fecha de Vencimiento",
+    "customer.invoice.from": "De",
+    "customer.invoice.line_items": "Líneas de la Factura",
+    "customer.invoice.no_invoices": "Sin Facturas",
+    "customer.invoice.no_invoices_description": "Tus facturas aparecerán aquí cuando tengas cargos.",
+    "customer.invoice.notes": "Notas",
+    "customer.invoice.number": "Número de Factura",
+    "customer.invoice.quantity": "Cantidad",
+    "customer.invoice.subtotal": "Subtotal",
+    "customer.invoice.title": "Factura",
+    "customer.invoice.total": "Total"
+}

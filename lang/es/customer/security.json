@@ -1,0 +1,5 @@
+{
+    "customer.security.password_updated": "Contraseña actualizada exitosamente.",
+    "customer.security.update_password": "Actualizar Contraseña",
+    "customer.security.update_password_description": "Cambia tu contraseña de acceso."
+}
