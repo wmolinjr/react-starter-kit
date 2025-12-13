@@ -36,6 +36,8 @@ return new class extends Migration
             $table->string('stripe_checkout_session_id')->nullable()->unique();
             $table->string('stripe_payment_intent_id')->nullable();
             $table->string('stripe_invoice_id')->nullable();
+            $table->string('provider_payment_id')->nullable();
+
 
             // Status
             $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
@@ -57,6 +59,7 @@ return new class extends Migration
             // Indexes
             $table->index('status');
             $table->index('purchased_at');
+            $table->index('provider_payment_id');
             $table->index(['valid_from', 'valid_until']);
             $table->index(['tenant_id', 'status']);
         });

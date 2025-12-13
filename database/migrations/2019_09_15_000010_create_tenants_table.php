@@ -22,6 +22,7 @@ class CreateTenantsTable extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('slug')->unique();
+            $table->string('business_sector')->nullable();
             $table->json('data')->nullable(); // Stancl internal keys (tenancy_db_name, etc.)
             $table->json('settings')->nullable();
             $table->string('stripe_id')->nullable()->index();
