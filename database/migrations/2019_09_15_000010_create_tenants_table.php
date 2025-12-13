@@ -26,6 +26,12 @@ class CreateTenantsTable extends Migration
             $table->json('data')->nullable(); // Stancl internal keys (tenancy_db_name, etc.)
             $table->json('settings')->nullable();
             $table->string('stripe_id')->nullable()->index();
+            $table->foreignUuid('customer_id')
+                ->nullable()
+                ->after('id')
+                ->constrained('customers')
+                ->nullOnDelete();
+            $table->string('payment_method_id')->nullable();
             $table->string('pm_type')->nullable();
             $table->string('pm_last_four', 4)->nullable();
             $table->timestamp('trial_ends_at')->nullable();
@@ -51,6 +57,7 @@ class CreateTenantsTable extends Migration
             // Regenerated when plan changes
             $table->json('plan_enabled_permissions')->nullable();
 
+            $table->index('customer_id');
             $table->index('plan_id');
 
             $table->timestamps();
